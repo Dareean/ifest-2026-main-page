@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fdf8fa;
+  color: #1d1b1d;
+  font-family: 'Geist', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.no-shadow {
+  box-shadow: none !important;
+}
+
+* {
+  box-shadow: none !important;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.paper-texture {
+  position: relative;
+}
+
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Riso Canvas Engine with Coarse Grain & Dot Screen */
+.bg-off-white,
+.bg-white,
+.bg-background,
+.bg-surface-container,
+.bg-midnight,
+.riso-canvas {
+  position: relative;
+}
+
+.bg-off-white::before,
+.bg-white::before,
+.bg-background::before,
+.bg-surface-container::before,
+.riso-canvas::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  background-image: 
+    radial-gradient(#04000D 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 16px 16px, auto;
+}
+
+/* Midnight Background also gets a subtle white/magenta grain screen */
+.bg-midnight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.025;
+  background-image: 
+    radial-gradient(#ffffff 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 20px 20px, auto;
+}
+
+/* Ink Bleed Filter Utility */
+.riso-bleed {
+  filter: url(#riso-ink-bleed);
+}
+
+/* 1. TEXT MISREGISTRATION (Chromatically Shifted Plates) */
+.riso-text-shadow-magenta {
+  text-shadow: 2.5px 2px 0px rgba(255, 61, 139, 0.85);
+}
+
+.riso-text-shadow-lime {
+  text-shadow: -2.5px -1.5px 0px rgba(214, 255, 0, 0.9);
+}
+
+.riso-text-shadow-double {
+  text-shadow: 
+    2px 1.5px 0px rgba(255, 61, 139, 0.8),
+    -2px -1.5px 0px rgba(136, 57, 255, 0.8);
+}
+
+.riso-text-shadow-double-dark {
+  text-shadow: 
+    2px 1.5px 0px rgba(255, 61, 139, 0.8),
+    -2.5px -2px 0px rgba(4, 0, 13, 0.95);
+}
+
+/* 2. CARD & BUTTON MISREGISTRATION (Faux Shifted Background Plates) */
+.riso-card-plate {
+  position: relative;
+  background-color: #F5F5F5;
+  border: 1px dashed rgba(4, 0, 13, 0.35);
+  transition: transform 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-card-plate::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-color: var(--plate-color, #FF3D8B); /* Saturated ink plate */
+  border: 1px dashed rgba(4, 0, 13, 0.35);
+  z-index: -1;
+  transform: translate(5px, 4px);
+  border-radius: inherit;
+  transition: transform 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-card-plate:hover {
+  transform: translate(-1.5px, -1px);
+}
+
+.riso-card-plate:hover::after {
+  transform: translate(6.5px, 5px);
+}
+
+.riso-card-plate:active {
+  transform: translate(3px, 2.5px);
+}
+
+.riso-card-plate:active::after {
+  transform: translate(2px, 1.5px);
+}
+
+/* Pill Button Misregistration */
+.riso-btn-plate {
+  position: relative;
+  border: 1px solid #04000D;
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-btn-plate::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-color: var(--plate-color, #D6FF00);
+  border: 1px solid #04000D;
+  z-index: -1;
+  border-radius: inherit;
+  transform: translate(3.5px, 2.5px);
+  transition: transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-btn-plate:hover {
+  transform: translate(-1px, -0.75px);
+}
+
+.riso-btn-plate:hover::after {
+  transform: translate(4.5px, 3.25px);
+}
+
+.riso-btn-plate:active {
+  transform: translate(2.5px, 1.75px);
+}
+
+.riso-btn-plate:active::after {
+  transform: translate(1px, 0.75px);
+}
+
+/* 3. SKETCHY DASHDED/DOUBLE BORDERS & ORGANIC RADII */
+.border-riso-sketchy-lg {
+  border: 1.25px dashed rgba(4, 0, 13, 0.35);
+  border-radius: 32px 28px 34px 29px / 29px 34px 28px 32px;
+}
+
+.border-riso-sketchy-md {
+  border: 1.25px dashed rgba(4, 0, 13, 0.35);
+  border-radius: 24px 20px 26px 22px / 22px 26px 20px 24px;
+}
+
+.border-riso-sketchy-sm {
+  border: 1.25px dashed rgba(4, 0, 13, 0.35);
+  border-radius: 12px 10px 14px 11px / 11px 14px 10px 12px;
+}
+
+.border-riso-double-lg {
+  border: 4px double rgba(4, 0, 13, 0.4);
+  border-radius: 32px 28px 34px 29px / 29px 34px 28px 32px;
+}
+
+.border-riso-double-md {
+  border: 4px double rgba(4, 0, 13, 0.4);
+  border-radius: 24px 20px 26px 22px / 22px 26px 20px 24px;
+}

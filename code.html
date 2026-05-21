@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#1d1b1d",
+                    "surface-tint": "#665971",
+                    "on-tertiary-fixed-variant": "#40493c",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#d1c0dd",
+                    "secondary-container": "#dcdddd",
+                    "tertiary-fixed-dim": "#c0cab8",
+                    "surface-bright": "#fdf8fa",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "background": "#fdf8fa",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "surface-dim": "#ded9db",
+                    "on-secondary": "#ffffff",
+                    "block-pink": "#EFD4D4",
+                    "surface-variant": "#e6e1e3",
+                    "on-error": "#ffffff",
+                    "primary": "#000000",
+                    "secondary-fixed": "#e2e2e2",
+                    "surface": "#fdf8fa",
+                    "on-primary-fixed-variant": "#4e4259",
+                    "error": "#ba1a1a",
+                    "on-surface-variant": "#4a454c",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#5d5f5f",
+                    "tertiary-fixed": "#dce6d3",
+                    "primary-container": "#21172c",
+                    "outline-variant": "#ccc4cc",
+                    "tertiary": "#000000",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#151e12",
+                    "block-mint": "#C8E6CD",
+                    "outline": "#7b757c",
+                    "on-secondary-container": "#5f6161",
+                    "accent-magenta": "#FF3D8B",
+                    "block-lime": "#DCEEB1",
+                    "on-primary-fixed": "#21172c",
+                    "surface-container-high": "#ece7e9",
+                    "surface-container-low": "#f8f2f4",
+                    "tertiary-container": "#151e12",
+                    "inverse-primary": "#d1c0dd",
+                    "block-coral": "#F3C9B6",
+                    "on-tertiary-container": "#7d8777",
+                    "on-primary-container": "#8d7e98",
+                    "inverse-surface": "#323032",
+                    "on-background": "#1d1b1d",
+                    "surface-container-highest": "#e6e1e3",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#eedcf9",
+                    "surface-container": "#f2ecef",
+                    "block-lilac": "#C5B0F4",
+                    "inverse-on-surface": "#f5eff1",
+                    "on-secondary-fixed-variant": "#454747",
+                    "on-primary": "#ffffff",
+                    "midnight": "#04000D",
+                    "lime-bright": "#D6FF00",
+                    "off-white": "#F5F5F5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "8px",
+                    "container-max": "1280px",
+                    "section-gap": "96px",
+                    "sm": "16px",
+                    "lg": "32px",
+                    "xl": "48px",
+                    "unit": "8px",
+                    "md": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "display-xl": ["Geist"],
+                    "caption": ["JetBrains Mono"],
+                    "body-lg": ["Geist"],
+                    "body-md": ["Geist"],
+                    "button": ["Geist"],
+                    "eyebrow": ["JetBrains Mono"],
+                    "mono": ["JetBrains Mono", "monospace"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+                    "display-xl": ["86px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                    "body-lg": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "body-md": ["18px", {"lineHeight": "1.45", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "button": ["18px", {"lineHeight": "1.0", "letterSpacing": "0", "fontWeight": "500"}],
+                    "eyebrow": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            },
+            "animation": {
+                "marquee": "marquee 35s linear infinite",
+                "float": "float 6s ease-in-out infinite",
+            },
+            "keyframes": {
+                "marquee": {
+                    "0%": { transform: "translateX(0%)" },
+                    "100%": { transform: "translateX(-50%)" },
+                },
+                "float": {
+                    "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
+                    "50%": { transform: "translateY(-20px) rotate(5deg)" },
+                }
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fdf8fa;
+            color: #1d1b1d;
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-shadow {
+            box-shadow: none !important;
+        }
+        * {
+            box-shadow: none !important;
+        }
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        [data-reveal].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Raw Paper Noise Overlay */
+        .paper-texture {
+            position: relative;
+        }
+        .paper-texture::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .bg-off-white, .bg-white, .bg-background, .bg-surface-container, .bg-midnight {
+            position: relative;
+        }
+        .bg-off-white::before, .bg-white::before, .bg-background::before, .bg-surface-container::before, .bg-midnight::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-background paper-texture">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-[60] flex justify-between items-center px-6 md:px-lg py-sm bg-background/95 backdrop-blur-sm max-w-container-max mx-auto left-1/2 -translate-x-1/2 border-b border-outline-variant md:border-none">
+<div class="flex items-center gap-3 md:gap-4">
+<img alt="UNTAD" class="h-8 md:h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9JaJvIDLTJQdFS5d5yoFAZhSrpqKx63XEw7xCSKOm74lLtdU7kFK8ry0-Ffl5DbiBue6L4B4xtlUckPSdKjoZyuI7OR1TDF8IBHoZ22Alpy3qSoDMOU4jBsLRryl0OpL6y7dkWz0jqk2e81gapQ2adZ2CA3wQpHL7HM_1GKVHFoQjipIh7lrKUqAnSS95Z7EDvmvaaqbECsPMA-t8NlAdCGaZAYC1BwZfMj6SqvKCFYVX7TSL-GVeaQhcVzHHag4WrtBwMhMl8Y"/>
+<img alt="HMTI" class="h-8 md:h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJQXQNNm9vUDNgESijKQHQ4U9jj90CMt1VQQNobIUggoIV7qe3RWu9pl7xaUtM30XL3nlxN9LXj2m6ZdK3YqXhVubUo-eFJYaN9m5nMPGqVVmq9qytOgHyfsPZrxl3YKRMlCp4pJ1cAFuzOPsMTry9CbeeZonCM9VQZ_xlnfRkZjtdnAUfoQez_mjYwOJUDiolihm56ECyziYVTYkfAeAQLh7wP0b3owa1QqIcYZaporMHHIYGa_lDzufxsDHWj0Z1ZxT-e42LZk"/>
+<img alt="I-FEST" class="h-8 md:h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhnw57bnP_MNSx7W9XMJ7qaxRXVmnex8RLUI13x_Rpl1xN4M7pXCy5pN_ZdOPnIHJTNN4kZSjT9DqzG_ee4l1CDfv44v8r4YlgZSciIPTAE-bXMwsc7jgnuUtS7p16r6Sh2cX5JKDsmjgzh6kEC0nC-x7DpfKeaJ7IZRE5nmVnbATSzj2k_2KAH4AIVzmjl6oj_exmAveMvGzDaZm9qPAKFAmAXmp2B8CsY_frqmD4LafhTT9wt45x5dHwqMVf9bWGHPMYK-whYig"/>
+</div>
+<nav class="hidden md:flex items-center space-x-xl">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 hover:text-accent-magenta transition-colors duration-200 active:scale-95" href="#">Roadshow</a>
+<a class="font-body-md text-body-md text-secondary hover:text-accent-magenta transition-colors duration-200 active:scale-95" href="#">Kompetisi</a>
+<a class="font-body-md text-body-md text-secondary hover:text-accent-magenta transition-colors duration-200 active:scale-95" href="#">Konser</a>
+<a class="font-body-md text-body-md text-secondary hover:text-accent-magenta transition-colors duration-200 active:scale-95" href="#">FAQ</a>
+</nav>
+<div class="flex items-center">
+<button class="bg-primary text-on-primary px-6 md:px-xl py-2 md:py-xs rounded-full font-button text-sm md:text-button hover:bg-accent-magenta transition-colors duration-200 active:scale-95">
+            AMANKAN TIKET
+        </button>
+</div>
+</header>
+<!-- Hero Section: The Symphony Begins -->
+<section class="bg-midnight min-h-[95vh] pt-[100px] md:pt-[120px] relative overflow-hidden flex flex-col justify-center" id="hero">
+<!-- Floating Design Elements -->
+<img alt="" class="absolute top-20 left-10 w-48 md:w-80 opacity-20 mix-blend-multiply animate-float pointer-events-none z-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ3CHt-1R_iMCcnlh58-6OZoKLwYa5lUSmPIWU-c_nIrYib7qgR2Pi3z3GcmPsx---RfNrrzBggzjxIub8LWjXTlXLY9QKliBEoULKCXNqmkXLOdOiIQ_e3eRNOW7VbbQLQ-OPsdudNlozwKibFhQAJ5pHRYdvLmP5Q2DnPOhKX0vjYgjUfix-8xil2zthLn0PxXI-XsEF5Asx_4-400APuDS9KvJfM9bOMiJRtVE7LyqL-zTe9PcVYa13pU7TVgglbRsNR1mXjMA" style="animation-delay: 0s;"/>
+<img alt="" class="absolute bottom-40 right-10 w-56 md:w-96 opacity-20 mix-blend-multiply animate-float pointer-events-none z-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsyDUZ7SJ2IdIYZBqKptdm4AfYvep5T8m6C2f7SuDOXJcoYncGkipBbWFbxhxceV-4_mDaQfPfvS9kD3aOMfyEqltlxE-DnIkZG1T9X1IqEbEy3zil6jezQ1pILBDXb94kait29GleZq9v6q8KIoXsr5dyGmFyQzohOQ_k5Oe9ssYMsQzEjdJZauzwTAuTz2txv7PBh6eCfm2gqRMKeWhvB1BDpr5gfrqKX1oCpO67LbmjbmDGJJUrjxZOP69ERSz2dTEWxdaEFPM" style="animation-delay: -2s;"/>
+<img alt="" class="absolute top-1/2 left-[15%] w-40 md:w-64 opacity-15 mix-blend-multiply animate-float pointer-events-none z-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsbNdM_Laxy_ln6hPMThNLeZo46VBn_iSBzKkIXPIf0KkiIy6uk2tYNqj5rr6-A7o3NDKzE6W_y9cuKZH7RB6yHnpBkqD-DsqURf_ulubbZhG6WajkoRteErAHYE_8pLZGX6EDmPFH8LdCrmKYCWyKoHwPh0uUsvsOtd6IlI2AB48Mcz48oYQ3djsjLU2aJf0TDWlzciO9SfIGTMh6cjIY8sbTNX9wu5y11g9zkjcJKJP9JoJw-UJ5qNSPUG8Xb7yKLk3gaJG_og0" style="animation-delay: -4s;"/>
+<img alt="" class="absolute top-20 right-[20%] w-32 md:w-56 opacity-20 mix-blend-multiply animate-float pointer-events-none z-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4-92NjN70zYJRzxQL6GyqyfQrcuHUUgp7YodSgYKryvpOM6Tr3faXdloY33KFG7GNZgYEDSEi700PjTtxVAX0bbfPlFMFVPVQYUd0MKNq3Jl6h-nIi2bks_j9X0fQX0IZJAfndX3nF1HDRfiayYpx2fIbxgNTufySHqYCvqqRvcRgTgNj-bOqEaSPnS6S4TtJ8sNF2jTrHukkrfgWFqPc6nUTc_LfXKRCWCXifUnWzf_aK9Ed_fc9DWKlFm0pMTQRWMXLP2H_CHo" style="animation-delay: -1s;"/>
+<div class="max-w-container-max mx-auto px-6 md:px-lg w-full py-xl relative z-10">
+<div data-reveal="" id="hero-content">
+<p class="font-mono text-lime-bright text-xs md:text-base tracking-[0.2em] uppercase mb-md">
+                THE BIGGEST IT FESTIVAL IN EASTERN INDONESIA
+            </p>
+<h1 class="font-bold text-lime-bright text-5xl md:text-8xl lg:text-[120px] tracking-tighter leading-[0.9] mb-lg max-w-5xl">
+                DIGITAL SYMPHONY
+            </h1>
+<p class="font-body-md text-base md:text-xl text-off-white max-w-2xl mb-xl leading-relaxed">
+                Mengorkestrasi Inovasi Global untuk Masa Depan Berkelanjutan. HMTI Universitas Tadulako memanggil 8.000+ inovator untuk bergabung dalam revolusi digital terbesar di Sulawesi Tengah.
+            </p>
+<button class="bg-off-white text-midnight px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button hover:bg-lime-bright transition-colors duration-300 active:scale-95">
+                EXPLORE THE SYMPHONY ↓
+            </button>
+</div>
+</div>
+<!-- Marquee -->
+<div class="absolute bottom-0 left-0 w-full bg-midnight border-t border-off-white/20 py-4 md:py-6 overflow-hidden">
+<div class="flex whitespace-nowrap animate-marquee items-center">
+<div class="flex items-center space-x-12 px-6">
+<img alt="Hannah Asa" class="h-6 md:h-10 w-auto brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNkv2nd4oC9evrxjVmiOkoGsdrMgyx1WzIFR8RNd8t-yWV9HI-nei0WOalBBUTc1hiC7pKH0O_obesU7kLqOHztF15mrQzt-8n3miZeyqKA_Epnwd-rG2WJ00QhfmTZlK7tkjPKiXZjnzziuBZQvuRAYcrqSmYeWGt_O9XQb-TWSdQ3WcPJBJai5H3175kPrG0C4kdSc6Xr9yt3_LVKxFPm2se5kZEHmncC9eT_wh-otjtzmHlcre2bU3WiBdW4nX4QjQQqWcqsV0"/>
+<span class="font-mono text-off-white text-sm md:text-lg uppercase tracking-widest">MAIN STRATEGIC PARTNER: HANNAH ASA INDONESIA ✦</span>
+<img alt="Sultan Music" class="h-6 md:h-10 w-auto brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUrrspETTLMK_VWe8VMHGBKJ6bqIsQJ3FkWj5f15jvn5c0yhB9ha8XFj6SDveCWLAAn7dJWPKtWDsFtKkoOwkQRaGLLT_LJDlgAyiX0aiqV8p4JGKTJJkXM7nZKcts1sDujhb-4pqv_Lp1yFsSoQRtIKp-smllKQITUBNB886zrZMdL0MEpRWbEuE56u6RsEeeA65EY0PV3cxhHo_wM_QZ-c6WvZYnZjtSaeTAoJlZKq-DpKLj4fnbLb0gZKC_mMq2DiGIQdc8cKg"/>
+<span class="font-mono text-off-white text-sm md:text-lg uppercase tracking-widest">STRATEGIC PARTNER: SULTAN MUSIC ✦</span>
+</div>
+<div class="flex items-center space-x-12 px-6">
+<img alt="Hannah Asa" class="h-6 md:h-10 w-auto brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNkv2nd4oC9evrxjVmiOkoGsdrMgyx1WzIFR8RNd8t-yWV9HI-nei0WOalBBUTc1hiC7pKH0O_obesU7kLqOHztF15mrQzt-8n3miZeyqKA_Epnwd-rG2WJ00QhfmTZlK7tkjPKiXZjnzziuBZQvuRAYcrqSmYeWGt_O9XQb-TWSdQ3WcPJBJai5H3175kPrG0C4kdSc6Xr9yt3_LVKxFPm2se5kZEHmncC9eT_wh-otjtzmHlcre2bU3WiBdW4nX4QjQQqWcqsV0"/>
+<span class="font-mono text-off-white text-sm md:text-lg uppercase tracking-widest">MAIN STRATEGIC PARTNER: HANNAH ASA INDONESIA ✦</span>
+<img alt="Sultan Music" class="h-6 md:h-10 w-auto brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUrrspETTLMK_VWe8VMHGBKJ6bqIsQJ3FkWj5f15jvn5c0yhB9ha8XFj6SDveCWLAAn7dJWPKtWDsFtKkoOwkQRaGLLT_LJDlgAyiX0aiqV8p4JGKTJJkXM7nZKcts1sDujhb-4pqv_Lp1yFsSoQRtIKp-smllKQITUBNB886zrZMdL0MEpRWbEuE56u6RsEeeA65EY0PV3cxhHo_wM_QZ-c6WvZYnZjtSaeTAoJlZKq-DpKLj4fnbLb0gZKC_mMq2DiGIQdc8cKg"/>
+<span class="font-mono text-off-white text-sm md:text-lg uppercase tracking-widest">STRATEGIC PARTNER: SULTAN MUSIC ✦</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Summary Section -->
+<section class="bg-off-white py-[64px] md:py-[96px] px-6 md:px-lg" data-reveal="">
+<div class="max-w-container-max mx-auto text-center">
+<h2 class="font-bold text-3xl md:text-4xl text-midnight tracking-tighter mb-lg">
+            Bukan Sekadar Festival. Ini Adalah Episentrum Perubahan.
+        </h2>
+<p class="font-body-lg text-base md:text-lg text-midnight max-w-3xl mx-auto leading-relaxed">
+            Disrupsi kecerdasan buatan dan teknologi bergerak lebih cepat dari sebelumnya. I-FEST 2026 hadir untuk menjembatani digital divide, mempertemukan talenta akar rumput dengan standar industri nasional. Dari ruang kelas pedalaman hingga panggung konser raksasa, mari ciptakan resonansi yang nyata.
+        </p>
+</div>
+</section>
+<!-- Phase 01 -->
+<section class="bg-off-white py-12 md:py-[96px] px-4 md:px-lg" data-reveal="">
+<div class="max-w-container-max mx-auto">
+<div class="bg-lime-bright rounded-[24px] md:rounded-[32px] p-8 md:p-[64px] text-midnight">
+<p class="font-mono text-xs md:text-sm uppercase tracking-widest">
+                PHASE 01: INCLUSIVITY
+            </p>
+<h2 class="font-bold text-2xl md:text-3xl tracking-tight mt-4">
+                Inklusi Tanpa Batas. Menyentuh yang Tak Tersentuh.
+            </h2>
+<p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed">
+                Berkolaborasi dengan Hannah Asa Indonesia, Digital Symphony Tour bergerak menuju 25 titik. Kami membawa literasi siber, AI, dan aksesibilitas teknologi ke sekolah umum, SLB, dan desa-desa terpencil di Palu, Sigi, dan Donggala. Karena teknologi adalah hak semua orang.
+            </p>
+<div class="mt-12 pt-6 border-t border-black/10 font-mono text-xs md:text-sm uppercase">
+                25 TITIK ROADSHOW | 2.500+ PELAJAR
+            </div>
+</div>
+</div>
+</section>
+<!-- Phase 02 -->
+<section class="bg-off-white py-12 md:py-[96px] px-4 md:px-lg" data-reveal="">
+<div class="max-w-container-max mx-auto">
+<div class="bg-[#D86BFF] rounded-[24px] md:rounded-[32px] p-8 md:p-[64px] text-midnight">
+<p class="font-mono text-xs md:text-sm uppercase tracking-widest">
+                PHASE 02: INCUBATION
+            </p>
+<h2 class="font-bold text-2xl md:text-3xl tracking-tight mt-4">
+                Arena Pembuktian Talenta Digital.
+            </h2>
+<p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed">
+                Waktunya membawa ide Anda ke permukaan. Berkompetisilah di tingkat nasional dalam UI/UX Design, Competitive Programming, dan Business Plan. Khusus untuk inovator lokal, Sulteng Digital Innovation Hub (S-DIH) Hackathon menanti solusi nyata Anda untuk masalah Agri-Tech dan Fin-Tech daerah.
+            </p>
+<div class="mt-12">
+<button class="bg-midnight text-off-white px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button hover:bg-opacity-90 transition-all duration-300 active:scale-95">
+                    DOWNLOAD RULEBOOK LOMBA
+                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Phase 03 -->
+<section class="bg-off-white py-12 md:py-[96px] px-4 md:px-lg" data-reveal="">
+<div class="max-w-container-max mx-auto">
+<div class="bg-[#8839FF] rounded-[24px] md:rounded-[32px] p-8 md:p-[64px] text-off-white">
+<p class="font-mono text-xs md:text-sm uppercase tracking-widest text-lime-bright">
+                PHASE 03: HARMONY
+            </p>
+<h2 class="font-bold text-3xl md:text-4xl tracking-tight mt-4">
+                Akhir Sebuah Simfoni. Bersama TULUS.
+            </h2>
+<p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed opacity-90">
+                Tiga hari puncak yang tak akan terlupakan. Jelajahi etalase inovasi di Expo UMKM, serap inspirasi dari panggung TEDx, dan rayakan puncak orkestrasi digital ini bersama 8.000 suara lainnya dalam Grand Closing Concert bersama solois terbaik tanah air, TULUS.
+            </p>
+<div class="mt-12">
+<button class="bg-lime-bright text-midnight px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button hover:bg-opacity-90 transition-all duration-300 active:scale-95">
+                    BELI TIKET KONSER (SOON)
+                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Canvas Area -->
+<main class="py-[64px] md:py-section-gap min-h-screen px-6 md:px-lg max-w-container-max mx-auto">
+<section class="w-full flex flex-col items-center justify-center text-center py-xl" data-reveal="">
+<span class="font-eyebrow text-sm md:text-eyebrow text-accent-magenta mb-sm uppercase tracking-widest">Digital Arts &amp; Future Music</span>
+<h2 class="font-display-xl text-4xl md:text-display-xl text-primary max-w-4xl mb-lg leading-tight">
+            Vibrant. Intellectual. <br class="hidden md:block"/> Celebratory.
+        </h2>
+<p class="font-body-lg text-base md:text-body-lg text-secondary max-w-2xl mb-xl">
+            A digital tribute to the raw energy of Risograph print culture. Join the intellectual movement at I-FEST 2026.
+        </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-lg w-full mt-12 md:mt-section-gap">
+<div class="bg-block-lilac aspect-square rounded-[24px] md:rounded-[32px] p-8 md:p-xl flex flex-col justify-end group cursor-pointer transition-transform duration-300 hover:-rotate-2">
+<span class="material-symbols-outlined text-4xl mb-md">brush</span>
+<h3 class="font-headline-lg text-xl md:text-headline-lg text-primary">MAIN STRATEGIC PARTNER</h3>
+</div>
+<div class="bg-block-mint aspect-square rounded-[24px] md:rounded-[32px] p-8 md:p-xl flex flex-col justify-end group cursor-pointer transition-transform duration-300 hover:rotate-1">
+<span class="material-symbols-outlined text-4xl mb-md">stadium</span>
+<h3 class="font-headline-lg text-xl md:text-headline-lg text-primary">STRATEGIC PARTNER</h3>
+</div>
+<div class="bg-block-coral aspect-square rounded-[24px] md:rounded-[32px] p-8 md:p-xl flex flex-col justify-end group cursor-pointer transition-transform duration-300 hover:rotate-2">
+<span class="material-symbols-outlined text-4xl mb-md">auto_awesome</span>
+<h3 class="font-headline-lg text-xl md:text-headline-lg text-primary">Exhibition</h3>
+</div>
+</div>
+</section>
+<div class="h-16 md:h-section-gap"></div>
+<section class="bg-surface-container rounded-[24px] md:rounded-[32px] p-8 md:p-xl mb-12 md:mb-section-gap" data-reveal="">
+<div class="flex flex-col md:flex-row gap-8 md:gap-xl items-center">
+<div class="flex-1">
+<h2 class="font-display-lg text-4xl md:text-display-lg text-primary mb-md leading-tight">Curating the <span class="text-accent-magenta italic">Unexpected</span></h2>
+<p class="font-body-md text-base md:text-body-md text-secondary">
+                    Our 2026 theme explores the intersection of algorithmic precision and human error, mimicking the tactile imperfections of ink on paper.
+                </p>
+</div>
+<div class="w-full md:w-1/3 bg-white rounded-[24px] p-6 md:p-lg border border-outline-variant">
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
+<span class="font-caption text-caption text-secondary">DATE</span>
+<span class="font-body-md text-body-md font-bold text-primary">12-14 OCT</span>
+</div>
+<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
+<span class="font-caption text-caption text-secondary">VENUE</span>
+<span class="font-body-md text-body-md font-bold text-primary">PALU, SULTENG</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-caption text-caption text-secondary">STATUS</span>
+<span class="inline-flex items-center px-xs py-[2px] bg-block-lime rounded-full font-eyebrow text-[10px] text-on-surface">EARLY BIRD</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- THE ALLIANCE Section -->
+<section class="bg-off-white py-24 px-8 md:px-16" data-reveal="">
+<div class="max-w-container-max mx-auto">
+<!-- Header -->
+<div class="mb-16">
+<p class="font-mono text-midnight text-xs md:text-sm uppercase tracking-widest mb-4">
+                THE ALLIANCE &amp; ECOSYSTEM
+            </p>
+<h2 class="font-bold text-4xl md:text-5xl tracking-tighter text-midnight">
+                Ekosistem Kolaborasi.
+            </h2>
+</div>
+<!-- Tier: ORGANIZED BY -->
+<div class="mb-16">
+<p class="font-mono text-xs text-midnight uppercase tracking-widest mb-10 text-center md:text-left">✦ ORGANIZED BY ✦</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center justify-items-center">
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200">
+<img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9JaJvIDLTJQdFS5d5yoFAZhSrpqKx63XEw7xCSKOm74lLtdU7kFK8ry0-Ffl5DbiBue6L4B4xtlUckPSdKjoZyuI7OR1TDF8IBHoZ22Alpy3qSoDMOU4jBsLRryl0OpL6y7dkWz0jqk2e81gapQ2adZ2CA3wQpHL7HM_1GKVHFoQjipIh7lrKUqAnSS95Z7EDvmvaaqbECsPMA-t8NlAdCGaZAYC1BwZfMj6SqvKCFYVX7TSL-GVeaQhcVzHHag4WrtBwMhMl8Y"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200">
+<img alt="HMTI Logo" class="max-h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJQXQNNm9vUDNgESijKQHQ4U9jj90CMt1VQQNobIUggoIV7qe3RWu9pl7xaUtM30XL3nlxN9LXj2m6ZdK3YqXhVubUo-eFJYaN9m5nMPGqVVmq9qytOgHyfsPZrxl3YKRMlCp4pJ1cAFuzOPsMTry9CbeeZonCM9VQZ_xlnfRkZjtdnAUfoQez_mjYwOJUDiolihm56ECyziYVTYkfAeAQLh7wP0b3owa1QqIcYZaporMHHIYGa_lDzufxsDHWj0Z1ZxT-e42LZk"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200">
+<img alt="I-FEST 2026 Logo" class="max-h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhnw57bnP_MNSx7W9XMJ7qaxRXVmnex8RLUI13x_Rpl1xN4M7pXCy5pN_ZdOPnIHJTNN4kZSjT9DqzG_ee4l1CDfv44v8r4YlgZSciIPTAE-bXMwsc7jgnuUtS7p16r6Sh2cX5JKDsmjgzh6kEC0nC-x7DpfKeaJ7IZRE5nmVnbATSzj2k_2KAH4AIVzmjl6oj_exmAveMvGzDaZm9qPAKFAmAXmp2B8CsY_frqmD4LafhTT9wt45x5dHwqMVf9bWGHPMYK-whYig"/>
+</div>
+</div>
+</div>
+<div class="border-b border-midnight/10 mb-16"></div>
+<!-- Tier 1: Main Strategic Partner -->
+<div class="border border-midnight p-8 md:p-12 mb-12 opacity-70 hover:opacity-100 transition-opacity duration-200">
+<p class="font-mono text-xs text-accent-magenta uppercase tracking-widest mb-8">✦ MAIN STRATEGIC PARTNER ✦</p>
+<div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
+<div class="w-full md:w-1/2">
+<img alt="Hannah Asa Indonesia" class="w-full max-w-[400px] h-auto object-contain mx-auto md:mx-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNkv2nd4oC9evrxjVmiOkoGsdrMgyx1WzIFR8RNd8t-yWV9HI-nei0WOalBBUTc1hiC7pKH0O_obesU7kLqOHztF15mrQzt-8n3miZeyqKA_Epnwd-rG2WJ00QhfmTZlK7tkjPKiXZjnzziuBZQvuRAYcrqSmYeWGt_O9XQb-TWSdQ3WcPJBJai5H3175kPrG0C4kdSc6Xr9yt3_LVKxFPm2se5kZEHmncC9eT_wh-otjtzmHlcre2bU3WiBdW4nX4QjQQqWcqsV0"/>
+</div>
+<div class="w-full md:w-1/2 text-midnight">
+<p class="font-body-lg text-lg leading-relaxed">
+                        Official partner mengawal eskalasi lobi pendanaan Tier-1 dan kurikulum 25 Titik Roadshow Inklusif.
+                    </p>
+</div>
+</div>
+</div>
+<div class="border-t border-midnight/10 mb-12"></div>
+<!-- Tier 2: Strategic Partner -->
+<div class="mb-12 opacity-70 hover:opacity-100 transition-opacity duration-200">
+<p class="font-mono text-xs text-[#8839FF] uppercase tracking-widest mb-8">✦ STRATEGIC PARTNER ✦</p>
+<div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
+<div class="w-full md:w-1/3">
+<img alt="Sultan Music" class="w-48 h-48 md:w-64 md:h-64 object-contain mx-auto md:mx-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUrrspETTLMK_VWe8VMHGBKJ6bqIsQJ3FkWj5f15jvn5c0yhB9ha8XFj6SDveCWLAAn7dJWPKtWDsFtKkoOwkQRaGLLT_LJDlgAyiX0aiqV8p4JGKTJJkXM7nZKcts1sDujhb-4pqv_Lp1yFsSoQRtIKp-smllKQITUBNB886zrZMdL0MEpRWbEuE56u6RsEeeA65EY0PV3cxhHo_wM_QZ-c6WvZYnZjtSaeTAoJlZKq-DpKLj4fnbLb0gZKC_mMq2DiGIQdc8cKg"/>
+</div>
+<div class="w-full md:w-2/3 text-midnight">
+<p class="font-body-md text-lg leading-relaxed max-w-xl">
+                        Official Production &amp; Vendor partner menjamin mutu infrastruktur panggung dan malam puncak acara.
+                    </p>
+</div>
+</div>
+</div>
+<div class="border-t border-midnight/10 mb-12"></div>
+<!-- Tier 3: Media Partner Network -->
+<div class="">
+<p class="font-mono text-xs text-midnight uppercase tracking-widest mb-12">✦ OFFICIAL MEDIA PARTNERS ✦</p>
+<div class="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12 items-center">
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="INFOCAMABA" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIf-XLJV5wgWKn8sUJTTcyBYXK2PGL8ZQciBfNDe03Z083GYHDM7BQYp73OxcC1yutGYbHcNTR1xpxJnsVpyq-tzRuHTVx1FxtUB3G-Lrp_qcP2iakrLg7VBeglCAa-mBafQzqQhU99Wp8JVBCAVREpxYx7vuJvzc1mggFB8q8W0r3b7k9ZASJIUmZJhxlQ1-0FSto44H7k1vOPgaeic4Ixa2SOQVyuYY3rR9SUDr1Qu8ygLRrLen7ZvPvspe0O9CnElStEq_Z9E8"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="LPM HITAM PUTIH" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcothA9N53EkGWftGiwlG1tRxOlGNXpNrs81LVSoHH04A5VGTQ8Qe_TI4M8Sq-kuvBTYnGotM4zpx_CxoEZE01Llu-aPcQyaT-mm-HC_U2TPI0M-W8PpViji7i0desas0ps_BTenZPMDTxNzLJvY29OJh76pUxVJxmMZXs9GsEciy_gLj5tRcfB_Br9ye9s9cMCRtHKqOc9NI8A64xqL6DA0SBGMDhJG_yg73GimR7M3fKWee_ar3x7_hH6OVYOfi7PUQ4Fr4G3bY"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="LPM NASEHA" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAve6O_dmxzzxUcMU4FjmI3GifnRum7pdq4WC1pm3pU8BgcRdEaCfCZadW8L69KbhLA7MZfL3tYdmPjF_iGLhX2NU-GMlykBjwIDfFCNkdQ0NiYFJiJt5-p-LUVOA9M6x5sTeBxOvFh1GyFqyVe89EaHEzBd--XkctDFewRlk_x1RRA-MTdEVjarxGrkMYl7pESLr9sp_f_Ho2AKHXsHdP35oA_6GPSccwksfTh7Gu5E8uNh-Fyg85h5FVTRYiZUsZgaxwgHQidht8"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="HIMA - SI UIN" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3cHBLGWF4rY4QWMe4L6XGJFzOhyEAF0SIFjpBNnyYCXrMFQpV5puefod00-4JXzoqc7PxvKg5rRG2kiqZwin0djPfSnSCFIf-GzHZHRv1Aqkmh52fyJBUAkOqkpGt5V8ReNZBDZ8BRdgsDBAfNirkZO1yfHEq990y8VnytlsYfmvlDgwg8wcapt4xKUvFUTT5Wl6OPaVezbSJCWkbccKHItOw0fwf_4thb2PNmseoB7Q7cZdVmDb77FAz1tQEjkPp9PaeCTmuM4Y"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="PROGRAMMING TADULAKO" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiKzbW28GT4Pd03b8iUoWBAxOzi4aS9TSgVcQI4ivq9D-SIWiO8LXVz6xsTJxjdF7D3c_GU88hBh4smdn16XclTrxUwS9R382hou6ZcZ0IMf_BsgaEbSWbjNP-aRMPoBMmGkhmGp-BBM03GgGRBlAfG2LZ1JBFn9gVN8ZS7YnusU4PPaqoiNA_KssiXh2ncmWB8wjHVtFsfamgz25j3onLQSSIoSo-eriz7XGzcA24lr_B8tfhcZhoKzE_iD-BZ6xnucqOT9mlrKE"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="HMPTI UNISA PALU" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfZn62f3J8jrzOal8aHzjvDeSBoRsBdZHGk_ALmmnrmuE-IvF6b4xCiDjHmPjgvzr8FmHUhLdq9NDiZztJ09nzFAWCbUrEzyrzhQpHmbcDhauV7uJ7EpUUes4KRFASkRVZtwYGWhuoSjYEZtZ9KILGt8F_uBdkx3esA3VINtvdcb40RKwwbg6YY4FxGhfj-Ir889KXVI5tYME_1Pb_RKnduBRNLIjgEXY9Ow7jIh7HS0xQFMbAxHFlcGksS6Icv8U8is99yGQQ1b0"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="HMPSI STMIK ADHI GUNA" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWY6FxbJ9de2HFiGlfjewW-7uNdU1C9lazWYLYD7CPHbTDnQKAshoL9GyVi64dZRWqGNP0diPdhKNzCohkR8yD3h7Xeo_EuX73iArImeUz7Tsv75XgZuTzbo8A1bVsJL6u1T7VZyWUdJ_qodpjAYfGO1ADAoCEAFLhmn1pSWIzgysj60lfPgHEyP09ihx2sZSwZGN-1FO8NKePG9JMPCxAJF3oZFPXiAc2ndpL8kLdLkBpqI5-gf9VBpBmN5TRKo2yzjhmftzH0Uo"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="ANIMEDIA TADULAKO" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALFVO-gNEslqXoiO96G7ghTETMWpLP-rxVRcPUezJ7FupdVcaYZ1IEAJcQnRiTouHm1J5t3nY5II3Y7Y05MVd94jlzqSt8uwMjpBnE6IzqI-1GTcxfo-DfGKOaFOsGBFPNbPoiam3Mt_ErN7nqUbQHGhu6Ei-6BgCRdhHyNAoJ9xDUhYh3Ag_9y2X2QJVZgjQo97uU5wgCpslsGW-57xgkAsYX6PPc7fl1jbF_yq9kT1FZRbonKApCJpiVcaTyOfeQV4-mGnrX7e4"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="PERMIKOMNAS" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4KcQLddXx8hCAvtaSggdSjF2Y1jC9ckym5twJieqeVM-uYe9kOfPlW9zEN17MVEUTPBNSKJAqV6jcKNZVG_AcpS_YiT3--IwcbuqjuKjZwE41DM9dk_bPuMcxZ3bnqFACE_ZMtc17LILHCVcGm1TG4QetUXTPK7KnWOrNPQ_5SQInyACnwygwVDpZbIeK_NJI2UGtxv-Y1NPk1dBhsQJAJ-RinNHuAZr0V7aQdkKko1VyzoePQbwNrxsnoQxTjhvd0dOr7uCVt74"/>
+</div>
+<div class="opacity-70 hover:opacity-100 transition-opacity duration-200 flex justify-center">
+<img alt="HIMATIF UIN" class="max-h-24 md:max-h-32 w-auto object-contain grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUmO_GdXBWWJZIgSyat26CfAA2LvhyxK3s64KxOXhWDuTivr63MYeePiXlkk3qWvV-_1yNzi6BiUFSwy7qYxxOT-Z92Ey3FGu118Uorb6MBxOO0du_pPRw7g9vkl9EFh2xq5F5lBs_qumlxJAFr9vqH2Bnd2SdJYww81nZ_D0B41l40rSceb-KQkeMsrPgmEt30Lp6xmw-0LMiFaWLUq5Mm77jCVjKtim6EMi03O4IrBWbJywIFad527DwCtuUKeUSWZMlsajezF8"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<footer class="w-full bg-midnight text-off-white py-16 px-6 md:px-lg border-t border-off-white/10 relative">
+<div class="max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<span class="font-headline-lg text-3xl font-bold text-lime-bright">I-FEST 2026</span>
+<p class="font-body-md text-sm md:text-base opacity-80 uppercase tracking-wider font-mono">
+                        ORGANIZED BY HMTI UNIVERSITAS TADULAKO
+                    </p>
+</div>
+<!-- Institutional Logos Footer -->
+<div class="flex gap-6 items-center brightness-0 invert opacity-60">
+<img alt="UNTAD" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9JaJvIDLTJQdFS5d5yoFAZhSrpqKx63XEw7xCSKOm74lLtdU7kFK8ry0-Ffl5DbiBue6L4B4xtlUckPSdKjoZyuI7OR1TDF8IBHoZ22Alpy3qSoDMOU4jBsLRryl0OpL6y7dkWz0jqk2e81gapQ2adZ2CA3wQpHL7HM_1GKVHFoQjipIh7lrKUqAnSS95Z7EDvmvaaqbECsPMA-t8NlAdCGaZAYC1BwZfMj6SqvKCFYVX7TSL-GVeaQhcVzHHag4WrtBwMhMl8Y"/>
+<img alt="HMTI" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJQXQNNm9vUDNgESijKQHQ4U9jj90CMt1VQQNobIUggoIV7qe3RWu9pl7xaUtM30XL3nlxN9LXj2m6ZdK3YqXhVubUo-eFJYaN9m5nMPGqVVmq9qytOgHyfsPZrxl3YKRMlCp4pJ1cAFuzOPsMTry9CbeeZonCM9VQZ_xlnfRkZjtdnAUfoQez_mjYwOJUDiolihm56ECyziYVTYkfAeAQLh7wP0b3owa1QqIcYZaporMHHIYGa_lDzufxsDHWj0Z1ZxT-e42LZk"/>
+<img alt="Cabinet" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGOO9Q0mjYc0H7aYPw3OmVq2D6_4YW65cNu_CCvDESeqbTs_coMrgaJ_KCfhxzjtQ3Bvqa67E6HCknZa8iPNcMb9zQZH8l81TIhJcDJmpYc9d6pFBMBjPdzUyZmbOIed-ho30XBdUc47mRF4whIXg3N5BE68gC8dUsANghJXqFpHgF9-hbiorFCmClyn3Y4O4y0NWEqm6DXHkapQitfCm0XzLijjz0M5OD_LaS-thSzF_i4Klvhxgf3Q3DdZGBO8pEOOE-yADwxNg"/>
+</div>
+<div class="flex gap-6 mt-4">
+<a class="text-xs font-mono uppercase tracking-widest hover:text-lime-bright transition-colors" href="#">Instagram</a>
+<a class="text-xs font-mono uppercase tracking-widest hover:text-lime-bright transition-colors" href="#">RINOYA</a>
+<a class="text-xs font-mono uppercase tracking-widest hover:text-lime-bright transition-colors" href="#">Contact</a>
+</div>
+</div>
+<div class="flex flex-col md:items-end md:text-right gap-4">
+<p class="font-body-md text-sm md:text-base opacity-80">
+                    Ingin menjadi bagian dari simfoni ini?
+                </p>
+<p class="font-headline-lg text-lg md:text-xl font-medium">
+                    Sponsorship &amp; Kemitraan: <br class="md:hidden"/>
+<span class="text-lime-bright">Fauzi (+62 821-9543-2152)</span>
+</p>
+<p class="font-caption text-[10px] opacity-40 mt-8">
+                    © 2026 I-FEST. All rights reserved. Orchestrated with passion in Central Sulawesi.
+                </p>
+</div>
+</div>
+</div>
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Intersection Observer for scroll animations
+        const revealElements = document.querySelectorAll('[data-reveal]');
+        
+        const revealCallback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Once animated, we can stop observing it
+                    observer.unobserve(entry.target);
+                }
+            });
+        };
+
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(revealCallback, observerOptions);
+
+        revealElements.forEach(el => {
+            observer.observe(el);
+        });
+
+        // Click micro-interactions
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.transform = 'scale(0.96)';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.transform = 'scale(1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+</script>
+</body></html>
