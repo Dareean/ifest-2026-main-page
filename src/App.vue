@@ -3,6 +3,58 @@ import { onBeforeUnmount, onMounted } from 'vue'
 
 let observer = null
 
+const visualAssetModules = import.meta.glob('./assets/visual_assets/*', {
+  eager: true,
+  import: 'default',
+})
+
+const mediaPartnerAssetModules = import.meta.glob('./assets/medpart/*', {
+  eager: true,
+  import: 'default',
+})
+
+const getAsset = (assetModules, folder, fileName) => assetModules[`./assets/${folder}/${fileName}`] ?? ''
+
+const heroDecorations = [
+  {
+    src: getAsset(visualAssetModules, 'visual_assets', 'Component 1.png'),
+    alt: 'Abstract visual asset',
+    className: 'absolute top-24 -left-12 md:-left-4 lg:left-6 w-48 md:w-80 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    delay: '0s',
+  },
+  {
+    src: getAsset(visualAssetModules, 'visual_assets', 'rb1 1.png'),
+    alt: 'Abstract visual asset',
+    className: 'absolute bottom-40 -right-12 md:right-6 w-56 md:w-96 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    delay: '-2s',
+  },
+  {
+    src: getAsset(visualAssetModules, 'visual_assets', 'ry1 1.png'),
+    alt: 'Abstract visual asset',
+    className: 'absolute bottom-32 -left-12 md:left-[5%] lg:left-[10%] w-40 md:w-64 opacity-70 md:opacity-80 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    delay: '-4s',
+  },
+  {
+    src: getAsset(visualAssetModules, 'visual_assets', 'cat1 1.png'),
+    alt: 'Abstract visual asset',
+    className: 'absolute top-24 -right-12 md:right-[10%] lg:right-[16%] w-32 md:w-56 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    delay: '-1s',
+  },
+]
+
+const mediaPartners = [
+  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.png') },
+  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.png') },
+  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.JPG') },
+  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.png') },
+  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.png') },
+  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.png') },
+  { name: 'HMPSI STMIK ADHI GUNA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(7) HMPSI STMIK Adhi Guna Palu (1) (1).png') },
+  { name: 'ANIMEDIA TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(8) Animedia Tadulako.png') },
+  { name: 'PERMIKOMNAS WILAYAH X', src: getAsset(mediaPartnerAssetModules, 'medpart', '(9) Permikomnas Wilayah X.png') },
+  { name: 'HIMATIF UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(10) HIMATIF UIN.jpeg') },
+]
+
 onMounted(() => {
   const revealElements = document.querySelectorAll('[data-reveal]')
 
@@ -95,16 +147,20 @@ onBeforeUnmount(() => {
     </header>
 
     <!-- SECTION B: Hero Section (Tactile Colored Paper Canvas) -->
-    <section id="hero" class="bg-off-white riso-canvas min-h-[95vh] pt-[120px] md:pt-[140px] relative overflow-hidden flex flex-col justify-center border-b border-dashed border-[#04000D]/30">
+    <section id="hero" class="bg-off-white riso-canvas min-h-[95vh] pt-[120px] md:pt-[140px] pb-[100px] relative overflow-hidden flex flex-col justify-center border-b border-dashed border-[#04000D]/30">
       
       <!-- Layered, Floating 3D Assets (Stamps Bleeding Into The Colored Paper Fibers) -->
-      <img alt="3D Element" class="absolute top-24 left-6 w-48 md:w-80 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ3CHt-1R_iMCcnlh58-6OZoKLwYa5lUSmPIWU-c_nIrYib7qgR2Pi3z3GcmPsx---RfNrrzBggzjxIub8LWjXTlXLY9QKliBEoULKCXNqmkXLOdOiIQ_e3eRNOW7VbbQLQ-OPsdudNlozwKibFhQAJ5pHRYdvLmP5Q2DnPOhKX0vjYgjUfix-8xil2zthLn0PxXI-XsEF5Asx_4-400APuDS9KvJfM9bOMiJRtVE7LyqL-zTe9PcVYa13pU7TVgglbRsNR1mXjMA" style="animation-delay: 0s;" />
-      <img alt="3D Element" class="absolute bottom-36 right-6 w-56 md:w-96 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsyDUZ7SJ2IdIYZBqKptdm4AfYvep5T8m6C2f7SuDOXJcoYncGkipBbWFbxhxceV-4_mDaQfPfvS9kD3aOMfyEqltlxE-DnIkZG1T9X1IqEbEy3zil6jezQ1pILBDXb94kait29GleZq9v6q8KIoXsr5dyGmFyQzohOQ_k5Oe9ssYMsQzEjdJZauzwTAuTz2txv7PBh6eCfm2gqRMKeWhvB1BDpr5gfrqKX1oCpO67LbmjbmDGJJUrjxZOP69ERSz2dTEWxdaEFPM" style="animation-delay: -2s;" />
-      <img alt="3D Element" class="absolute top-1/2 left-[12%] w-40 md:w-64 opacity-70 md:opacity-80 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsbNdM_Laxy_ln6hPMThNLeZo46VBn_iSBzKkIXPIf0KkiIy6uk2tYNqj5rr6-A7o3NDKzE6W_y9cuKZH7RB6yHnpBkqD-DsqURf_ulubbZhG6WajkoRteErAHYE_8pLZGX6EDmPFH8LdCrmKYCWyKoHwPh0uUsvsOtd6IlI2AB48Mcz48oYQ3djsjLU2aJf0TDWlzciO9SfIGTMh6cjIY8sbTNX9wu5y11g9zkjcJKJP9JoJw-UJ5qNSPUG8Xb7yKLk3gaJG_og0" style="animation-delay: -4s;" />
-      <img alt="3D Element" class="absolute top-24 right-[16%] w-32 md:w-56 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4-92NjN70zYJRzxQL6GyqyfQrcuHUUgp7YodSgYKryvpOM6Tr3faXdloY33KFG7GNZgYEDSEi700PjTtxVAX0bbfPlFMFVPVQYUd0MKNq3Jl6h-nIi2bks_j9X0fQX0IZJAfndX3nF1HDRfiayYpx2fIbxgNTufySHqYCvqqRvcRgTgNj-bOqEaSPnS6S4TtJ8sNF2jTrHukkrfgWFqPc6nUTc_LfXKRCWCXifUnWzf_aK9Ed_fc9DWKlFm0pMTQRWMXLP2H_CHo" style="animation-delay: -1s;" />
+      <img
+        v-for="asset in heroDecorations"
+        :key="asset.src"
+        :alt="asset.alt"
+        :class="asset.className"
+        :src="asset.src"
+        :style="{ animationDelay: asset.delay }"
+      />
       
-      <div class="max-w-container-max mx-auto px-6 md:px-lg w-full py-xl relative z-10">
-        <div data-reveal id="hero-content">
+      <div class="max-w-container-max mx-auto px-6 md:px-lg w-full py-xl relative z-10 flex flex-col items-center text-center">
+        <div data-reveal id="hero-content" class="flex flex-col items-center">
           <p class="font-mono text-[#FF3D8B] text-xs md:text-base tracking-[0.22em] uppercase mb-md font-bold select-none riso-bleed">
             THE BIGGEST IT FESTIVAL IN EASTERN INDONESIA
           </p>
@@ -114,7 +170,7 @@ onBeforeUnmount(() => {
             DIGITAL SYMPHONY
           </h1>
           
-          <p class="font-body-md text-base md:text-xl text-[#04000D]/80 max-w-2xl mb-xl leading-relaxed">
+          <p class="font-body-md text-base md:text-xl text-[#04000D]/80 max-w-2xl mb-xl leading-relaxed mx-auto">
             Mengorkestrasi Inovasi Global untuk Masa Depan Berkelanjutan. HMTI Universitas Tadulako memanggil 8.000+ inovator untuk bergabung dalam revolusi digital terbesar di Sulawesi Tengah.
           </p>
           
@@ -330,50 +386,12 @@ onBeforeUnmount(() => {
           <div class="p-8 md:p-12">
             <p class="font-mono text-[#04000D] text-xs uppercase tracking-widest font-bold mb-8">✦ OFFICIAL MEDIA PARTNERS ✦</p>
             <div class="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8 items-stretch">
-              <!-- Media 1: INFOCAMABA -->
-              <div class="border border-[#04000D]/10 p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30">
-                <img alt="INFOCAMABA" class="max-h-16 w-auto object-contain filter contrast-125 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIf-XLJV5wgWKn8sUJTTcyBYXK2PGL8ZQciBfNDe03Z083GYHDM7BQYp73OxcC1yutGYbHcNTR1xpxJnsVpyq-tzRuHTVx1FxtUB3G-Lrp_qcP2iakrLg7VBeglCAa-mBafQzqQhU99Wp8JVBCAVREpxYx7vuJvzc1mggFB8q8W0r3b7k9ZASJIUmZJhxlQ1-0FSto44H7k1vOPgaeic4Ixa2SOQVyuYY3rR9SUDr1Qu8ygLRrLen7ZvPvspe0O9CnElStEq_Z9E8" />
-              </div>
-              <!-- Media 2: LPM HITAM PUTIH -->
-              <div class="border border-[#04000D]/10 p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30">
-                <img alt="LPM HITAM PUTIH" class="max-h-16 w-auto object-contain filter contrast-125 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcothA9N53EkGWftGiwlG1tRxOlGNXpNrs81LVSoHH04A5VGTQ8Qe_TI4M8Sq-kuvBTYnGotM4zpx_CxoEZE01Llu-aPcQyaT-mm-HC_U2TPI0M-W8PpViji7i0desas0ps_BTenZPMDTxNzLJvY29OJh76pUxVJxmMZXs9GsEciy_gLj5tRcfB_Br9ye9s9cMCRtHKqOc9NI8A64xqL6DA0SBGMDhJG_yg73GimR7M3fKWee_ar3x7_hH6OVYOfi7PUQ4Fr4G3bY" />
-              </div>
-              <!-- Media 3: LPM NASEHA -->
-              <div class="border border-[#04000D]/10 p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30">
-                <img alt="LPM NASEHA" class="max-h-16 w-auto object-contain filter contrast-125 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAve6O_dmxzzxUcMU4FjmI3GifnRum7pdq4WC1pm3pU8BgcRdEaCfCZadW8L69KbhLA7MZfL3tYdmPjF_iGLhX2NU-GMlykBjwIDfFCNkdQ0NiYFJiJt5-p-LUVOA9M6x5sTeBxOvFh1GyFqyVe89EaHEzBd--XkctDFewRlk_x1RRA-MTdEVjarxGrkMYl7pESLr9sp_f_Ho2AKHXsHdP35oA_6GPSccwksfTh7Gu5E8uNh-Fyg85h5FVTRYiZUsZgaxwgHQidht8" />
-              </div>
-              <!-- Media 4: HIMA - SI UIN -->
-              <div class="border border-[#04000D]/10 p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30">
-                <img alt="HIMA - SI UIN" class="max-h-16 w-auto object-contain filter contrast-125 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3cHBLGWF4rY4QWMe4L6XGJFzOhyEAF0SIFjpBNnyYCXrMFQpV5puefod00-4JXzoqc7PxvKg5rRG2kiqZwin0djPfSnSCFIf-GzHZHRv1Aqkmh52fyJBUAkOqkpGt5V8ReNZBDZ8BRdgsDBAfNirkZO1yfHEq990y8VnytlsYfmvlDgwg8wcapt4xKUvFUTT5Wl6OPaVezbSJCWkbccKHItOw0fwf_4thb2PNmseoB7Q7cZdVmDb77FAz1tQEjkPp9PaeCTmuM4Y" />
-              </div>
-              <!-- Media 5: PROGRAMMING TADULAKO -->
-              <div class="border border-[#04000D]/10 p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30">
-                <img alt="PROGRAMMING TADULAKO" class="max-h-16 w-auto object-contain filter contrast-125 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiKzbW28GT4Pd03b8iUoWBAxOzi4aS9TSgVcQI4ivq9D-SIWiO8LXVz6xsTJxjdF7D3c_GU88hBh4smdn16XclTrxUwS9R382hou6ZcZ0IMf_BsgaEbSWbjNP-aRMPoBMmGkhmGp-BBM03GgGRBlAfG2LZ1JBFn9gVN8ZS7YnusU4PPaqoiNA_KssiXh2ncmWB8wjHVtFsfamgz25j3onLQSSIoSo-eriz7XGzcA24lr_B8tfhcZhoKzE_iD-BZ6xnucqOT9mlrKE" />
-              </div>
-              <!-- Media 6: RRI PALU -->
-              <div class="border border-[#04000D]/10 p-4 flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[80px]">
-                <span class="font-mono text-xs font-bold uppercase tracking-wider text-[#04000D]">RRI PALU</span>
-                <span class="font-mono text-[9px] text-[#04000D]/60 mt-1">99.6 FM</span>
-              </div>
-              <!-- Media 7: SOAL PALU -->
-              <div class="border border-[#04000D]/10 p-4 flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[80px]">
-                <span class="font-mono text-xs font-bold uppercase tracking-wider text-[#04000D]">SOAL PALU</span>
-                <span class="font-mono text-[9px] text-[#04000D]/60 mt-1">@soalpalu</span>
-              </div>
-              <!-- Media 8: PALU KINI -->
-              <div class="border border-[#04000D]/10 p-4 flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[80px]">
-                <span class="font-mono text-xs font-bold uppercase tracking-wider text-[#04000D]">PALU KINI</span>
-                <span class="font-mono text-[9px] text-[#04000D]/60 mt-1">@palu.kini</span>
-              </div>
-              <!-- Media 9: MEDIA ADVENTURE -->
-              <div class="border border-[#04000D]/10 p-4 flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[80px]">
-                <span class="font-mono text-xs font-bold uppercase tracking-wider text-[#04000D]">MEDIA ADV</span>
-                <span class="font-mono text-[9px] text-[#04000D]/60 mt-1">NETWORK</span>
-              </div>
-              <!-- Media 10: SULTENG POS -->
-              <div class="border border-[#04000D]/10 p-4 flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[80px]">
-                <span class="font-mono text-xs font-bold uppercase tracking-wider text-[#04000D]">SULTENG POS</span>
-                <span class="font-mono text-[9px] text-[#04000D]/60 mt-1">HARIAN</span>
+              <div
+                v-for="partner in mediaPartners"
+                :key="partner.name"
+                class="border border-[#04000D]/10 p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[88px]"
+              >
+                <img :alt="partner.name" class="max-h-16 w-auto object-contain filter contrast-125 grayscale" :src="partner.src" />
               </div>
             </div>
           </div>
