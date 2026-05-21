@@ -349,6 +349,100 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
+    <!-- SECTION P: 3 Core Pillars (Brutalist Trilogy Engine) -->
+    <section id="pillars" class="bg-[#F5F5F5] riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+      <!-- Background Decorative Stamp Shards -->
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.png')" 
+        alt="Decorative Riso Plate Shard" 
+        class="absolute top-10 right-10 w-36 md:w-56 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
+      
+      <div class="max-w-container-max mx-auto relative z-10">
+        
+        <!-- Section Header -->
+        <div class="mb-12 md:mb-16 text-left">
+          <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
+            THE TRILOGY ENGINE
+          </span>
+          <h2 class="font-black text-4xl sm:text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed riso-text-shadow-magenta">
+            Tiga Pilar Simfoni.
+          </h2>
+        </div>
+
+        <!-- The Brutalist Trilogy Grid System -->
+        <div class="flex flex-col md:grid md:grid-cols-[1.2fr_1fr_1.1fr] border-2 md:border-3 border-[#04000D] bg-[#04000D] gap-[2px] md:gap-[3px] rounded-none overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #04000D;">
+          
+          <!-- CELL 1: ROADSHOW INKLUSIF -->
+          <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a]">
+            <div>
+              <div class="flex justify-between items-start mb-6">
+                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">
+                  PHASE 01
+                </span>
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
+              </div>
+              <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4">
+                01 / ROADSHOW INKLUSIF
+              </h3>
+              <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
+                Menggerakkan Digital Symphony Tour ke 25 titik krusial di Palu, Sigi, dan Donggala. Kami membawa modul literasi siber, AI, dan aksesibilitas teknologi inklusif langsung ke sekolah umum, SLB, dan desa terpencil bersama Main Strategic Partner kita, Hannah Asa Indonesia.
+              </p>
+            </div>
+            <div class="mt-8 border-t border-[#04000D]/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#04000D]/75">
+              <span>25 SITES</span>
+              <span>INCLUSIVE TECH</span>
+            </div>
+          </div>
+
+          <!-- CELL 2: INCUBATION ARENA -->
+          <div class="bg-[#D86BFF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff]">
+            <div>
+              <div class="flex justify-between items-start mb-6">
+                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D86BFF] px-2 py-0.5">
+                  PHASE 02
+                </span>
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-02]</span>
+              </div>
+              <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4">
+                02 / INCUBATION ARENA
+              </h3>
+              <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
+                Wadah pembuktian inovasi skala nasional melalui UI/UX Design, Competitive Programming, dan Business Plan. Diperkuat dengan Sulteng Digital Innovation Hub (S-DIH) Hackathon murni untuk melahirkan solusi Agri-Tech dan Fin-Tech berbasis kearifan lokal.
+              </p>
+            </div>
+            <div class="mt-8 border-t border-[#04000D]/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#04000D]/75">
+              <span>ARENA INCUBATION</span>
+              <span>S-DIH HACKATHON</span>
+            </div>
+          </div>
+
+          <!-- CELL 3: GRAND CLOSING CONCERT -->
+          <div class="bg-[#8839FF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-white transition-all duration-200 hover:bg-[#9752ff]">
+            <div>
+              <div class="flex justify-between items-start mb-6">
+                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">
+                  PHASE 03
+                </span>
+                <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-03]</span>
+              </div>
+              <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#D6FF00] riso-text-shadow-magenta riso-bleed">
+                03 / GRAND CLOSING CONCERT
+              </h3>
+              <p class="font-body text-sm md:text-base leading-relaxed text-[#F5F5F5]/90">
+                Malam puncak perayaan orkestrasi digital selama 3 hari penuh. Menggabungkan etalase produk kreatif di Expo UMKM, panggung inspirasi TEDx Talks, dan ditutup dengan konser mahakarya masif bersama solois terbaik nasional, TULUS, didukung oleh Strategic Partner produksi kita, Sultan Music.
+              </p>
+            </div>
+            <div class="mt-8 border-t border-white/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#D6FF00]/95">
+              <span>EXPO &amp; TEDX</span>
+              <span>TULUS SHOWCASE</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- SECTION D: Phase 01: Inclusivity (Interactive Magenta Misregistration Card Plate) -->
     <section id="roadshow" class="bg-off-white riso-canvas py-6 sm:py-12 md:py-[80px] px-0 sm:px-4 md:px-lg relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
@@ -360,13 +454,68 @@ onBeforeUnmount(() => {
 
       <div class="max-w-container-max mx-auto relative z-10">
         <div class="riso-card-plate bg-[#DCEEB1] border-riso-sketchy-lg border-x-0 sm:border-x rounded-none sm:rounded-xl p-6 py-16 sm:p-8 md:p-[64px] text-[#04000D]" style="--plate-color: #FF3D8B;">
-          <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#FF3D8B]">PHASE 01: INCLUSIVITY</p>
-          <h2 class="font-bold text-xl sm:text-2xl md:text-4xl tracking-tight mt-4 leading-tight md:leading-none riso-bleed">Inklusi Tanpa Batas. Menyentuh yang Tak Tersentuh.</h2>
-          <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed text-[#04000D]/90">
-            Berkolaborasi dengan Hannah Asa Indonesia, Digital Symphony Tour bergerak menuju 25 titik. Kami membawa literasi siber, AI, dan aksesibilitas teknologi ke sekolah umum, SLB, dan desa-desa terpencil di Palu, Sigi, dan Donggala. Karena teknologi adalah hak semua orang.
-          </p>
-          <div class="mt-12 pt-6 border-t border-[#04000D]/10 font-mono text-xs md:text-sm uppercase font-bold text-[#04000D]/70">
-            25 TITIK ROADSHOW | 2.500+ PELAJAR
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- Left Editorial Info -->
+            <div class="lg:col-span-7 flex flex-col justify-center">
+              <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#FF3D8B]">PHASE 01: INCLUSIVITY</p>
+              <h2 class="font-bold text-xl sm:text-2xl md:text-4xl tracking-tight mt-4 leading-tight riso-bleed">Inklusi Tanpa Batas. Menyentuh yang Tak Tersentuh.</h2>
+              <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed text-[#04000D]/90">
+                Berkolaborasi dengan Hannah Asa Indonesia, Digital Symphony Tour bergerak menuju 25 titik. Kami membawa literasi siber, AI, dan aksesibilitas teknologi ke sekolah umum, SLB, dan desa-desa terpencil di Palu, Sigi, dan Donggala. Karena teknologi adalah hak semua orang.
+              </p>
+              <div class="mt-10 pt-6 border-t border-[#04000D]/10 font-mono text-xs md:text-sm uppercase font-bold text-[#04000D]/70">
+                25 TITIK ROADSHOW | 2.500+ PELAJAR
+              </div>
+            </div>
+            
+            <!-- Right Roadshow Map Stencil Mockup -->
+            <div class="lg:col-span-5 w-full flex justify-center mt-6 lg:mt-0">
+              <div class="w-full max-w-[340px] aspect-[4/3] bg-white border-riso-sketchy-md p-5 flex flex-col justify-between relative overflow-hidden select-none hover:rotate-[1deg] hover:scale-[1.02] transition-all duration-300 shadow-none">
+                <!-- Stencil Grid Texture -->
+                <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:12px_12px] opacity-[0.03] pointer-events-none"></div>
+                
+                <div class="flex justify-between items-start border-b border-dashed border-[#04000D]/10 pb-2">
+                  <span class="font-mono text-[9px] text-[#04000D]/50 font-bold uppercase">MAP COORDINATES</span>
+                  <span class="font-mono text-[9px] text-[#FF3D8B] font-bold">[C-01]</span>
+                </div>
+                
+                <!-- Map Stencil Visual Drawing -->
+                <div class="relative h-28 my-auto flex items-center justify-center">
+                  <!-- Stencil background plate outline -->
+                  <div class="absolute inset-4 border border-dashed border-[#04000D]/20 rounded-lg"></div>
+                  
+                  <!-- Dotted connecting route line -->
+                  <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 50,80 Q 150,20 280,60" fill="none" stroke="#04000D" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
+                  </svg>
+                  
+                  <!-- Node 1: PALU -->
+                  <div class="absolute left-[15%] bottom-[15%] flex flex-col items-center">
+                    <span class="w-3 h-3 rounded-full bg-[#FF3D8B] border border-[#04000D] animate-ping opacity-75 absolute"></span>
+                    <span class="w-3 h-3 rounded-full bg-[#FF3D8B] border border-[#04000D] relative z-10"></span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D] mt-1 bg-white px-1 border border-[#04000D]/20 uppercase">PALU</span>
+                  </div>
+                  
+                  <!-- Node 2: SIGI -->
+                  <div class="absolute left-[50%] top-[10%] flex flex-col items-center">
+                    <span class="w-3 h-3 rounded-full bg-[#04000D] border border-white z-10"></span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D] mt-1 bg-white px-1 border border-[#04000D]/20 uppercase">SIGI</span>
+                  </div>
+                  
+                  <!-- Node 3: DONGGALA -->
+                  <div class="absolute right-[12%] bottom-[35%] flex flex-col items-center">
+                    <span class="w-3 h-3 rounded-full bg-[#04000D] border border-white z-10"></span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D] mt-1 bg-white px-1 border border-[#04000D]/20 uppercase">DONGGALA</span>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center pt-2 border-t border-dashed border-[#04000D]/10">
+                  <span class="font-mono text-[8px] font-bold text-[#04000D]/60 uppercase">REGIONAL SECTOR-10</span>
+                  <span class="font-mono text-[8px] font-bold text-[#04000D]/80">25-POINTS</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -383,15 +532,56 @@ onBeforeUnmount(() => {
 
       <div class="max-w-container-max mx-auto relative z-10">
         <div class="riso-card-plate bg-[#D86BFF] border-riso-sketchy-lg border-x-0 sm:border-x rounded-none sm:rounded-xl p-6 py-16 sm:p-8 md:p-[64px] text-[#04000D]" style="--plate-color: #D6FF00;">
-          <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#04000D]/80">PHASE 02: INCUBATION</p>
-          <h2 class="font-bold text-xl sm:text-2xl md:text-4xl tracking-tight mt-4 leading-tight md:leading-none riso-bleed">Arena Pembuktian Talenta Digital.</h2>
-          <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed text-[#04000D]/90">
-            Waktunya membawa ide Anda ke permukaan. Berkompetisilah di tingkat nasional dalam UI/UX Design, Competitive Programming, dan Business Plan. Khusus untuk inovator lokal, Sulteng Digital Innovation Hub (S-DIH) Hackathon menanti solusi nyata Anda untuk masalah Agri-Tech dan Fin-Tech daerah.
-          </p>
-          <div class="mt-12">
-            <button class="riso-btn-plate bg-[#04000D] text-white px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button font-bold" style="--plate-color: #ffffff;">
-              DOWNLOAD RULEBOOK LOMBA
-            </button>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- Left Editorial Info -->
+            <div class="lg:col-span-7 flex flex-col justify-center">
+              <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#04000D]/80">PHASE 02: INCUBATION</p>
+              <h2 class="font-bold text-xl sm:text-2xl md:text-4xl tracking-tight mt-4 leading-tight riso-bleed">Arena Pembuktian Talenta Digital.</h2>
+              <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed text-[#04000D]/90">
+                Waktunya membawa ide Anda ke permukaan. Berkompetisilah di tingkat nasional dalam UI/UX Design, Competitive Programming, dan Business Plan. Khusus untuk inovator lokal, Sulteng Digital Innovation Hub (S-DIH) Hackathon menanti solusi nyata Anda untuk masalah Agri-Tech dan Fin-Tech daerah.
+              </p>
+              <div class="mt-10">
+                <!-- Bulletproof Explicit Dark Riso Button with robust override classes -->
+                <button class="riso-btn-dark text-white px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button font-bold focus:outline-none" style="--plate-color: #ffffff;">
+                  DOWNLOAD RULEBOOK LOMBA
+                </button>
+              </div>
+            </div>
+            
+            <!-- Right National Competition Badge/Booklet Mockup -->
+            <div class="lg:col-span-5 w-full flex justify-center mt-6 lg:mt-0">
+              <div class="w-full max-w-[340px] aspect-[4/3] bg-white border-riso-sketchy-md p-5 flex flex-col justify-between relative overflow-hidden select-none hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 shadow-none">
+                <!-- Tech grid matrix screen -->
+                <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.04] pointer-events-none"></div>
+                
+                <div class="flex justify-between items-start border-b border-dashed border-[#04000D]/10 pb-2">
+                  <span class="font-mono text-[9px] text-[#04000D]/50 font-bold uppercase">COMPETITION DOSSIER</span>
+                  <span class="font-mono text-[9px] text-[#04000D] font-bold">[C-02]</span>
+                </div>
+                
+                <!-- Floppy Disk / Booklet Retro Artwork mockup -->
+                <div class="my-auto py-2 flex flex-col items-center justify-center text-center">
+                  <!-- Disk sliding metal cover -->
+                  <div class="w-20 h-16 bg-[#D6FF00] border border-[#04000D] flex flex-col items-center justify-center p-1 relative z-10">
+                    <div class="w-6 h-10 bg-white border border-[#04000D]/40 absolute left-2 top-0"></div>
+                    <div class="w-3 h-2 bg-[#04000D] absolute right-2 bottom-2 rounded-sm"></div>
+                  </div>
+                  <h4 class="font-mono text-[11px] font-extrabold uppercase text-[#04000D] tracking-wider mt-3">NATIONAL ARENA</h4>
+                  <div class="flex items-center gap-1.5 mt-2.5">
+                    <span class="font-mono text-[8px] font-bold bg-[#04000D] text-[#D6FF00] px-1 py-[1px] uppercase">UI/UX</span>
+                    <span class="font-mono text-[8px] font-bold bg-[#04000D] text-[#D6FF00] px-1 py-[1px] uppercase">PROG</span>
+                    <span class="font-mono text-[8px] font-bold bg-[#04000D] text-[#D6FF00] px-1 py-[1px] uppercase">BIZ</span>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center pt-2 border-t border-dashed border-[#04000D]/10">
+                  <span class="font-mono text-[8px] font-bold text-[#04000D]/60 uppercase">INCUBATED SECTOR-02</span>
+                  <span class="inline-flex items-center px-1.5 py-[1px] bg-[#D6FF00]/20 border border-[#D6FF00]/40 font-mono text-[8px] text-[#04000D] font-bold uppercase">COMING SOON</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -408,15 +598,58 @@ onBeforeUnmount(() => {
 
       <div class="max-w-container-max mx-auto relative z-10">
         <div class="riso-card-plate bg-[#8839FF] border-riso-sketchy-lg border-x-0 sm:border-x rounded-none sm:rounded-xl p-6 py-16 sm:p-8 md:p-[64px] text-white" style="--plate-color: #FF3D8B;">
-          <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#D6FF00] riso-bleed">PHASE 03: HARMONY</p>
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tight mt-4 leading-tight md:leading-none riso-bleed">Akhir Sebuah Simfoni. Bersama TULUS.</h2>
-          <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed opacity-95">
-            Tiga hari puncak yang tak akan terlupakan. Jelajahi etalase inovasi di Expo UMKM, serap inspirasi dari panggung TEDx, dan rayakan puncak orkestrasi digital ini bersama 8.000 suara lainnya dalam Grand Closing Concert bersama solois terbaik tanah air, TULUS.
-          </p>
-          <div class="mt-12">
-            <button class="riso-btn-plate bg-[#D6FF00] text-[#04000D] px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button font-bold" style="--plate-color: #ffffff;">
-              BELI TIKET KONSER (SOON)
-            </button>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- Left Editorial Info -->
+            <div class="lg:col-span-7 flex flex-col justify-center">
+              <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#D6FF00] riso-bleed">PHASE 03: HARMONY</p>
+              <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tight mt-4 leading-tight riso-bleed">Akhir Sebuah Simfoni. Bersama TULUS.</h2>
+              <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed opacity-95">
+                Tiga hari puncak yang tak akan terlupakan. Jelajahi etalase inovasi di Expo UMKM, serap inspirasi dari panggung TEDx, dan rayakan puncak orkestrasi digital ini bersama 8.000 suara lainnya dalam Grand Closing Concert bersama solois terbaik tanah air, TULUS.
+              </p>
+              <div class="mt-10">
+                <button class="riso-btn-plate bg-[#D6FF00] text-[#04000D] px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button font-bold focus:outline-none" style="--plate-color: #ffffff;">
+                  BELI TIKET KONSER (SOON)
+                </button>
+              </div>
+            </div>
+            
+            <!-- Right Gorgeous VIP Concert Ticket Mockup -->
+            <div class="lg:col-span-5 w-full flex justify-center mt-6 lg:mt-0">
+              <div class="w-full max-w-[340px] aspect-[4/3] bg-[#04000D] border-riso-sketchy-md p-5 flex flex-col justify-between text-[#F5F5F5] riso-ticket-cut overflow-hidden select-none hover:rotate-[1.5deg] hover:scale-[1.02] transition-all duration-300 shadow-none" style="--plate-color: #FF3D8B;">
+                <!-- Barcode screen and neon noise -->
+                <div class="absolute inset-0 bg-[radial-gradient(#FF3D8B_1px,transparent_1px)] [background-size:14px_14px] opacity-[0.08] pointer-events-none"></div>
+                
+                <div class="flex justify-between items-start border-b border-dashed border-[#F5F5F5]/20 pb-2 relative z-10">
+                  <span class="font-mono text-[9px] text-[#D6FF00] font-bold uppercase">CLOSING CONCERT PASS</span>
+                  <span class="font-mono text-[9px] text-[#FF3D8B] font-bold">[C-03]</span>
+                </div>
+                
+                <!-- Ticket details and massive TULUS stamp -->
+                <div class="my-auto py-2 flex flex-col items-center justify-center text-center relative z-10">
+                  <span class="font-mono text-[8px] tracking-widest text-[#F5F5F5]/60 uppercase">GRAND LIVE PERFORMANCE</span>
+                  <h4 class="font-display-lg text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter text-[#D6FF00] leading-none riso-bleed riso-text-shadow-magenta mt-1.5">
+                    Tulus
+                  </h4>
+                  
+                  <!-- Barcode Graphic inside ticket -->
+                  <div class="w-36 h-6 mt-4 riso-barcode-bg border-l border-r border-[#F5F5F5]/30 opacity-90 filter invert"></div>
+                  <span class="font-mono text-[8px] tracking-widest text-[#F5F5F5]/60 mt-1 uppercase">GA-8000-SYM</span>
+                </div>
+                
+                <div class="flex justify-between items-center pt-2 border-t border-dashed border-[#F5F5F5]/20 relative z-10">
+                  <div class="flex flex-col text-left">
+                    <span class="font-mono text-[7px] text-[#F5F5F5]/50 uppercase leading-none">VENUE</span>
+                    <span class="font-mono text-[8px] text-[#F5F5F5] font-bold uppercase">TADULAKO AUDITORIUM</span>
+                  </div>
+                  <div class="flex flex-col text-right">
+                    <span class="font-mono text-[7px] text-[#F5F5F5]/50 uppercase leading-none">SECTION</span>
+                    <span class="font-mono text-[8px] text-[#D6FF00] font-bold uppercase">GEN ADMISSION</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -436,18 +669,75 @@ onBeforeUnmount(() => {
         </p>
         
         <!-- Tactile 3D-effect Card Grid with snapy hover interactions -->
+        <!-- Tactile 3D-effect Card Grid with snapy hover interactions -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-lg w-full mt-12 md:mt-section-gap select-none px-4 sm:px-0">
-          <div class="riso-card-plate bg-block-lilac border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-xl flex flex-col justify-end group cursor-pointer text-[#04000D] font-bold" style="--plate-color: #FF3D8B;">
-            <span class="material-symbols-outlined text-4xl mb-md">brush</span>
-            <h3 class="font-headline-lg text-lg sm:text-xl md:text-headline-lg">MAIN STRATEGIC PARTNER</h3>
+          <!-- Card 1: MAIN STRATEGIC PARTNER STAMP -->
+          <div class="riso-card-plate bg-block-lilac border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-lg flex flex-col justify-between group cursor-pointer text-[#04000D] hover:rotate-[-1.5deg] hover:scale-[1.01] transition-all duration-300" style="--plate-color: #FF3D8B;">
+            <div class="flex justify-between items-start w-full border-b border-dashed border-[#04000D]/20 pb-3">
+              <span class="font-mono text-[10px] md:text-xs tracking-wider text-[#04000D]/60 uppercase font-extrabold">01 / BRAND PLATFORM</span>
+              <span class="font-mono text-[9px] px-1.5 py-0.5 bg-[#FF3D8B]/10 border border-[#FF3D8B]/20 rounded font-bold text-[#FF3D8B] tracking-widest uppercase">STAMP</span>
+            </div>
+            
+            <div class="my-auto py-4 flex flex-col items-center justify-center text-center">
+              <h4 class="font-display-lg text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tighter text-[#04000D] leading-none riso-bleed riso-text-shadow-magenta">
+                Hannah Asa
+              </h4>
+              <p class="font-mono text-[10px] tracking-widest uppercase text-[#04000D]/75 font-bold mt-2">Indonesia</p>
+            </div>
+
+            <div class="flex justify-between items-center w-full pt-3 border-t border-dashed border-[#04000D]/20">
+              <span class="font-mono text-[9px] md:text-[10px] tracking-widest text-[#04000D]/60 uppercase font-bold">MAIN STRATEGIC PARTNER</span>
+              <span class="font-mono text-[9px] md:text-[10px] text-[#04000D]/80 font-bold">[HA.IDN-2026]</span>
+            </div>
           </div>
-          <div class="riso-card-plate bg-block-mint border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-xl flex flex-col justify-end group cursor-pointer text-[#04000D] font-bold" style="--plate-color: #D6FF00;">
-            <span class="material-symbols-outlined text-4xl mb-md">stadium</span>
-            <h3 class="font-headline-lg text-lg sm:text-xl md:text-headline-lg">STRATEGIC PARTNER</h3>
+
+          <!-- Card 2: STRATEGIC PARTNERS GRID -->
+          <div class="riso-card-plate bg-block-mint border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-lg flex flex-col justify-between group cursor-pointer text-[#04000D] hover:rotate-[1.5deg] hover:scale-[1.01] transition-all duration-300" style="--plate-color: #D6FF00;">
+            <div class="flex justify-between items-start w-full border-b border-dashed border-[#04000D]/20 pb-3">
+              <span class="font-mono text-[10px] md:text-xs tracking-wider text-[#04000D]/60 uppercase font-extrabold">02 / CO-SPONSORSHIP</span>
+              <span class="font-mono text-[9px] px-1.5 py-0.5 bg-[#04000D] rounded font-bold text-[#D6FF00] tracking-widest uppercase">PARTNERS</span>
+            </div>
+            
+            <div class="my-auto py-3 w-full flex flex-col gap-3">
+              <div class="flex items-center gap-3 justify-center">
+                <span class="material-symbols-outlined text-[#04000D]/60 text-lg sm:text-xl">music_note</span>
+                <span class="font-display-lg text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase leading-none riso-bleed text-[#04000D]">Sultan Music</span>
+              </div>
+              <div class="w-12 h-px border-t border-dashed border-[#04000D]/30 mx-auto"></div>
+              <div class="flex items-center gap-3 justify-center">
+                <span class="material-symbols-outlined text-[#04000D]/60 text-lg sm:text-xl">school</span>
+                <span class="font-display-lg text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase leading-none riso-bleed text-[#04000D]">Google GSA</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center w-full pt-3 border-t border-dashed border-[#04000D]/20">
+              <span class="font-mono text-[9px] md:text-[10px] tracking-widest text-[#04000D]/60 uppercase font-bold">STRATEGIC PARTNERS</span>
+              <span class="font-mono text-[9px] md:text-[10px] text-[#04000D]/80 font-bold">[SULTAN-GSA]</span>
+            </div>
           </div>
-          <div class="riso-card-plate bg-block-coral border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-xl flex flex-col justify-end group cursor-pointer text-[#04000D] font-bold" style="--plate-color: #8839FF;">
-            <span class="material-symbols-outlined text-4xl mb-md">auto_awesome</span>
-            <h3 class="font-headline-lg text-lg sm:text-xl md:text-headline-lg">Exhibition</h3>
+
+          <!-- Card 3: EXHIBITION retro TICKET PASS -->
+          <div class="riso-card-plate bg-block-coral border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-lg flex flex-col justify-between group cursor-pointer text-[#04000D] riso-ticket-cut overflow-hidden hover:rotate-[-1deg] hover:scale-[1.01] transition-all duration-300" style="--plate-color: #8839FF;">
+            <div class="flex justify-between items-start w-full border-b border-dashed border-[#04000D]/20 pb-3">
+              <span class="font-mono text-[10px] md:text-xs tracking-wider text-[#04000D]/60 uppercase font-extrabold">03 / SHOWCASE TICKET</span>
+              <span class="font-mono text-[9px] px-1.5 py-0.5 bg-[#8839FF]/10 border border-[#8839FF]/20 rounded font-bold text-[#8839FF] tracking-widest uppercase">PASS</span>
+            </div>
+            
+            <div class="my-auto py-2 flex flex-col items-center justify-center text-center">
+              <h4 class="font-display-lg text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tighter uppercase leading-none riso-bleed text-[#04000D]">
+                Exhibition
+              </h4>
+              <p class="font-mono text-[9px] tracking-widest uppercase text-[#04000D]/70 font-bold mt-1">Innovation & Talents</p>
+              
+              <!-- Miniature CSS Barcode -->
+              <div class="w-32 h-6 mt-4 riso-barcode-bg border-l border-r border-[#04000D] opacity-75"></div>
+              <span class="font-mono text-[8px] tracking-widest text-[#04000D]/50 mt-1 uppercase">EX-2026-TAD</span>
+            </div>
+
+            <div class="flex justify-between items-center w-full pt-3 border-t border-dashed border-[#04000D]/20">
+              <span class="font-mono text-[9px] md:text-[10px] tracking-widest text-[#04000D]/60 uppercase font-bold">TECH EXHIBITION</span>
+              <span class="font-mono text-[9px] md:text-[10px] text-[#04000D]/80 font-bold">[GATE-A]</span>
+            </div>
           </div>
         </div>
       </section>
