@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone *)",
+      "Bash(npm config *)",
+      "Read(//d/ai-website-cloner-template/**)",
+      "Bash(npm install *)",
+      "WebFetch(domain:github.com)",
+      "Read(//tmp/**)",
+      "Bash(cp -r .claude/* __TRACKED_VAR__/.claude/)",
+      "Bash(cp -r .claude __TRACKED_VAR__/.claude/impeccable)"
+    ]
+  }
+}
