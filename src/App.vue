@@ -1,11 +1,72 @@
 <script setup>
-import { ref, onBeforeUnmount, onMounted } from 'vue'
+import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import RisoLoader from './components/RisoLoader.vue'
 
 const showContent = ref(false)
 const isLoading = ref(true)
 const isMenuOpen = ref(false)
 const activeZineIndex = ref(0)
+
+const isMobile = ref(false)
+const updateViewport = () => {
+  isMobile.value = typeof window !== 'undefined' ? window.innerWidth < 768 : false
+}
+
+// SECTION K: Animated Counter States
+const countPartisipan = ref(0)
+const countRoadshow = ref(0)
+const countTalent = ref(0)
+const countExposure = ref(0)
+const hasAnimated = ref(false)
+
+const formattedPartisipan = computed(() => {
+  return countPartisipan.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '+'
+})
+
+const formattedRoadshow = computed(() => {
+  return countRoadshow.value + ' TITIK'
+})
+
+const formattedTalent = computed(() => {
+  return countTalent.value + '+'
+})
+
+const formattedExposure = computed(() => {
+  return countExposure.value + 'K+'
+})
+
+const animateCounters = () => {
+  if (hasAnimated.value) return
+  hasAnimated.value = true
+
+  const duration = 1500 // Snappy 1.5 seconds mechanical ticker count-up
+  const startTime = performance.now()
+
+  const tick = (now) => {
+    const elapsed = now - startTime
+    const progress = Math.min(elapsed / duration, 1)
+
+    // Steep easeOutQuart to count up rapidly and lock violently
+    const ease = 1 - Math.pow(1 - progress, 4)
+
+    countPartisipan.value = Math.floor(ease * 8000)
+    countRoadshow.value = Math.floor(ease * 25)
+    countTalent.value = Math.floor(ease * 500)
+    countExposure.value = Math.floor(ease * 800)
+
+    if (progress < 1) {
+      requestAnimationFrame(tick)
+    } else {
+      // Violent lock at final targets
+      countPartisipan.value = 8000
+      countRoadshow.value = 25
+      countTalent.value = 500
+      countExposure.value = 800
+    }
+  }
+
+  requestAnimationFrame(tick)
+}
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
@@ -40,6 +101,11 @@ const mediaPartnerAssetModules = import.meta.glob('./assets/medpart/*', {
 })
 
 const strategicPartnerAssetModules = import.meta.glob('./assets/sponsor-strategic_partner/*', {
+  eager: true,
+  import: 'default',
+})
+
+const mainLogoAssetModules = import.meta.glob('./assets/logo_utama/*', {
   eager: true,
   import: 'default',
 })
@@ -151,6 +217,8 @@ const tickerPartners = [
 ]
 
 onMounted(() => {
+  updateViewport()
+  window.addEventListener('resize', updateViewport)
   if (isLoading.value) {
     document.body.style.overflow = 'hidden'
   }
@@ -171,6 +239,22 @@ onMounted(() => {
   })
 
   revealElements.forEach((element) => observer.observe(element))
+
+  // Scroll trigger counter observer for Section K
+  const keyNumbersSection = document.querySelector('#impact-dashboard')
+  if (keyNumbersSection) {
+    const keyNumbersObserver = new IntersectionObserver((entries, observerInstance) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateCounters()
+          observerInstance.unobserve(entry.target)
+        }
+      })
+    }, {
+      threshold: 0.15,
+    })
+    keyNumbersObserver.observe(keyNumbersSection)
+  }
 
   const interactiveElements = document.querySelectorAll('button, a')
   const setPressedScale = (element, scale) => {
@@ -205,6 +289,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewport)
   if (observer) {
     observer.disconnect()
     observer = null
@@ -227,17 +312,17 @@ onBeforeUnmount(() => {
         <!-- Logo Flex Container with UNTAD -> HMTI -> I-FEST -->
         <div class="flex items-center gap-2 md:gap-4 select-none">
           <div class="flex items-center gap-1.5 md:gap-3">
-            <img alt="UNTAD Logo" class="h-7 md:h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9JaJvIDLTJQdFS5d5yoFAZhSrpqKx63XEw7xCSKOm74lLtdU7kFK8ry0-Ffl5DbiBue6L4B4xtlUckPSdKjoZyuI7OR1TDF8IBHoZ22Alpy3qSoDMOU4jBsLRryl0OpL6y7dkWz0jqk2e81gapQ2adZ2CA3wQpHL7HM_1GKVHFoQjipIh7lrKUqAnSS95Z7EDvmvaaqbECsPMA-t8NlAdCGaZAYC1BwZfMj6SqvKCFYVX7TSL-GVeaQhcVzHHag4WrtBwMhMl8Y" />
-            <img alt="HMTI Logo" class="h-7 md:h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJQXQNNm9vUDNgESijKQHQ4U9jj90CMt1VQQNobIUggoIV7qe3RWu9pl7xaUtM30XL3nlxN9LXj2m6ZdK3YqXhVubUo-eFJYaN9m5nMPGqVVmq9qytOgHyfsPZrxl3YKRMlCp4pJ1cAFuzOPsMTry9CbeeZonCM9VQZ_xlnfRkZjtdnAUfoQez_mjYwOJUDiolihm56ECyziYVTYkfAeAQLh7wP0b3owa1QqIcYZaporMHHIYGa_lDzufxsDHWj0Z1ZxT-e42LZk" />
-            <img alt="I-FEST Logo" class="h-7 md:h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhnw57bnP_MNSx7W9XMJ7qaxRXVmnex8RLUI13x_Rpl1xN4M7pXCy5pN_ZdOPnIHJTNN4kZSjT9DqzG_ee4l1CDfv44v8r4YlgZSciIPTAE-bXMwsc7jgnuUtS7p16r6Sh2cX5JKDsmjgzh6kEC0nC-x7DpfKeaJ7IZRE5nmVnbATSzj2k_2KAH4AIVzmjl6oj_exmAveMvGzDaZm9qPAKFAmAXmp2B8CsY_frqmD4LafhTT9wt45x5dHwqMVf9bWGHPMYK-whYig" />
+            <img alt="UNTAD Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
+            <img alt="HMTI Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
+            <img alt="I-FEST Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.png')" />
           </div>
           <span class="hidden sm:inline-block font-mono text-base md:text-lg font-bold tracking-widest text-[#04000D] border-l border-[#04000D]/20 pl-3 md:pl-4 riso-bleed">I-FEST 2026</span>
         </div>
 
         <nav class="hidden md:flex items-center space-x-xl select-none">
-          <a class="font-body-md text-body-md text-[#04000D] font-bold border-b border-[#04000D] pb-0.5 hover:text-accent-magenta transition-colors duration-200" href="#roadshow">Roadshow</a>
-          <a class="font-body-md text-body-md text-[#04000D]/75 hover:text-accent-magenta transition-colors duration-200" href="#kompetisi">Kompetisi</a>
-          <a class="font-body-md text-body-md text-[#04000D]/75 hover:text-accent-magenta transition-colors duration-200" href="#konser">Konser</a>
+          <a class="font-body-md text-body-md text-[#04000D] font-bold border-b border-[#04000D] pb-0.5 hover:text-accent-magenta transition-colors duration-200" href="#pillars">Roadshow</a>
+          <a class="font-body-md text-body-md text-[#04000D]/75 hover:text-accent-magenta transition-colors duration-200" href="#pillars">Kompetisi</a>
+          <a class="font-body-md text-body-md text-[#04000D]/75 hover:text-accent-magenta transition-colors duration-200" href="#pillars">Konser</a>
           <a class="font-body-md text-body-md text-[#04000D]/75 hover:text-accent-magenta transition-colors duration-200" href="#partners">Network</a>
         </nav>
 
@@ -260,9 +345,9 @@ onBeforeUnmount(() => {
       <div class="absolute inset-0 bg-noise-grain opacity-[0.03] pointer-events-none z-0"></div>
       
       <nav class="flex flex-col items-center gap-8 z-10 text-center">
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#roadshow">Roadshow</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#kompetisi">Kompetisi</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#konser">Konser</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#pillars">Roadshow</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#pillars">Kompetisi</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#pillars">Konser</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#04000D]/30 pb-1 hover:text-accent-magenta" href="#partners">Network</a>
         
         <button @click="toggleMenu" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3 rounded-full font-button text-base font-bold mt-8" style="--plate-color: #FF3D8B;">
@@ -443,342 +528,9 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <!-- SECTION D: Phase 01: Inclusivity (Interactive Magenta Misregistration Card Plate) -->
-    <section id="roadshow" class="bg-off-white riso-canvas py-6 sm:py-12 md:py-[80px] px-0 sm:px-4 md:px-lg relative overflow-hidden" data-reveal>
-      <!-- Background Decorative Stamp Shards -->
-      <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'rp1 1.png')" 
-        alt="Decorative Riso Plate Shard" 
-        class="absolute -top-12 -right-16 w-40 md:w-64 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
-      />
-
-      <div class="max-w-container-max mx-auto relative z-10">
-        <div class="riso-card-plate bg-[#DCEEB1] border-riso-sketchy-lg border-x-0 sm:border-x rounded-none sm:rounded-xl p-6 py-16 sm:p-8 md:p-[64px] text-[#04000D]" style="--plate-color: #FF3D8B;">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            <!-- Left Editorial Info -->
-            <div class="lg:col-span-7 flex flex-col justify-center">
-              <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#FF3D8B]">PHASE 01: INCLUSIVITY</p>
-              <h2 class="font-bold text-xl sm:text-2xl md:text-4xl tracking-tight mt-4 leading-tight riso-bleed">Inklusi Tanpa Batas. Menyentuh yang Tak Tersentuh.</h2>
-              <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed text-[#04000D]/90">
-                Berkolaborasi dengan Hannah Asa Indonesia, Digital Symphony Tour bergerak menuju 25 titik. Kami membawa literasi siber, AI, dan aksesibilitas teknologi ke sekolah umum, SLB, dan desa-desa terpencil di Palu, Sigi, dan Donggala. Karena teknologi adalah hak semua orang.
-              </p>
-              <div class="mt-10 pt-6 border-t border-[#04000D]/10 font-mono text-xs md:text-sm uppercase font-bold text-[#04000D]/70">
-                25 TITIK ROADSHOW | 2.500+ PELAJAR
-              </div>
-            </div>
-            
-            <!-- Right Roadshow Map Stencil Mockup -->
-            <div class="lg:col-span-5 w-full flex justify-center mt-6 lg:mt-0">
-              <div class="w-full max-w-[340px] aspect-[4/3] bg-white border-riso-sketchy-md p-5 flex flex-col justify-between relative overflow-hidden select-none hover:rotate-[1deg] hover:scale-[1.02] transition-all duration-300 shadow-none">
-                <!-- Stencil Grid Texture -->
-                <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:12px_12px] opacity-[0.03] pointer-events-none"></div>
-                
-                <div class="flex justify-between items-start border-b border-dashed border-[#04000D]/10 pb-2">
-                  <span class="font-mono text-[9px] text-[#04000D]/50 font-bold uppercase">MAP COORDINATES</span>
-                  <span class="font-mono text-[9px] text-[#FF3D8B] font-bold">[C-01]</span>
-                </div>
-                
-                <!-- Map Stencil Visual Drawing -->
-                <div class="relative h-28 my-auto flex items-center justify-center">
-                  <!-- Stencil background plate outline -->
-                  <div class="absolute inset-4 border border-dashed border-[#04000D]/20 rounded-lg"></div>
-                  
-                  <!-- Dotted connecting route line -->
-                  <svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 50,80 Q 150,20 280,60" fill="none" stroke="#04000D" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
-                  </svg>
-                  
-                  <!-- Node 1: PALU -->
-                  <div class="absolute left-[15%] bottom-[15%] flex flex-col items-center">
-                    <span class="w-3 h-3 rounded-full bg-[#FF3D8B] border border-[#04000D] animate-ping opacity-75 absolute"></span>
-                    <span class="w-3 h-3 rounded-full bg-[#FF3D8B] border border-[#04000D] relative z-10"></span>
-                    <span class="font-mono text-[9px] font-bold text-[#04000D] mt-1 bg-white px-1 border border-[#04000D]/20 uppercase">PALU</span>
-                  </div>
-                  
-                  <!-- Node 2: SIGI -->
-                  <div class="absolute left-[50%] top-[10%] flex flex-col items-center">
-                    <span class="w-3 h-3 rounded-full bg-[#04000D] border border-white z-10"></span>
-                    <span class="font-mono text-[9px] font-bold text-[#04000D] mt-1 bg-white px-1 border border-[#04000D]/20 uppercase">SIGI</span>
-                  </div>
-                  
-                  <!-- Node 3: DONGGALA -->
-                  <div class="absolute right-[12%] bottom-[35%] flex flex-col items-center">
-                    <span class="w-3 h-3 rounded-full bg-[#04000D] border border-white z-10"></span>
-                    <span class="font-mono text-[9px] font-bold text-[#04000D] mt-1 bg-white px-1 border border-[#04000D]/20 uppercase">DONGGALA</span>
-                  </div>
-                </div>
-                
-                <div class="flex justify-between items-center pt-2 border-t border-dashed border-[#04000D]/10">
-                  <span class="font-mono text-[8px] font-bold text-[#04000D]/60 uppercase">REGIONAL SECTOR-10</span>
-                  <span class="font-mono text-[8px] font-bold text-[#04000D]/80">25-POINTS</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION E: Phase 02: Incubation (Interactive Lime Misregistration Card Plate) -->
-    <section id="kompetisi" class="bg-off-white riso-canvas py-6 sm:py-12 md:py-[80px] px-0 sm:px-4 md:px-lg relative overflow-hidden" data-reveal>
-      <!-- Background Decorative Stamp Shards -->
-      <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'sy3 1.png')" 
-        alt="Decorative Riso Plate Shard" 
-        class="absolute -bottom-8 -left-12 w-36 md:w-60 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
-      />
-
-      <div class="max-w-container-max mx-auto relative z-10">
-        <div class="riso-card-plate bg-[#D86BFF] border-riso-sketchy-lg border-x-0 sm:border-x rounded-none sm:rounded-xl p-6 py-16 sm:p-8 md:p-[64px] text-[#04000D]" style="--plate-color: #D6FF00;">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            <!-- Left Editorial Info -->
-            <div class="lg:col-span-7 flex flex-col justify-center">
-              <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#04000D]/80">PHASE 02: INCUBATION</p>
-              <h2 class="font-bold text-xl sm:text-2xl md:text-4xl tracking-tight mt-4 leading-tight riso-bleed">Arena Pembuktian Talenta Digital.</h2>
-              <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed text-[#04000D]/90">
-                Waktunya membawa ide Anda ke permukaan. Berkompetisilah di tingkat nasional dalam UI/UX Design, Competitive Programming, dan Business Plan. Khusus untuk inovator lokal, Sulteng Digital Innovation Hub (S-DIH) Hackathon menanti solusi nyata Anda untuk masalah Agri-Tech dan Fin-Tech daerah.
-              </p>
-              <div class="mt-10">
-                <!-- Bulletproof Explicit Dark Riso Button with robust override classes -->
-                <button class="riso-btn-dark text-white px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button font-bold focus:outline-none" style="--plate-color: #ffffff;">
-                  DOWNLOAD RULEBOOK LOMBA
-                </button>
-              </div>
-            </div>
-            
-            <!-- Right National Competition Badge/Booklet Mockup -->
-            <div class="lg:col-span-5 w-full flex justify-center mt-6 lg:mt-0">
-              <div class="w-full max-w-[340px] aspect-[4/3] bg-white border-riso-sketchy-md p-5 flex flex-col justify-between relative overflow-hidden select-none hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 shadow-none">
-                <!-- Tech grid matrix screen -->
-                <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.04] pointer-events-none"></div>
-                
-                <div class="flex justify-between items-start border-b border-dashed border-[#04000D]/10 pb-2">
-                  <span class="font-mono text-[9px] text-[#04000D]/50 font-bold uppercase">COMPETITION DOSSIER</span>
-                  <span class="font-mono text-[9px] text-[#04000D] font-bold">[C-02]</span>
-                </div>
-                
-                <!-- Floppy Disk / Booklet Retro Artwork mockup -->
-                <div class="my-auto py-2 flex flex-col items-center justify-center text-center">
-                  <!-- Disk sliding metal cover -->
-                  <div class="w-20 h-16 bg-[#D6FF00] border border-[#04000D] flex flex-col items-center justify-center p-1 relative z-10">
-                    <div class="w-6 h-10 bg-white border border-[#04000D]/40 absolute left-2 top-0"></div>
-                    <div class="w-3 h-2 bg-[#04000D] absolute right-2 bottom-2 rounded-sm"></div>
-                  </div>
-                  <h4 class="font-mono text-[11px] font-extrabold uppercase text-[#04000D] tracking-wider mt-3">NATIONAL ARENA</h4>
-                  <div class="flex items-center gap-1.5 mt-2.5">
-                    <span class="font-mono text-[8px] font-bold bg-[#04000D] text-[#D6FF00] px-1 py-[1px] uppercase">UI/UX</span>
-                    <span class="font-mono text-[8px] font-bold bg-[#04000D] text-[#D6FF00] px-1 py-[1px] uppercase">PROG</span>
-                    <span class="font-mono text-[8px] font-bold bg-[#04000D] text-[#D6FF00] px-1 py-[1px] uppercase">BIZ</span>
-                  </div>
-                </div>
-                
-                <div class="flex justify-between items-center pt-2 border-t border-dashed border-[#04000D]/10">
-                  <span class="font-mono text-[8px] font-bold text-[#04000D]/60 uppercase">INCUBATED SECTOR-02</span>
-                  <span class="inline-flex items-center px-1.5 py-[1px] bg-[#D6FF00]/20 border border-[#D6FF00]/40 font-mono text-[8px] text-[#04000D] font-bold uppercase">COMING SOON</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION F: Phase 03: Harmony (Interactive Lilac Misregistration Card Plate) -->
-    <section id="konser" class="bg-off-white riso-canvas py-6 sm:py-12 md:py-[80px] px-0 sm:px-4 md:px-lg relative overflow-hidden" data-reveal>
-      <!-- Background Decorative Stamp Shards -->
-      <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry4 1.png')" 
-        alt="Decorative Riso Plate Shard" 
-        class="absolute -top-10 -right-8 w-44 md:w-72 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
-      />
-
-      <div class="max-w-container-max mx-auto relative z-10">
-        <div class="riso-card-plate bg-[#8839FF] border-riso-sketchy-lg border-x-0 sm:border-x rounded-none sm:rounded-xl p-6 py-16 sm:p-8 md:p-[64px] text-white" style="--plate-color: #FF3D8B;">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            <!-- Left Editorial Info -->
-            <div class="lg:col-span-7 flex flex-col justify-center">
-              <p class="font-mono text-xs md:text-sm uppercase tracking-widest font-bold text-[#D6FF00] riso-bleed">PHASE 03: HARMONY</p>
-              <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tight mt-4 leading-tight riso-bleed">Akhir Sebuah Simfoni. Bersama TULUS.</h2>
-              <p class="text-base md:text-lg mt-6 max-w-2xl leading-relaxed opacity-95">
-                Tiga hari puncak yang tak akan terlupakan. Jelajahi etalase inovasi di Expo UMKM, serap inspirasi dari panggung TEDx, dan rayakan puncak orkestrasi digital ini bersama 8.000 suara lainnya dalam Grand Closing Concert bersama solois terbaik tanah air, TULUS.
-              </p>
-              <div class="mt-10">
-                <button class="riso-btn-plate bg-[#D6FF00] text-[#04000D] px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button font-bold focus:outline-none" style="--plate-color: #ffffff;">
-                  BELI TIKET KONSER (SOON)
-                </button>
-              </div>
-            </div>
-            
-            <!-- Right Gorgeous VIP Concert Ticket Mockup -->
-            <div class="lg:col-span-5 w-full flex justify-center mt-6 lg:mt-0">
-              <div class="w-full max-w-[340px] aspect-[4/3] bg-[#04000D] border-riso-sketchy-md p-5 flex flex-col justify-between text-[#F5F5F5] riso-ticket-cut overflow-hidden select-none hover:rotate-[1.5deg] hover:scale-[1.02] transition-all duration-300 shadow-none" style="--plate-color: #FF3D8B;">
-                <!-- Barcode screen and neon noise -->
-                <div class="absolute inset-0 bg-[radial-gradient(#FF3D8B_1px,transparent_1px)] [background-size:14px_14px] opacity-[0.08] pointer-events-none"></div>
-                
-                <div class="flex justify-between items-start border-b border-dashed border-[#F5F5F5]/20 pb-2 relative z-10">
-                  <span class="font-mono text-[9px] text-[#D6FF00] font-bold uppercase">CLOSING CONCERT PASS</span>
-                  <span class="font-mono text-[9px] text-[#FF3D8B] font-bold">[C-03]</span>
-                </div>
-                
-                <!-- Ticket details and massive TULUS stamp -->
-                <div class="my-auto py-2 flex flex-col items-center justify-center text-center relative z-10">
-                  <span class="font-mono text-[8px] tracking-widest text-[#F5F5F5]/60 uppercase">GRAND LIVE PERFORMANCE</span>
-                  <h4 class="font-display-lg text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter text-[#D6FF00] leading-none riso-bleed riso-text-shadow-magenta mt-1.5">
-                    Tulus
-                  </h4>
-                  
-                  <!-- Barcode Graphic inside ticket -->
-                  <div class="w-36 h-6 mt-4 riso-barcode-bg border-l border-r border-[#F5F5F5]/30 opacity-90 filter invert"></div>
-                  <span class="font-mono text-[8px] tracking-widest text-[#F5F5F5]/60 mt-1 uppercase">GA-8000-SYM</span>
-                </div>
-                
-                <div class="flex justify-between items-center pt-2 border-t border-dashed border-[#F5F5F5]/20 relative z-10">
-                  <div class="flex flex-col text-left">
-                    <span class="font-mono text-[7px] text-[#F5F5F5]/50 uppercase leading-none">VENUE</span>
-                    <span class="font-mono text-[8px] text-[#F5F5F5] font-bold uppercase">TADULAKO AUDITORIUM</span>
-                  </div>
-                  <div class="flex flex-col text-right">
-                    <span class="font-mono text-[7px] text-[#F5F5F5]/50 uppercase leading-none">SECTION</span>
-                    <span class="font-mono text-[8px] text-[#D6FF00] font-bold uppercase">GEN ADMISSION</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION H: Main Grid Sections -->
-    <main class="py-[64px] md:py-section-gap min-h-screen px-4 sm:px-6 md:px-lg max-w-container-max mx-auto relative z-10">
-      <section class="w-full flex flex-col items-center justify-center text-center py-xl" data-reveal>
-        <span class="font-eyebrow text-sm md:text-eyebrow text-accent-magenta mb-sm uppercase tracking-widest font-bold">Digital Arts &amp; Future Music</span>
-        
-        <!-- Double Shift Riso text shadow -->
-        <h2 class="font-display-xl text-3xl sm:text-4xl md:text-display-xl text-[#04000D] max-w-4xl mb-lg leading-tight riso-text-shadow-double riso-bleed">
-          Vibrant. Intellectual. <br class="hidden md:block" /> Celebratory.
-        </h2>
-        <p class="font-body-lg text-base md:text-body-lg text-[#04000D]/80 max-w-2xl mb-xl">
-          A digital tribute to the raw energy of Risograph print culture. Join the intellectual movement at I-FEST 2026.
-        </p>
-        
-        <!-- Tactile 3D-effect Card Grid with snapy hover interactions -->
-        <!-- Tactile 3D-effect Card Grid with snapy hover interactions -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-lg w-full mt-12 md:mt-section-gap select-none px-4 sm:px-0">
-          <!-- Card 1: MAIN STRATEGIC PARTNER STAMP -->
-          <div class="riso-card-plate bg-block-lilac border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-lg flex flex-col justify-between group cursor-pointer text-[#04000D] hover:rotate-[-1.5deg] hover:scale-[1.01] transition-all duration-300" style="--plate-color: #FF3D8B;">
-            <div class="flex justify-between items-start w-full border-b border-dashed border-[#04000D]/20 pb-3">
-              <span class="font-mono text-[10px] md:text-xs tracking-wider text-[#04000D]/60 uppercase font-extrabold">01 / BRAND PLATFORM</span>
-              <span class="font-mono text-[9px] px-1.5 py-0.5 bg-[#FF3D8B]/10 border border-[#FF3D8B]/20 rounded font-bold text-[#FF3D8B] tracking-widest uppercase">STAMP</span>
-            </div>
-            
-            <div class="my-auto py-4 flex flex-col items-center justify-center text-center">
-              <h4 class="font-display-lg text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tighter text-[#04000D] leading-none riso-bleed riso-text-shadow-magenta">
-                Hannah Asa
-              </h4>
-              <p class="font-mono text-[10px] tracking-widest uppercase text-[#04000D]/75 font-bold mt-2">Indonesia</p>
-            </div>
-
-            <div class="flex justify-between items-center w-full pt-3 border-t border-dashed border-[#04000D]/20">
-              <span class="font-mono text-[9px] md:text-[10px] tracking-widest text-[#04000D]/60 uppercase font-bold">MAIN STRATEGIC PARTNER</span>
-              <span class="font-mono text-[9px] md:text-[10px] text-[#04000D]/80 font-bold">[HA.IDN-2026]</span>
-            </div>
-          </div>
-
-          <!-- Card 2: STRATEGIC PARTNERS GRID -->
-          <div class="riso-card-plate bg-block-mint border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-lg flex flex-col justify-between group cursor-pointer text-[#04000D] hover:rotate-[1.5deg] hover:scale-[1.01] transition-all duration-300" style="--plate-color: #D6FF00;">
-            <div class="flex justify-between items-start w-full border-b border-dashed border-[#04000D]/20 pb-3">
-              <span class="font-mono text-[10px] md:text-xs tracking-wider text-[#04000D]/60 uppercase font-extrabold">02 / CO-SPONSORSHIP</span>
-              <span class="font-mono text-[9px] px-1.5 py-0.5 bg-[#04000D] rounded font-bold text-[#D6FF00] tracking-widest uppercase">PARTNERS</span>
-            </div>
-            
-            <div class="my-auto py-3 w-full flex flex-col gap-3">
-              <div class="flex items-center gap-3 justify-center">
-                <span class="material-symbols-outlined text-[#04000D]/60 text-lg sm:text-xl">music_note</span>
-                <span class="font-display-lg text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase leading-none riso-bleed text-[#04000D]">Sultan Music</span>
-              </div>
-              <div class="w-12 h-px border-t border-dashed border-[#04000D]/30 mx-auto"></div>
-              <div class="flex items-center gap-3 justify-center">
-                <span class="material-symbols-outlined text-[#04000D]/60 text-lg sm:text-xl">school</span>
-                <span class="font-display-lg text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase leading-none riso-bleed text-[#04000D]">Google GSA</span>
-              </div>
-            </div>
-
-            <div class="flex justify-between items-center w-full pt-3 border-t border-dashed border-[#04000D]/20">
-              <span class="font-mono text-[9px] md:text-[10px] tracking-widest text-[#04000D]/60 uppercase font-bold">STRATEGIC PARTNERS</span>
-              <span class="font-mono text-[9px] md:text-[10px] text-[#04000D]/80 font-bold">[SULTAN-GSA]</span>
-            </div>
-          </div>
-
-          <!-- Card 3: EXHIBITION retro TICKET PASS -->
-          <div class="riso-card-plate bg-block-coral border-riso-sketchy-md aspect-[4/3] sm:aspect-square p-6 sm:p-8 md:p-lg flex flex-col justify-between group cursor-pointer text-[#04000D] riso-ticket-cut overflow-hidden hover:rotate-[-1deg] hover:scale-[1.01] transition-all duration-300" style="--plate-color: #8839FF;">
-            <div class="flex justify-between items-start w-full border-b border-dashed border-[#04000D]/20 pb-3">
-              <span class="font-mono text-[10px] md:text-xs tracking-wider text-[#04000D]/60 uppercase font-extrabold">03 / SHOWCASE TICKET</span>
-              <span class="font-mono text-[9px] px-1.5 py-0.5 bg-[#8839FF]/10 border border-[#8839FF]/20 rounded font-bold text-[#8839FF] tracking-widest uppercase">PASS</span>
-            </div>
-            
-            <div class="my-auto py-2 flex flex-col items-center justify-center text-center">
-              <h4 class="font-display-lg text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tighter uppercase leading-none riso-bleed text-[#04000D]">
-                Exhibition
-              </h4>
-              <p class="font-mono text-[9px] tracking-widest uppercase text-[#04000D]/70 font-bold mt-1">Innovation & Talents</p>
-              
-              <!-- Miniature CSS Barcode -->
-              <div class="w-32 h-6 mt-4 riso-barcode-bg border-l border-r border-[#04000D] opacity-75"></div>
-              <span class="font-mono text-[8px] tracking-widest text-[#04000D]/50 mt-1 uppercase">EX-2026-TAD</span>
-            </div>
-
-            <div class="flex justify-between items-center w-full pt-3 border-t border-dashed border-[#04000D]/20">
-              <span class="font-mono text-[9px] md:text-[10px] tracking-widest text-[#04000D]/60 uppercase font-bold">TECH EXHIBITION</span>
-              <span class="font-mono text-[9px] md:text-[10px] text-[#04000D]/80 font-bold">[GATE-A]</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="h-16 md:h-section-gap"></div>
-
-      <!-- SECTION I: Info Overlay Card -->
-      <section class="riso-card-plate bg-surface-container border-riso-sketchy-lg p-6 sm:p-8 md:p-xl mb-12 md:mb-section-gap" style="--plate-color: #D6FF00;" data-reveal>
-        <div class="flex flex-col md:flex-row gap-8 md:gap-xl items-center">
-          <div class="flex-1">
-            <h2 class="font-display-lg text-2xl sm:text-3xl md:text-display-lg text-[#04000D] mb-md leading-tight riso-bleed">
-              Curating the <span class="text-accent-magenta italic">Unexpected</span>
-            </h2>
-            <p class="font-body-md text-base md:text-body-md text-[#04000D]/80">
-              Our 2026 theme explores the intersection of algorithmic precision and human error, mimicking the tactile imperfections of ink on paper.
-            </p>
-          </div>
-          
-          <!-- Inner card styled with sketchy dashed lines -->
-          <div class="w-full md:w-1/3 bg-white border-riso-sketchy-md p-6 md:p-lg">
-            <div class="flex flex-col gap-sm">
-              <div class="flex justify-between items-center border-b border-dashed border-[#04000D]/10 pb-sm">
-                <span class="font-caption text-caption text-[#04000D]/60">DATE</span>
-                <span class="font-body-md text-body-md font-bold text-[#04000D]">12-14 OCT</span>
-              </div>
-              <div class="flex justify-between items-center border-b border-dashed border-[#04000D]/10 pb-sm">
-                <span class="font-caption text-caption text-[#04000D]/60">VENUE</span>
-                <span class="font-body-md text-body-md font-bold text-[#04000D]">PALU, SULTENG</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="font-caption text-caption text-[#04000D]/60">STATUS</span>
-                <span class="inline-flex items-center px-xs py-[2px] bg-block-lime border border-[#04000D]/20 rounded-full font-eyebrow text-[10px] text-[#04000D] font-bold">EARLY BIRD</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
 
     <!-- SECTION K: KEY NUMBERS (The Impact Dashboard) -->
-    <section class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
+    <section id="impact-dashboard" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.png')" 
@@ -795,7 +547,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[140px]">
               <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TARGET PARTISIPAN</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed">8.000+</h3>
+                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedPartisipan }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D]/80 font-bold uppercase leading-none">TARGET PARTICIPANTS</p>
               </div>
             </div>
@@ -807,7 +559,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[140px]">
               <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">TITIK ROADSHOW INKLUSIF</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed">25 TITIK</h3>
+                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedRoadshow }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D]/80 font-bold uppercase leading-none">REGIONAL ROADSHOWS</p>
               </div>
             </div>
@@ -819,7 +571,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[140px]">
               <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TALENTA DIGITAL</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed">500+</h3>
+                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedTalent }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D]/80 font-bold uppercase leading-none">DIGITAL TALENTS INCUBATED</p>
               </div>
             </div>
@@ -831,7 +583,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[140px]">
               <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI MEDIA EXPOSURE</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed">800K+</h3>
+                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedExposure }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D]/80 font-bold uppercase leading-none">ESTIMATED MEDIA EXPOSURE</p>
               </div>
             </div>
@@ -868,12 +620,50 @@ onBeforeUnmount(() => {
               
               <!-- Connection Line -->
               <!-- Desktop: horizontal dashed line -->
-              <div class="hidden lg:block absolute top-[28px] left-[5%] right-[5%] h-0.5 border-t-2 border-dashed border-[#04000D]/30 z-0"></div>
+              <div 
+                v-motion
+                :initial="{ opacity: 0 }"
+                :visible-once="{ 
+                  opacity: 1, 
+                  transition: { 
+                    duration: 600, 
+                    delay: 100 
+                  } 
+                }"
+                class="hidden lg:block absolute top-[28px] left-[5%] right-[5%] h-0.5 border-t-2 border-dashed border-[#04000D]/30 z-0"
+              ></div>
               <!-- Mobile: vertical dashed line -->
-              <div class="lg:hidden absolute top-[40px] bottom-[40px] left-[27px] w-0.5 border-l-2 border-dashed border-[#04000D]/30 z-0"></div>
+              <div 
+                v-motion
+                :initial="{ opacity: 0 }"
+                :visible-once="{ 
+                  opacity: 1, 
+                  transition: { 
+                    duration: 600, 
+                    delay: 100 
+                  } 
+                }"
+                class="lg:hidden absolute top-[40px] bottom-[40px] left-[27px] w-0.5 border-l-2 border-dashed border-[#04000D]/30 z-0"
+              ></div>
 
               <!-- Step 1 -->
-              <div class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group">
+              <div 
+                v-motion
+                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
+                :visible-once="{ 
+                  opacity: 1, 
+                  scale: 1,
+                  rotate: isMobile ? -0.5 : -1.5,
+                  transition: { 
+                    type: 'spring', 
+                    stiffness: 120, 
+                    damping: 14, 
+                    mass: 1.2,
+                    delay: 0 
+                  } 
+                }"
+                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
+              >
                 <!-- Bullet Circle -->
                 <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
                   01
@@ -888,7 +678,23 @@ onBeforeUnmount(() => {
               </div>
 
               <!-- Step 2 -->
-              <div class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group">
+              <div 
+                v-motion
+                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
+                :visible-once="{ 
+                  opacity: 1, 
+                  scale: 1,
+                  rotate: isMobile ? 0.5 : 1,
+                  transition: { 
+                    type: 'spring', 
+                    stiffness: 120, 
+                    damping: 14, 
+                    mass: 1.2,
+                    delay: 200 
+                  } 
+                }"
+                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
+              >
                 <!-- Bullet Circle -->
                 <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
                   02
@@ -903,7 +709,23 @@ onBeforeUnmount(() => {
               </div>
 
               <!-- Step 3 -->
-              <div class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group">
+              <div 
+                v-motion
+                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
+                :visible-once="{ 
+                  opacity: 1, 
+                  scale: 1,
+                  rotate: isMobile ? -0.5 : -0.5,
+                  transition: { 
+                    type: 'spring', 
+                    stiffness: 120, 
+                    damping: 14, 
+                    mass: 1.2,
+                    delay: 400 
+                  } 
+                }"
+                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
+              >
                 <!-- Bullet Circle -->
                 <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
                   03
@@ -918,7 +740,23 @@ onBeforeUnmount(() => {
               </div>
 
               <!-- Step 4 -->
-              <div class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group">
+              <div 
+                v-motion
+                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
+                :visible-once="{ 
+                  opacity: 1, 
+                  scale: 1,
+                  rotate: isMobile ? 0.5 : 2,
+                  transition: { 
+                    type: 'spring', 
+                    stiffness: 120, 
+                    damping: 14, 
+                    mass: 1.2,
+                    delay: 600 
+                  } 
+                }"
+                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
+              >
                 <!-- Bullet Circle -->
                 <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
                   04
@@ -1105,7 +943,10 @@ onBeforeUnmount(() => {
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">04/</span>
-                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left">VISITASI INDUSTRI</span>
+                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
+                  VISITASI INDUSTRI
+                  <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
+                </span>
               </div>
               <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 3 ? 'rotate-45' : ''">+</span>
             </button>
@@ -1394,6 +1235,65 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
+    <!-- SECTION BPH: Core Management BPH (Command Matrix) -->
+    <section id="bph-matrix" class="bg-[#F5F5F5] riso-canvas py-16 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+      <div class="max-w-container-max mx-auto relative z-10">
+        
+        <!-- Section Header -->
+        <div class="mb-16 md:mb-20">
+          <p class="font-mono text-[#04000D] text-xs uppercase tracking-widest mb-4 font-bold">INTERNAL COMMAND MATRIX</p>
+          <h2 class="font-black text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed">Struktur Orkestrasi.</h2>
+        </div>
+
+        <!-- Asymmetrical Organizational Grid -->
+        <div class="flex flex-col md:grid md:grid-cols-3 gap-8 md:gap-8 pb-16 md:pb-24">
+          
+          <!-- CELL 1: The Leader Block -->
+          <div 
+            class="bg-[#D86BFF] border-[3px] border-[#04000D] rounded-none p-6 md:p-8 flex flex-col justify-between transition-opacity duration-150 hover:opacity-95 md:translate-y-0 relative z-30 select-none"
+            style="box-shadow: 6px 6px 0px 0px #04000D !important;"
+          >
+            <div>
+              <p class="font-mono text-xs uppercase tracking-wider text-[#04000D] font-bold">✦ PROJECT MANAGER ✦</p>
+              <h3 class="font-black text-2xl sm:text-3xl tracking-tighter mt-2 leading-tight text-[#04000D] uppercase">NAKITA SEMESTA</h3>
+              <p class="font-mono text-xs text-[#04000D]/80 mt-4 leading-relaxed">
+                Mengawal eskalasi strategic partner, lobi eksternal, dan seluruh jalannya 10 divisi operasional.
+              </p>
+            </div>
+          </div>
+
+          <!-- CELL 2: The System Block -->
+          <div 
+            class="bg-[#D6FF00] border-[3px] border-[#04000D] rounded-none p-6 md:p-8 flex flex-col justify-between transition-opacity duration-150 hover:opacity-95 md:translate-y-6 relative z-20 select-none"
+            style="box-shadow: 6px 6px 0px 0px #04000D !important;"
+          >
+            <div>
+              <p class="font-mono text-xs uppercase tracking-wider text-[#04000D] font-bold">✦ SECRETARY ✦</p>
+              <h3 class="font-black text-2xl sm:text-3xl tracking-tighter mt-2 leading-tight text-[#04000D] uppercase">RIZKA FILARDI TOLIZ</h3>
+              <p class="font-mono text-xs text-[#04000D]/80 mt-4 leading-relaxed">
+                Arsitek administrasi, standarisasi birokrasi legal, dan timeline checklist Pleno umum panitia.
+              </p>
+            </div>
+          </div>
+
+          <!-- CELL 3: The Engine Block -->
+          <div 
+            class="bg-[#8839FF] border-[3px] border-[#04000D] rounded-none p-6 md:p-8 flex flex-col justify-between transition-opacity duration-150 hover:opacity-95 md:translate-y-12 relative z-10 select-none"
+            style="box-shadow: 6px 6px 0px 0px #04000D !important;"
+          >
+            <div>
+              <p class="font-mono text-xs uppercase tracking-wider text-[#D6FF00] font-bold">✦ TREASURER ✦</p>
+              <h3 class="font-black text-2xl sm:text-3xl tracking-tighter mt-2 leading-tight text-[#D6FF00] riso-text-shadow-magenta uppercase">DAREEAN AHMAD</h3>
+              <p class="font-mono text-xs text-[#F5F5F5]/90 mt-4 leading-relaxed">
+                Komandan finansial, manajemen dana taktis roadshow, alokasi subsidi visitasi Jawa, dan sistem leaderboard QRIS.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- SECTION J: "OUR NETWORK" / SPONSOR HIERARCHY (Placed right above the Footer) -->
     <section id="partners" class="bg-white riso-canvas py-16 sm:py-24 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
@@ -1414,10 +1314,11 @@ onBeforeUnmount(() => {
         <!-- Stamped Organizer Logos -->
         <div class="mb-16">
           <p class="font-mono text-xs text-[#04000D]/70 uppercase tracking-widest mb-10 text-center md:text-left font-bold">✦ ORGANIZED BY ✦</p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center justify-items-center">
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9JaJvIDLTJQdFS5d5yoFAZhSrpqKx63XEw7xCSKOm74lLtdU7kFK8ry0-Ffl5DbiBue6L4B4xtlUckPSdKjoZyuI7OR1TDF8IBHoZ22Alpy3qSoDMOU4jBsLRryl0OpL6y7dkWz0jqk2e81gapQ2adZ2CA3wQpHL7HM_1GKVHFoQjipIh7lrKUqAnSS95Z7EDvmvaaqbECsPMA-t8NlAdCGaZAYC1BwZfMj6SqvKCFYVX7TSL-GVeaQhcVzHHag4WrtBwMhMl8Y" /></div>
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="HMTI Logo" class="max-h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJQXQNNm9vUDNgESijKQHQ4U9jj90CMt1VQQNobIUggoIV7qe3RWu9pl7xaUtM30XL3nlxN9LXj2m6ZdK3YqXhVubUo-eFJYaN9m5nMPGqVVmq9qytOgHyfsPZrxl3YKRMlCp4pJ1cAFuzOPsMTry9CbeeZonCM9VQZ_xlnfRkZjtdnAUfoQez_mjYwOJUDiolihm56ECyziYVTYkfAeAQLh7wP0b3owa1QqIcYZaporMHHIYGa_lDzufxsDHWj0Z1ZxT-e42LZk" /></div>
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="I-FEST 2026 Logo" class="max-h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhnw57bnP_MNSx7W9XMJ7qaxRXVmnex8RLUI13x_Rpl1xN4M7pXCy5pN_ZdOPnIHJTNN4kZSjT9DqzG_ee4l1CDfv44v8r4YlgZSciIPTAE-bXMwsc7jgnuUtS7p16r6Sh2cX5JKDsmjgzh6kEC0nC-x7DpfKeaJ7IZRE5nmVnbATSzj2k_2KAH4AIVzmjl6oj_exmAveMvGzDaZm9qPAKFAmAXmp2B8CsY_frqmD4LafhTT9wt45x5dHwqMVf9bWGHPMYK-whYig" /></div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 items-center justify-items-center">
+            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" /></div>
+            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="HMTI Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" /></div>
+            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="HMTI Cabinet Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" /></div>
+            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="I-FEST 2026 Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.png')" /></div>
           </div>
         </div>
 
@@ -1497,9 +1398,10 @@ onBeforeUnmount(() => {
             <div class="flex flex-col gap-3">
               <span class="font-mono text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#F5F5F5]/60">ORGANIZED BY HMTI UNIVERSITAS TADULAKO</span>
               <div class="flex flex-row flex-wrap items-center gap-4 md:gap-6">
-                <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd9JaJvIDLTJQdFS5d5yoFAZhSrpqKx63XEw7xCSKOm74lLtdU7kFK8ry0-Ffl5DbiBue6L4B4xtlUckPSdKjoZyuI7OR1TDF8IBHoZ22Alpy3qSoDMOU4jBsLRryl0OpL6y7dkWz0jqk2e81gapQ2adZ2CA3wQpHL7HM_1GKVHFoQjipIh7lrKUqAnSS95Z7EDvmvaaqbECsPMA-t8NlAdCGaZAYC1BwZfMj6SqvKCFYVX7TSL-GVeaQhcVzHHag4WrtBwMhMl8Y" />
-                <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJQXQNNm9vUDNgESijKQHQ4U9jj90CMt1VQQNobIUggoIV7qe3RWu9pl7xaUtM30XL3nlxN9LXj2m6ZdK3YqXhVubUo-eFJYaN9m5nMPGqVVmq9qytOgHyfsPZrxl3YKRMlCp4pJ1cAFuzOPsMTry9CbeeZonCM9VQZ_xlnfRkZjtdnAUfoQez_mjYwOJUDiolihm56ECyziYVTYkfAeAQLh7wP0b3owa1QqIcYZaporMHHIYGa_lDzufxsDHWj0Z1ZxT-e42LZk" />
-                <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGOO9Q0mjYc0H7aYPw3OmVq2D6_4YW65cNu_CCvDESeqbTs_coMrgaJ_KCfhxzjtQ3Bvqa67E6HCknZa8iPNcMb9zQZH8l81TIhJcDJmpYc9d6pFBMBjPdzUyZmbOIed-ho30XBdUc47mRF4whIXg3N5BE68gC8dUsANghJXqFpHgF9-hbiorFCmClyn3Y4O4y0NWEqm6DXHkapQitfCm0XzLijjz0M5OD_LaS-thSzF_i4Klvhxgf3Q3DdZGBO8pEOOE-yADwxNg" />
+                <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
+                <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
+                <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" />
+                <img alt="I-FEST Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.png')" />
               </div>
             </div>
 
