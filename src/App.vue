@@ -167,23 +167,23 @@ const heroDecorations = [
 ]
 
 const mediaPartners = [
-  { name: 'RRI CENTRAL SULAWESI', src: '' },
-  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.png') },
-  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.png') },
-  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.JPG') },
-  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.png') },
-  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.png') },
-  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.png') },
-  { name: 'HMPSI STMIK ADHI GUNA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(7) HMPSI STMIK Adhi Guna Palu (1) (1).png') },
-  { name: 'ANIMEDIA TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(8) Animedia Tadulako.png') },
-  { name: 'PERMIKOMNAS WILAYAH X', src: getAsset(mediaPartnerAssetModules, 'medpart', '(9) Permikomnas Wilayah X.png') },
-  { name: 'HIMATIF UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(10) HIMATIF UIN.jpeg') },
+  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.png'), instagram: 'https://www.instagram.com/infocamaba_/' },
+  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.png'), instagram: 'https://www.instagram.com/hmpti_unisa/' },
+  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.jpg'), instagram: 'https://www.instagram.com/lpm.hitamputih/' },
+  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.png'), instagram: 'https://www.instagram.com/lpmnaseha/' },
+  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.png'), instagram: 'https://www.instagram.com/himasi.uindkpalu/' },
+  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.png'), instagram: 'https://www.instagram.com/programming.tadulako/' },
+  { name: 'HMPSSI STMIK ADHI GUNA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(7) HMPSI STMIK Adhi Guna Palu (1) (1).png'), instagram: 'https://www.instagram.com/hmpssi_adhiguna/' },
+  { name: 'ANIMEDIA TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(8) Animedia Tadulako.png'), instagram: 'https://www.instagram.com/animediatadulako/' },
+  { name: 'PERMIKOMNAS WILAYAH X', src: getAsset(mediaPartnerAssetModules, 'medpart', '(9) Permikomnas Wilayah X.png'), instagram: 'https://www.instagram.com/permikomnaswilayahx/' },
+  { name: 'HIMATIF UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(10) HIMATIF UIN.jpeg'), instagram: 'https://www.instagram.com/himatif.uindkpalu/' },
 ]
 
 const mainStrategicPartner = {
   name: 'Hannah Asa Indonesia',
   shortName: 'HANNAH ASA INDONESIA',
   src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Hannah Asa.png'),
+  instagram: 'https://www.instagram.com/hannahasaindonesia/',
 }
 
 const strategicPartners = [
@@ -193,6 +193,7 @@ const strategicPartners = [
     src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Sultan Music.png'),
     description: 'Official Production & Vendor partner menjamin mutu infrastruktur panggung dan malam puncak acara.',
     logoMaxWidth: 'max-w-[200px]',
+    instagram: 'https://www.instagram.com/sultan_musik.id/',
   },
   {
     name: 'Google Student Ambasador',
@@ -200,6 +201,7 @@ const strategicPartners = [
     src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'gsa.png'),
     description: 'Strategic execution partner yang mendukung operasional kolaborasi dan aktivasi lintas program.',
     logoMaxWidth: 'max-w-[180px]',
+    instagram: '',
   },
 ]
 
@@ -214,6 +216,20 @@ const tickerPartners = [
     roleLabel: 'STRATEGIC PARTNER',
     logoClass: 'h-7 md:h-8',
   })),
+]
+
+const marqueeLogos = [
+  { name: 'Hannah Asa Indonesia', src: mainStrategicPartner.src, isMedia: false },
+  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.png'), isMedia: true },
+  { name: 'Sultan Music', src: strategicPartners[0].src, isMedia: false },
+  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.png'), isMedia: true },
+  { name: 'UNTAD', src: getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png'), isMedia: false },
+  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.jpg'), isMedia: true },
+  { name: 'HMTI', src: getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png'), isMedia: false },
+  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.png'), isMedia: true },
+  { name: 'Google Student Ambasador', src: strategicPartners[1].src, isMedia: false },
+  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.png'), isMedia: true },
+  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.png'), isMedia: true },
 ]
 
 onMounted(() => {
@@ -390,20 +406,24 @@ onBeforeUnmount(() => {
         </div>
       </div>
       
-      <!-- Ticker Tape Ribbon (Redesigned for Professional Riso Vibe) -->
-      <div class="absolute bottom-0 left-0 w-full bg-[#D6FF00] border-t-2 border-[#04000D] py-3 md:py-4 overflow-hidden z-20 select-none shadow-[0_-4px_0_0_rgba(4,0,13,0.05)]">
-        <div class="flex whitespace-nowrap animate-marquee items-center">
-          <div v-for="group in 2" :key="group" class="flex items-center">
-            <div v-for="item in 3" :key="item" class="flex items-center px-4 md:px-8">
-              <template v-for="partner in tickerPartners" :key="`${group}-${item}-${partner.name}`">
-                <img
-                  :alt="partner.name"
-                  :class="partner.logoClass"
-                  class="w-auto object-contain filter brightness-0 invert mr-3 md:mr-5"
-                  :src="partner.src"
-                />
-                <span class="font-mono text-[#04000D] text-sm md:text-base uppercase tracking-widest font-bold mr-6 md:mr-10">{{ partner.roleLabel }}: {{ partner.shortName }}</span>
-              </template>
+      <!-- Ticker Tape Ribbon (Infinite Logo Marquee) -->
+      <div class="absolute bottom-0 left-0 w-full bg-[#D6FF00] border-y-2 border-[#04000D] py-4 md:py-6 overflow-hidden z-20 select-none shadow-[0_-4px_0_0_rgba(4,0,13,0.05)]">
+        <div class="flex whitespace-nowrap animate-marquee items-center will-change-transform">
+          <!-- We repeat the set of logos twice (using group in 2) to ensure perfect 100% seamless infinite looping -->
+          <div v-for="group in 2" :key="group" class="flex items-center flex-shrink-0">
+            <div 
+              v-for="logo in marqueeLogos.filter(logo => logo.src)" 
+              :key="`${group}-${logo.name}`" 
+              class="flex items-center flex-shrink-0"
+            >
+              <!-- Separator element: a bold solid diamond character (✦) -->
+              <span class="font-mono text-xs md:text-sm font-bold text-[#04000D] mx-4 md:mx-8 select-none flex-shrink-0">✦</span>
+              <!-- Logo image, locked for stability -->
+              <img 
+                :alt="logo.name" 
+                class="h-7 md:h-12 w-auto object-contain mix-blend-multiply filter grayscale contrast-200 transition-opacity duration-150 opacity-85 hover:opacity-100 flex-shrink-0 will-change-transform" 
+                :src="logo.src" 
+              />
             </div>
           </div>
         </div>
@@ -1245,48 +1265,102 @@ onBeforeUnmount(() => {
           <h2 class="font-black text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed">Struktur Orkestrasi.</h2>
         </div>
 
-        <!-- Asymmetrical Organizational Grid -->
-        <div class="flex flex-col md:grid md:grid-cols-3 gap-8 md:gap-8 pb-16 md:pb-24">
+        <!-- Asymmetrical Organizational Blueprint Rows -->
+        <div class="border-t-3 border-x-3 border-[#04000D] bg-white pb-0 mb-16 md:mb-24 select-none">
           
-          <!-- CELL 1: The Leader Block -->
-          <div 
-            class="bg-[#D86BFF] border-[3px] border-[#04000D] rounded-none p-6 md:p-8 flex flex-col justify-between transition-opacity duration-150 hover:opacity-95 md:translate-y-0 relative z-30 select-none"
-            style="box-shadow: 6px 6px 0px 0px #04000D !important;"
-          >
-            <div>
-              <p class="font-mono text-xs uppercase tracking-wider text-[#04000D] font-bold">✦ PROJECT MANAGER ✦</p>
-              <h3 class="font-black text-2xl sm:text-3xl tracking-tighter mt-2 leading-tight text-[#04000D] uppercase">NAKITA SEMESTA</h3>
-              <p class="font-mono text-xs text-[#04000D]/80 mt-4 leading-relaxed">
+          <!-- ROW 1: NAKITA SEMESTA (Project Manager) -->
+          <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
+            <!-- Left Side Column (Color Ink Block) -->
+            <div class="bg-[#D86BFF] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+              <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PROJECT MANAGER ✦</span>
+              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-2deg]">
+                NS
+              </div>
+            </div>
+            <!-- Right Side Column (The Dossier Block) -->
+            <div class="bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
+              <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
+                <span>Instagram:</span>
+                <a href="https://www.instagram.com/semestaaa___/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
+                  @semestaaa___
+                </a>
+              </div>
+              <div class="mt-4 border border-[#04000D]/20 bg-white/60 p-4 font-mono text-xs md:text-sm text-[#04000D]/80 leading-relaxed shadow-[3px_3px_0px_0px_rgba(4,0,13,0.05)] max-w-2xl">
                 Mengawal eskalasi strategic partner, lobi eksternal, dan seluruh jalannya 10 divisi operasional.
-              </p>
+              </div>
             </div>
           </div>
 
-          <!-- CELL 2: The System Block -->
-          <div 
-            class="bg-[#D6FF00] border-[3px] border-[#04000D] rounded-none p-6 md:p-8 flex flex-col justify-between transition-opacity duration-150 hover:opacity-95 md:translate-y-6 relative z-20 select-none"
-            style="box-shadow: 6px 6px 0px 0px #04000D !important;"
-          >
-            <div>
-              <p class="font-mono text-xs uppercase tracking-wider text-[#04000D] font-bold">✦ SECRETARY ✦</p>
-              <h3 class="font-black text-2xl sm:text-3xl tracking-tighter mt-2 leading-tight text-[#04000D] uppercase">RIZKA FILARDI TOLIZ</h3>
-              <p class="font-mono text-xs text-[#04000D]/80 mt-4 leading-relaxed">
+          <!-- ROW 2: DAREEAN A. RAFFI (PIC I-FEST 2026) - Reversed Layout -->
+          <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
+            <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
+            <div class="order-1 md:order-2 bg-[#D6FF00] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+              <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PIC I-FEST 2026 ✦</span>
+              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[3deg]">
+                DR
+              </div>
+            </div>
+            <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
+            <div class="order-2 md:order-1 bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">DAREEAN A. RAFFI</h3>
+              <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
+                <span>Instagram:</span>
+                <a href="https://www.instagram.com/darenrafi/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
+                  @darenrafi
+                </a>
+              </div>
+              <div class="mt-4 border border-[#04000D]/20 bg-white/60 p-4 font-mono text-xs md:text-sm text-[#04000D]/80 leading-relaxed shadow-[3px_3px_0px_0px_rgba(4,0,13,0.05)] max-w-2xl">
                 Arsitek administrasi, standarisasi birokrasi legal, dan timeline checklist Pleno umum panitia.
-              </p>
+              </div>
             </div>
           </div>
 
-          <!-- CELL 3: The Engine Block -->
-          <div 
-            class="bg-[#8839FF] border-[3px] border-[#04000D] rounded-none p-6 md:p-8 flex flex-col justify-between transition-opacity duration-150 hover:opacity-95 md:translate-y-12 relative z-10 select-none"
-            style="box-shadow: 6px 6px 0px 0px #04000D !important;"
-          >
-            <div>
-              <p class="font-mono text-xs uppercase tracking-wider text-[#D6FF00] font-bold">✦ TREASURER ✦</p>
-              <h3 class="font-black text-2xl sm:text-3xl tracking-tighter mt-2 leading-tight text-[#D6FF00] riso-text-shadow-magenta uppercase">DAREEAN AHMAD</h3>
-              <p class="font-mono text-xs text-[#F5F5F5]/90 mt-4 leading-relaxed">
-                Komandan finansial, manajemen dana taktis roadshow, alokasi subsidi visitasi Jawa, dan sistem leaderboard QRIS.
-              </p>
+          <!-- ROW 3: GABRIEL KRISTOFAN (Ketua Panitia) -->
+          <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
+            <!-- Left Side Column (Color Ink Block) -->
+            <div class="bg-[#8839FF] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+              <span class="font-mono text-xs tracking-widest border-b-2 border-[#D6FF00] pb-1 block w-full mb-6 font-bold text-[#D6FF00]">✦ KETUA PANITIA ✦</span>
+              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-1deg]">
+                GK
+              </div>
+            </div>
+            <!-- Right Side Column (The Dossier Block) -->
+            <div class="bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">GABRIEL KRISTOFAN</h3>
+              <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
+                <span>Instagram:</span>
+                <a href="https://www.instagram.com/gabrielkristofansupari/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
+                  @gabrielkristofansupari
+                </a>
+              </div>
+              <div class="mt-4 border border-[#04000D]/20 bg-white/60 p-4 font-mono text-xs md:text-sm text-[#04000D]/80 leading-relaxed shadow-[3px_3px_0px_0px_rgba(4,0,13,0.05)] max-w-2xl">
+                Memimpin eksekusi teknis lapangan, mengoordinasikan seluruh divisi kepanitiaan, dan memastikan kelancaran alur acara.
+              </div>
+            </div>
+          </div>
+
+          <!-- ROW 4: REYQAL SYAWALANO (Wakil Ketua Panitia) - Reversed Layout -->
+          <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
+            <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
+            <div class="order-1 md:order-2 bg-[#D86BFF] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+              <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ WAKIL KETUA PANITIA ✦</span>
+              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[2deg]">
+                RS
+              </div>
+            </div>
+            <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
+            <div class="order-2 md:order-1 bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">REYQAL SYAWALANO</h3>
+              <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
+                <span>Instagram:</span>
+                <a href="https://www.instagram.com/reyqalsew/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
+                  @reyqalsew
+                </a>
+              </div>
+              <div class="mt-4 border border-[#04000D]/20 bg-white/60 p-4 font-mono text-xs md:text-sm text-[#04000D]/80 leading-relaxed shadow-[3px_3px_0px_0px_rgba(4,0,13,0.05)] max-w-2xl">
+                Mendampingi Ketua Panitia dalam pengawasan operasional harian, kontrol kualitas teknis divisi, dan manajemen mitigasi risiko.
+              </div>
             </div>
           </div>
 
@@ -1315,10 +1389,83 @@ onBeforeUnmount(() => {
         <div class="mb-16">
           <p class="font-mono text-xs text-[#04000D]/70 uppercase tracking-widest mb-10 text-center md:text-left font-bold">✦ ORGANIZED BY ✦</p>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 items-center justify-items-center">
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" /></div>
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="HMTI Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" /></div>
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="HMTI Cabinet Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" /></div>
-            <div class="opacity-70 hover:opacity-100 transition-opacity duration-200"><img alt="I-FEST 2026 Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.png')" /></div>
+            
+            <!-- UNTAD LOGO -->
+            <div class="relative group flex flex-col items-center">
+              <a 
+                href="https://www.instagram.com/humasuntad/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+              >
+                <img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
+              </a>
+              <!-- Brutalist Tooltip -->
+              <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
+                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                  UNIVERSITAS TADULAKO
+                </div>
+                <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
+              </div>
+            </div>
+
+            <!-- HMTI LOGO -->
+            <div class="relative group flex flex-col items-center">
+              <a 
+                href="https://www.instagram.com/hmtiuntad/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+              >
+                <img alt="HMTI Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
+              </a>
+              <!-- Brutalist Tooltip -->
+              <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
+                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                  HIMPUNAN MAHASISWA TEKNIK INFORMATIKA - UNTAD
+                </div>
+                <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
+              </div>
+            </div>
+
+            <!-- HMTI CABINET LOGO -->
+            <div class="relative group flex flex-col items-center">
+              <a 
+                href="https://www.instagram.com/hmtiuntad/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+              >
+                <img alt="HMTI Cabinet Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" />
+              </a>
+              <!-- Brutalist Tooltip -->
+              <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
+                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                   KABINET ALLBLUE - HMTI UNTAD
+                </div>
+                <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
+              </div>
+            </div>
+
+            <!-- RINOYA LOGO -->
+            <div class="relative group flex flex-col items-center">
+              <a 
+                href="https://www.instagram.com/rinoya.hmtiuntad/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+              >
+                <img alt="RINOYA Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).png')" />
+              </a>
+              <!-- Brutalist Tooltip -->
+              <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
+                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                  DEPARTEMEN RINOYA - HMTI UNTAD
+                </div>
+                <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1338,7 +1485,14 @@ onBeforeUnmount(() => {
               </p>
             </div>
             <div class="w-full md:w-1/2 flex justify-center items-center opacity-70 hover:opacity-100 transition-opacity duration-200">
-              <img :alt="mainStrategicPartner.name" class="w-full max-w-[360px] h-auto object-contain mix-blend-multiply filter contrast-125" :src="mainStrategicPartner.src" />
+              <a 
+                :href="mainStrategicPartner.instagram" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="cursor-pointer flex justify-center items-center"
+              >
+                <img :alt="mainStrategicPartner.name" class="w-full max-w-[360px] h-auto object-contain mix-blend-multiply filter contrast-125" :src="mainStrategicPartner.src" />
+              </a>
             </div>
           </div>
 
@@ -1354,7 +1508,23 @@ onBeforeUnmount(() => {
                 :key="partner.name"
                 class="border border-[#04000D]/10 bg-off-white/40 p-5 md:p-6 rounded-lg flex flex-col items-center text-center gap-4 opacity-75 hover:opacity-100 transition-opacity duration-200"
               >
+                <!-- Render image with instagram link if present, otherwise render normally -->
+                <a 
+                  v-if="partner.instagram"
+                  :href="partner.instagram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="cursor-pointer w-full flex justify-center items-center"
+                >
+                  <img
+                    :alt="partner.name"
+                    :class="partner.logoMaxWidth"
+                    class="w-full h-14 md:h-16 object-contain mix-blend-multiply filter contrast-125 transition-all duration-300 hover:opacity-85"
+                    :src="partner.src"
+                  />
+                </a>
                 <img
+                  v-else
                   :alt="partner.name"
                   :class="partner.logoMaxWidth"
                   class="w-full h-14 md:h-16 object-contain mix-blend-multiply filter contrast-125"
@@ -1370,13 +1540,31 @@ onBeforeUnmount(() => {
           <div class="p-6 sm:p-8 md:p-12">
             <p class="font-mono text-[#04000D] text-xs uppercase tracking-widest font-bold mb-8">✦ OFFICIAL MEDIA PARTNERS ✦</p>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-8 items-stretch">
-              <div
+              <a
                 v-for="partner in mediaPartners"
                 :key="partner.name"
-                class="border border-[#04000D]/10 p-3 md:p-4 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[72px] md:min-h-[88px] rounded-lg"
+                :href="partner.instagram || '#'"
+                :target="partner.instagram ? '_blank' : '_self'"
+                rel="noopener noreferrer"
+                class="relative group border border-[#04000D]/10 p-3 md:p-4 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200 bg-off-white/30 min-h-[72px] md:min-h-[88px] rounded-lg cursor-pointer"
               >
-                <img :alt="partner.name" class="max-h-10 md:max-h-16 w-auto object-contain mx-auto filter contrast-125 grayscale" :src="partner.src" />
-              </div>
+                <!-- Render image if partner.src is present, otherwise show fallback text -->
+                <img 
+                  v-if="partner.src"
+                  :alt="partner.name" 
+                  class="max-h-10 md:max-h-16 w-auto object-contain mx-auto filter contrast-125 grayscale transition-all duration-300 group-hover:filter-none" 
+                  :src="partner.src" 
+                />
+                <span v-else class="font-mono text-[10px] md:text-xs font-bold text-[#04000D]/60 tracking-wider text-center px-1">{{ partner.name }}</span>
+
+                <!-- Brutalist Tooltip -->
+                <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
+                  <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none text-center max-w-[180px] md:max-w-[240px] break-words shadow-[3px_3px_0px_0px_#FF3D8B]">
+                    {{ partner.name }}
+                  </div>
+                  <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
+                </div>
+              </a>
             </div>
           </div>
 
@@ -1385,11 +1573,11 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION G: Footer Section (Deep Midnight Canvas) -->
-    <footer class="w-full bg-[#04000D] text-[#F5F5F5] py-16 px-6 md:px-lg border-t border-dashed border-[#F5F5F5]/25 relative overflow-hidden select-none">
+    <footer class="w-full bg-[#04000D] text-[#F5F5F5] py-12 md:py-16 px-6 md:px-lg border-t border-dashed border-[#F5F5F5]/25 relative overflow-hidden select-none">
       <div class="max-w-container-max mx-auto relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           
-          <div class="flex flex-col gap-8">
+          <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
               <span class="font-headline-lg text-3xl sm:text-4xl font-bold text-[#D6FF00] riso-text-shadow-double-dark riso-bleed">I-FEST 2026</span>
             </div>
@@ -1398,17 +1586,19 @@ onBeforeUnmount(() => {
             <div class="flex flex-col gap-3">
               <span class="font-mono text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#F5F5F5]/60">ORGANIZED BY HMTI UNIVERSITAS TADULAKO</span>
               <div class="flex flex-row flex-wrap items-center gap-4 md:gap-6">
-                <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
-                <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
-                <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" />
-                <img alt="I-FEST Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.png')" />
+                <a href="https://www.instagram.com/humasuntad/" target="_blank" rel="noopener noreferrer">
+                  <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
+                </a>
+                <a href="https://www.instagram.com/hmtiuntad/" target="_blank" rel="noopener noreferrer">
+                  <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
+                </a>
+                <a href="https://www.instagram.com/hmtiuntad/" target="_blank" rel="noopener noreferrer">
+                  <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" />
+                </a>
+                <a href="https://www.instagram.com/rinoya.hmtiuntad/" target="_blank" rel="noopener noreferrer">
+                  <img alt="RINOYA Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).png')" />
+                </a>
               </div>
-            </div>
-
-            <div class="flex gap-6 mt-4">
-              <a class="text-xs font-mono uppercase tracking-widest hover:text-[#D6FF00] transition-colors" href="#">Instagram</a>
-              <a class="text-xs font-mono uppercase tracking-widest hover:text-[#D6FF00] transition-colors" href="#">RINOYA</a>
-              <a class="text-xs font-mono uppercase tracking-widest hover:text-[#D6FF00] transition-colors" href="#">Contact</a>
             </div>
           </div>
           
@@ -1422,10 +1612,13 @@ onBeforeUnmount(() => {
                 @fest_untad
               </a>
             </div>
-
-            <p class="font-caption text-[10px] opacity-40 mt-8">© 2026 I-FEST. All rights reserved. Orchestrated with passion in Central Sulawesi.</p>
           </div>
           
+        </div>
+
+        <!-- Divider line & copyright -->
+        <div class="border-t border-[#F5F5F5]/10 mt-8 md:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="font-caption text-[10px] opacity-40">© 2026 I-FEST. All rights reserved. Orchestrated with passion in Central Sulawesi.</p>
         </div>
       </div>
     </footer>
