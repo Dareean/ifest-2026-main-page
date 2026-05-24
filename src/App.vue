@@ -1282,8 +1282,8 @@ onBeforeUnmount(() => {
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
-                <a href="https://www.instagram.com/semestaaa___/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
-                  @semestaaa___
+                <a href="https://www.instagram.com/semestaaaa.__/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
+                  @semestaaaa.__
                 </a>
               </div>
               <div class="mt-4 border border-[#04000D]/20 bg-white/60 p-4 font-mono text-xs md:text-sm text-[#04000D]/80 leading-relaxed shadow-[3px_3px_0px_0px_rgba(4,0,13,0.05)] max-w-2xl">
