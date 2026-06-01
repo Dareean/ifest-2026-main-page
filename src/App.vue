@@ -430,69 +430,69 @@ onBeforeUnmount(() => {
         <!-- The Brutalist Trilogy Grid System -->
         <div class="flex flex-col md:grid md:grid-cols-[1.2fr_1fr_1.1fr] border-2 md:border-3 border-[#04000D] bg-[#04000D] gap-[2px] md:gap-[3px] rounded-none overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #04000D;">
           
-          <!-- CELL 1: EMANASI -->
+          <!-- CELL 1: RESONANCE -->
           <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a]">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">
-                  DAMPAK SOSIAL INKLUSIF
+                  DAMPAK NYATA
                 </span>
-                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-03]</span>
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
               </div>
               <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-magenta riso-bleed">
-                01 / EMANASI
+                01 / RESONANCE
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
-                Mengalirkan dampak nyata lewat Digital Symphony Tour ke berbagai daerah di Sulawesi Tengah, memastikan pemerataan akses literasi digital, inklusi teknologi disabilitas, serta keberlanjutan bagi seluruh lapisan masyarakat.
+                Menciptakan inovasi digital mutakhir yang memberikan solusi berkelanjutan dan manfaat nyata bagi masyarakat luas.
               </p>
             </div>
             <div class="mt-8 border-t border-[#04000D]/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#04000D]/75">
-              <span>25 SITES</span>
-              <span>SOCIAL IMPACT</span>
+              <span>REAL IMPACT</span>
+              <span>SUSTAINABLE INNOVATION</span>
             </div>
           </div>
 
-          <!-- CELL 2: COMPETITION -->
+          <!-- CELL 2: SYNERGY -->
           <div class="bg-[#D86BFF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff]">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D86BFF] px-2 py-0.5">
-                  AKSELERASI TALENTA
+                  KOLABORASI
                 </span>
-                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-02]</span>
               </div>
               <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-lime riso-bleed">
-                02 / COMPETITION
+                02 / SYNERGY
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
-                Menjadi wadah kompetisi teknologi tingkat nasional dan regional untuk menguji, mengasah, dan melahirkan talenta digital mutakhir yang siap menjawab tantangan industri globally.
+                Mengorkestrasi kolaborasi strategis lintas sektor akademisi, industri, dan pemerintah untuk membangun ekosistem terintegrasi.
               </p>
             </div>
             <div class="mt-8 border-t border-[#04000D]/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#04000D]/75">
-              <span>ARENA COMPETITION</span>
-              <span>TALENT ACCELERATION</span>
+              <span>STRATEGIC COLLABORATION</span>
+              <span>INTEGRATED ECOSYSTEM</span>
             </div>
           </div>
 
-          <!-- CELL 3: INNOVATION -->
+          <!-- CELL 3: INCLUSIVITY -->
           <div class="bg-[#8839FF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-white transition-all duration-200 hover:bg-[#9752ff]">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">
-                  EKSPLORASI TEKNOLOGI
+                  INKLUSIFITAS
                 </span>
-                <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-02]</span>
+                <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-03]</span>
               </div>
               <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#D6FF00] riso-text-shadow-magenta riso-bleed">
-                03 / INNOVATION
+                03 / INCLUSIVITY
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed text-[#F5F5F5]/90">
-                Ruang inkubasi, pameran produk digital, dan seminar internasional yang mengorkestrasi kolaborasi strategis antara akademisi, industri, dan pemerintah guna membangun ekosistem teknologi yang terintegrasi.
+                Mendorong pemerataan akses dan literasi digital agar seluruh lapisan masyarakat siap menghadapi tantangan disrupsi tanpa terkecuali.
               </p>
             </div>
             <div class="mt-8 border-t border-white/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#D6FF00]/95">
-              <span>EXPO &amp; SEMINAR</span>
-              <span>INTEGRATED ECOSYSTEM</span>
+              <span>EQUAL ACCESS</span>
+              <span>DIGITAL LITERACY</span>
             </div>
           </div>
 
