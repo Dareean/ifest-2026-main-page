@@ -320,61 +320,6 @@ onBeforeUnmount(() => {
 <template>
   <RisoLoader @split="onSplit" @loaded="onLoaded" />
 
-  <!-- SECTION A: Top Navigation Chrome -->
-  <header class="fixed inset-x-0 top-0 z-[60] w-full border-b border-dashed border-[#04000D]/30 bg-off-white/95 backdrop-blur-sm">
-    <div class="max-w-container-max mx-auto flex justify-between items-center px-3 sm:px-4 md:px-lg py-3 md:py-sm">
-      
-      <!-- Logo Flex Container with UNTAD -> HMTI -> I-FEST -->
-      <div class="flex items-center gap-2 md:gap-4 select-none">
-        <div class="flex items-center gap-1.5 md:gap-3">
-          <img alt="UNTAD Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
-          <img alt="HMTI Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
-          <img alt="I-FEST Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.webp')" />
-        </div>
-        <span class="hidden sm:inline-block font-mono text-base md:text-lg font-bold tracking-widest text-[#04000D] border-l border-[#04000D]/20 pl-3 md:pl-4 riso-bleed">I-FEST 2026</span>
-      </div>
-
-      <nav class="hidden md:flex items-center gap-3 lg:gap-6 xl:gap-8 select-none">
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#roadshow">Roadshow</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#kompetisi">Kompetisi</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#timeline">Timeline</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#galeri-jejak-langkah">Arsip 2025</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#partners">Network</a>
-      </nav>
-
-      <div class="flex items-center gap-2 select-none">
-        <a href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-4 lg:px-lg py-2 rounded-full font-button text-xs lg:text-sm select-none font-bold text-center inline-block" style="--plate-color: #FF3D8B;">
-          DAFTAR KOMPETISI
-        </a>
-        <button @click="toggleMenu" class="p-1.5 flex items-center justify-center border border-[#04000D] rounded bg-white hover:bg-off-white md:hidden transition-colors" aria-label="Toggle menu">
-          <span class="material-symbols-outlined text-xl text-[#04000D] font-bold">
-            {{ isMenuOpen ? 'close' : 'menu' }}
-          </span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Mobile Drawer Menu Overlay -->
-  <div v-if="isMenuOpen" class="fixed inset-0 z-50 w-full h-screen bg-off-white overflow-y-auto p-8 md:hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.04] pointer-events-none z-0"></div>
-    <div class="absolute inset-0 bg-noise-grain opacity-[0.03] pointer-events-none z-0"></div>
-    
-    <div class="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] gap-y-6 relative z-10">
-      <nav class="flex flex-col items-center gap-8 text-center">
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#roadshow">Roadshow</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#kompetisi">Kompetisi</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#timeline">Timeline</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D86BFF] pb-1 hover:text-accent-magenta" href="#galeri-jejak-langkah">Arsip 2025</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#04000D]/30 pb-1 hover:text-accent-magenta" href="#partners">Network</a>
-        
-        <a @click="toggleMenu" href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3 rounded-full font-button text-base font-bold mt-8 text-center inline-block" style="--plate-color: #FF3D8B;">
-          DAFTAR KOMPETISI
-        </a>
-      </nav>
-    </div>
-  </div>
-
   <div 
     class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text pb-12 transition-all duration-700 ease-out"
     :class="{ 'opacity-0 scale-[0.98] pointer-events-none h-screen overflow-hidden': !showContent }"
@@ -2170,6 +2115,61 @@ onBeforeUnmount(() => {
       </div>
     </footer>
   </div>
+
+  <!-- Mobile Drawer Menu Overlay -->
+  <div v-if="isMenuOpen" class="fixed inset-0 z-[80] w-full h-screen bg-off-white overflow-y-auto p-8 pt-24 md:hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.04] pointer-events-none z-0"></div>
+    <div class="absolute inset-0 bg-noise-grain opacity-[0.03] pointer-events-none z-0"></div>
+    
+    <div class="flex flex-col items-center justify-center min-h-[calc(100vh-96px)] gap-y-6 relative z-10">
+      <nav class="flex flex-col items-center gap-8 text-center">
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#roadshow">Roadshow</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#kompetisi">Kompetisi</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#timeline">Timeline</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D86BFF] pb-1 hover:text-accent-magenta" href="#galeri-jejak-langkah">Arsip 2025</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#04000D]/30 pb-1 hover:text-accent-magenta" href="#partners">Network</a>
+        
+        <a @click="toggleMenu" href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3 rounded-full font-button text-base font-bold mt-8 text-center inline-block" style="--plate-color: #FF3D8B;">
+          DAFTAR KOMPETISI
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- SECTION A: Top Navigation Chrome -->
+  <header class="fixed inset-x-0 top-0 z-[90] w-full border-b border-dashed border-[#04000D]/30 bg-off-white/95 backdrop-blur-sm">
+    <div class="max-w-container-max mx-auto flex justify-between items-center px-3 sm:px-4 md:px-lg py-3 md:py-sm">
+      
+      <!-- Logo Flex Container with UNTAD -> HMTI -> I-FEST -->
+      <div class="flex items-center gap-2 md:gap-4 select-none">
+        <div class="flex items-center gap-1.5 md:gap-3">
+          <img alt="UNTAD Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
+          <img alt="HMTI Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
+          <img alt="I-FEST Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.webp')" />
+        </div>
+        <span class="hidden sm:inline-block font-mono text-base md:text-lg font-bold tracking-widest text-[#04000D] border-l border-[#04000D]/20 pl-3 md:pl-4 riso-bleed">I-FEST 2026</span>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-3 lg:gap-6 xl:gap-8 select-none">
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#roadshow">Roadshow</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#kompetisi">Kompetisi</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#timeline">Timeline</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#galeri-jejak-langkah">Arsip 2025</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#partners">Network</a>
+      </nav>
+
+      <div class="flex items-center gap-2 select-none">
+        <a href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-4 lg:px-lg py-2 rounded-full font-button text-xs lg:text-sm select-none font-bold text-center inline-block" style="--plate-color: #FF3D8B;">
+          DAFTAR KOMPETISI
+        </a>
+        <button @click="toggleMenu" class="p-1.5 flex items-center justify-center border border-[#04000D] rounded bg-white hover:bg-off-white md:hidden transition-colors" aria-label="Toggle menu">
+          <span class="material-symbols-outlined text-xl text-[#04000D] font-bold">
+            {{ isMenuOpen ? 'close' : 'menu' }}
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
 
   <!-- AI CHAT ASSISTANT FLOATING WIDGET -->
   <template v-if="isChatActivated">
