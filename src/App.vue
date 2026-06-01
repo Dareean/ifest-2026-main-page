@@ -608,9 +608,9 @@ onBeforeUnmount(() => {
           <div class="bg-white border-2 border-[#04000D] p-6 flex flex-col justify-between" style="box-shadow: 4px 4px 0px 0px #04000D;">
             <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-widest font-bold">PENJANGKAUAN WILAYAH</span>
             <div class="mt-4">
-              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D] riso-text-shadow-magenta">
+              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D]">
                 <AnimatedCounter :end="25" :duration="1400" />
-                <span class="ml-2">TITIK KUNJUNGAN</span>
+                <span class="ml-2 text-accent-magenta">TITIK KUNJUNGAN</span>
               </h3>
               <p class="font-mono text-xs text-[#04000D]/80 mt-2">Palu, Sigi, Donggala (Pasigala)</p>
             </div>
@@ -618,9 +618,9 @@ onBeforeUnmount(() => {
           <div class="bg-[#DCEEB1] border-2 border-[#04000D] p-6 flex flex-col justify-between" style="box-shadow: 4px 4px 0px 0px #04000D;">
             <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-widest font-bold">ESTIMASI IMPACT</span>
             <div class="mt-4">
-              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D] riso-text-shadow-double-dark">
+              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D]">
                 <AnimatedCounter :end="800" :duration="1600" suffix="+" />
-                <span class="ml-2">PELAJAR &amp; MARGINAL</span>
+                <span class="ml-2 text-accent-magenta">PELAJAR &amp; MARGINAL</span>
               </h3>
               <p class="font-mono text-xs text-[#04000D]/80 mt-2">Pemberdayaan Digital Inklusif Terjangkau</p>
             </div>
@@ -868,8 +868,8 @@ onBeforeUnmount(() => {
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-[#DCEEB1] px-2 py-0.5">ALGORITMA &amp; PROBLEM SOLVING</span>
                   <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[NAT-01]</span>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-magenta riso-bleed">
-                  COMPETITIVE PROGRAMMING
+                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                  COMPETITIVE <span class="text-accent-magenta">PROGRAMMING</span>
                 </h3>
                 <p class="text-sm text-[#04000D]/85 leading-relaxed mb-6">
                   Uji ketajaman pemikiran logis dan kecepatan menyelesaikan persoalan algoritma kompleks di bawah tekanan waktu yang ketat.
@@ -900,8 +900,8 @@ onBeforeUnmount(() => {
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-[#EFD4D4] px-2 py-0.5">DESAIN DIGITAL BERDAMPAK</span>
                   <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[NAT-02]</span>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-double-dark riso-bleed">
-                  UI/UX DESIGN
+                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                  UI/UX <span class="text-accent-magenta">DESIGN</span>
                 </h3>
                 <p class="text-sm text-[#04000D]/85 leading-relaxed mb-6">
                   Rancang solusi antarmuka digital yang intuitif, inklusif, dan memecahkan permasalahan nyata masyarakat secara kreatif.
@@ -932,8 +932,8 @@ onBeforeUnmount(() => {
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-[#C8E6CD] px-2 py-0.5">IDE BISNIS INOVATIF</span>
                   <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[NAT-03]</span>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-magenta riso-bleed">
-                  DIGITAL BUSINESS PLAN
+                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                  DIGITAL <span class="text-accent-magenta">BUSINESS PLAN</span>
                 </h3>
                 <p class="text-sm text-[#04000D]/85 leading-relaxed mb-6">
                   Ubah gagasan bisnis kreatif berbasis digital menjadi rancangan proposal bisnis yang matang, realistis, dan siap investasi.
@@ -978,8 +978,8 @@ onBeforeUnmount(() => {
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">VIDEO EDUKATIF &amp; KREATIF</span>
                   <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[REG-01]</span>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-magenta riso-bleed">
-                  CREATIVE VIDEO COMPETITION
+                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                  CREATIVE VIDEO <span class="text-accent-magenta">COMPETITION</span>
                 </h3>
                 <p class="text-sm text-[#04000D]/85 leading-relaxed mb-6">
                   Salurkan kreativitas sinematik Anda untuk merancang video edukasi bertema Literasi Digital yang mampu menarik dan mengedukasi masyarakat luas.
@@ -1010,8 +1010,8 @@ onBeforeUnmount(() => {
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-[#8839FF] px-2 py-0.5">DESAIN VISUAL EDUKATIF</span>
                   <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[REG-02]</span>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-lime riso-bleed">
-                  DIGITAL EDUCATION POSTER
+                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                  DIGITAL EDUCATION <span class="text-accent-magenta">POSTER</span>
                 </h3>
                 <p class="text-sm text-[#04000D]/85 leading-relaxed mb-6">
                   Visualisasikan gagasan Anda dalam bentuk poster edukatif bertema literasi siber untuk menyampaikan pesan penting teknologi secara grafis.
@@ -1054,8 +1054,8 @@ onBeforeUnmount(() => {
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">HACKATHON + SHOWCASE</span>
                   <span class="font-mono text-xs font-bold text-white/50">[S-DIH ENGINE]</span>
                 </div>
-                <h3 class="font-black text-3xl sm:text-4xl md:text-5xl uppercase tracking-tighter leading-none mb-6 text-[#D6FF00] riso-bleed riso-text-shadow-magenta">
-                  SULTENG DIGITAL INNOVATION HUB (S-DIH)
+                <h3 class="font-black text-3xl sm:text-4xl md:text-5xl uppercase tracking-tighter leading-none mb-6 text-[#D6FF00] riso-bleed">
+                  SULTENG DIGITAL INNOVATION <span class="text-white">HUB (S-DIH)</span>
                 </h3>
                 <p class="font-body text-sm md:text-base leading-relaxed text-[#F5F5F5]/85 mb-8 max-w-3xl">
                   Inkubator inovasi digital murni untuk melahirkan solusi lokal. Ikuti kompetisi Hackathon multi-hari yang intensif untuk memecahkan problem statement krusial daerah di bawah bimbingan langsung praktisi industri dan juri profesional tingkat nasional.

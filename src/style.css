@@ -105,6 +105,22 @@ body {
   text-shadow: 2.5px 2px 0px rgba(255, 61, 139, 0.85);
 }
 
+.riso-text-shadow-soft-gray {
+  text-shadow: 1.5px 1.5px 0px rgba(74, 69, 76, 0.2);
+}
+
+.riso-text-shadow-soft-green {
+  text-shadow: 1.5px 1.5px 0px rgba(64, 73, 60, 0.45);
+}
+
+.riso-text-shadow-tight-magenta {
+  text-shadow: 1px 1px 0px rgba(255, 61, 139, 0.95);
+}
+
+.riso-text-shadow-tight-dark {
+  text-shadow: 1px 1px 0px rgba(4, 0, 13, 0.25);
+}
+
 .riso-text-shadow-lime {
   text-shadow: -2.5px -1.5px 0px rgba(214, 255, 0, 0.9);
 }
