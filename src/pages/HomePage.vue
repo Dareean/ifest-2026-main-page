@@ -492,7 +492,7 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-12 md:mb-16 text-left">
+        <div class="mb-16 md:mb-24 text-left">
           <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
             THE TRILOGY ENGINE
           </span>
@@ -502,10 +502,10 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- The Brutalist Trilogy Grid System -->
-        <div id="trilogy-grid" class="flex flex-col md:grid md:grid-cols-[1.2fr_1fr_1.1fr] border-2 md:border-3 border-[#04000D] bg-[#04000D] gap-[2px] md:gap-[3px] rounded-none overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #04000D;">
+        <div id="trilogy-grid" class="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1.1fr] gap-6 md:gap-8 rounded-none select-none">
           
           <!-- CELL 1: RESONANCE -->
-          <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a]">
+          <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">
@@ -513,7 +513,7 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
               </div>
-              <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-magenta riso-bleed">
+              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#04000D]" style="text-shadow: 2px 2px 0px #FF3D8B;">
                 01 / RESONANCE
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
@@ -527,7 +527,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- CELL 2: SYNERGY -->
-          <div class="bg-[#D86BFF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff]">
+          <div class="bg-[#D86BFF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D86BFF] px-2 py-0.5">
@@ -535,7 +535,7 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-02]</span>
               </div>
-              <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-lime riso-bleed">
+              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#04000D]" style="text-shadow: 2px 2px 0px #D6FF00;">
                 02 / SYNERGY
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
@@ -549,7 +549,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- CELL 3: INCLUSIVITY -->
-          <div class="bg-[#8839FF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-white transition-all duration-200 hover:bg-[#9752ff]">
+          <div class="bg-[#8839FF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-white transition-all duration-200 hover:bg-[#9752ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">
@@ -557,7 +557,7 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-03]</span>
               </div>
-              <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#D6FF00] riso-text-shadow-magenta riso-bleed">
+              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#D6FF00]" style="text-shadow: 2px 2px 0px #04000D;">
                 03 / INCLUSIVITY
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed text-[#F5F5F5]/90">
