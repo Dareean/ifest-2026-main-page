@@ -11,6 +11,7 @@ const showContent = ref(true)
 const isLoading = ref(false)
 const isMenuOpen = ref(false)
 const activeZineIndex = ref(0)
+const activeTimelinePhase = ref(-1)
 
 
 const isMobile = ref(false)
@@ -809,183 +810,392 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <!-- SECTION L: TIMELINE KEGIATAN (The Print Ticker) -->
-    <section id="timeline" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-0 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
-      <!-- Background Decorative Stamp Shards -->
-      <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'sb2 1.webp')" 
-        alt="Decorative Riso Plate Shard" 
-        class="absolute -bottom-12 -right-16 w-36 md:w-56 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
-      />
+    <!-- SECTION L: TIMELINE KEGIATAN (The Roadmap Series) -->
+    <section id="timeline" class="bg-off-white riso-canvas py-16 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
+      <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.02] pointer-events-none z-0"></div>
+      <div class="absolute inset-0 bg-noise-grain opacity-[0.015] pointer-events-none z-0"></div>
 
-      <div class="max-w-container-max mx-auto sm:px-4 lg:px-0 relative z-10">
-        <div class="bg-[#D6FF00] border-y-2 sm:border-2 border-[#04000D] rounded-none sm:rounded-[32px] p-6 sm:p-8 md:p-12 relative overflow-hidden select-none mx-0 sm:mx-4 lg:mx-0">
-          <!-- Raw noise and dot grain filter inside lime block -->
-          <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.05] pointer-events-none z-0"></div>
-          <div class="absolute inset-0 bg-noise-grain opacity-[0.03] pointer-events-none z-0"></div>
-          
-          <div class="relative z-10">
-            <!-- Timeline Title -->
-            <div class="mb-10 text-center lg:text-left">
-              <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D]/60">ROAD TO DIGITAL SYMPHONY</span>
-              <h2 class="font-bold text-3xl md:text-4xl tracking-tighter text-[#04000D] mt-1 riso-bleed">Timeline Kegiatan</h2>
+      <div class="max-w-container-max mx-auto relative z-10">
+        
+        <!-- HEADER BLOCK (Matching image_f0d77e.png) -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16 select-none border-b-2 border-[#04000D] pb-8">
+          <div class="text-left">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-12 h-1 bg-[#3B82F6] inline-block"></span>
+              <span class="font-mono text-sm uppercase tracking-widest font-black text-[#3B82F6]">TIMELINE</span>
+              <span class="bg-[#3B82F6] text-white px-3 py-1 text-[10px] font-mono font-bold rounded-full tracking-wider uppercase ml-2">I-FEST 2026 – Digital Symphony</span>
             </div>
-            
-            <!-- Timeline track -->
-            <div class="relative flex flex-col lg:flex-row gap-8 lg:gap-12 mt-12">
-              
-              <!-- Connection Line -->
-              <!-- Desktop: horizontal dashed line -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0 }"
-                :visible-once="{ 
-                  opacity: 1, 
-                  transition: { 
-                    duration: 600, 
-                    delay: 100 
-                  } 
-                }"
-                class="hidden lg:block absolute top-[28px] left-[5%] right-[5%] h-0.5 border-t-2 border-dashed border-[#04000D]/30 z-0"
-              ></div>
-              <!-- Mobile: vertical dashed line -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0 }"
-                :visible-once="{ 
-                  opacity: 1, 
-                  transition: { 
-                    duration: 600, 
-                    delay: 100 
-                  } 
-                }"
-                class="lg:hidden absolute top-[40px] bottom-[40px] left-[27px] w-0.5 border-l-2 border-dashed border-[#04000D]/30 z-0"
-              ></div>
+            <h2 class="font-black text-3xl sm:text-4xl md:text-5xl leading-none text-[#04000D] tracking-tight uppercase">
+              Timeline &amp; <span class="text-[#8B5CF6] italic font-serif lowercase capitalize">Rangkaian</span> <br class="hidden sm:inline"/>I-FEST 2026
+            </h2>
+            <p class="font-mono text-sm font-bold text-[#3B82F6] uppercase tracking-wider mt-4">
+              Roadmap Menuju Puncak
+            </p>
+          </div>
+          
+          <!-- Big 6 Rangkaian Badge -->
+          <div class="bg-[#F3F0FF] border-2 border-[#8B5CF6] p-6 rounded-2xl flex items-center gap-4 self-start md:self-auto shadow-[4px_4px_0px_0px_#8B5CF6] min-w-[240px]">
+            <span class="font-black text-5xl md:text-6xl text-[#8B5CF6] leading-none">6</span>
+            <div class="text-left font-mono">
+              <span class="text-xs uppercase tracking-widest text-[#8B5CF6]/80 font-bold block">RANGKAIAN</span>
+              <span class="text-xs uppercase tracking-widest text-[#8B5CF6] font-black block">KEGIATAN</span>
+            </div>
+          </div>
+        </div>
 
-              <!-- Step 1 -->
+        <!-- TIMELINE GRID / ROADMAP FLOW -->
+        <div class="relative mt-20 select-none">
+          
+          <!-- Central Connecting Spine -->
+          <!-- Desktop: Perfect Center -->
+          <div class="hidden lg:block absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-1 border-l-4 border-dashed border-slate-300/80 z-0"></div>
+          <!-- Mobile: Left Align -->
+          <div class="lg:hidden absolute left-8 top-4 bottom-4 w-1 border-l-4 border-dashed border-slate-300/80 z-0"></div>
+
+          <div class="flex flex-col gap-16 md:gap-20">
+            
+            <!-- PHASE 01 -->
+            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
+              <!-- Left Card -->
               <div 
                 v-motion
-                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
-                :visible-once="{ 
-                  opacity: 1, 
-                  scale: 1,
-                  rotate: isMobile ? -0.5 : -1.5,
-                  transition: { 
-                    type: 'spring', 
-                    stiffness: 120, 
-                    damping: 14, 
-                    mass: 1.2,
-                    delay: 0 
-                  } 
-                }"
-                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
+                :initial="{ opacity: 0, x: -40 }"
+                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+                class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
-                <!-- Bullet Circle -->
-                <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#8B5CF6] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #8B5CF6;">
+                  <div 
+                    @click="activeTimelinePhase = activeTimelinePhase === 0 ? -1 : 0"
+                    class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
+                  >
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 01: Identity &amp; Foundation</h4>
+                    <div class="flex items-center gap-3">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#8B5CF6] uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        Januari - Maret
+                      </span>
+                      <!-- Chevron icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#8B5CF6] transition-transform duration-300" :class="activeTimelinePhase === 0 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="activeTimelinePhase === 0 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                  >
+                    <div class="bg-[#FAF5FF] border border-purple-100 rounded-xl p-4 md:p-5">
+                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
+                        <tr class="align-top">
+                          <td class="w-[80px] font-black text-[#8B5CF6] py-1">Januari:</td>
+                          <td class="py-1 text-[#04000D]/90">Pembentukan Tim Inti &amp; Penyusunan Konsep Kasar.</td>
+                        </tr>
+                        <tr class="align-top border-t border-purple-100/50">
+                          <td class="font-black text-[#8B5CF6] py-2">Februari:</td>
+                          <td class="py-2 text-[#04000D]/90">Penyusunan Proposal Kegiatan.</td>
+                        </tr>
+                        <tr class="align-top border-t border-purple-100/50">
+                          <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
+                          <td class="py-2 text-[#04000D]/90">Finalisasi struktur kepanitiaan (80+ personil).</td>
+                        </tr>
+                        <tr class="align-top border-t border-purple-100/50">
+                          <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
+                          <td class="py-2 text-[#04000D]/90">Audiensi Mitra Strategis &amp; Pencarian Dana.</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Spine Node -->
+              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#8B5CF6] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#8B5CF6] shadow-[2px_2px_0px_0px_#04000D]">
                   01
                 </div>
-                <div class="flex-1 lg:mt-2">
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase mb-1">JUNI 2026</span>
-                  <h4 class="font-bold text-lg text-[#04000D] tracking-tight leading-tight mt-1">KICK-OFF &amp; ROADSHOW</h4>
-                  <p class="text-sm text-[#04000D]/80 leading-relaxed mt-2 max-w-sm">
-                    Kick-off Phase &amp; 25-Titik Regional Roadshow Launch.
-                  </p>
-                </div>
               </div>
+              
+              <!-- Spacer for desktop -->
+              <div class="hidden lg:block lg:order-3"></div>
+            </div>
 
-              <!-- Step 2 -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
-                :visible-once="{ 
-                  opacity: 1, 
-                  scale: 1,
-                  rotate: isMobile ? 0.5 : 1,
-                  transition: { 
-                    type: 'spring', 
-                    stiffness: 120, 
-                    damping: 14, 
-                    mass: 1.2,
-                    delay: 200 
-                  } 
-                }"
-                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
-              >
-                <!-- Bullet Circle -->
-                <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
+            <!-- PHASE 02 -->
+            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
+              <!-- Spacer for desktop -->
+              <div class="hidden lg:block lg:order-1"></div>
+              
+              <!-- Spine Node -->
+              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#10B981] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#10B981] shadow-[2px_2px_0px_0px_#04000D]">
                   02
                 </div>
-                <div class="flex-1 lg:mt-2">
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase mb-1">JULI 2026</span>
-                  <h4 class="font-bold text-lg text-[#04000D] tracking-tight leading-tight mt-1">NATIONAL COMPETITION</h4>
-                  <p class="text-sm text-[#04000D]/80 leading-relaxed mt-2 max-w-sm">
-                    National Digital Competition Opening (UI/UX, CP, Business Plan).
-                  </p>
-                </div>
               </div>
 
-              <!-- Step 3 -->
+              <!-- Right Card -->
               <div 
                 v-motion
-                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
-                :visible-once="{ 
-                  opacity: 1, 
-                  scale: 1,
-                  rotate: isMobile ? -0.5 : -0.5,
-                  transition: { 
-                    type: 'spring', 
-                    stiffness: 120, 
-                    damping: 14, 
-                    mass: 1.2,
-                    delay: 400 
-                  } 
-                }"
-                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
+                :initial="{ opacity: 0, x: 40 }"
+                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+                class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
-                <!-- Bullet Circle -->
-                <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#10B981] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #10B981;">
+                  <div 
+                    @click="activeTimelinePhase = activeTimelinePhase === 1 ? -1 : 1"
+                    class="flex items-center justify-between border-b border-emerald-100 pb-3 cursor-pointer select-none"
+                  >
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 02: Inklusif Roadshow</h4>
+                    <div class="flex items-center gap-3">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#10B981] uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        Mei - Agustus
+                      </span>
+                      <!-- Chevron icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#10B981] transition-transform duration-300" :class="activeTimelinePhase === 1 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="activeTimelinePhase === 1 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                  >
+                    <div class="bg-[#ECFDF5] border border-emerald-100 rounded-xl p-4 md:p-5">
+                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
+                        <tr class="align-top">
+                          <td class="w-[95px] font-black text-[#10B981] py-1">Mei - Jun:</td>
+                          <td class="py-1 text-[#04000D]/90">Awal pergerakan menyasar sekolah umum, sekolah alam/alternatif, dan komunitas disabilitas.</td>
+                        </tr>
+                        <tr class="align-top border-t border-emerald-100/50">
+                          <td class="font-black text-[#10B981] py-2">Jul - Agust:</td>
+                          <td class="py-2 text-[#04000D]/90">Ekspansi roadshow ke 800+ pelajar &amp; masyarakat marginal.</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PHASE 03 -->
+            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
+              <!-- Left Card -->
+              <div 
+                v-motion
+                :initial="{ opacity: 0, x: -40 }"
+                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+                class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
+              >
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#3B82F6] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #3B82F6;">
+                  <div 
+                    @click="activeTimelinePhase = activeTimelinePhase === 2 ? -1 : 2"
+                    class="flex items-center justify-between border-b border-blue-100 pb-3 cursor-pointer select-none"
+                  >
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 03: Awareness &amp; Reg</h4>
+                    <div class="flex items-center gap-3">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#3B82F6] uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        Juli - Agustus
+                      </span>
+                      <!-- Chevron icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#3B82F6] transition-transform duration-300" :class="activeTimelinePhase === 2 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="activeTimelinePhase === 2 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                  >
+                    <div class="bg-[#EFF6FF] border border-blue-100 rounded-xl p-4 md:p-5">
+                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
+                        <tr class="align-top">
+                          <td class="w-[80px] font-black text-[#3B82F6] py-1">Juli:</td>
+                          <td class="py-1 text-[#04000D]/90">Pembukaan pendaftaran Arena Kompetisi di sela-sela roadshow lapangan.</td>
+                        </tr>
+                        <tr class="align-top border-t border-blue-100/50">
+                          <td class="font-black text-[#3B82F6] py-2">Agustus:</td>
+                          <td class="py-2 text-[#04000D]/90">Kampanye masif registrasi 6 Lomba menargetkan 500+ kompetitor elite.</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Spine Node -->
+              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#3B82F6] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#3B82F6] shadow-[2px_2px_0px_0px_#04000D]">
                   03
                 </div>
-                <div class="flex-1 lg:mt-2">
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase mb-1">AGUSTUS 2026</span>
-                  <h4 class="font-bold text-lg text-[#04000D] tracking-tight leading-tight mt-1">REGIONAL INCUBATION</h4>
-                  <p class="text-sm text-[#04000D]/80 leading-relaxed mt-2 max-w-sm">
-                    S-DIH Hackathon Regional Incubation &amp; Java Tech Visitation Planning.
-                  </p>
-                </div>
               </div>
+              
+              <!-- Spacer for desktop -->
+              <div class="hidden lg:block lg:order-3"></div>
+            </div>
 
-              <!-- Step 4 -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0, scale: 1.1, rotate: 0 }"
-                :visible-once="{ 
-                  opacity: 1, 
-                  scale: 1,
-                  rotate: isMobile ? 0.5 : 2,
-                  transition: { 
-                    type: 'spring', 
-                    stiffness: 120, 
-                    damping: 14, 
-                    mass: 1.2,
-                    delay: 600 
-                  } 
-                }"
-                class="relative flex lg:flex-col items-start gap-6 lg:gap-4 lg:flex-1 z-10 group origin-center"
-              >
-                <!-- Bullet Circle -->
-                <div class="w-14 h-14 rounded-full bg-[#F5F5F5] border-2 border-[#04000D] flex items-center justify-center font-mono text-sm font-bold text-[#04000D] shrink-0 z-10 transition-transform duration-200">
+            <!-- PHASE 04 -->
+            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
+              <!-- Spacer for desktop -->
+              <div class="hidden lg:block lg:order-1"></div>
+              
+              <!-- Spine Node -->
+              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#F59E0B] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#F59E0B] shadow-[2px_2px_0px_0px_#04000D]">
                   04
                 </div>
-                <div class="flex-1 lg:mt-2">
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase mb-1">SEPTEMBER 2026</span>
-                  <h4 class="font-bold text-lg text-[#04000D] tracking-tight leading-tight mt-1">GRAND PEAK EVENT</h4>
-                  <p class="text-sm text-[#04000D]/80 leading-relaxed mt-2 max-w-sm">
-                    Expo Inovasi UMKM, TEDx Talks, Grand closing Concert.
-                  </p>
+              </div>
+
+              <!-- Right Card -->
+              <div 
+                v-motion
+                :initial="{ opacity: 0, x: 40 }"
+                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+                class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
+              >
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#F59E0B] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #F59E0B;">
+                  <div 
+                    @click="activeTimelinePhase = activeTimelinePhase === 3 ? -1 : 3"
+                    class="flex items-center justify-between border-b border-amber-100 pb-3 cursor-pointer select-none"
+                  >
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 04: Benchmark &amp; Exploration</h4>
+                    <div class="flex items-center gap-3">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#F59E0B] uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        Agustus - Sept
+                      </span>
+                      <!-- Chevron icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 3 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="activeTimelinePhase === 3 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                  >
+                    <div class="bg-[#FFFBEB] border border-amber-100 rounded-xl p-4 md:p-5">
+                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
+                        <tr class="align-top">
+                          <td class="w-[90px] font-black text-[#F59E0B] py-1">Agustus:</td>
+                          <td class="py-1 text-[#04000D]/90">Studi banding akademik ke laboratorium teknologi universitas target di Pulau Jawa.</td>
+                        </tr>
+                        <tr class="align-top border-t border-amber-100/50">
+                          <td class="font-black text-[#F59E0B] py-2">September:</td>
+                          <td class="py-2 text-[#04000D]/90">Industrial Visitation ke raksasa teknologi untuk sinkronisasi praktik industri.</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PHASE 05 -->
+            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
+              <!-- Left Card -->
+              <div 
+                v-motion
+                :initial="{ opacity: 0, x: -40 }"
+                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+                class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
+              >
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#EF4444] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #EF4444;">
+                  <div 
+                    @click="activeTimelinePhase = activeTimelinePhase === 4 ? -1 : 4"
+                    class="flex items-center justify-between border-b border-red-100 pb-3 cursor-pointer select-none"
+                  >
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 05: Local Intellectual Series</h4>
+                    <div class="flex items-center gap-3">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#EF4444] uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        September
+                      </span>
+                      <!-- Chevron icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#EF4444] transition-transform duration-300" :class="activeTimelinePhase === 4 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="activeTimelinePhase === 4 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                  >
+                    <div class="bg-[#FEF2F2] border border-red-100 rounded-xl p-4 md:p-5">
+                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
+                        <tr class="align-top">
+                          <td class="w-[90px] font-black text-[#EF4444] py-1">Pekan 3-4:</td>
+                          <td class="py-1 text-[#04000D]/90">TEDxUNTAD: Regional Resonance membedah tantangan disrupsi digital.</td>
+                        </tr>
+                        <tr class="align-top border-t border-red-100/50">
+                          <td class="font-black text-[#EF4444] py-2">Output:</td>
+                          <td class="py-2 text-[#04000D]/90">Dokumentasi pemikiran strategis untuk Expo Inovasi November.</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Spine Node -->
+              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#EF4444] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#EF4444] shadow-[2px_2px_0px_0px_#04000D]">
+                  05
+                </div>
+              </div>
+              
+              <!-- Spacer for desktop -->
+              <div class="hidden lg:block lg:order-3"></div>
+            </div>
+
+            <!-- PHASE 06 -->
+            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
+              <!-- Spacer for desktop -->
+              <div class="hidden lg:block lg:order-1"></div>
+              
+              <!-- Spine Node -->
+              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0F172A] border-4 border-[#F59E0B] flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D]">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-[#F59E0B]"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM6.16 5.1a.75.75 0 0 1 1.06 0l1.59 1.59a.75.75 0 1 1-1.06 1.06L6.16 6.16a.75.75 0 0 1 0-1.06Zm10.62 0a.75.75 0 0 1 0 1.06l-1.59 1.59a.75.75 0 1 1-1.06-1.06l1.59-1.59a.75.75 0 0 1 1.06 0ZM2.25 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75Zm15 0a.75.75 0 0 1 .75-.75H21a.75.75 0 0 1 0 1.5h-2.25a.75.75 0 0 1-.75-.75Zm-10.5 5.34a.75.75 0 0 1 1.06 0l1.59 1.59a.75.75 0 1 1-1.06 1.06l-1.59-1.59a.75.75 0 0 1 0-1.06Zm7.06 0a.75.75 0 0 1 0 1.06l-1.59 1.59a.75.75 0 1 1-1.06-1.06l1.59-1.59a.75.75 0 0 1 1.06 0ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5ZM12 18.75a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>
                 </div>
               </div>
 
+              <!-- Right Card (Dark Navy Theme) -->
+              <div 
+                v-motion
+                :initial="{ opacity: 0, x: 40 }"
+                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
+                class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
+              >
+                <div class="w-full max-w-xl text-left bg-[#0F172A] border-3 border-[#F59E0B] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #F59E0B;">
+                  <div 
+                    @click="activeTimelinePhase = activeTimelinePhase === 5 ? -1 : 5"
+                    class="flex items-center justify-between border-b border-slate-700 pb-3 cursor-pointer select-none"
+                  >
+                    <h4 class="font-black text-lg md:text-xl text-white tracking-tight uppercase">PHASE 06: Grand Symphony &amp; Legacy</h4>
+                    <div class="flex items-center gap-3">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#F59E0B] uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        Nov - Des
+                      </span>
+                      <!-- Chevron icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 5 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="overflow-hidden transition-all duration-300 ease-in-out"
+                    :class="activeTimelinePhase === 5 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                  >
+                    <div class="bg-[#1E293B] border border-slate-700 rounded-xl p-4 md:p-5">
+                      <table class="w-full font-mono text-xs md:text-sm text-white">
+                        <tr class="align-top">
+                          <td class="w-[95px] font-black text-[#F59E0B] py-1">November:</td>
+                          <td class="py-1 text-white/90"><span class="font-bold text-[#F59E0B]">3 HARI PUNCAK I-FEST 2026</span> (Expo Inovasi, Seminar Internasional, Awarding Night, Grand Closing Concert).</td>
+                        </tr>
+                        <tr class="align-top border-t border-slate-700/50">
+                          <td class="font-black text-[#F59E0B] py-2">Desember:</td>
+                          <td class="py-2 text-white/90">Perilisan Official Aftermovie &amp; Penyerahan Impact Report kepada mitra untuk transparansi ROI.</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
