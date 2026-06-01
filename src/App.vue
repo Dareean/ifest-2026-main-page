@@ -1,209 +1,15 @@
 <script setup>
-import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
+import { ref, computed, onBeforeUnmount, onMounted, defineAsyncComponent } from 'vue'
 import RisoLoader from './components/RisoLoader.vue'
-import { GoogleGenerativeAI } from "@google/generative-ai"
-// No external markdown library needed — using a self-contained inline parser below
 
-/**
- * Self-contained Markdown-to-HTML parser.
- * Handles: bold, italic, inline code, fenced code blocks,
- * unordered lists, ordered lists, blockquotes, headings, and line breaks.
- * No external library required — eliminates marked v18 browser ESM crash.
- */
-const parseMarkdown = (rawInput) => {
-  if (!rawInput) return '';
-
-  // ── Step 1: Pre-process inline AI list patterns ──────────────────────────
-  // AI sometimes returns " * Item" inline — convert to actual newline lists
-  let src = rawInput
-    .replace(/[ \t]+\*[ \t]+/g, '\n- ')
-    .replace(/([^\n])[ \t]+(\d+\.[ \t]+\*\*)/g, '$1\n\n$2')
-    .replace(/([^\n])[ \t]+(\d+\.[ \t])/g, '$1\n$2');
-
-  // ── Step 2: Escape raw HTML to prevent XSS ───────────────────────────────
-  src = src
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // ── Step 3: Fenced code blocks (```lang\ncode\n```) ──────────────────────
-  src = src.replace(/```[\w]*\n([\s\S]*?)```/g, (_, code) => {
-    return '<pre><code>' + code.trim() + '</code></pre>';
-  });
-
-  // ── Step 4: Process line by line ─────────────────────────────────────────
-  const lines = src.split('\n');
-  const output = [];
-  let inUL = false;
-  let inOL = false;
-
-  const closeUL = () => { if (inUL) { output.push('</ul>'); inUL = false; } };
-  const closeOL = () => { if (inOL) { output.push('</ol>'); inOL = false; } };
-
-  for (let i = 0; i < lines.length; i++) {
-    const ln = lines[i];
-
-    // Headings ## H2, # H1
-    if (/^#{1,6}\s/.test(ln)) {
-      closeUL(); closeOL();
-      const level = ln.match(/^(#+)/)[1].length;
-      const content = ln.replace(/^#+\s*/, '');
-      output.push('<h' + level + ' style="font-weight:800;margin-bottom:4px;">' + applyInline(content) + '</h' + level + '>');
-      continue;
-    }
-
-    // Blockquote
-    if (/^&gt;\s?/.test(ln)) {
-      closeUL(); closeOL();
-      output.push('<blockquote>' + applyInline(ln.replace(/^&gt;\s?/, '')) + '</blockquote>');
-      continue;
-    }
-
-    // Unordered list item (-, *, +)
-    if (/^[-*+]\s+/.test(ln)) {
-      closeOL();
-      if (!inUL) { output.push('<ul>'); inUL = true; }
-      output.push('<li>' + applyInline(ln.replace(/^[-*+]\s+/, '')) + '</li>');
-      continue;
-    }
-
-    // Ordered list item (1. 2. 3.)
-    if (/^\d+\.\s+/.test(ln)) {
-      closeUL();
-      if (!inOL) { output.push('<ol>'); inOL = true; }
-      output.push('<li>' + applyInline(ln.replace(/^\d+\.\s+/, '')) + '</li>');
-      continue;
-    }
-
-    // Empty line — close lists and insert break
-    if (ln.trim() === '') {
-      closeUL(); closeOL();
-      output.push('<br/>');
-      continue;
-    }
-
-    // Regular paragraph line
-    closeUL(); closeOL();
-    output.push('<p>' + applyInline(ln) + '</p>');
-  }
-
-  closeUL(); closeOL();
-  return output.join('');
-};
-
-/** Apply inline formatting: bold, italic, inline code */
-const applyInline = (str) => {
-  return str
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
-    .replace(/_([^_]+)_/g, '<em>$1</em>');
-};
-
-// ── Gemini AI SDK Initialization ─────────────────────────────────────────────
-// Reads the API key directly from Vite's environment variable system.
-// Set VITE_GEMINI_API_KEY in your .env.local file (never commit this file!).
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
-  systemInstruction: `
-    Anda adalah IFEST AI ASSISTANT, koordinator virtual resmi untuk Informatics Festival (I-FEST) 2026 yang diadakan oleh HMTI Universitas Tadulako (UNTAD) Palu.
-    
-    Karakter & Gaya Bahasa: Cerdas, taktis, menggunakan prinsip Swiss Design yang ringkas, ramah mahasiswa, dan fleksibel. 
-    
-    KNOWLEDGE BASE (Gunakan data ini untuk menjawab semua pertanyaan secara natural):
-    - Tema: "Digital Symphony: Orchestrating Global Innovation For a Sustainable Future".
-    - Rekam Jejak 2025: 2.525 penerima manfaat, 11 sekolah roadshow, 200+ peserta kompetisi nasional.
-    - Angka Kunci 2026: Target 8.000+ partisipan, 25 titik roadshow (Palu, Sigi, Donggala), inkubasi 500+ talenta lokal.
-    - 6 Cabang Lomba:
-      1. Competitive Programming (Nasional, Rp100.000/tim, C/C++/Python/Java).
-      2. UI/UX Design (Nasional, Rp85.000/tim).
-      3. Digital Business Plan (Nasional, Rp85.000/tim).
-      4. Creative Video (Regional Sulteng, Individu, Tema Literasi Digital).
-      5. Digital Education Poster (Regional Sulteng, Individu, Pameran Hari-H).
-      6. Arena Inovasi Digital / Hackathon S-DIH (Regional Sulteng, Inkubasi Solusi Daerah).
-    - Timeline: Januari-Maret (Konsep & Tim Inti), Mei-Agustus (Roadshow & Registrasi Lomba), Agustus-September (Studi Banding/Industrial Visitation ke Jawa), November (Puncak Acara 3 Hari: Expo, Seminar Internasional, Awarding, Concert).
-    
-    FORMATTING INSTRUCTIONS:
-    - ALWAYS structure lists, sub-points, and metadata sections with standard Markdown list items (using '-' or '*' or numbers followed by a dot, each on a fresh new line).
-    - NEVER combine multiple bullet points or list items into a single inline paragraph. Every single item (e.g. Cakupan, Biaya, Persyaratan) MUST be on its own line to guarantee proper markdown list compilation.
-    - Use bold text (**text**) for list item headers and key terms to ensure they are visually striking and structured.
-    
-    CRITICAL SECURITY PRIVACY:
-    1. Jawab seluruh pertanyaan user secara cerdas tanpa pencocokan kata kunci yang kaku (no hardcoded keyword switches).
-    2. STRICT EMBARGO: Identitas Guest Star utama konser (Tulus) bersifat sangat RAHASIA dan BELUM FINAL. Jika user memancing, menanyakan rumor, atau meminta bocoran line-up artis konser, Anda WAJIB menyangkal/merahasiakannya secara ketat. Gunakan narasi mystery-hype (Contoh: "Secret Guest Star / Mystery Act / TBA yang akan membawa kejutan luar biasa di panggung Digital Symphony Concert. Pantau terus kanal resmi kami!"). Jangan pernah membocorkan nama Tulus under any circumstances.
-  `
-});
+const AiChatWidget = defineAsyncComponent(() => import('./components/AiChatWidget.vue'))
+const isChatActivated = ref(false)
 
 const showContent = ref(false)
 const isLoading = ref(true)
 const isMenuOpen = ref(false)
 const activeZineIndex = ref(0)
 
-// AI Chat Assistant Widget States
-const isChatOpen = ref(false)
-const chatInput = ref('')
-const chatMessages = ref([
-  {
-    sender: 'bot',
-    text: 'Halo! Saya AI Assistant I-FEST 2026. Tanyakan saya apa saja tentang info lomba, juknis, rute roadshow, atau sejarah I-FEST!',
-    time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-  }
-])
-
-const quickPrompts = [
-  '🏆 Informasi Lomba',
-  '📍 Rute Roadshow',
-  '📜 Sejarah I-FEST'
-]
-
-const toggleChat = () => {
-  isChatOpen.value = !isChatOpen.value
-}
-
-// Compute dynamic chatStateHistory mapping conversation logs to Gemini SDK specifications
-const chatStateHistory = computed(() => {
-  return chatMessages.value.slice(1).map(msg => ({
-    role: msg.sender === 'user' ? 'user' : 'model',
-    parts: [{ text: msg.text }]
-  }));
-});
-
-const sendChatMessage = async (text) => {
-  const messageText = text || chatInput.value
-  if (!messageText || !messageText.trim()) return
-
-  // Push user message
-  chatMessages.value.push({
-    sender: 'user',
-    text: messageText,
-    time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-  })
-
-  if (!text) {
-    chatInput.value = ''
-  }
-
-  // Push loading bot message
-  const botMessageIndex = chatMessages.value.push({
-    sender: 'bot',
-    text: 'Mengetik...',
-    time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-  }) - 1
-
-  try {
-    const chatSession = model.startChat({ history: chatStateHistory.value })
-    const result = await chatSession.sendMessage(messageText)
-    const responseText = await result.response.text()
-    
-    // Update the bot message with real response text
-    chatMessages.value[botMessageIndex].text = responseText
-  } catch (error) {
-    console.error("Gemini API stream failed:", error)
-    chatMessages.value[botMessageIndex].text = "Terima kasih atas pertanyaan Anda! Pertanyaan Anda sudah direkam. Integrasi sistem kecerdasan buatan (AI) I-FEST yang terkoneksi langsung dengan database utama sedang dioptimasi penuh untuk fase pasca-UAS."
-  }
-}
 
 const isMobile = ref(false)
 const updateViewport = () => {
@@ -312,25 +118,25 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`./assets/${fo
 
 const galleryImages = [
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'academic_workshop.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'academic_workshop.webp'),
     alt: 'Tema Utama: Resonansi Digital',
     title: 'Tema Utama: Resonansi Digital',
     description: 'Capturing the 2025 spirit of youth collaboration impacting Central Sulawesi technology growth.'
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'palu_dev_day.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'palu_dev_day.webp'),
     alt: '2.525 Penerima Manfaat',
     title: '2.525 Penerima Manfaat',
     description: 'Direct impact tracking over 13 High Schools visited and 1,082 participants crowding the Tadulako Main Auditorium.'
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'smart_helmet.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'smart_helmet.webp'),
     alt: '30 Produk Teknologi Lokal',
     title: '30 Produk Teknologi Lokal',
     description: 'Showcasing 30 native inventions across Mobile Apps, VR Megalith Showcases, IoT, and Web Development (Ternary AI).'
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'tech_meetup.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'tech_meetup.webp'),
     alt: '390.1K Instagram Reach',
     title: '390.1K Instagram Reach',
     description: 'Capturing our massive digital exposure footprint under the official @ifest_untad network during the campaign.'
@@ -339,25 +145,25 @@ const galleryImages = [
 
 const heroDecorations = [
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'Component 1.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'Component 1.webp'),
     alt: 'Abstract visual asset',
     className: 'absolute top-24 -left-12 md:-left-4 lg:left-6 w-48 md:w-80 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
     delay: '0s',
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'rb1 1.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'rb1 1.webp'),
     alt: 'Abstract visual asset',
     className: 'absolute bottom-40 -right-12 md:right-6 w-56 md:w-96 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
     delay: '-2s',
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'ry1 1.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'ry1 1.webp'),
     alt: 'Abstract visual asset',
     className: 'absolute bottom-32 -left-12 md:left-[5%] lg:left-[10%] w-40 md:w-64 opacity-70 md:opacity-80 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
     delay: '-4s',
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'cat1 1.png'),
+    src: getAsset(visualAssetModules, 'visual_assets', 'cat1 1.webp'),
     alt: 'Abstract visual asset',
     className: 'absolute top-24 -right-12 md:right-[10%] lg:right-[16%] w-32 md:w-56 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
     delay: '-1s',
@@ -365,22 +171,22 @@ const heroDecorations = [
 ]
 
 const mediaPartners = [
-  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.png'), instagram: 'https://www.instagram.com/infocamaba_/' },
-  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.png'), instagram: 'https://www.instagram.com/hmpti_unisa/' },
-  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.jpg'), instagram: 'https://www.instagram.com/lpm.hitamputih/' },
-  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.png'), instagram: 'https://www.instagram.com/lpmnaseha/' },
-  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.png'), instagram: 'https://www.instagram.com/himasi.uindkpalu/' },
-  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.png'), instagram: 'https://www.instagram.com/programming.tadulako/' },
-  { name: 'HMPSSI STMIK ADHI GUNA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(7) HMPSI STMIK Adhi Guna Palu (1) (1).png'), instagram: 'https://www.instagram.com/hmpssi_adhiguna/' },
-  { name: 'ANIMEDIA TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(8) Animedia Tadulako.png'), instagram: 'https://www.instagram.com/animediatadulako/' },
-  { name: 'PERMIKOMNAS WILAYAH X', src: getAsset(mediaPartnerAssetModules, 'medpart', '(9) Permikomnas Wilayah X.png'), instagram: 'https://www.instagram.com/permikomnaswilayahx/' },
-  { name: 'HIMATIF UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(10) HIMATIF UIN.jpeg'), instagram: 'https://www.instagram.com/himatif.uindkpalu/' },
+  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.webp'), instagram: 'https://www.instagram.com/infocamaba_/' },
+  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.webp'), instagram: 'https://www.instagram.com/hmpti_unisa/' },
+  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.webp'), instagram: 'https://www.instagram.com/lpm.hitamputih/' },
+  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.webp'), instagram: 'https://www.instagram.com/lpmnaseha/' },
+  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.webp'), instagram: 'https://www.instagram.com/himasi.uindkpalu/' },
+  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.webp'), instagram: 'https://www.instagram.com/programming.tadulako/' },
+  { name: 'HMPSSI STMIK ADHI GUNA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(7) HMPSI STMIK Adhi Guna Palu (1) (1).webp'), instagram: 'https://www.instagram.com/hmpssi_adhiguna/' },
+  { name: 'ANIMEDIA TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(8) Animedia Tadulako.webp'), instagram: 'https://www.instagram.com/animediatadulako/' },
+  { name: 'PERMIKOMNAS WILAYAH X', src: getAsset(mediaPartnerAssetModules, 'medpart', '(9) Permikomnas Wilayah X.webp'), instagram: 'https://www.instagram.com/permikomnaswilayahx/' },
+  { name: 'HIMATIF UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(10) HIMATIF UIN.webp'), instagram: 'https://www.instagram.com/himatif.uindkpalu/' },
 ]
 
 const mainStrategicPartner = {
   name: 'Hannah Asa Indonesia',
   shortName: 'HANNAH ASA INDONESIA',
-  src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Hannah Asa.png'),
+  src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Hannah Asa.webp'),
   instagram: 'https://www.instagram.com/hannahasaindonesia/',
 }
 
@@ -388,7 +194,7 @@ const strategicPartners = [
   {
     name: 'Sultan Music',
     shortName: 'SULTAN MUSIC',
-    src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Sultan Music.png'),
+    src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Sultan Music.webp'),
     description: 'Official Production & Vendor partner menjamin mutu infrastruktur panggung dan malam puncak acara.',
     logoMaxWidth: 'max-w-[200px]',
     instagram: 'https://www.instagram.com/sultan_musik.id/',
@@ -396,7 +202,7 @@ const strategicPartners = [
   {
     name: 'Google Student Ambasador',
     shortName: 'GSA',
-    src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'gsa.png'),
+    src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'gsa.webp'),
     description: 'Strategic execution partner yang mendukung operasional kolaborasi dan aktivasi lintas program.',
     logoMaxWidth: 'max-w-[180px]',
     instagram: '',
@@ -418,16 +224,16 @@ const tickerPartners = [
 
 const marqueeLogos = [
   { name: 'Hannah Asa Indonesia', src: mainStrategicPartner.src, isMedia: false },
-  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.png'), isMedia: true },
+  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.webp'), isMedia: true },
   { name: 'Sultan Music', src: strategicPartners[0].src, isMedia: false },
-  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.png'), isMedia: true },
-  { name: 'UNTAD', src: getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png'), isMedia: false },
-  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.jpg'), isMedia: true },
-  { name: 'HMTI', src: getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png'), isMedia: false },
-  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.png'), isMedia: true },
+  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.webp'), isMedia: true },
+  { name: 'UNTAD', src: getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp'), isMedia: false },
+  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.webp'), isMedia: true },
+  { name: 'HMTI', src: getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp'), isMedia: false },
+  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.webp'), isMedia: true },
   { name: 'Google Student Ambasador', src: strategicPartners[1].src, isMedia: false },
-  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.png'), isMedia: true },
-  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.png'), isMedia: true },
+  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.webp'), isMedia: true },
+  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.webp'), isMedia: true },
 ]
 
 onMounted(() => {
@@ -526,9 +332,9 @@ onBeforeUnmount(() => {
         <!-- Logo Flex Container with UNTAD -> HMTI -> I-FEST -->
         <div class="flex items-center gap-2 md:gap-4 select-none">
           <div class="flex items-center gap-1.5 md:gap-3">
-            <img alt="UNTAD Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
-            <img alt="HMTI Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
-            <img alt="I-FEST Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.png')" />
+            <img alt="UNTAD Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
+            <img alt="HMTI Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
+            <img alt="I-FEST Logo" class="h-7 md:h-10 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo-IFEST-2026.webp')" />
           </div>
           <span class="hidden sm:inline-block font-mono text-base md:text-lg font-bold tracking-widest text-[#04000D] border-l border-[#04000D]/20 pl-3 md:pl-4 riso-bleed">I-FEST 2026</span>
         </div>
@@ -633,12 +439,12 @@ onBeforeUnmount(() => {
     <section class="bg-off-white riso-canvas py-[80px] md:py-[110px] px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Subtle Decorative Background Assets (Literal Riso stamped look) -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.webp')" 
         alt="Decorative Risograph Star Shard" 
         class="absolute top-12 left-4 md:left-12 lg:left-24 w-16 md:w-28 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'rb4 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'rb4 1.webp')" 
         alt="Decorative Risograph Star Shard" 
         class="absolute bottom-12 right-4 md:right-12 lg:right-24 w-20 md:w-32 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -657,7 +463,7 @@ onBeforeUnmount(() => {
     <section id="pillars" class="bg-[#F5F5F5] riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute top-10 right-10 w-36 md:w-56 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -751,12 +557,12 @@ onBeforeUnmount(() => {
     <section id="roadshow" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background decorative riso shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'rg1 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'rg1 1.webp')" 
         alt="Decorative Riso Stamp Shard" 
         class="absolute -top-12 -left-16 w-36 md:w-56 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.webp')" 
         alt="Decorative Riso Stamp Shard" 
         class="absolute bottom-12 -right-12 w-28 md:w-44 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -994,12 +800,12 @@ onBeforeUnmount(() => {
       
       <!-- Background decorative riso shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.webp')" 
         alt="Decorative Riso Stamp Shard" 
         class="absolute -top-12 -right-16 w-36 md:w-56 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'sb3 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sb3 1.webp')" 
         alt="Decorative Riso Stamp Shard" 
         class="absolute bottom-12 -left-12 w-28 md:w-44 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -1284,7 +1090,7 @@ onBeforeUnmount(() => {
     <section id="impact-dashboard" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute -top-6 -left-12 w-28 md:w-44 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -1356,7 +1162,7 @@ onBeforeUnmount(() => {
     <section id="timeline" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-0 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'sb2 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sb2 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute -bottom-12 -right-16 w-36 md:w-56 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -1539,7 +1345,7 @@ onBeforeUnmount(() => {
     <section id="detail-kegiatan" class="bg-off-white riso-canvas py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute top-36 -right-24 w-48 md:w-80 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -1802,7 +1608,7 @@ onBeforeUnmount(() => {
 
       <!-- Background Decorative Stamp Shards (Yellow on Purple contrast) -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'sy5 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sy5 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute -bottom-8 -right-16 w-36 md:w-56 opacity-35 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -1848,7 +1654,7 @@ onBeforeUnmount(() => {
     <section class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'sg1 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sg1 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute -top-12 -left-16 w-32 md:w-52 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -2111,7 +1917,7 @@ onBeforeUnmount(() => {
     <section id="partners" class="bg-white riso-canvas py-16 sm:py-24 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'cat3 1.png')" 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'cat3 1.webp')" 
         alt="Decorative Riso Plate Shard" 
         class="absolute bottom-16 -right-16 w-36 md:w-56 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
@@ -2137,7 +1943,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
+                <img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -2156,7 +1962,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="HMTI Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
+                <img alt="HMTI Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -2175,7 +1981,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="HMTI Cabinet Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" />
+                <img alt="HMTI Cabinet Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -2194,7 +2000,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="RINOYA Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).png')" />
+                <img alt="RINOYA Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -2326,16 +2132,16 @@ onBeforeUnmount(() => {
               <span class="font-mono text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#F5F5F5]/60">ORGANIZED BY HMTI UNIVERSITAS TADULAKO</span>
               <div class="flex flex-row flex-wrap items-center gap-4 md:gap-6">
                 <a href="https://www.instagram.com/humasuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.png')" />
+                  <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
                 </a>
                 <a href="https://www.instagram.com/hmtiuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.png')" />
+                  <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
                 </a>
                 <a href="https://www.instagram.com/hmtiuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.png')" />
+                  <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.webp')" />
                 </a>
                 <a href="https://www.instagram.com/rinoya.hmtiuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="RINOYA Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).png')" />
+                  <img alt="RINOYA Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).webp')" />
                 </a>
               </div>
             </div>
@@ -2363,107 +2169,19 @@ onBeforeUnmount(() => {
     </footer>
 
     <!-- AI CHAT ASSISTANT FLOATING WIDGET -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      
-      <!-- Chat Window Overlay with Slide-Up Transition -->
-      <transition
-        enter-active-class="transition duration-300 ease-out transform"
-        enter-from-class="opacity-0 translate-y-8 scale-95"
-        enter-to-class="opacity-100 translate-y-0 scale-100"
-        leave-active-class="transition duration-200 ease-in transform"
-        leave-from-class="opacity-100 translate-y-0 scale-100"
-        leave-to-class="opacity-0 translate-y-8 scale-95"
-      >
-        <div v-show="isChatOpen" class="w-[300px] sm:w-[360px] h-[450px] bg-white border-2 sm:border-3 border-[#04000D] flex flex-col justify-between overflow-hidden shadow-[6px_6px_0px_0px_#04000D] mb-4 select-none">
-          
-          <!-- Header Area -->
-          <div class="bg-[#04000D] text-white px-4 py-3 flex justify-between items-center border-b-2 border-[#04000D]">
-            <div class="flex items-center gap-2">
-              <!-- Animated Online Indicator -->
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D6FF00] opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-[#D6FF00]"></span>
-              </span>
-              <span class="font-mono text-[10px] sm:text-xs uppercase tracking-wider font-extrabold text-white">IFEST AI Assistant</span>
-            </div>
-            <!-- Close Button -->
-            <button @click="toggleChat" class="text-white/60 hover:text-white transition-colors" aria-label="Close chat">
-              <span class="material-symbols-outlined text-base font-bold">close</span>
-            </button>
-          </div>
-
-          <!-- Message Scrollable Logs -->
-          <div class="flex-1 p-3.5 overflow-y-auto bg-off-white/40 flex flex-col gap-3">
-            
-            <div 
-              v-for="(msg, idx) in chatMessages" 
-              :key="idx" 
-              class="flex flex-col"
-              :class="msg.sender === 'user' ? 'items-end' : 'items-start'"
-            >
-              <!-- Speech Bubble -->
-              <div 
-                class="max-w-[85%] sm:max-w-[75%] p-2.5 font-mono text-xs md:text-sm leading-relaxed whitespace-pre-line overflow-x-hidden break-words prose prose-neutral max-w-full chat-prose"
-                :class="msg.sender === 'user' 
-                  ? 'bg-[#04000D] text-white border border-[#04000D] shadow-[2px_2px_0px_0px_rgba(255,61,139,0.85)]' 
-                  : 'bg-[#DCEEB1]/70 border border-[#04000D] text-[#04000D]'"
-                v-html="parseMarkdown(msg.text)"
-              >
-              </div>
-              
-              <!-- Timestamp -->
-              <span class="font-mono text-[8px] text-[#04000D]/50 mt-0.5 uppercase tracking-wider px-1">
-                {{ msg.time }}
-              </span>
-            </div>
-
-            <!-- Quick Action Chips -->
-            <div v-if="chatMessages.length === 1" class="flex flex-col gap-1.5 mt-1">
-              <span class="font-mono text-[8px] text-[#04000D]/50 uppercase tracking-widest font-extrabold">Rekomendasi Topik:</span>
-              <div class="flex flex-wrap gap-1.5">
-                <button 
-                  v-for="chip in quickPrompts" 
-                  :key="chip" 
-                  @click="sendChatMessage(chip)"
-                  class="font-mono text-[9px] font-bold text-[#04000D] bg-white border border-[#04000D] px-2 py-0.5 hover:bg-[#FF3D8B] hover:text-white transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0 shadow-[2.5px_2.5px_0px_0px_#04000D] select-none"
-                >
-                  {{ chip }}
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Bottom Input Bar -->
-          <div class="p-2.5 border-t-2 border-[#04000D] bg-white flex gap-2">
-            <input 
-              v-model="chatInput" 
-              @keyup.enter="sendChatMessage()" 
-              type="text" 
-              placeholder="Ketik pertanyaan Anda..." 
-              class="flex-1 font-mono text-[10px] px-2.5 py-1.5 border border-[#04000D] focus:outline-none focus:ring-1 focus:ring-[#FF3D8B]"
-            />
-            <button 
-              @click="sendChatMessage()" 
-              class="riso-btn-plate bg-[#04000D] text-white px-3 py-1.5 rounded-none font-mono text-[10px] font-bold text-center inline-block"
-              style="--plate-color: #FF3D8B;"
-            >
-              KIRIM
-            </button>
-          </div>
-
-        </div>
-      </transition>
-
+    <template v-if="isChatActivated">
+      <AiChatWidget @close="isChatActivated = false" />
+    </template>
+    <div v-else class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       <!-- The Trigger Floating Button -->
       <button 
-        @click="toggleChat" 
+        @click="isChatActivated = true" 
         class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative transition-transform duration-200 active:scale-95 group" 
         style="--plate-color: #D6FF00;"
-        :aria-label="isChatOpen ? 'Close Assistant' : 'Open Assistant'"
+        aria-label="Open Assistant"
       >
         <!-- Pulse Indicator Overlay -->
-        <span class="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5" v-if="!isChatOpen">
+        <span class="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF3D8B] opacity-75"></span>
           <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#FF3D8B]"></span>
         </span>
@@ -2477,22 +2195,16 @@ onBeforeUnmount(() => {
           stroke-width="2" 
           stroke-linecap="round" 
           stroke-linejoin="round" 
-          class="w-6 h-6 transition-transform duration-300"
-          :class="isChatOpen ? 'rotate-90' : 'group-hover:scale-110'"
+          class="w-6 h-6 transition-transform duration-300 group-hover:scale-110"
         >
-          <path d="M12 8V4H8" v-if="!isChatOpen"/>
-          <rect width="16" height="12" x="4" y="8" rx="2" v-if="!isChatOpen"/>
-          <path d="M2 14h2" v-if="!isChatOpen"/>
-          <path d="M20 14h2" v-if="!isChatOpen"/>
-          <path d="M15 13v2" v-if="!isChatOpen"/>
-          <path d="M9 13v2" v-if="!isChatOpen"/>
-          <!-- X Close Icon in SVG if Open -->
-          <line x1="18" y1="6" x2="6" y2="18" v-if="isChatOpen"></line>
-          <line x1="6" y1="6" x2="18" y2="18" v-if="isChatOpen"></line>
+          <path d="M12 8V4H8"/>
+          <rect width="16" height="12" x="4" y="8" rx="2"/>
+          <path d="M2 14h2"/>
+          <path d="M20 14h2"/>
+          <path d="M15 13v2"/>
+          <path d="M9 13v2"/>
         </svg>
       </button>
-
     </div>
-    
   </div>
 </template>
