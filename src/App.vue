@@ -2,36 +2,104 @@
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import RisoLoader from './components/RisoLoader.vue'
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { marked } from 'marked'
+// No external markdown library needed — using a self-contained inline parser below
 
-// Compile Markdown to secure HTML strings safely
-const parseMarkdown = (text) => {
-  if (!text) return '';
-  
-  // Pre-process inline bullet/numbered lists from the AI to make sure they
-  // automatically drop to separate lines with standard list items
-  let formatted = text
-    .replace(/\s+\*\s+/g, '\n- ') // Convert inline ' * ' to vertical list items
-    .replace(/([^\n])\s+(\d+\.\s+\*\*)/g, '$1\n\n$2') // Ensure numbering points have blank lines before them
-    .replace(/([^\n])\s+(\d+\.)/g, '$1\n$2'); // Convert inline numbers to vertical lists
-    
-  try {
-    if (marked && typeof marked.parse === 'function') {
-      return marked.parse(formatted, { breaks: true, gfm: true });
-    }
-  } catch (error) {
-    console.error("Markdown parsing failed, using fallback parser:", error);
-  }
-  
-  // Safe fallback parser if marked is not ready/available
-  return formatted
+/**
+ * Self-contained Markdown-to-HTML parser.
+ * Handles: bold, italic, inline code, fenced code blocks,
+ * unordered lists, ordered lists, blockquotes, headings, and line breaks.
+ * No external library required — eliminates marked v18 browser ESM crash.
+ */
+const parseMarkdown = (rawInput) => {
+  if (!rawInput) return '';
+
+  // ── Step 1: Pre-process inline AI list patterns ──────────────────────────
+  // AI sometimes returns " * Item" inline — convert to actual newline lists
+  let src = rawInput
+    .replace(/[ \t]+\*[ \t]+/g, '\n- ')
+    .replace(/([^\n])[ \t]+(\d+\.[ \t]+\*\*)/g, '$1\n\n$2')
+    .replace(/([^\n])[ \t]+(\d+\.[ \t])/g, '$1\n$2');
+
+  // ── Step 2: Escape raw HTML to prevent XSS ───────────────────────────────
+  src = src
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n/g, '<br/>');
-}
+    .replace(/>/g, '&gt;');
+
+  // ── Step 3: Fenced code blocks (```lang\ncode\n```) ──────────────────────
+  src = src.replace(/```[\w]*\n([\s\S]*?)```/g, (_, code) => {
+    return '<pre><code>' + code.trim() + '</code></pre>';
+  });
+
+  // ── Step 4: Process line by line ─────────────────────────────────────────
+  const lines = src.split('\n');
+  const output = [];
+  let inUL = false;
+  let inOL = false;
+
+  const closeUL = () => { if (inUL) { output.push('</ul>'); inUL = false; } };
+  const closeOL = () => { if (inOL) { output.push('</ol>'); inOL = false; } };
+
+  for (let i = 0; i < lines.length; i++) {
+    const ln = lines[i];
+
+    // Headings ## H2, # H1
+    if (/^#{1,6}\s/.test(ln)) {
+      closeUL(); closeOL();
+      const level = ln.match(/^(#+)/)[1].length;
+      const content = ln.replace(/^#+\s*/, '');
+      output.push('<h' + level + ' style="font-weight:800;margin-bottom:4px;">' + applyInline(content) + '</h' + level + '>');
+      continue;
+    }
+
+    // Blockquote
+    if (/^&gt;\s?/.test(ln)) {
+      closeUL(); closeOL();
+      output.push('<blockquote>' + applyInline(ln.replace(/^&gt;\s?/, '')) + '</blockquote>');
+      continue;
+    }
+
+    // Unordered list item (-, *, +)
+    if (/^[-*+]\s+/.test(ln)) {
+      closeOL();
+      if (!inUL) { output.push('<ul>'); inUL = true; }
+      output.push('<li>' + applyInline(ln.replace(/^[-*+]\s+/, '')) + '</li>');
+      continue;
+    }
+
+    // Ordered list item (1. 2. 3.)
+    if (/^\d+\.\s+/.test(ln)) {
+      closeUL();
+      if (!inOL) { output.push('<ol>'); inOL = true; }
+      output.push('<li>' + applyInline(ln.replace(/^\d+\.\s+/, '')) + '</li>');
+      continue;
+    }
+
+    // Empty line — close lists and insert break
+    if (ln.trim() === '') {
+      closeUL(); closeOL();
+      output.push('<br/>');
+      continue;
+    }
+
+    // Regular paragraph line
+    closeUL(); closeOL();
+    output.push('<p>' + applyInline(ln) + '</p>');
+  }
+
+  closeUL(); closeOL();
+  return output.join('');
+};
+
+/** Apply inline formatting: bold, italic, inline code */
+const applyInline = (str) => {
+  return str
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+    .replace(/_([^_]+)_/g, '<em>$1</em>');
+};
 
 // Google Gen AI SDK Constructor Proxy Wrapper for Strict Interface Alignment
 class GoogleGenAIAdapter {
