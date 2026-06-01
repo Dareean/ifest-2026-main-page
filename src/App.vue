@@ -2117,7 +2117,7 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- Mobile Drawer Menu Overlay -->
-  <div v-if="isMenuOpen" class="fixed inset-0 z-[80] w-full h-screen bg-off-white overflow-y-auto p-8 pt-24 md:hidden">
+  <div v-if="isMenuOpen" class="fixed inset-0 z-[80] w-full h-screen bg-[#F5F5F5] overflow-y-auto p-8 pt-24 md:hidden">
     <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.04] pointer-events-none z-0"></div>
     <div class="absolute inset-0 bg-noise-grain opacity-[0.03] pointer-events-none z-0"></div>
     
