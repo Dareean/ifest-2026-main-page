@@ -361,21 +361,23 @@ onBeforeUnmount(() => {
     </header>
 
     <!-- Mobile Drawer Menu Overlay -->
-    <div v-if="isMenuOpen" class="fixed inset-0 z-50 w-full h-screen bg-off-white flex flex-col justify-center items-center p-8 md:hidden">
+    <div v-if="isMenuOpen" class="fixed inset-0 z-50 w-full h-screen bg-off-white overflow-y-auto p-8 md:hidden">
       <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.04] pointer-events-none z-0"></div>
       <div class="absolute inset-0 bg-noise-grain opacity-[0.03] pointer-events-none z-0"></div>
       
-      <nav class="flex flex-col items-center gap-8 z-10 text-center">
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#roadshow">Roadshow</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#kompetisi">Kompetisi</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#timeline">Timeline</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D86BFF] pb-1 hover:text-accent-magenta" href="#galeri-jejak-langkah">Arsip 2025</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#04000D]/30 pb-1 hover:text-accent-magenta" href="#partners">Network</a>
-        
-        <a @click="toggleMenu" href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3 rounded-full font-button text-base font-bold mt-8 text-center inline-block" style="--plate-color: #FF3D8B;">
-          DAFTAR KOMPETISI
-        </a>
-      </nav>
+      <div class="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] gap-y-6 relative z-10">
+        <nav class="flex flex-col items-center gap-8 text-center">
+          <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#roadshow">Roadshow</a>
+          <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#kompetisi">Kompetisi</a>
+          <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#timeline">Timeline</a>
+          <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D86BFF] pb-1 hover:text-accent-magenta" href="#galeri-jejak-langkah">Arsip 2025</a>
+          <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#04000D]/30 pb-1 hover:text-accent-magenta" href="#partners">Network</a>
+          
+          <a @click="toggleMenu" href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3 rounded-full font-button text-base font-bold mt-8 text-center inline-block" style="--plate-color: #FF3D8B;">
+            DAFTAR KOMPETISI
+          </a>
+        </nav>
+      </div>
     </div>
 
     <!-- SECTION B: Hero Section (Tactile Colored Paper Canvas) -->
