@@ -438,7 +438,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION C: Intro (Tactile Text Section) -->
-    <section class="bg-off-white riso-canvas py-[80px] md:py-[110px] px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section class="bg-off-white riso-canvas py-[48px] md:py-[64px] px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Subtle Decorative Background Assets (Literal Riso stamped look) -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.webp')" 
@@ -451,13 +451,32 @@ onBeforeUnmount(() => {
         class="absolute bottom-12 right-4 md:right-12 lg:right-24 w-20 md:w-32 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
 
-      <div class="max-w-container-max mx-auto text-center relative z-10">
-        <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl text-[#04000D] tracking-tighter leading-tight md:leading-none mb-lg px-2 riso-text-shadow-magenta riso-bleed">
-          Bukan Sekadar Festival. Ini Adalah Episentrum Perubahan.
-        </h2>
-        <p class="font-body-lg text-base md:text-xl text-[#04000D]/85 max-w-3xl mx-auto leading-relaxed px-2">
-          Disrupsi kecerdasan buatan dan teknologi bergerak lebih cepat dari sebelumnya. I-FEST 2026 hadir untuk menjembatani digital divide, mempertemukan talenta akar rumput dengan standar industri nasional. Dari ruang kelas pedalaman hingga panggung konser raksasa, mari ciptakan resonansi yang nyata.
-        </p>
+      <div class="max-w-container-max mx-auto relative z-10">
+        <div class="bg-[#F5F5F5] border-2 border-[#04000D] shadow-[6px_6px_0px_0px_rgba(4,0,13,1)] p-6 md:p-8 relative overflow-hidden text-left">
+          
+          <!-- Giant Background Number Overlay -->
+          <img 
+            :src="getAsset(visualAssetModules, 'visual_assets', 'cat1 1.webp')" 
+            alt="IFEST 01 Risograph Stamp" 
+            class="absolute -bottom-6 -right-6 w-32 sm:w-48 md:w-64 opacity-[0.06] pointer-events-none select-none z-0 mix-blend-multiply" 
+          />
+          
+          <div class="relative z-10 max-w-4xl">
+            <!-- Monospace indicator tag -->
+            <span class="font-mono text-xs uppercase tracking-widest text-[#3B82F6] block mb-3.5 font-black">// CORE MANIFESTO</span>
+            
+            <!-- Headline -->
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none uppercase text-[#04000D] riso-bleed mb-4">
+              Mengorkestrasi Inovasi, <br class="hidden sm:inline" /><span class="text-[#8839FF]">Mengalirkan Inklusi</span>.
+            </h2>
+            
+            <!-- Paragraph -->
+            <p class="text-base md:text-lg text-gray-700 leading-relaxed max-w-2xl">
+              Disrupsi kecerdasan buatan dan teknologi bergerak lebih cepat dari sebelumnya. I-FEST 2026 hadir untuk menjembatani digital divide, mempertemukan talenta akar rumput dengan standar industri nasional. Dari ruang kelas pedalaman hingga panggung konser raksasa, mari ciptakan resonansi yang nyata.
+            </p>
+          </div>
+          
+        </div>
       </div>
     </section>
 
