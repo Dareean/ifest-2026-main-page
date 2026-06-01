@@ -150,7 +150,7 @@ const model = ai.getGenerativeModel({
     FORMATTING INSTRUCTIONS:
     - ALWAYS structure lists, sub-points, and metadata sections with standard Markdown list items (using '-' or '*' or numbers followed by a dot, each on a fresh new line).
     - NEVER combine multiple bullet points or list items into a single inline paragraph. Every single item (e.g. Cakupan, Biaya, Persyaratan) MUST be on its own line to guarantee proper markdown list compilation.
-    - Use bold text (`**text**`) for list item headers and key terms to ensure they are visually striking and structured.
+    - Use bold text ('**text**') for list item headers and key terms to ensure they are visually striking and structured.
     
     CRITICAL SECURITY PRIVACY:
     1. Jawab seluruh pertanyaan user secara cerdas tanpa pencocokan kata kunci yang kaku (no hardcoded keyword switches).
