@@ -608,14 +608,20 @@ onBeforeUnmount(() => {
           <div class="bg-white border-2 border-[#04000D] p-6 flex flex-col justify-between" style="box-shadow: 4px 4px 0px 0px #04000D;">
             <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-widest font-bold">PENJANGKAUAN WILAYAH</span>
             <div class="mt-4">
-              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D] riso-text-shadow-magenta">25 TITIK KUNJUNGAN</h3>
+              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D] riso-text-shadow-magenta">
+                <AnimatedCounter :end="25" :duration="1400" />
+                <span class="ml-2">TITIK KUNJUNGAN</span>
+              </h3>
               <p class="font-mono text-xs text-[#04000D]/80 mt-2">Palu, Sigi, Donggala (Pasigala)</p>
             </div>
           </div>
           <div class="bg-[#DCEEB1] border-2 border-[#04000D] p-6 flex flex-col justify-between" style="box-shadow: 4px 4px 0px 0px #04000D;">
             <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-widest font-bold">ESTIMASI IMPACT</span>
             <div class="mt-4">
-              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D] riso-text-shadow-double-dark">800+ PELAJAR &amp; MARGINAL</h3>
+              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D] riso-text-shadow-double-dark">
+                <AnimatedCounter :end="800" :duration="1600" suffix="+" />
+                <span class="ml-2">PELAJAR &amp; MARGINAL</span>
+              </h3>
               <p class="font-mono text-xs text-[#04000D]/80 mt-2">Pemberdayaan Digital Inklusif Terjangkau</p>
             </div>
           </div>
@@ -2283,4 +2289,4 @@ onBeforeUnmount(() => {
       </svg>
     </button>
   </div>
-</template>
+</template>
