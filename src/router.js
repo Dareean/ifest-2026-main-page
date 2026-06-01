@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from './pages/HomePage.vue'
 import CompetitionsPage from './pages/CompetitionsPage.vue'
+import RoadshowPage from './pages/RoadshowPage.vue'
 
 const routes = [
   {
@@ -16,6 +17,11 @@ const routes = [
   {
     path: '/competitions',
     redirect: '/kompetisi'
+  },
+  {
+    path: '/roadshow',
+    name: 'Roadshow',
+    component: RoadshowPage
   }
 ]
 

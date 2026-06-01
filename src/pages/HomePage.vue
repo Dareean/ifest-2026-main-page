@@ -145,62 +145,6 @@ const galleryImages = [
   }
 ]
 
-const roadshowTargets = [
-  {
-    title: "Komunitas Disabilitas",
-    subtitle: "Inklusi Teknologi",
-    accentColor: "#3B82F6",
-    points: [
-      "SLB & sekolah inklusi",
-      "Komunitas disabilitas non-sekolah",
-      "Teknologi aksesibilitas",
-      "Pendekatan partisipatif & visual"
-    ]
-  },
-  {
-    title: "Sekolah Daun / Alternatif",
-    subtitle: "Inklusi Marginal",
-    accentColor: "#10B981",
-    points: [
-      "Sekolah masyarakat adat",
-      "Sekolah alam & alternatif",
-      "Literasi Digital Dasar",
-      "Learning by doing, konteks lokal"
-    ]
-  },
-  {
-    title: "Sekolah Umum",
-    subtitle: "Penjangkauan Luas",
-    accentColor: "#EF4444",
-    points: [
-      "SMP & SMA sederajat",
-      "Simulasi interaktif keamanan siber",
-      "Pengenalan dunia IT & karier",
-      "Literasi Digital"
-    ]
-  },
-  {
-    title: "Mahasiswa",
-    subtitle: "Peer Learning",
-    accentColor: "#8B5CF6",
-    points: [
-      "Literasi & Etika Penggunaan AI",
-      "Eksplorasi tools Google AI",
-      "Diskusi & sharing session"
-    ]
-  },
-  {
-    title: "Kelompok Perempuan",
-    subtitle: "Gender Equality",
-    accentColor: "#EC4899",
-    points: [
-      "Literasi & Etika Penggunaan AI",
-      "Literasi dan Keamanan Digital",
-      "Diskusi & sharing session"
-    ]
-  }
-]
-
 const heroDecorations = [
   {
     src: getAsset(visualAssetModules, 'visual_assets', 'Component 1.webp'),
@@ -348,24 +292,7 @@ onMounted(() => {
     }
   )
 
-  // 3. Roadshow Cards Staggered Entry
-  gsap.fromTo('#roadshow-grid > div',
-    { opacity: 0, y: 40 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      stagger: 0.12,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '#roadshow-grid',
-        start: 'top 85%',
-        toggleActions: 'play none none none'
-      }
-    }
-  )
-
-  // 4. Competition Cards (Tier 1 & Tier 2) Staggered Entry
+  // 3. Competition Cards (Tier 1 & Tier 2) Staggered Entry
   gsap.fromTo('#kompetisi-grid-tier1 > div',
     { opacity: 0, y: 40 },
     {
@@ -641,179 +568,27 @@ onBeforeUnmount(() => {
         class="absolute bottom-12 -right-12 w-28 md:w-44 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
 
-      <div class="max-w-container-max mx-auto relative z-10">
+      <div class="max-w-container-max mx-auto relative z-10 text-center lg:text-left">
         
-        <!-- Section Header -->
-        <div class="mb-12 md:mb-16 text-center lg:text-left">
-          <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
-            DIGITAL SYMPHONY TOUR
-          </span>
-          <h2 class="font-black text-4xl sm:text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed flex flex-wrap justify-center lg:justify-start gap-y-2 select-none pt-2 pb-2">
-            <span class="bg-[#D6FF00] text-[#04000D] px-3.5 py-1.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[5px_5px_0px_0px_#04000D] mr-2">ROADSHOW INKLUSIF</span> &amp; SOCIAL MOVEMENT.
-          </h2>
-          <p class="font-body-md text-base md:text-xl text-[#04000D]/80 max-w-3xl mt-6 leading-relaxed">
-            Aksi nyata pengabdian masyarakat untuk mengorkestrasi inovasi dan menghadirkan akses literasi digital langsung ke sekolah, desa, dan komunitas yang paling membutuhkan.
-          </p>
-        </div>
-
-        <!-- Metrics Display -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 select-none">
-          <div class="bg-white border-2 border-[#04000D] p-6 flex flex-col justify-between" style="box-shadow: 4px 4px 0px 0px #04000D;">
-            <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-widest font-bold">PENJANGKAUAN WILAYAH</span>
-            <div class="mt-4">
-              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D]">
-                <AnimatedCounter :end="25" :duration="1400" />
-                <span class="ml-2 text-accent-magenta">TITIK KUNJUNGAN</span>
-              </h3>
-              <p class="font-mono text-xs text-[#04000D]/80 mt-2">Palu, Sigi, Donggala (Pasigala)</p>
-            </div>
-          </div>
-          <div class="bg-[#DCEEB1] border-2 border-[#04000D] p-6 flex flex-col justify-between" style="box-shadow: 4px 4px 0px 0px #04000D;">
-            <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-widest font-bold">ESTIMASI IMPACT</span>
-            <div class="mt-4">
-              <h3 class="text-3xl sm:text-4xl font-black text-[#04000D]">
-                <AnimatedCounter :end="800" :duration="1600" suffix="+" />
-                <span class="ml-2 text-accent-magenta">PELAJAR &amp; MARGINAL</span>
-              </h3>
-              <p class="font-mono text-xs text-[#04000D]/80 mt-2">Pemberdayaan Digital Inklusif Terjangkau</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- TIER 2: TARGET AUDIENS & SEGMENTASI (Bento Grid) -->
-        <div class="mb-16">
-          <div class="flex items-center gap-3 mb-8 select-none">
-            <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">TARGET SEGMENTS</span>
-            <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">SEGMENTASI PENJANGKAUAN</span>
-          </div>
-
-          <div id="roadshow-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 select-none">
-            
-            <div 
-              v-for="card in roadshowTargets" 
-              :key="card.title"
-              class="flex flex-col border-2 md:border-3 border-[#04000D] transition-transform duration-200 hover:-rotate-1" 
-              style="box-shadow: 4px 4px 0px 0px #04000D;"
-            >
-              <!-- Top Header Block (White with Accent Border) -->
-              <div class="bg-white border-b-2 border-[#04000D] p-4 flex flex-col justify-center min-h-[95px] text-left">
-                <h4 class="font-black text-sm text-[#04000D] leading-tight uppercase">{{ card.title }}</h4>
-                <span class="font-mono text-[9px] font-bold mt-1 uppercase" :style="{ color: card.accentColor }">{{ card.subtitle }}</span>
-              </div>
-              
-              <!-- Bottom Body Block (Midnight Deep Blue) -->
-              <div class="bg-[#04000D] p-5 flex-1 flex flex-col justify-start">
-                <ul class="flex flex-col gap-3 font-mono text-[10px] sm:text-[11px] text-white/95">
-                  <li v-for="point in card.points" :key="point" class="flex items-start gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" :style="{ backgroundColor: card.accentColor }"></span>
-                    <span class="leading-tight text-left">{{ point }}</span>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-
-        <!-- TIER 3: CORE CURRICULUM / TOPIC MATRICES -->
-        <div class="mb-16">
-          <div class="flex items-center gap-3 mb-8 select-none">
-            <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">CURRICULUM PILLARS</span>
-            <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">MATRIKS MATERI INTI</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
-            <div class="border-2 border-dashed border-[#04000D] p-5 bg-[#F5F5F5] relative">
-              <div class="absolute -top-3 left-4 bg-[#FF3D8B] text-white font-mono text-[9px] px-2 py-0.5 font-bold uppercase">PILLAR 01</div>
-              <h4 class="font-black uppercase text-base tracking-tight leading-none mb-3 text-[#04000D] mt-2">LITERASI &amp; KEAMANAN DIGITAL</h4>
-              <p class="text-xs text-[#04000D]/80 leading-relaxed">Edukasi seputar siber, perlindungan data pribadi, dan anti-fraud finansial dasar.</p>
-            </div>
-            
-            <div class="border-2 border-dashed border-[#04000D] p-5 bg-[#F5F5F5] relative">
-              <div class="absolute -top-3 left-4 bg-[#D6FF00] text-[#04000D] font-mono text-[9px] px-2 py-0.5 font-bold uppercase">PILLAR 02</div>
-              <h4 class="font-black uppercase text-base tracking-tight leading-none mb-3 text-[#04000D] mt-2">TEKNOLOGI AKSESIBILITAS</h4>
-              <p class="text-xs text-[#04000D]/80 leading-relaxed">Pemanfaatan piranti lunak pembaca layar, konverter teks-ke-suara, dan hardware adaptif.</p>
-            </div>
-
-            <div class="border-2 border-dashed border-[#04000D] p-5 bg-[#F5F5F5] relative">
-              <div class="absolute -top-3 left-4 bg-[#8839FF] text-white font-mono text-[9px] px-2 py-0.5 font-bold uppercase">PILLAR 03</div>
-              <h4 class="font-black uppercase text-base tracking-tight leading-none mb-3 text-[#04000D] mt-2">LITERASI AI &amp; ETIKA DIGITAL</h4>
-              <p class="text-xs text-[#04000D]/80 leading-relaxed">Kolaborasi program Google Student Ambassador; memperkenalkan Gemini AI sebagai kolaborator produktif secara etis.</p>
-            </div>
-
-            <div class="border-2 border-dashed border-[#04000D] p-5 bg-[#F5F5F5] relative">
-              <div class="absolute -top-3 left-4 bg-[#D86BFF] text-[#04000D] font-mono text-[9px] px-2 py-0.5 font-bold uppercase">PILLAR 04</div>
-              <h4 class="font-black uppercase text-base tracking-tight leading-none mb-3 text-[#04000D] mt-2">KOLABORATIF PENGABDIAN</h4>
-              <p class="text-xs text-[#04000D]/80 leading-relaxed">Sinergi terarah mahasiswa Informatika Universitas Tadulako langsung membantu problem riil di lapangan.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- TIER 4: THREE-STAGE TIMELINE FLOW -->
-        <div class="mb-16">
-          <div class="flex items-center gap-3 mb-8 select-none">
-            <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">EXECUTION TIMELINE</span>
-            <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">ALUR PELAKSANAAN KUNJUNGAN</span>
-          </div>
-
-          <!-- Timeline stepper layout -->
-          <div class="flex flex-col lg:flex-row gap-8 lg:gap-6 relative border-l-2 lg:border-l-0 lg:border-t-2 border-[#04000D] pl-6 lg:pl-0 pt-0 lg:pt-8 select-none">
-            
-            <!-- Stage 01 -->
-            <div class="flex-1 relative">
-              <!-- Bullet badge -->
-              <div class="absolute -left-[33px] lg:-left-0 -top-1 lg:-top-[41px] w-6 h-6 bg-[#FF3D8B] border-2 border-[#04000D] rounded-full flex items-center justify-center font-mono text-[10px] font-bold text-white shadow-[2px_2px_0px_0px_#04000D]">
-                1
-              </div>
-              <span class="font-mono text-[10px] font-bold uppercase text-[#FF3D8B] block mb-2">STAGE 01</span>
-              <h4 class="font-black uppercase text-lg text-[#04000D] mb-2">KONSOLIDASI &amp; FINALISASI KONSEP</h4>
-              <p class="text-xs sm:text-sm text-[#04000D]/80 leading-relaxed">
-                Koordinasi internal panitia pelaksana, penyesuaian silabus modul ajar per segmen sasaran, serta konfirmasi tertulis dengan para mitra kolaborator wilayah.
-              </p>
-            </div>
-
-            <!-- Stage 02 -->
-            <div class="flex-1 relative">
-              <!-- Bullet badge -->
-              <div class="absolute -left-[33px] lg:-left-0 -top-1 lg:-top-[41px] w-6 h-6 bg-[#D6FF00] border-2 border-[#04000D] rounded-full flex items-center justify-center font-mono text-[10px] font-bold text-[#04000D] shadow-[2px_2px_0px_0px_#04000D]">
-                2
-              </div>
-              <span class="font-mono text-[10px] font-bold uppercase text-[#04000D]/60 block mb-2">STAGE 02</span>
-              <h4 class="font-black uppercase text-lg text-[#04000D] mb-2">EKSEKUSI KUNJUNGAN BERTAHAP</h4>
-              <p class="text-xs sm:text-sm text-[#04000D]/80 leading-relaxed">
-                Pelaksanaan roadshow berkala ke tiap titik lokasi penjangkauan (SLB, sekolah umum, &amp; balai desa) secara terstruktur berdasarkan kesiapan rute operasional.
-              </p>
-            </div>
-
-            <!-- Stage 03 -->
-            <div class="flex-1 relative">
-              <!-- Bullet badge -->
-              <div class="absolute -left-[33px] lg:-left-0 -top-1 lg:-top-[41px] w-6 h-6 bg-[#8839FF] border-2 border-[#04000D] rounded-full flex items-center justify-center font-mono text-[10px] font-bold text-white shadow-[2px_2px_0px_0px_#04000D]">
-                3
-              </div>
-              <span class="font-mono text-[10px] font-bold uppercase text-[#8839FF] block mb-2">STAGE 03</span>
-              <h4 class="font-black uppercase text-lg text-[#04000D] mb-2">DAMPAK &amp; PUBLIKASI MAKSIMAL</h4>
-              <p class="text-xs sm:text-sm text-[#04000D]/80 leading-relaxed">
-                Penyusunan pelaporan dampak nyata, peluncuran aftermovie perjalanan, serta eskalasi konten komunikasi bersama ekosistem #TeamGoogle.
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- TIER 5: FOOTNOTE & CALL-TO-ACTION (CTA) -->
-        <div class="border-t-2 border-[#04000D] pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div class="flex items-start gap-3 flex-1 text-left">
-            <span class="text-xl text-[#FF3D8B] select-none leading-none">✦</span>
-            <p class="font-mono text-[10px] sm:text-xs text-[#04000D]/70 italic leading-relaxed">
-              Tanggal &amp; lokasi spesifik dalam tahap koordinasi dengan pihak kolaborator daerah. Detail teknis penjangkauan akan diperbarui setelah konfirmasi resmi diperoleh.
+        <!-- Section Header Teaser -->
+        <div class="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8">
+          <div class="max-w-3xl">
+            <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
+              DIGITAL SYMPHONY TOUR
+            </span>
+            <h2 class="font-black text-4xl sm:text-5xl md:text-6xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed flex flex-wrap justify-center lg:justify-start gap-y-2 select-none pt-2 pb-2">
+              <span class="bg-[#D6FF00] text-[#04000D] px-3.5 py-1.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[5px_5px_0px_0px_#04000D] mr-2">ROADSHOW INKLUSIF</span> &amp; SOCIAL MOVEMENT.
+            </h2>
+            <p class="font-body-md text-base md:text-xl text-[#04000D]/80 mt-6 leading-relaxed">
+              Aksi nyata pengabdian masyarakat untuk mengorkestrasi inovasi dan menghadirkan akses literasi digital langsung ke sekolah, desa, dan komunitas disabilitas yang paling membutuhkan di wilayah Palu, Sigi, dan Donggala (Pasigala).
             </p>
           </div>
           
-          <a href="https://saweria.co/" target="_blank" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3.5 rounded-full font-button text-xs font-bold select-none text-center inline-block whitespace-nowrap" style="--plate-color: #FF3D8B;">
-            Ajukan Kolaborasi Sekolah
-          </a>
+          <div class="flex-shrink-0 select-none">
+            <router-link to="/roadshow" class="riso-btn-plate bg-[#04000D] text-white px-8 py-4 rounded-full font-button text-xs font-bold text-center inline-block" style="--plate-color: #FF3D8B;">
+              Eksplorasi Rute Roadshow →
+            </router-link>
+          </div>
         </div>
 
       </div>
