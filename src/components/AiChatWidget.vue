@@ -196,7 +196,7 @@ const sendChatMessage = async (text) => {
     chatMessages.value[botMessageIndex].text = responseText
   } catch (error) {
     console.error("Gemini API stream failed:", error)
-    chatMessages.value[botMessageIndex].text = "Terima kasih atas pertanyaan Anda! Pertanyaan Anda sudah direkam. Integrasi sistem kecerdasan buatan (AI) I-FEST yang terkoneksi langsung dengan database utama sedang dioptimasi penuh untuk fase pasca-UAS."
+    chatMessages.value[botMessageIndex].text = "Maaf, terjadi kendala saat menghubungi AI Assistant. \n\n**Detail Kendala:** " + (error.message || error) + "\n\n*Catatan: Jika dideploy ke production (seperti Vercel), pastikan 'VITE_GEMINI_API_KEY' sudah dimasukkan ke dalam Environment Variables di dashboard Vercel Anda.*"
   }
 }
 </script>
