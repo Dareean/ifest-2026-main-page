@@ -29,7 +29,16 @@ const onLoaded = () => {
   >
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
-        <component :is="Component" />
+        <Suspense>
+          <template #default>
+            <component :is="Component" />
+          </template>
+          <template #fallback>
+            <div class="w-full h-screen bg-[#f4f4f4] flex items-center justify-center font-mono text-xs text-[#04000D] uppercase tracking-widest font-bold">
+              Loading Section...
+            </div>
+          </template>
+        </Suspense>
       </transition>
     </router-view>
   </div>
