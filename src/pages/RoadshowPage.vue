@@ -230,10 +230,6 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
             Tanggal &amp; lokasi spesifik dalam tahap koordinasi dengan pihak kolaborator daerah Pasigala. Proposal kolaborasi sekolah atau komunitas dapat diajukan secara resmi melalui panitia pelaksana.
           </p>
         </div>
-        
-        <a href="https://saweria.co/" target="_blank" class="riso-btn-plate bg-[#04000D] text-white px-8 py-4 rounded-full font-button text-xs font-bold text-center inline-block whitespace-nowrap" style="--plate-color: #FF3D8B;">
-          Ajukan Kemitraan Sekolah / Rute
-        </a>
       </div>
 
     </div>

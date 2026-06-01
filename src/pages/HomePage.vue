@@ -1800,7 +1800,7 @@ onBeforeUnmount(() => {
           
           <div class="flex flex-col md:items-end md:text-right gap-4">
             <p class="font-body-md text-sm md:text-base opacity-80">Ingin menjadi bagian dari simfoni ini?</p>
-            <p class="font-headline-lg text-lg md:text-xl font-medium">Sponsorship &amp; Kemitraan: <br class="md:hidden" /><span class="text-[#D6FF00]">Fauzi (+62 821-9543-2152)</span></p>
+            <p class="font-headline-lg text-lg md:text-xl font-medium">Sponsorship &amp; Kemitraan: <br class="md:hidden" /><a href="https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20%5BNama%20Anda%5D%20dari%20%5BNama%20Perusahaan%2FInstansi%5D.%20Kami%20tertarik%20untuk%20mengetahui%20lebih%20lanjut%20mengenai%20peluang%20kerja%20sama%20dan%20paket%20sponsorship%20di%20I-FEST%202026.%20Boleh%20kami%20meminta%20berkas%20Proposal%20Umum%20terbaru%3F%20Terima%20kasih%21" target="_blank" rel="noopener noreferrer" class="text-[#D6FF00] hover:underline transition-all duration-200">Fauzi (+62 821-9543-2152)</a></p>
             
             <div class="font-mono text-sm tracking-wider mt-1">
               <span class="opacity-75">Instagram:</span>
