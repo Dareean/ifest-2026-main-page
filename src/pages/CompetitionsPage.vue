@@ -34,10 +34,6 @@ watch(() => route.query.id, (newId) => {
   }
 })
 
-// Go back home helper
-const goHome = () => {
-  router.push('/')
-}
 </script>
 
 <template>
@@ -52,13 +48,13 @@ const goHome = () => {
       <header class="border-b-4 border-[#04000D] pb-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 select-none">
         <div>
           <!-- Back button with Brutalist hover mechanics -->
-          <button 
-            @click="goHome"
+          <router-link
+            to="/"
             class="flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] mb-4 bg-white border-2 border-[#04000D] px-3.5 py-1.5 transform hover:-translate-x-1 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform duration-150 cursor-pointer"
             style="box-shadow: 3px 3px 0px 0px #04000D;"
           >
             ← Kembali ke Home
-          </button>
+          </router-link>
           
           <span class="font-mono text-xs uppercase tracking-[0.25em] font-bold text-[#FF3D8B] block mb-1">
             IFEST 2026 DIGITAL ARENA
@@ -69,7 +65,6 @@ const goHome = () => {
         </div>
         
         <div class="font-mono text-xs text-[#04000D]/60 uppercase tracking-wider text-left md:text-right border-l-2 md:border-l-0 md:border-r-2 border-[#04000D] pl-4 md:pl-0 md:pr-4 py-1.5">
-          <span>Swiss Clean Brutalism Layout</span><br />
           <span>Central Sulawesi Technology Epoch</span>
         </div>
       </header>
@@ -94,15 +89,32 @@ const goHome = () => {
               :style="{ 
                 backgroundColor: activeCompetition.id === comp.id ? comp.cardBg : '#F5F5F5',
                 transform: activeCompetition.id === comp.id ? 'translate(0px, 0px)' : 'translate(-3px, -3px)',
-                boxShadow: activeCompetition.id === comp.id ? '0px 0px 0px 0px #04000D' : '4px 4px 0px 0px #04000D'
+                boxShadow: activeCompetition.id === comp.id ? '0px 0px 0px 0px #04000D' : '4px 4px 0px 0px #04000D',
+                color: activeCompetition.id === comp.id ? comp.textColor : '#04000D'
               }"
             >
               <div class="flex justify-between items-start mb-4 w-full">
-                <span class="bg-[#04000D] text-white text-[8px] px-1.5 py-0.5 rounded-none font-mono tracking-widest">{{ comp.id }}</span>
-                <span class="text-[9px] opacity-60 tracking-wider">{{ comp.scale }}</span>
+                <span 
+                  class="text-[8px] px-1.5 py-0.5 rounded-none font-mono tracking-widest"
+                  :style="{ 
+                    backgroundColor: activeCompetition.id === comp.id && comp.textColor === '#FFFFFF' ? '#FFFFFF' : '#04000D',
+                    color: activeCompetition.id === comp.id && comp.textColor === '#FFFFFF' ? '#04000D' : '#FFFFFF'
+                  }"
+                >
+                  {{ comp.id }}
+                </span>
+                <span 
+                  class="text-[9px] tracking-wider opacity-60"
+                  :style="{ color: activeCompetition.id === comp.id ? comp.textColor : '#04000D' }"
+                >
+                  {{ comp.scale }}
+                </span>
               </div>
               
-              <span class="text-sm font-black text-[#04000D] leading-none uppercase select-none">
+              <span 
+                class="text-sm font-black leading-none uppercase select-none"
+                :style="{ color: activeCompetition.id === comp.id ? comp.textColor : '#04000D' }"
+              >
                 {{ comp.title }}
               </span>
             </button>

@@ -1,15 +1,8 @@
 <script setup>
 import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { roadshowTargets } from '../data/roadshowData'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-const router = useRouter()
-
-const goHome = () => {
-  router.push('/')
-}
 
 onMounted(() => {
   window.scrollTo(0, 0)
@@ -55,13 +48,13 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
       <header class="border-b-4 border-[#04000D] pb-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 select-none">
         <div>
           <!-- Back button with Brutalist hover mechanics -->
-          <button 
-            @click="goHome"
+          <router-link
+            to="/"
             class="flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] mb-4 bg-white border-2 border-[#04000D] px-3.5 py-1.5 transform hover:-translate-x-1 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform duration-150 cursor-pointer"
             style="box-shadow: 3px 3px 0px 0px #04000D;"
           >
             ← Kembali ke Home
-          </button>
+          </router-link>
           
           <span class="font-mono text-xs uppercase tracking-[0.25em] font-bold text-[#FF3D8B] block mb-1">
             IFEST 2026 ROADSHOW MAP

@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from './pages/HomePage.vue'
-import CompetitionsPage from './pages/CompetitionsPage.vue'
-import RoadshowPage from './pages/RoadshowPage.vue'
 
 const routes = [
   {
@@ -12,7 +10,7 @@ const routes = [
   {
     path: '/kompetisi',
     name: 'Competitions',
-    component: CompetitionsPage
+    component: () => import('./pages/CompetitionsPage.vue')
   },
   {
     path: '/competitions',
@@ -21,12 +19,12 @@ const routes = [
   {
     path: '/roadshow',
     name: 'Roadshow',
-    component: RoadshowPage
+    component: () => import('./pages/RoadshowPage.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
@@ -37,4 +35,10 @@ const router = createRouter({
   }
 })
 
+// Force viewport scroll reset to the absolute top on every route change
+router.afterEach(() => {
+  window.scrollTo(0, 0)
+})
+
 export default router
+
