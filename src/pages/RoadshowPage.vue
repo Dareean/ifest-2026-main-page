@@ -1,31 +1,38 @@
 <script setup>
-import { onMounted } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import { roadshowTargets } from '../data/roadshowData'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-onMounted(() => {
+onMounted(async () => {
   window.scrollTo(0, 0)
-  
-  // Register GSAP ScrollTrigger
-  gsap.registerPlugin(ScrollTrigger)
-  
-  // Staggered entry animation for the 5 target audience cards
-  gsap.fromTo('#roadshow-grid > div',
-    { opacity: 0, y: 40 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      stagger: 0.1,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '#roadshow-grid',
-        start: 'top 85%',
-        toggleActions: 'play none none none'
+
+  await nextTick()
+
+  try {
+    gsap.registerPlugin(ScrollTrigger)
+
+    const roadshowGrid = document.querySelector('#roadshow-grid')
+    if (!roadshowGrid) return
+
+    gsap.fromTo('#roadshow-grid > div',
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: roadshowGrid,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
       }
-    }
-  )
+    )
+  } catch (error) {
+    console.error('Roadshow animation init failed:', error)
+  }
 })
 
 // Asset loading for decorative risk stamp shards

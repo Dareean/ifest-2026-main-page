@@ -27,11 +27,11 @@ const onLoaded = () => {
     class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text pb-12 transition-all duration-700 ease-out"
     :class="{ 'opacity-0 scale-[0.98] pointer-events-none h-screen overflow-hidden': !showContent }"
   >
-    <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component, route }">
       <transition name="fade" mode="out-in">
         <Suspense>
           <template #default>
-            <component :is="Component" />
+            <component :is="Component" :key="route.fullPath" />
           </template>
           <template #fallback>
             <div class="w-full h-screen bg-[#f4f4f4] flex items-center justify-center font-mono text-xs text-[#04000D] uppercase tracking-widest font-bold">
