@@ -430,69 +430,69 @@ onBeforeUnmount(() => {
         <!-- The Brutalist Trilogy Grid System -->
         <div class="flex flex-col md:grid md:grid-cols-[1.2fr_1fr_1.1fr] border-2 md:border-3 border-[#04000D] bg-[#04000D] gap-[2px] md:gap-[3px] rounded-none overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #04000D;">
           
-          <!-- CELL 1: ROADSHOW INKLUSIF -->
+          <!-- CELL 1: EMANASI -->
           <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a]">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">
-                  PHASE 01
+                  DAMPAK SOSIAL INKLUSIF
                 </span>
-                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-03]</span>
               </div>
               <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-magenta riso-bleed">
-                01 / ROADSHOW INKLUSIF
+                01 / EMANASI
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
-                Menggerakkan Digital Symphony Tour ke 25 titik krusial di Palu, Sigi, dan Donggala. Kami membawa modul literasi siber, AI, dan aksesibilitas teknologi inklusif langsung ke sekolah umum, SLB, dan desa terpencil bersama Main Strategic Partner kita, Hannah Asa Indonesia.
+                Mengalirkan dampak nyata lewat Digital Symphony Tour ke berbagai daerah di Sulawesi Tengah, memastikan pemerataan akses literasi digital, inklusi teknologi disabilitas, serta keberlanjutan bagi seluruh lapisan masyarakat.
               </p>
             </div>
             <div class="mt-8 border-t border-[#04000D]/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#04000D]/75">
               <span>25 SITES</span>
-              <span>INCLUSIVE TECH</span>
+              <span>SOCIAL IMPACT</span>
             </div>
           </div>
 
-          <!-- CELL 2: INCUBATION ARENA -->
+          <!-- CELL 2: COMPETITION -->
           <div class="bg-[#D86BFF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff]">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D86BFF] px-2 py-0.5">
-                  PHASE 02
+                  AKSELERASI TALENTA
                 </span>
-                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-02]</span>
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
               </div>
               <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#04000D] riso-text-shadow-lime riso-bleed">
-                02 / INCUBATION ARENA
+                02 / COMPETITION
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
-                Wadah pembuktian inovasi skala nasional melalui UI/UX Design, Competitive Programming, dan Business Plan. Diperkuat dengan Sulteng Digital Innovation Hub (S-DIH) Hackathon murni untuk melahirkan solusi Agri-Tech dan Fin-Tech berbasis kearifan lokal.
+                Menjadi wadah kompetisi teknologi tingkat nasional dan regional untuk menguji, mengasah, dan melahirkan talenta digital mutakhir yang siap menjawab tantangan industri globally.
               </p>
             </div>
             <div class="mt-8 border-t border-[#04000D]/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#04000D]/75">
-              <span>ARENA INCUBATION</span>
-              <span>S-DIH HACKATHON</span>
+              <span>ARENA COMPETITION</span>
+              <span>TALENT ACCELERATION</span>
             </div>
           </div>
 
-          <!-- CELL 3: GRAND CLOSING CONCERT -->
+          <!-- CELL 3: INNOVATION -->
           <div class="bg-[#8839FF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-white transition-all duration-200 hover:bg-[#9752ff]">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">
-                  PHASE 03
+                  EKSPLORASI TEKNOLOGI
                 </span>
-                <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-03]</span>
+                <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-02]</span>
               </div>
               <h3 class="font-black uppercase text-xl sm:text-2xl md:text-3xl tracking-tight leading-none mb-4 text-[#D6FF00] riso-text-shadow-magenta riso-bleed">
-                03 / GRAND CLOSING CONCERT
+                03 / INNOVATION
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed text-[#F5F5F5]/90">
-                Malam puncak perayaan orkestrasi digital selama 3 hari penuh. Menggabungkan etalase produk kreatif di Expo UMKM, panggung inspirasi TEDx Talks, dan ditutup dengan konser mahakarya masif bersama SECRET GUEST STAR, didukung oleh Strategic Partner produksi kita, Sultan Music.
+                Ruang inkubasi, pameran produk digital, dan seminar internasional yang mengorkestrasi kolaborasi strategis antara akademisi, industri, dan pemerintah guna membangun ekosistem teknologi yang terintegrasi.
               </p>
             </div>
             <div class="mt-8 border-t border-white/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#D6FF00]/95">
-              <span>EXPO &amp; TEDX</span>
-              <span>SECRET SHOWCASE</span>
+              <span>EXPO &amp; SEMINAR</span>
+              <span>INTEGRATED ECOSYSTEM</span>
             </div>
           </div>
 
