@@ -425,4 +425,75 @@ body {
     transparent 16px
   );
 }
-
+
+/* 4. Chat Bubble Markdown Prose Parser Styles */
+.chat-prose p {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.chat-prose p:last-child {
+  margin-bottom: 0;
+}
+.chat-prose strong {
+  font-weight: 800;
+  color: inherit;
+}
+.chat-prose ul {
+  list-style-type: disc;
+  padding-left: 16px;
+  margin-bottom: 6px;
+  display: block;
+}
+.chat-prose ol {
+  list-style-type: decimal;
+  padding-left: 16px;
+  margin-bottom: 6px;
+  display: block;
+}
+.chat-prose li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+  display: list-item;
+}
+.chat-prose li:last-child {
+  margin-bottom: 0;
+}
+.chat-prose code {
+  font-family: 'JetBrains Mono', monospace;
+  background-color: rgba(4, 0, 13, 0.08);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.chat-prose pre {
+  font-family: 'JetBrains Mono', monospace;
+  background-color: #04000D;
+  color: #F8F8F2;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 8px;
+  font-size: 0.85em;
+}
+.chat-prose pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+.chat-prose blockquote {
+  border-left: 3px solid #04000D;
+  padding-left: 8px;
+  margin-left: 0;
+  margin-bottom: 6px;
+  font-style: italic;
+  color: rgba(4, 0, 13, 0.7);
+}
+.chat-prose a {
+  color: #FF3D8B;
+  text-decoration: underline;
+  font-weight: 700;
+}
+.chat-prose a:hover {
+  opacity: 0.8;
+}
