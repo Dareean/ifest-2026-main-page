@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, onBeforeUnmount, onMounted, defineAsyncComponent } from 'vue'
 import RisoLoader from './components/RisoLoader.vue'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const AiChatWidget = defineAsyncComponent(() => import('./components/AiChatWidget.vue'))
 const isChatActivated = ref(false)
@@ -242,38 +244,113 @@ onMounted(() => {
   if (isLoading.value) {
     document.body.style.overflow = 'hidden'
   }
+  // GSAP ScrollTrigger integration
+  gsap.registerPlugin(ScrollTrigger)
+
+  // 1. Core Section Reveal Animations
   const revealElements = document.querySelectorAll('[data-reveal]')
-
-  const revealCallback = (entries, activeObserver) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible')
-        activeObserver.unobserve(entry.target)
-      }
-    })
-  }
-
-  observer = new IntersectionObserver(revealCallback, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px',
+  revealElements.forEach((el) => {
+    if (el.id === 'hero-content') {
+      // Hero content fades in smoothly on load
+      gsap.fromTo(el, 
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.15 }
+      )
+    } else {
+      // General section reveal triggers
+      gsap.fromTo(el,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      )
+    }
   })
 
-  revealElements.forEach((element) => observer.observe(element))
+  // 2. Trilogy Grid Staggered Card Entry
+  gsap.fromTo('#trilogy-grid > div',
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.12,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '#trilogy-grid',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    }
+  )
 
-  // Scroll trigger counter observer for Section K
+  // 3. Roadshow Cards Staggered Entry
+  gsap.fromTo('#roadshow-grid > div',
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.12,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '#roadshow-grid',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    }
+  )
+
+  // 4. Competition Cards (Tier 1 & Tier 2) Staggered Entry
+  gsap.fromTo('#kompetisi-grid-tier1 > div',
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.12,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '#kompetisi-grid-tier1',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    }
+  )
+
+  gsap.fromTo('#kompetisi-grid-tier2 > div',
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.12,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '#kompetisi-grid-tier2',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    }
+  )
+
+  // 5. Impact Dashboard Counters Trigger
   const keyNumbersSection = document.querySelector('#impact-dashboard')
   if (keyNumbersSection) {
-    const keyNumbersObserver = new IntersectionObserver((entries, observerInstance) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animateCounters()
-          observerInstance.unobserve(entry.target)
-        }
-      })
-    }, {
-      threshold: 0.15,
+    ScrollTrigger.create({
+      trigger: keyNumbersSection,
+      start: 'top 85%',
+      onEnter: () => animateCounters(),
+      once: true
     })
-    keyNumbersObserver.observe(keyNumbersSection)
   }
 
   const interactiveElements = document.querySelectorAll('button, a')
@@ -310,10 +387,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateViewport)
-  if (observer) {
-    observer.disconnect()
-    observer = null
-  }
+  ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
 })
 </script>
 
@@ -428,7 +502,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- The Brutalist Trilogy Grid System -->
-        <div class="flex flex-col md:grid md:grid-cols-[1.2fr_1fr_1.1fr] border-2 md:border-3 border-[#04000D] bg-[#04000D] gap-[2px] md:gap-[3px] rounded-none overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #04000D;">
+        <div id="trilogy-grid" class="flex flex-col md:grid md:grid-cols-[1.2fr_1fr_1.1fr] border-2 md:border-3 border-[#04000D] bg-[#04000D] gap-[2px] md:gap-[3px] rounded-none overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #04000D;">
           
           <!-- CELL 1: RESONANCE -->
           <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a]">
@@ -554,7 +628,7 @@ onBeforeUnmount(() => {
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">SEGMENTASI PENJANGKAUAN</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div id="roadshow-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             <!-- Card 1: Komunitas Disabilitas -->
             <div class="bg-[#C5B0F4] border-2 md:border-3 border-[#04000D] p-6 sm:p-8 flex flex-col justify-between min-h-[260px] relative transition-transform duration-200 hover:-rotate-1" style="box-shadow: 6px 6px 0px 0px #04000D;">
@@ -779,7 +853,7 @@ onBeforeUnmount(() => {
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">KATEGORI NASIONAL</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div id="kompetisi-grid-tier1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
             <!-- Card 1: Competitive Programming -->
             <div class="bg-[#DCEEB1] border-2 md:border-3 border-[#04000D] p-6 sm:p-8 flex flex-col justify-between min-h-[460px] relative transition-transform duration-200 hover:-rotate-1 hover:bg-[#e4f5bd]" style="box-shadow: 6px 6px 0px 0px #04000D;">
@@ -887,7 +961,7 @@ onBeforeUnmount(() => {
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">KATEGORI REGIONAL (SULTENG &amp; SEKITARNYA)</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div id="kompetisi-grid-tier2" class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             <!-- Card 4: Creative Video Competition -->
             <div class="bg-white border-2 md:border-3 border-[#04000D] p-6 sm:p-8 flex flex-col justify-between min-h-[380px] relative transition-transform duration-200 hover:rotate-1" style="box-shadow: 6px 6px 0px 0px #04000D;">
