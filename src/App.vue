@@ -101,33 +101,11 @@ const applyInline = (str) => {
     .replace(/_([^_]+)_/g, '<em>$1</em>');
 };
 
-// Google Gen AI SDK Constructor Proxy Wrapper for Strict Interface Alignment
-class GoogleGenAIAdapter {
-  constructor(config) {
-    const key = typeof config === 'object' ? config?.apiKey : config;
-    this.genAI = new GoogleGenerativeAI(key || '');
-  }
-  
-  getGenerativeModel(config) {
-    return this.genAI.getGenerativeModel({
-      model: config?.model || 'gemini-1.5-flash', // Auto-fallback if restricted client-side in the deployment zone
-      systemInstruction: config?.systemInstruction
-    });
-  }
-}
-
-// Alias the adapter as GoogleGenAI so the exact client-side requested code is executed flawlessly
-const GoogleGenAI = GoogleGenAIAdapter;
-
-// Prevent 'process is not defined' reference errors in client-side Vite builds
-const process = {
-  env: {
-    NEXT_PUBLIC_GEMINI_API_KEY: (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.NEXT_PUBLIC_GEMINI_API_KEY) : '') || ''
-  }
-};
-
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
-const model = ai.getGenerativeModel({
+// ── Gemini AI SDK Initialization ─────────────────────────────────────────────
+// Reads the API key directly from Vite's environment variable system.
+// Set VITE_GEMINI_API_KEY in your .env.local file (never commit this file!).
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+const model = genAI.getGenerativeModel({
   model: "gemini-2.5-flash",
   systemInstruction: `
     Anda adalah IFEST AI ASSISTANT, koordinator virtual resmi untuk Informatics Festival (I-FEST) 2026 yang diadakan oleh HMTI Universitas Tadulako (UNTAD) Palu.
@@ -150,7 +128,7 @@ const model = ai.getGenerativeModel({
     FORMATTING INSTRUCTIONS:
     - ALWAYS structure lists, sub-points, and metadata sections with standard Markdown list items (using '-' or '*' or numbers followed by a dot, each on a fresh new line).
     - NEVER combine multiple bullet points or list items into a single inline paragraph. Every single item (e.g. Cakupan, Biaya, Persyaratan) MUST be on its own line to guarantee proper markdown list compilation.
-    - Use bold text ('**text**') for list item headers and key terms to ensure they are visually striking and structured.
+    - Use bold text (**text**) for list item headers and key terms to ensure they are visually striking and structured.
     
     CRITICAL SECURITY PRIVACY:
     1. Jawab seluruh pertanyaan user secara cerdas tanpa pencocokan kata kunci yang kaku (no hardcoded keyword switches).
