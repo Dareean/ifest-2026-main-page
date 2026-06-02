@@ -52,7 +52,7 @@ const onLoaded = () => {
   <div v-else class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
     <button 
       @click="isChatActivated = true" 
-      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative transition-transform duration-200 active:scale-95 group" 
+      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
       style="--plate-color: #D6FF00;"
       aria-label="Open Assistant"
     >

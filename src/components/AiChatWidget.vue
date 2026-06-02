@@ -297,7 +297,7 @@ const sendChatMessage = async (text) => {
     <!-- The Trigger Floating Button -->
     <button 
       @click="toggleChat" 
-      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative transition-transform duration-200 active:scale-95 group" 
+      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
       style="--plate-color: #D6FF00;"
       :aria-label="isChatOpen ? 'Close Assistant' : 'Open Assistant'"
     >

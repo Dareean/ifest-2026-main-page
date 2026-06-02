@@ -13,6 +13,27 @@ const isMenuOpen = ref(false)
 const activeZineIndex = ref(0)
 const activeTimelinePhase = ref(-1)
 
+const activeSection = ref('')
+
+const handleScroll = () => {
+  const scrollPosition = window.scrollY + 180 // Navbar offset + padding
+  const sections = ['roadshow', 'kompetisi', 'timeline', 'galeri-jejak-langkah', 'partners']
+  
+  let currentActive = ''
+  for (const id of sections) {
+    const el = document.getElementById(id)
+    if (el) {
+      const top = el.offsetTop
+      const height = el.offsetHeight
+      if (scrollPosition >= top && scrollPosition < top + height) {
+        currentActive = id
+        break
+      }
+    }
+  }
+  activeSection.value = currentActive
+}
+
 
 const isMobile = ref(false)
 const updateViewport = () => {
@@ -242,9 +263,14 @@ const marqueeLogos = [
 onMounted(() => {
   updateViewport()
   window.addEventListener('resize', updateViewport)
+  window.addEventListener('scroll', handleScroll)
+  // Run once to set initial active section
+  handleScroll()
+
   if (isLoading.value) {
     document.body.style.overflow = 'hidden'
   }
+
   // GSAP ScrollTrigger integration
   gsap.registerPlugin(ScrollTrigger)
 
@@ -337,23 +363,6 @@ onMounted(() => {
     })
   }
 
-  const interactiveElements = document.querySelectorAll('button, a')
-  const setPressedScale = (element, scale) => {
-    element.style.transform = scale
-  }
-
-  interactiveElements.forEach((element) => {
-    const handleMouseDown = () => setPressedScale(element, 'scale(0.96)')
-    const handleMouseUp = () => setPressedScale(element, 'scale(1)')
-    const handleMouseLeave = () => setPressedScale(element, 'scale(1)')
-
-    element.addEventListener('mousedown', handleMouseDown)
-    element.addEventListener('mouseup', handleMouseUp)
-    element.addEventListener('mouseleave', handleMouseLeave)
-
-    element.__ifestHandlers = { handleMouseDown, handleMouseUp, handleMouseLeave }
-  })
-
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (event) => {
       event.preventDefault()
@@ -371,6 +380,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateViewport)
+  window.removeEventListener('scroll', handleScroll)
   ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
 })
 </script>
@@ -452,7 +462,7 @@ onBeforeUnmount(() => {
       />
 
       <div class="max-w-container-max mx-auto relative z-10">
-        <div class="bg-[#F5F5F5] border-2 border-[#04000D] shadow-[6px_6px_0px_0px_rgba(4,0,13,1)] p-6 md:p-8 relative overflow-hidden text-left">
+        <div class="bg-solid-white border-2 border-[#04000D] shadow-[6px_6px_0px_0px_rgba(4,0,13,1)] p-6 md:p-8 relative overflow-hidden text-left">
           
           <!-- Giant Background Number Overlay -->
           <img 
@@ -1241,7 +1251,7 @@ onBeforeUnmount(() => {
         <!-- Accordion Rows Container -->
         <div class="border border-[#04000D]/20 divide-y divide-[#04000D]/20 bg-white">
           
-          <!-- Accordion Row 1: Persiapan Panitia -->
+          <!-- Accordion Row 1: Identity & Foundation -->
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 0 ? -1 : 0"
@@ -1250,7 +1260,7 @@ onBeforeUnmount(() => {
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">01/</span>
-                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left">PERSIAPAN PANITIA</span>
+                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left">IDENTITY &amp; FOUNDATION</span>
               </div>
               <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 0 ? 'rotate-45' : ''">+</span>
             </button>
@@ -1286,110 +1296,51 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <!-- Accordion Row 2: Roadshow Inklusif -->
+          <!-- Row 2: Roadshow Inklusif (Digital Symphony Tour) [LINK ROUTING] -->
           <div class="transition-all duration-200">
-            <button 
-              @click="activeZineIndex = activeZineIndex === 1 ? -1 : 1"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
-              :class="activeZineIndex === 1 ? 'bg-[#D6FF00]/5' : ''"
+            <router-link 
+              to="/roadshow"
+              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4 block"
             >
-              <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
+              <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">02/</span>
-                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left">ROADSHOW INKLUSIF</span>
+                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
+                  ROADSHOW INKLUSIF (Digital Symphony Tour)
+                  <span class="inline-block bg-white text-[#FF3D8B] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border-2 border-[#FF3D8B] shrink-0">LIVE</span>
+                </span>
               </div>
-              <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 1 ? 'rotate-45' : ''">+</span>
-            </button>
-            
-            <div 
-              v-show="activeZineIndex === 1" 
-              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
-            >
-              <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                <div class="md:col-span-4">
-                  <span class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#04000D]/60 block mb-2">Regional Expansion</span>
-                  <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> 25-Titik Journey: Palu, Sigi &amp; Donggala
-                    </div>
-                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Special Needs Schools (SLB) Collaboration
-                    </div>
-                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> AI &amp; Cyber Literacy Modules with Hannah Asa
-                    </div>
-                  </div>
-                </div>
-                <div class="md:col-span-8 font-body-md text-sm sm:text-base text-[#04000D]/80 leading-relaxed">
-                  <p class="mb-4">
-                    Menjangkau 25 titik sekolah menengah dan Sekolah Luar Biasa (SLB) di wilayah Palu, Sigi, dan Donggala. Kami membagikan modul literasi kecerdasan buatan (AI) dan keamanan siber yang dirancang khusus bersama Hannah Asa Indonesia agar dapat dipelajari secara inklusif oleh semua siswa.
-                  </p>
-                  <p class="font-mono text-xs text-[#04000D]/60 italic">
-                    ✦ Partner Strategis: Hannah Asa Indonesia &amp; Relawan HMTI ✦
-                  </p>
-                </div>
-              </div>
-            </div>
+              <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200">↗</span>
+            </router-link>
           </div>
 
-          <!-- Accordion Row 3: Arena Lomba -->
+          <!-- Row 3: Arena Kompetisi (Digital Competitions) [LINK ROUTING] -->
           <div class="transition-all duration-200">
-            <button 
-              @click="activeZineIndex = activeZineIndex === 2 ? -1 : 2"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
-              :class="activeZineIndex === 2 ? 'bg-[#D6FF00]/5' : ''"
+            <router-link 
+              to="/kompetisi"
+              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4 block"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">03/</span>
                 <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
-                  ARENA KOMPETISI
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
+                  ARENA KOMPETISI (Digital Competitions)
+                  <span class="inline-block bg-white text-[#10B981] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border-2 border-[#10B981] shrink-0">OPEN</span>
                 </span>
               </div>
-              <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 2 ? 'rotate-45' : ''">+</span>
-            </button>
-            
-            <div 
-              v-show="activeZineIndex === 2" 
-              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
-            >
-              <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                <div class="md:col-span-4">
-                  <span class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#04000D]/60 block mb-2">Competition Categories</span>
-                  <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> National UI/UX Design Competition
-                    </div>
-                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Competitive Programming Arena
-                    </div>
-                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Tech-Driven Business Plan Challenge
-                    </div>
-                  </div>
-                </div>
-                <div class="md:col-span-8 font-body-md text-sm sm:text-base text-[#04000D]/80 leading-relaxed">
-                  <p class="mb-4">
-                    Perlombaan tingkat nasional yang menantang kreativitas dan ketajaman teknis mahasiswa seluruh Indonesia. Menghadirkan tiga kategori utama: desain UI/UX inovatif, kompetisi pemrograman kompetitif yang intensif, serta perancangan proposal rencana bisnis berbasis teknologi pintar.
-                  </p>
-                  <p class="font-mono text-xs text-[#04000D]/60 italic">
-                    ✦ Total Hadiah Ratusan Juta Rupiah &amp; Sertifikat Nasional ✦
-                  </p>
-                </div>
-              </div>
-            </div>
+              <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200">↗</span>
+            </router-link>
           </div>
 
-          <!-- Accordion Row 4: Visitasi Industri -->
+          <!-- Accordion Row 4: Benchmark & Exploration (Visitasi Industri) -->
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 3 ? -1 : 3"
               class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
               :class="activeZineIndex === 3 ? 'bg-[#D6FF00]/5' : ''"
             >
-              <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
+              <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">04/</span>
                 <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
-                  VISITASI INDUSTRI
+                  BENCHMARK &amp; EXPLORATION (Visitasi Industri)
                   <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
                 </span>
               </div>
@@ -1427,7 +1378,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <!-- Accordion Row 5: TEDx & Malam Puncak -->
+          <!-- Accordion Row 5: Local Intellectual Series (TEDxUNTAD) -->
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 4 ? -1 : 4"
@@ -1437,7 +1388,7 @@ onBeforeUnmount(() => {
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">05/</span>
                 <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
-                  TEDx &amp; MALAM PUNCAK
+                  LOCAL INTELLECTUAL SERIES (TEDxUNTAD)
                   <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
                 </span>
               </div>
@@ -1450,33 +1401,82 @@ onBeforeUnmount(() => {
             >
               <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-4">
+                  <span class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#04000D]/60 block mb-2">Intellectual Checkpoints</span>
+                  <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
+                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Curated TEDx Stages &amp; Local Speakers
+                    </div>
+                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
+                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Regional Resonance Panels
+                    </div>
+                    <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
+                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Interdisciplinary Knowledge Sharing
+                    </div>
+                  </div>
+                </div>
+                <div class="md:col-span-8 font-body-md text-sm sm:text-base text-[#04000D]/80 leading-relaxed">
+                  <p class="mb-4">
+                    TEDxUNTAD menghadirkan serangkaian pembicara lokal dan nasional terkurasi untuk membahas isu-isu krusial seputar disrupsi teknologi, kebudayaan, dan inovasi inklusif guna memantik gagasan besar di Sulawesi Tengah.
+                  </p>
+                  <p class="font-mono text-xs text-[#04000D]/60 italic">
+                    ✦ Lisensi Resmi TEDx &amp; Divisi Intelektual HMTI ✦
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion Row 6: The Grand Symphony (Malam Puncak) -->
+          <div class="transition-all duration-200">
+            <button 
+              @click="activeZineIndex = activeZineIndex === 5 ? -1 : 5"
+              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
+              :class="activeZineIndex === 5 ? 'bg-[#D6FF00]/5' : ''"
+            >
+              <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
+                <span class="font-mono text-base text-[#04000D]/60 shrink-0">06/</span>
+                <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
+                  THE GRAND SYMPHONY (Malam Puncak)
+                  <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
+                </span>
+              </div>
+              <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 5 ? 'rotate-45' : ''">+</span>
+            </button>
+            
+            <div 
+              v-show="activeZineIndex === 5" 
+              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
+            >
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                <div class="md:col-span-4">
                   <span class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#04000D]/60 block mb-2">Grand Orchestration</span>
                   <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
                       <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> 3-Days Innovation Expo: 30+ Booths
                     </div>
                     <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Curated TEDx Stages &amp; Local Speakers
+                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Visual Projection Mapping
                     </div>
                     <div class="flex items-center gap-2 font-mono text-xs text-[#04000D]">
-                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Grand Closing Concert.
+                      <span class="w-1.5 h-1.5 bg-[#04000D] rounded-full"></span> Grand Closing Concert
                     </div>
                   </div>
                 </div>
                 <div class="md:col-span-8 font-body-md text-sm sm:text-base text-[#04000D]/80 leading-relaxed">
                   <p class="mb-4">
-                    Malam puncak termegah yang memadukan pameran inovasi digital UMKM selama tiga hari penuh, konferensi inspiratif berlisensi TEDx, dan konser penutup spektakuler bersama SECRET GUEST STAR, dibalut dengan visual projection mapping bertema Simfoni Digital.
+                    Malam puncak termegah yang memadukan pameran inovasi digital UMKM selama tiga hari penuh, awarding night bagi pemenang kompetisi nasional, dan konser penutup spektakuler bersama Guest Star, dibalut dengan visual projection mapping bertema Simfoni Digital.
                   </p>
-                  <div class="inline-flex items-center border-2 border-dashed border-[#04000D] p-2 bg-transparent gap-3 select-none">
+                  <div class="inline-flex items-center border-2 border-dashed border-[#04000D] p-2 bg-transparent gap-3 select-none mb-4">
                     <span class="font-mono text-xs text-[#04000D] font-extrabold uppercase tracking-widest">COMING SOON PRINT STAMP: [ SECRET GUEST STAR - TBA ]</span>
                   </div>
+                  <p class="font-mono text-xs text-[#04000D]/60 italic block mt-2">
+                    ✦ BPH &amp; Seluruh Divisi Kerja I-FEST 2026 ✦
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-
+          </div>        
         </div>
-
       </div>
     </section>
 
@@ -2056,22 +2056,18 @@ onBeforeUnmount(() => {
     
     <div class="flex flex-col items-center justify-center min-h-[calc(100vh-96px)] gap-y-6 relative z-10">
       <nav class="flex flex-col items-center gap-8 text-center">
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#FF3D8B] pb-1 hover:text-accent-magenta" href="#roadshow">Roadshow</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D6FF00] pb-1 hover:text-accent-magenta" href="#kompetisi">Kompetisi</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#8839FF] pb-1 hover:text-accent-magenta" href="#timeline">Timeline</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#D86BFF] pb-1 hover:text-accent-magenta" href="#galeri-jejak-langkah">Arsip 2025</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold text-[#04000D] border-b-2 border-dashed border-[#04000D]/30 pb-1 hover:text-accent-magenta" href="#partners">Network</a>
-        
-        <a @click="toggleMenu" href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-8 py-3 rounded-full font-button text-base font-bold mt-8 text-center inline-block" style="--plate-color: #FF3D8B;">
-          DAFTAR KOMPETISI
-        </a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'roadshow' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#FF3D8B]/30 hover:text-accent-magenta'" href="#roadshow">Roadshow</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'kompetisi' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D6FF00]/30 hover:text-accent-magenta'" href="#kompetisi">Kompetisi</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#8839FF]/30 hover:text-accent-magenta'" href="#timeline">Timeline</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
     </div>
   </div>
 
   <!-- SECTION A: Top Navigation Chrome -->
   <header class="fixed inset-x-0 top-0 z-[90] w-full border-b border-dashed border-[#04000D]/30 bg-off-white/95 backdrop-blur-sm">
-    <div class="max-w-container-max mx-auto flex justify-between items-center px-3 sm:px-4 md:px-lg py-3 md:py-sm">
+    <div class="max-w-container-max mx-auto flex items-center px-3 sm:px-4 md:px-lg py-3 md:py-sm gap-4 lg:gap-8">
       
       <!-- Logo Flex Container with UNTAD -> HMTI -> I-FEST -->
       <div class="flex items-center gap-2 md:gap-4 select-none">
@@ -2083,19 +2079,16 @@ onBeforeUnmount(() => {
         <span class="hidden sm:inline-block font-mono text-base md:text-lg font-bold tracking-widest text-[#04000D] border-l border-[#04000D]/20 pl-3 md:pl-4 riso-bleed">I-FEST 2026</span>
       </div>
 
-      <nav class="hidden md:flex items-center gap-3 lg:gap-6 xl:gap-8 select-none">
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#roadshow">Roadshow</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#kompetisi">Kompetisi</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#timeline">Timeline</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#galeri-jejak-langkah">Arsip 2025</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider text-[#04000D]/70 hover:text-accent-magenta transition-colors duration-200" href="#partners">Network</a>
+      <nav class="hidden md:flex items-center gap-3 lg:gap-5 xl:gap-6 select-none ml-auto mr-2 lg:mr-4 justify-end">
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'roadshow' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#roadshow">Roadshow</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'kompetisi' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#kompetisi">Kompetisi</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#timeline">Timeline</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
 
-      <div class="flex items-center gap-2 select-none">
-        <a href="#kompetisi" class="riso-btn-plate bg-[#04000D] text-white px-4 lg:px-lg py-2 rounded-full font-button text-xs lg:text-sm select-none font-bold text-center inline-block" style="--plate-color: #FF3D8B;">
-          DAFTAR KOMPETISI
-        </a>
-        <button @click="toggleMenu" class="p-1.5 flex items-center justify-center border border-[#04000D] rounded bg-white hover:bg-off-white md:hidden transition-colors" aria-label="Toggle menu">
+      <div class="flex items-center gap-2 select-none md:hidden ml-auto">
+        <button @click="toggleMenu" class="p-1.5 flex items-center justify-center border border-[#04000D] rounded bg-white hover:bg-off-white transition-colors" aria-label="Toggle menu">
           <span class="material-symbols-outlined text-xl text-[#04000D] font-bold">
             {{ isMenuOpen ? 'close' : 'menu' }}
           </span>
@@ -2112,7 +2105,7 @@ onBeforeUnmount(() => {
     <!-- The Trigger Floating Button -->
     <button 
       @click="isChatActivated = true" 
-      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative transition-transform duration-200 active:scale-95 group" 
+      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
       style="--plate-color: #D6FF00;"
       aria-label="Open Assistant"
     >
@@ -2143,3 +2136,17 @@ onBeforeUnmount(() => {
     </button>
   </div>
 </template>
+
+<style scoped>
+.bg-solid-white {
+  background-color: #ffffff !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+.bg-solid-white::before {
+  display: none !important;
+  content: none !important;
+  background-image: none !important;
+}
+</style>
+

@@ -533,19 +533,6 @@
             observer.observe(el);
         });
 
-        // Click micro-interactions
-        document.querySelectorAll('button, a').forEach(el => {
-            el.addEventListener('mousedown', () => {
-                el.style.transform = 'scale(0.96)';
-            });
-            el.addEventListener('mouseup', () => {
-                el.style.transform = 'scale(1)';
-            });
-            el.addEventListener('mouseleave', () => {
-                el.style.transform = 'scale(1)';
-            });
-        });
-
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
