@@ -417,7 +417,7 @@ onBeforeUnmount(() => {
             Mengorkestrasi Inovasi Global untuk Masa Depan Berkelanjutan. HMTI Universitas Tadulako memanggil 8.000+ inovator untuk bergabung dalam revolusi digital terbesar di Sulawesi Tengah.
           </p>
           
-          <button class="riso-btn-plate bg-[#04000D] text-white px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button select-none font-bold" style="--plate-color: #D6FF00;">
+          <button class="riso-btn-plate bg-black text-white px-8 md:px-xl py-3 md:py-md rounded-full font-button text-button select-none font-bold active:scale-95" style="--plate-color: #FF3D8B;">
             EXPLORE THE SYMPHONY ↓
           </button>
         </div>
