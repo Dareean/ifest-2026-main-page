@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { competitionsData } from '../data/competitionsData'
 
@@ -7,14 +7,40 @@ const route = useRoute()
 const router = useRouter()
 
 const activeCompetition = ref(competitionsData[0])
+const isScrolled = ref(false)
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50
+}
 
 const selectCompetition = (comp) => {
   activeCompetition.value = comp
   router.replace({ query: { id: comp.id } })
 }
 
+const selectCompetitionAndScroll = (comp) => {
+  selectCompetition(comp)
+  const el = document.getElementById('competition-details')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+const getShortName = (id) => {
+  switch (id) {
+    case 'NAT-01': return 'CP'
+    case 'NAT-02': return 'UI/UX'
+    case 'NAT-03': return 'Business Plan'
+    case 'REG-01': return 'Video'
+    case 'REG-02': return 'Poster'
+    case 'REG-03': return 'Hackathon'
+    default: return id
+  }
+}
+
 onMounted(() => {
   window.scrollTo(0, 0)
+  window.addEventListener('scroll', handleScroll)
   
   const compId = route.query.id
   if (compId) {
@@ -23,6 +49,10 @@ onMounted(() => {
       activeCompetition.value = found
     }
   }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
 })
 
 watch(() => route.query.id, (newId) => {
@@ -42,38 +72,96 @@ watch(() => route.query.id, (newId) => {
     <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.03] pointer-events-none z-0"></div>
     <div class="absolute inset-0 bg-noise-grain opacity-[0.02] pointer-events-none z-0"></div>
 
-    <div class="max-w-container-max mx-auto px-4 sm:px-6 md:px-lg pt-12 md:pt-16 relative z-10">
-      
-      <!-- HEADER CHROME -->
-      <header class="border-b-4 border-[#04000D] pb-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 select-none">
-        <div>
-          <!-- Back button with Brutalist hover mechanics -->
-          <router-link
-            to="/"
-            class="flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] mb-4 bg-white border-2 border-[#04000D] px-3.5 py-1.5 transform hover:-translate-x-1 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform duration-150 cursor-pointer"
-            style="box-shadow: 3px 3px 0px 0px #04000D;"
+    <!-- HEADER CHROME -->
+    <header 
+      :class="[
+        'fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out border-[#04000D] select-none',
+        isScrolled 
+          ? 'bg-white/85 backdrop-blur-md shadow-sm border-b' 
+          : 'bg-white/100 py-6 h-auto border-b-4'
+      ]"
+    >
+      <div class="max-w-container-max mx-auto px-4 sm:px-6 md:px-lg transition-all duration-300" :class="isScrolled ? 'py-2 h-16 flex items-center' : ''">
+        <div 
+          class="w-full flex transition-all duration-300 ease-in-out"
+          :class="isScrolled ? 'flex-row items-center justify-between' : 'flex-col md:flex-row md:items-end justify-between gap-6'"
+        >
+          <div 
+            class="flex transition-all duration-300 ease-in-out"
+            :class="isScrolled ? 'flex-row items-center gap-4' : 'flex-col'"
           >
-            ← Kembali ke Home
-          </router-link>
+            <!-- Back button with Brutalist hover mechanics -->
+            <router-link
+              to="/"
+              :class="[
+                'flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] transition-all duration-300 cursor-pointer',
+                isScrolled 
+                  ? 'px-1 py-1' 
+                  : 'bg-white border-2 border-[#04000D] px-3.5 py-1.5 transform hover:-translate-x-1 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0'
+              ]"
+              :style="isScrolled ? {} : { boxShadow: '3px 3px 0px 0px #04000D' }"
+            >
+              {{ isScrolled ? '← Home' : '← Kembali ke Home' }}
+            </router-link>
+            
+            <span 
+              :class="[
+                'font-mono text-xs uppercase tracking-[0.25em] font-bold text-[#FF3D8B] transition-all duration-300',
+                isScrolled ? 'opacity-0 pointer-events-none hidden' : 'block mb-1 mt-4'
+              ]"
+            >
+              IFEST 2026 DIGITAL ARENA
+            </span>
+            <h1 
+              :class="[
+                'font-black text-[#04000D] riso-bleed uppercase transition-all duration-300',
+                isScrolled 
+                  ? 'text-lg md:text-xl font-bold uppercase tracking-normal' 
+                  : 'text-4xl sm:text-5xl md:text-6xl tracking-[-0.04em] leading-none'
+              ]"
+            >
+              DIGITAL COMPETITIONS.
+            </h1>
+          </div>
           
-          <span class="font-mono text-xs uppercase tracking-[0.25em] font-bold text-[#FF3D8B] block mb-1">
-            IFEST 2026 DIGITAL ARENA
-          </span>
-          <h1 class="font-black text-4xl sm:text-5xl md:text-6xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed uppercase">
-            DIGITAL COMPETITIONS.
-          </h1>
+          <div 
+            :class="[
+              'font-mono text-xs text-[#04000D]/60 uppercase tracking-wider text-left md:text-right border-l-2 md:border-l-0 md:border-r-2 border-[#04000D] pl-4 md:pl-0 md:pr-4 py-1.5 transition-all duration-300',
+              isScrolled ? 'opacity-0 pointer-events-none hidden' : 'block'
+            ]"
+          >
+            <span>Central Sulawesi Technology Epoch</span>
+          </div>
         </div>
-        
-        <div class="font-mono text-xs text-[#04000D]/60 uppercase tracking-wider text-left md:text-right border-l-2 md:border-l-0 md:border-r-2 border-[#04000D] pl-4 md:pl-0 md:pr-4 py-1.5">
-          <span>Central Sulawesi Technology Epoch</span>
-        </div>
-      </header>
+      </div>
 
+      <!-- Sticky Sub-Tabs Row (Visible on scroll) -->
+      <div 
+        v-if="isScrolled" 
+        class="border-t border-[#04000D] bg-white/90 backdrop-blur-md py-1.5 px-4 sm:px-6 md:px-lg transition-all duration-300"
+      >
+        <div class="max-w-container-max mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar font-mono text-[10px] uppercase font-bold text-[#04000D]">
+          <span class="text-[#04000D]/50 mr-2 flex-shrink-0">Jump To:</span>
+          <button 
+            v-for="comp in competitionsData" 
+            :key="comp.id"
+            @click="selectCompetitionAndScroll(comp)"
+            class="px-2.5 py-1 border border-[#04000D] transition-all duration-150 flex-shrink-0 hover:bg-[#04000D] hover:text-white"
+            :class="activeCompetition.id === comp.id ? 'bg-[#04000D] text-white' : 'bg-white text-[#04000D]'"
+          >
+            {{ getShortName(comp.id) }}
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-container-max mx-auto px-4 sm:px-6 md:px-lg pt-64 sm:pt-72 md:pt-80 relative z-10">
+      
       <!-- TWO-COLUMN MAIN GRID -->
       <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 md:gap-12 items-start">
         
         <!-- SIDEBAR NAVIGATION / TAB SWITCHER -->
-        <aside class="lg:sticky lg:top-24 z-20">
+        <aside class="lg:sticky lg:top-36 z-20">
           <div class="flex items-center gap-2.5 mb-6 select-none">
             <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2 py-0.5">CATEGORIES</span>
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/40">KATEGORI LOMBA</span>
@@ -124,7 +212,7 @@ watch(() => route.query.id, (newId) => {
         <!-- CONTENT AREA (THE DEEP CONTEXT) -->
         <main class="w-full">
           <!-- Dynamic details page for the active selection -->
-          <article class="bg-white border-3 md:border-4 border-[#04000D] p-6 sm:p-8 md:p-12 relative" :style="{ boxShadow: '10px 10px 0px 0px #04000D' }">
+          <article id="competition-details" class="bg-white border-3 md:border-4 border-[#04000D] p-6 sm:p-8 md:p-12 relative" :style="{ boxShadow: '10px 10px 0px 0px #04000D' }">
             
             <!-- Category Banner Accent -->
             <div class="absolute -top-0.5 right-6 bg-[#04000D] text-white px-4 py-1.5 font-mono text-[9px] sm:text-xs font-bold uppercase tracking-widest">
