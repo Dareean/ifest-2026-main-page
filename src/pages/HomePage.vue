@@ -116,6 +116,13 @@ const onLoaded = () => {
   isLoading.value = false
 }
 
+const scrollToHero = () => {
+  const heroSection = document.getElementById('hero')
+  if (heroSection) {
+    heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
 let observer = null
 
 const visualAssetModules = import.meta.glob('../assets/visual_assets/*', {
@@ -2002,13 +2009,19 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           
-          <div class="flex flex-col gap-6">
+            <div class="relative flex flex-col gap-6 group">
+              <button
+                type="button"
+                class="absolute inset-0 z-20 rounded-none bg-transparent cursor-pointer"
+                aria-label="Kembali ke hero section"
+                @click="scrollToHero"
+              ></button>
             <div class="flex flex-col gap-2">
               <span class="font-headline-lg text-3xl sm:text-4xl font-bold text-[#D6FF00] riso-text-shadow-double-dark riso-bleed">I-FEST 2026</span>
             </div>
             
             <!-- Bottom-Left Institutional Logo flex block -->
-            <div class="flex flex-col gap-3">
+            <div class="relative z-10 flex flex-col gap-3">
               <span class="font-mono text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#F5F5F5]/60">ORGANIZED BY HMTI UNIVERSITAS TADULAKO</span>
               <div class="flex flex-row flex-wrap items-center gap-4 md:gap-6">
                 <a href="https://www.instagram.com/humasuntad/" target="_blank" rel="noopener noreferrer">

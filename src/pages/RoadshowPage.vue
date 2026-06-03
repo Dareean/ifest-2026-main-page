@@ -1,11 +1,18 @@
 <script setup>
-import { nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { roadshowTargets } from '../data/roadshowData'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+const isScrolled = ref(false)
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50
+}
+
 onMounted(async () => {
   window.scrollTo(0, 0)
+  window.addEventListener('scroll', handleScroll)
 
   await nextTick()
 
@@ -35,6 +42,10 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
 // Asset loading for decorative risk stamp shards
 const visualAssetModules = import.meta.glob('../assets/visual_assets/*', {
   eager: true,
@@ -49,33 +60,72 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
     <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.03] pointer-events-none z-0"></div>
     <div class="absolute inset-0 bg-noise-grain opacity-[0.02] pointer-events-none z-0"></div>
 
-    <div class="max-w-container-max mx-auto px-4 sm:px-6 md:px-lg pt-12 md:pt-16 relative z-10">
-      
-      <!-- HEADER CHROME -->
-      <header class="border-b-4 border-[#04000D] pb-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 select-none">
-        <div>
-          <!-- Back button with Brutalist hover mechanics -->
-          <router-link
-            to="/"
-            class="flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] mb-4 bg-white border-2 border-[#04000D] px-3.5 py-1.5 transform hover:-translate-x-1 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform duration-150 cursor-pointer"
-            style="box-shadow: 3px 3px 0px 0px #04000D;"
+    <!-- HEADER CHROME -->
+    <header 
+      :class="[
+        'fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out border-[#04000D] select-none',
+        isScrolled 
+          ? 'bg-white/85 backdrop-blur-md py-2 h-16 shadow-sm border-b' 
+          : 'bg-white/100 py-6 h-auto border-b-4'
+      ]"
+    >
+      <div class="max-w-container-max mx-auto px-4 sm:px-6 md:px-lg h-full flex items-center">
+        <div 
+          class="w-full flex transition-all duration-300 ease-in-out"
+          :class="isScrolled ? 'flex-row items-center justify-between' : 'flex-col md:flex-row md:items-end justify-between gap-6'"
+        >
+          <div 
+            class="flex transition-all duration-300 ease-in-out"
+            :class="isScrolled ? 'flex-row items-center gap-4' : 'flex-col'"
           >
-            ← Kembali ke Home
-          </router-link>
+            <!-- Back button with Brutalist hover mechanics -->
+            <router-link
+              to="/"
+              :class="[
+                'flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] transition-all duration-300 cursor-pointer',
+                isScrolled 
+                  ? 'px-1 py-1' 
+                  : 'bg-white border-2 border-[#04000D] px-3.5 py-1.5 transform hover:-translate-x-1 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0'
+              ]"
+              :style="isScrolled ? {} : { boxShadow: '3px 3px 0px 0px #04000D' }"
+            >
+              {{ isScrolled ? '← Home' : '← Kembali ke Home' }}
+            </router-link>
+            
+            <span 
+              :class="[
+                'font-mono text-xs uppercase tracking-[0.25em] font-bold text-[#FF3D8B] transition-all duration-300',
+                isScrolled ? 'opacity-0 pointer-events-none hidden' : 'block mb-1 mt-4'
+              ]"
+            >
+              IFEST 2026 ROADSHOW MAP
+            </span>
+            <h1 
+              :class="[
+                'font-black text-[#04000D] riso-bleed uppercase transition-all duration-300',
+                isScrolled 
+                  ? 'text-lg md:text-xl font-bold uppercase tracking-normal' 
+                  : 'text-4xl sm:text-5xl md:text-6xl tracking-[-0.04em] leading-none'
+              ]"
+            >
+              ROADSHOW INKLUSIF.
+            </h1>
+          </div>
           
-          <span class="font-mono text-xs uppercase tracking-[0.25em] font-bold text-[#FF3D8B] block mb-1">
-            IFEST 2026 ROADSHOW MAP
-          </span>
-          <h1 class="font-black text-4xl sm:text-5xl md:text-6xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed uppercase">
-            ROADSHOW INKLUSIF.
-          </h1>
+          <div 
+            :class="[
+              'font-mono text-xs text-[#04000D]/60 uppercase tracking-wider text-left md:text-right border-l-2 md:border-l-0 md:border-r-2 border-[#04000D] pl-4 md:pl-0 md:pr-4 py-1.5 transition-all duration-300',
+              isScrolled ? 'opacity-0 pointer-events-none hidden' : 'block'
+            ]"
+          >
+            <span>Social Impact Program</span><br />
+            <span>Central Sulawesi Tour Hub</span>
+          </div>
         </div>
-        
-        <div class="font-mono text-xs text-[#04000D]/60 uppercase tracking-wider text-left md:text-right border-l-2 md:border-l-0 md:border-r-2 border-[#04000D] pl-4 md:pl-0 md:pr-4 py-1.5">
-          <span>Social Impact Program</span><br />
-          <span>Central Sulawesi Tour Hub</span>
-        </div>
-      </header>
+      </div>
+    </header>
+
+    <div class="max-w-container-max mx-auto px-4 sm:px-6 md:px-lg pt-64 sm:pt-72 md:pt-80 relative z-10">
 
       <!-- METRICS & IMPACT SUMMARY BLOCK -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 select-none">
