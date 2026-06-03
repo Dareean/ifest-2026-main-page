@@ -17,7 +17,7 @@ const activeSection = ref('')
 
 const handleScroll = () => {
   const scrollPosition = window.scrollY + 180 // Navbar offset + padding
-  const sections = ['roadshow', 'kompetisi', 'timeline', 'galeri-jejak-langkah', 'partners']
+  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'partners']
   
   let currentActive = ''
   for (const id of sections) {
@@ -383,6 +383,19 @@ onMounted(() => {
       }
     })
   })
+
+  // Handle autoscroll persist state logic
+  const targetSectionId = window.history.state?.scrollToSection
+  if (targetSectionId) {
+    setTimeout(() => {
+      const element = document.getElementById(targetSectionId)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        // Clear state
+        window.history.replaceState({ ...window.history.state, scrollToSection: null }, document.title)
+      }
+    }, 150)
+  }
 })
 
 onBeforeUnmount(() => {
@@ -592,7 +605,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION COMP: ROADSHOW INKLUSIF & SOCIAL MOVEMENT -->
-    <section id="roadshow" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="roadshow-section" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background decorative riso shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'rg1 1.webp')" 
@@ -622,7 +635,7 @@ onBeforeUnmount(() => {
           </div>
           
           <div class="flex-shrink-0 select-none">
-            <router-link to="/roadshow" class="riso-btn-plate bg-[#04000D] text-white px-8 py-4 rounded-full font-button text-xs font-bold text-center inline-block" style="--plate-color: #FF3D8B;">
+            <router-link :to="{ path: '/roadshow', state: { fromSection: 'roadshow-section' } }" class="riso-btn-plate bg-[#04000D] text-white px-8 py-4 rounded-full font-button text-xs font-bold text-center inline-block" style="--plate-color: #FF3D8B;">
               Eksplorasi Rute Roadshow →
             </router-link>
           </div>
@@ -632,7 +645,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION COMP: COMPETITION BENTO GRID -->
-    <section id="kompetisi" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="competitions-section" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       
       <!-- Background decorative riso shards -->
       <img 
@@ -690,7 +703,7 @@ onBeforeUnmount(() => {
               </div>
               
               <div class="mt-8 select-none">
-                <router-link :to="{ path: '/kompetisi', query: { id: comp.id } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
+                <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
                   Lihat Detail Lomba →
                 </router-link>
               </div>
@@ -729,7 +742,7 @@ onBeforeUnmount(() => {
               </div>
               
               <div class="mt-8 select-none">
-                <router-link :to="{ path: '/kompetisi', query: { id: comp.id } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
+                <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
                   Lihat Detail Lomba →
                 </router-link>
               </div>
@@ -763,7 +776,7 @@ onBeforeUnmount(() => {
                 </div>
               </div>
               <div class="w-full md:w-auto">
-                <router-link :to="{ path: '/kompetisi', query: { id: 'REG-03' } }" class="riso-btn-plate bg-[#D6FF00] text-[#04000D] px-8 py-3 rounded-full font-button text-xs text-center font-extrabold block" style="--plate-color: #FF3D8B;">
+                <router-link :to="{ path: '/kompetisi', query: { id: 'REG-03' }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate bg-[#D6FF00] text-[#04000D] px-8 py-3 rounded-full font-button text-xs text-center font-extrabold block" style="--plate-color: #FF3D8B;">
                   Lihat Detail Lomba →
                 </router-link>
               </div>
@@ -1306,7 +1319,7 @@ onBeforeUnmount(() => {
           <!-- Row 2: Roadshow Inklusif (Digital Symphony Tour) [LINK ROUTING] -->
           <div class="transition-all duration-200">
             <router-link 
-              to="/roadshow"
+              :to="{ path: '/roadshow', state: { fromSection: 'roadshow-section' } }"
               class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4 block"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
@@ -1323,7 +1336,7 @@ onBeforeUnmount(() => {
           <!-- Row 3: Arena Kompetisi (Digital Competitions) [LINK ROUTING] -->
           <div class="transition-all duration-200">
             <router-link 
-              to="/kompetisi"
+              :to="{ path: '/kompetisi', state: { fromSection: 'competitions-section' } }"
               class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4 block"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
@@ -2069,8 +2082,8 @@ onBeforeUnmount(() => {
     
     <div class="flex flex-col items-center justify-center min-h-[calc(100vh-96px)] gap-y-6 relative z-10">
       <nav class="flex flex-col items-center gap-8 text-center">
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'roadshow' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#FF3D8B]/30 hover:text-accent-magenta'" href="#roadshow">Roadshow</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'kompetisi' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D6FF00]/30 hover:text-accent-magenta'" href="#kompetisi">Kompetisi</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'roadshow-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#FF3D8B]/30 hover:text-accent-magenta'" href="#roadshow-section">Roadshow</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'competitions-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D6FF00]/30 hover:text-accent-magenta'" href="#competitions-section">Kompetisi</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#8839FF]/30 hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
@@ -2093,8 +2106,8 @@ onBeforeUnmount(() => {
       </div>
 
       <nav class="hidden md:flex items-center gap-3 lg:gap-5 xl:gap-6 select-none ml-auto mr-2 lg:mr-4 justify-end">
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'roadshow' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#roadshow">Roadshow</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'kompetisi' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#kompetisi">Kompetisi</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'roadshow-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#roadshow-section">Roadshow</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'competitions-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#competitions-section">Kompetisi</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#partners">Network</a>

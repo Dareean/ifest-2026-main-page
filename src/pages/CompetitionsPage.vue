@@ -8,6 +8,7 @@ const router = useRouter()
 
 const activeCompetition = ref(competitionsData[0])
 const isScrolled = ref(false)
+const returnSection = ref('')
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
@@ -41,6 +42,7 @@ const getShortName = (id) => {
 onMounted(() => {
   window.scrollTo(0, 0)
   window.addEventListener('scroll', handleScroll)
+  returnSection.value = window.history.state?.fromSection || ''
   
   const compId = route.query.id
   if (compId) {
@@ -92,7 +94,7 @@ watch(() => route.query.id, (newId) => {
           >
             <!-- Back button with Brutalist hover mechanics -->
             <router-link
-              to="/"
+              :to="{ path: '/', state: { scrollToSection: returnSection } }"
               :class="[
                 'flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] transition-all duration-300 cursor-pointer',
                 isScrolled 

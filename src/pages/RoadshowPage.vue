@@ -5,6 +5,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const isScrolled = ref(false)
+const returnSection = ref('')
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
@@ -13,6 +14,7 @@ const handleScroll = () => {
 onMounted(async () => {
   window.scrollTo(0, 0)
   window.addEventListener('scroll', handleScroll)
+  returnSection.value = window.history.state?.fromSection || ''
 
   await nextTick()
 
@@ -80,7 +82,7 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
           >
             <!-- Back button with Brutalist hover mechanics -->
             <router-link
-              to="/"
+              :to="{ path: '/', state: { scrollToSection: returnSection } }"
               :class="[
                 'flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] transition-all duration-300 cursor-pointer',
                 isScrolled 
