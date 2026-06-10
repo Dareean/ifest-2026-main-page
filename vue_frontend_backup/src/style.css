@@ -1,0 +1,521 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fdf8fa;
+  color: #1d1b1d;
+  font-family: 'Geist', 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, button, input, select, textarea {
+  font-family: 'Geist', 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.no-shadow {
+  box-shadow: none !important;
+}
+
+* {
+  box-shadow: none !important;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.paper-texture {
+  position: relative;
+}
+
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Riso Canvas Engine with Coarse Grain & Dot Screen */
+.bg-off-white,
+.bg-background,
+.bg-surface-container,
+.bg-midnight,
+.riso-canvas {
+  position: relative;
+}
+
+.bg-off-white::before,
+.bg-background::before,
+.bg-surface-container::before,
+.riso-canvas::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.04;
+  background-image: 
+    radial-gradient(#04000D 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 16px 16px, auto;
+}
+
+.bg-solid-white {
+  background-color: #ffffff !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+.bg-solid-white::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Midnight Background also gets a subtle white/magenta grain screen */
+.bg-midnight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.025;
+  background-image: 
+    radial-gradient(#ffffff 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 20px 20px, auto;
+}
+
+/* Ink Bleed Filter Utility */
+.riso-bleed {
+  filter: url(#riso-ink-bleed);
+}
+
+/* 1. TEXT MISREGISTRATION (Chromatically Shifted Plates) */
+.riso-text-shadow-magenta {
+  text-shadow: 2.5px 2px 0px rgba(255, 61, 139, 0.85);
+}
+
+.riso-text-shadow-soft-gray {
+  text-shadow: 1.5px 1.5px 0px rgba(74, 69, 76, 0.2);
+}
+
+.riso-text-shadow-soft-green {
+  text-shadow: 1.5px 1.5px 0px rgba(64, 73, 60, 0.45);
+}
+
+.riso-text-shadow-tight-magenta {
+  text-shadow: 1px 1px 0px rgba(255, 61, 139, 0.95);
+}
+
+.riso-text-shadow-tight-dark {
+  text-shadow: 1px 1px 0px rgba(4, 0, 13, 0.25);
+}
+
+.riso-text-shadow-lime {
+  text-shadow: -2.5px -1.5px 0px rgba(214, 255, 0, 0.9);
+}
+
+.riso-text-shadow-double {
+  text-shadow: 
+    2px 1.5px 0px rgba(255, 61, 139, 0.8),
+    -2px -1.5px 0px rgba(136, 57, 255, 0.8);
+}
+
+.riso-text-shadow-double-dark {
+  text-shadow: 
+    2px 1.5px 0px rgba(255, 61, 139, 0.8),
+    -2.5px -2px 0px rgba(4, 0, 13, 0.95);
+}
+
+/* 2. CARD & BUTTON MISREGISTRATION (Faux Shifted Background Plates) */
+.riso-card-plate {
+  position: relative;
+  background-color: #F5F5F5;
+  border: 1px dashed rgba(4, 0, 13, 0.35);
+  transition: transform 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-card-plate::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-color: var(--plate-color, #FF3D8B); /* Saturated ink plate */
+  border: 1px dashed rgba(4, 0, 13, 0.35);
+  z-index: -1;
+  transform: translate(1.5px, 1px);
+  border-radius: inherit;
+  transition: transform 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@media (min-width: 768px) {
+  .riso-card-plate::after {
+    transform: translate(3px, 2px);
+  }
+}
+
+.riso-card-plate:hover {
+  transform: translate(-0.5px, -0.3px);
+}
+@media (min-width: 768px) {
+  .riso-card-plate:hover {
+    transform: translate(-1px, -0.75px);
+  }
+}
+
+.riso-card-plate:hover::after {
+  transform: translate(2px, 1.3px);
+}
+@media (min-width: 768px) {
+  .riso-card-plate:hover::after {
+    transform: translate(4px, 2.75px);
+  }
+}
+
+.riso-card-plate:active {
+  transform: translate(1px, 0.6px);
+}
+@media (min-width: 768px) {
+  .riso-card-plate:active {
+    transform: translate(2px, 1.25px);
+  }
+}
+
+.riso-card-plate:active::after {
+  transform: translate(0.5px, 0.3px);
+}
+@media (min-width: 768px) {
+  .riso-card-plate:active::after {
+    transform: translate(1px, 0.75px);
+  }
+}
+
+/* Pill Button Misregistration */
+.riso-btn-plate {
+  position: relative;
+  border: 1px solid #04000D;
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-btn-plate::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-color: var(--plate-color, #D6FF00);
+  border: 1px solid #04000D;
+  z-index: -1;
+  border-radius: inherit;
+  transform: translate(1.5px, 1px);
+  transition: transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@media (min-width: 768px) {
+  .riso-btn-plate::after {
+    transform: translate(3px, 2px);
+  }
+}
+
+.riso-btn-plate:hover {
+  transform: translate(-0.5px, -0.3px);
+}
+@media (min-width: 768px) {
+  .riso-btn-plate:hover {
+    transform: translate(-1px, -0.75px);
+  }
+}
+
+.riso-btn-plate:hover::after {
+  transform: translate(2px, 1.3px);
+}
+@media (min-width: 768px) {
+  .riso-btn-plate:hover::after {
+    transform: translate(4px, 2.75px);
+  }
+}
+
+.riso-btn-plate:active {
+  transform: translate(1px, 0.6px);
+}
+@media (min-width: 768px) {
+  .riso-btn-plate:active {
+    transform: translate(2px, 1.25px);
+  }
+}
+
+.riso-btn-plate:active::after {
+  transform: translate(0.5px, 0.3px);
+}
+@media (min-width: 768px) {
+  .riso-btn-plate:active::after {
+    transform: translate(1px, 0.75px);
+  }
+}
+
+/* 3. SKETCHY DASHDED/DOUBLE BORDERS & ORGANIC RADII */
+.border-riso-sketchy-lg {
+  border: 1.25px dashed rgba(4, 0, 13, 0.35);
+  border-radius: 12px;
+}
+@media (min-width: 768px) {
+  .border-riso-sketchy-lg {
+    border-radius: 32px 28px 34px 29px / 29px 34px 28px 32px;
+  }
+}
+
+.border-riso-sketchy-md {
+  border: 1.25px dashed rgba(4, 0, 13, 0.35);
+  border-radius: 10px;
+}
+@media (min-width: 768px) {
+  .border-riso-sketchy-md {
+    border-radius: 24px 20px 26px 22px / 22px 26px 20px 24px;
+  }
+}
+
+.border-riso-sketchy-sm {
+  border: 1.25px dashed rgba(4, 0, 13, 0.35);
+  border-radius: 6px;
+}
+@media (min-width: 768px) {
+  .border-riso-sketchy-sm {
+    border-radius: 12px 10px 14px 11px / 11px 14px 10px 12px;
+  }
+}
+
+.border-riso-double-lg {
+  border: 4px double rgba(4, 0, 13, 0.4);
+  border-radius: 12px;
+}
+@media (min-width: 768px) {
+  .border-riso-double-lg {
+    border-radius: 32px 28px 34px 29px / 29px 34px 28px 32px;
+  }
+}
+
+.border-riso-double-md {
+  border: 4px double rgba(4, 0, 13, 0.4);
+  border-radius: 10px;
+}
+@media (min-width: 768px) {
+  .border-riso-double-md {
+    border-radius: 24px 20px 26px 22px / 22px 26px 20px 24px;
+  }
+}
+
+/* Session 3 Tactile Utilities */
+
+/* 1. Bulletproof Dark Riso Button */
+.riso-btn-dark {
+  background-color: #04000D !important;
+  color: #ffffff !important;
+  border: 1px solid #04000D !important;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.riso-btn-dark::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-color: var(--plate-color, #ffffff) !important;
+  border: 1px solid #04000D;
+  z-index: -1;
+  border-radius: inherit;
+  transform: translate(1.5px, 1px);
+  transition: transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@media (min-width: 768px) {
+  .riso-btn-dark::after {
+    transform: translate(3px, 2px);
+  }
+}
+
+.riso-btn-dark:hover {
+  transform: translate(-0.5px, -0.3px) !important;
+}
+
+@media (min-width: 768px) {
+  .riso-btn-dark:hover {
+    transform: translate(-1px, -0.75px) !important;
+  }
+}
+
+.riso-btn-dark:hover::after {
+  transform: translate(2px, 1.3px);
+}
+
+@media (min-width: 768px) {
+  .riso-btn-dark:hover::after {
+    transform: translate(4px, 2.75px);
+  }
+}
+
+.riso-btn-dark:active {
+  transform: translate(1px, 0.6px) !important;
+}
+
+@media (min-width: 768px) {
+  .riso-btn-dark:active {
+    transform: translate(2px, 1.25px) !important;
+  }
+}
+
+.riso-btn-dark:active::after {
+  transform: translate(0.5px, 0.3px);
+}
+
+@media (min-width: 768px) {
+  .riso-btn-dark:active::after {
+    transform: translate(1px, 0.75px);
+  }
+}
+
+/* 2. Tactile Ticket Stub Notched Cuts */
+.riso-ticket-cut {
+  position: relative;
+}
+
+/* Left notch */
+.riso-ticket-cut::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-color: #F5F5F5; /* Matches base canvas background */
+  border-radius: 50%;
+  border: 1px dashed rgba(4, 0, 13, 0.35);
+  clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 50% 50%);
+  z-index: 20;
+}
+
+/* Right notch */
+.riso-ticket-cut::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-color: #F5F5F5; /* Matches base canvas background */
+  border-radius: 50%;
+  border: 1px dashed rgba(4, 0, 13, 0.35);
+  clip-path: polygon(0% 0%, 50% 0%, 50% 50%, 50% 100%, 0% 100%);
+  z-index: 20;
+}
+
+/* 3. Barcode Generator CSS Utility */
+.riso-barcode-bg {
+  background: repeating-linear-gradient(
+    90deg,
+    #04000D,
+    #04000D 2px,
+    transparent 2px,
+    transparent 6px,
+    #04000D 6px,
+    #04000D 7px,
+    transparent 7px,
+    transparent 11px,
+    #04000D 11px,
+    #04000D 14px,
+    transparent 14px,
+    transparent 16px
+  );
+}
+
+/* 4. Chat Bubble Markdown Prose Parser Styles */
+.chat-prose p {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.chat-prose p:last-child {
+  margin-bottom: 0;
+}
+.chat-prose strong {
+  font-weight: 800;
+  color: inherit;
+}
+.chat-prose ul {
+  list-style-type: disc;
+  padding-left: 16px;
+  margin-bottom: 6px;
+  display: block;
+}
+.chat-prose ol {
+  list-style-type: decimal;
+  padding-left: 16px;
+  margin-bottom: 6px;
+  display: block;
+}
+.chat-prose li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+  display: list-item;
+}
+.chat-prose li:last-child {
+  margin-bottom: 0;
+}
+.chat-prose code {
+  font-family: 'JetBrains Mono', monospace;
+  background-color: rgba(4, 0, 13, 0.08);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.chat-prose pre {
+  font-family: 'JetBrains Mono', monospace;
+  background-color: #04000D;
+  color: #F8F8F2;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 8px;
+  font-size: 0.85em;
+}
+.chat-prose pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+.chat-prose blockquote {
+  border-left: 3px solid #04000D;
+  padding-left: 8px;
+  margin-left: 0;
+  margin-bottom: 6px;
+  font-style: italic;
+  color: rgba(4, 0, 13, 0.7);
+}
+.chat-prose a {
+  color: #FF3D8B;
+  text-decoration: underline;
+  font-weight: 700;
+}
+.chat-prose a:hover {
+  opacity: 0.8;
+}
