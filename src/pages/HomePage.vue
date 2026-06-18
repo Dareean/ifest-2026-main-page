@@ -411,7 +411,7 @@ onBeforeUnmount(() => {
   >
 
     <!-- SECTION B: Hero Section (Tactile Colored Paper Canvas) -->
-    <section id="hero" class="bg-off-white riso-canvas min-h-[95vh] pt-[120px] md:pt-[140px] pb-[100px] relative overflow-hidden flex flex-col justify-center border-b border-dashed border-[#04000D]/30">
+    <section id="hero" class="bg-off-white riso-canvas min-h-[85vh] pt-[100px] md:pt-[120px] pb-[70px] relative overflow-hidden flex flex-col justify-center border-b border-dashed border-[#04000D]/30">
       
       <!-- Layered, Floating 3D Assets (Stamps Bleeding Into The Colored Paper Fibers) -->
       <img
@@ -423,7 +423,7 @@ onBeforeUnmount(() => {
         :style="{ animationDelay: asset.delay }"
       />
       
-      <div class="max-w-container-max mx-auto px-6 md:px-lg w-full py-xl relative z-10 flex flex-col items-center text-center">
+      <div class="max-w-container-max mx-auto px-6 md:px-lg w-full py-lg relative z-10 flex flex-col items-center text-center">
         <div data-reveal id="hero-content" class="flex flex-col items-center">
           <p class="font-mono text-[#FF3D8B] text-xs md:text-base tracking-[0.22em] uppercase mb-md font-bold select-none riso-bleed px-4">
             THE BIGGEST IT FESTIVAL IN EASTERN INDONESIA
@@ -433,7 +433,7 @@ onBeforeUnmount(() => {
             <span class="riso-text-shadow-magenta inline-block">DIGITAL SYMPHONY</span>
           </h1>
           
-          <p class="font-body-md text-base md:text-xl text-[#04000D]/80 max-w-2xl mb-xl leading-relaxed mx-auto px-4">
+          <p class="font-body-md text-base md:text-xl text-[#04000D]/80 max-w-2xl mb-lg leading-relaxed mx-auto px-4">
             Mengorkestrasi Inovasi Global untuk Masa Depan Berkelanjutan. HMTI Universitas Tadulako memanggil 8.000+ inovator untuk bergabung dalam revolusi digital terbesar di Sulawesi Tengah.
           </p>
           
@@ -444,7 +444,7 @@ onBeforeUnmount(() => {
       </div>
       
       <!-- Ticker Tape Ribbon (Infinite Logo Marquee) -->
-      <div class="absolute bottom-0 left-0 w-full bg-[#D6FF00] border-y-2 border-[#04000D] py-4 md:py-6 overflow-hidden z-20 select-none shadow-[0_-4px_0_0_rgba(4,0,13,0.05)]">
+      <div class="absolute bottom-0 left-0 w-full bg-[#D6FF00] border-y-2 border-[#04000D] py-3 md:py-4 overflow-hidden z-20 select-none shadow-[0_-4px_0_0_rgba(4,0,13,0.05)]">
         <div class="flex whitespace-nowrap animate-marquee items-center will-change-transform">
           <!-- We repeat the set of logos twice (using group in 2) to ensure perfect 100% seamless infinite looping -->
           <div v-for="group in 2" :key="group" class="flex items-center flex-shrink-0">
@@ -468,7 +468,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION C: Intro (Tactile Text Section) -->
-    <section class="bg-off-white riso-canvas py-[48px] md:py-[64px] px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section class="bg-off-white riso-canvas py-[32px] md:py-[48px] px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Subtle Decorative Background Assets (Literal Riso stamped look) -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.webp')" 
@@ -511,7 +511,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION P: 3 Core Pillars (Brutalist Trilogy Engine) -->
-    <section id="pillars" class="bg-[#F5F5F5] riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="pillars" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.webp')" 
@@ -522,7 +522,7 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-16 md:mb-24 text-left">
+        <div class="mb-10 md:mb-14 text-left">
           <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
             THE TRILOGY ENGINE
           </span>
@@ -535,7 +535,7 @@ onBeforeUnmount(() => {
         <div id="trilogy-grid" class="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1.1fr] gap-6 md:gap-8 rounded-none select-none">
           
           <!-- CELL 1: RESONANCE -->
-          <div class="bg-[#D6FF00] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
+          <div class="bg-[#D6FF00] p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[280px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">
@@ -557,7 +557,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- CELL 2: SYNERGY -->
-          <div class="bg-[#D86BFF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
+          <div class="bg-[#D86BFF] p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[280px] text-[#04000D] transition-all duration-200 hover:bg-[#df85ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D86BFF] px-2 py-0.5">
@@ -579,7 +579,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- CELL 3: INCLUSIVITY -->
-          <div class="bg-[#8839FF] p-6 sm:p-8 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[360px] text-white transition-all duration-200 hover:bg-[#9752ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
+          <div class="bg-[#8839FF] p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[280px] text-white transition-all duration-200 hover:bg-[#9752ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
                 <span class="font-mono text-[10px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">
@@ -605,7 +605,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION COMP: ROADSHOW INKLUSIF & SOCIAL MOVEMENT -->
-    <section id="roadshow-section" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="roadshow-section" class="bg-off-white riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background decorative riso shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'rg1 1.webp')" 
@@ -645,7 +645,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION COMP: COMPETITION BENTO GRID -->
-    <section id="competitions-section" class="bg-off-white riso-canvas py-20 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="competitions-section" class="bg-off-white riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       
       <!-- Background decorative riso shards -->
       <img 
@@ -662,7 +662,7 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-12 md:mb-16 text-center lg:text-left">
+        <div class="mb-8 md:mb-10 text-center lg:text-left">
           <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
             IFEST 2026 CHALLENGE
           </span>
@@ -675,34 +675,34 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- TIER 1: KATEGORI NASIONAL (3-Column Bento Grid) -->
-        <div class="mb-16">
-          <div class="flex items-center gap-3 mb-8 select-none">
+        <div class="mb-10">
+          <div class="flex items-center gap-3 mb-5 select-none">
             <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">TIER 01</span>
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">KATEGORI NASIONAL</span>
           </div>
 
-          <div id="kompetisi-grid-tier1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div id="kompetisi-grid-tier1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div 
               v-for="comp in competitionsData.slice(0, 3)" 
               :key="comp.id"
-              class="border-2 md:border-3 border-[#04000D] p-6 sm:p-8 flex flex-col justify-between min-h-[300px] relative transition-transform duration-200 hover:-rotate-1"
+              class="border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200 hover:-rotate-1"
               :style="{ backgroundColor: comp.cardBg, boxShadow: '6px 6px 0px 0px #04000D' }"
             >
               <div>
-                <div class="flex justify-between items-start mb-6">
+                <div class="flex justify-between items-start mb-4">
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-white px-2 py-0.5">{{ comp.tagline }}</span>
                   <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[{{ comp.id }}]</span>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                <h3 class="font-black uppercase text-lg sm:text-xl tracking-tight leading-none mb-3 text-[#04000D] riso-bleed">
                   {{ comp.title.split(' ')[0] }} <span class="text-accent-magenta">{{ comp.title.split(' ').slice(1).join(' ') }}</span>
                 </h3>
-                <div class="border-t border-dashed border-[#04000D]/20 pt-4 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
+                <div class="border-t border-dashed border-[#04000D]/20 pt-3 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
                   <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
                   <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">{{ comp.fee }}</span></div>
                 </div>
               </div>
-              
-              <div class="mt-8 select-none">
+
+              <div class="mt-5 select-none">
                 <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
                   Lihat Detail Lomba →
                 </router-link>
@@ -712,17 +712,17 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- TIER 2: KATEGORI REGIONAL (2-Column Bento Grid) -->
-        <div class="mb-16">
-          <div class="flex items-center gap-3 mb-8 select-none">
+        <div class="mb-10">
+          <div class="flex items-center gap-3 mb-5 select-none">
             <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">TIER 02</span>
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">KATEGORI REGIONAL (SULTENG &amp; SEKITARNYA)</span>
           </div>
 
-          <div id="kompetisi-grid-tier2" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div id="kompetisi-grid-tier2" class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div 
               v-for="comp in competitionsData.slice(3, 5)" 
               :key="comp.id"
-              class="bg-white border-2 md:border-3 border-[#04000D] p-6 sm:p-8 flex flex-col justify-between min-h-[300px] relative transition-transform duration-200 hover:rotate-1"
+              class="bg-white border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200 hover:rotate-1"
               style="box-shadow: 6px 6px 0px 0px #04000D;"
             >
               <!-- Stamp accent plate -->
@@ -758,7 +758,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- Massive dark contrast bento card for S-DIH -->
-          <div class="bg-[#04000D] border-2 md:border-3 border-[#04000D] p-6 sm:p-8 md:p-10 relative overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #FF3D8B;">
+          <div class="bg-[#04000D] border-2 md:border-3 border-[#04000D] p-5 sm:p-6 md:p-8 relative overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #FF3D8B;">
             <div class="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03] pointer-events-none z-0"></div>
             
             <div class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-center">
@@ -788,7 +788,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION K: KEY NUMBERS (The Impact Dashboard) -->
-    <section id="impact-dashboard" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
+    <section id="impact-dashboard" class="bg-[#F5F5F5] riso-canvas py-8 md:py-12 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry6 1.webp')" 
@@ -802,10 +802,10 @@ onBeforeUnmount(() => {
           <!-- Stat 1 -->
           <div class="relative group">
             <div class="absolute inset-0 bg-[#04000D] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
-            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[145px]">
-              <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TARGET PARTISIPAN</span>
+            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
+              <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TARGET PARTISIPAN</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedPartisipan }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedPartisipan }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#D6FF00] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[2px_2px_0px_0px_#04000D]">8.000+ PARTICIPANTS</span>
                 </p>
@@ -816,10 +816,10 @@ onBeforeUnmount(() => {
           <!-- Stat 2 -->
           <div class="relative group">
             <div class="absolute inset-0 bg-[#D6FF00] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
-            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[145px]">
-              <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">TITIK ROADSHOW INKLUSIF</span>
+            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
+              <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">TITIK ROADSHOW INKLUSIF</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedRoadshow }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedRoadshow }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#D86BFF] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[-2px] translate-y-[1px] shadow-[2px_2px_0px_0px_#04000D]">25 REGIONAL ROADSHOWS</span>
                 </p>
@@ -830,10 +830,10 @@ onBeforeUnmount(() => {
           <!-- Stat 3 -->
           <div class="relative group">
             <div class="absolute inset-0 bg-[#04000D] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
-            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[145px]">
-              <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TALENTA DIGITAL</span>
+            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
+              <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TALENTA DIGITAL</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedTalent }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedTalent }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#D6FF00] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[1px] translate-y-[-1px] shadow-[2px_2px_0px_0px_#04000D]">500+ DIGITAL TALENTS</span>
                 </p>
@@ -844,10 +844,10 @@ onBeforeUnmount(() => {
           <!-- Stat 4 -->
           <div class="relative group">
             <div class="absolute inset-0 bg-[#D6FF00] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
-            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-5 sm:p-6 z-10 flex flex-col justify-between min-h-[145px]">
-              <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI MEDIA EXPOSURE</span>
+            <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
+              <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI MEDIA EXPOSURE</span>
               <div>
-                <h3 class="text-3xl sm:text-5xl font-bold tracking-tighter text-[#04000D] leading-none mb-2 font-headline-lg riso-bleed tabular-nums">{{ formattedExposure }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedExposure }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#D86BFF] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[-1px] translate-y-[2px] shadow-[2px_2px_0px_0px_#04000D]">800K+ MEDIA EXPOSURE</span>
                 </p>
@@ -860,14 +860,14 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION L: TIMELINE KEGIATAN (The Roadmap Series) -->
-    <section id="timeline" class="bg-off-white riso-canvas py-16 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
+    <section id="timeline" class="bg-off-white riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.02] pointer-events-none z-0"></div>
       <div class="absolute inset-0 bg-noise-grain opacity-[0.015] pointer-events-none z-0"></div>
 
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- HEADER BLOCK (Matching image_f0d77e.png) -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16 select-none border-b-2 border-[#04000D] pb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 select-none border-b-2 border-[#04000D] pb-6">
           <div class="text-left">
             <div class="flex items-center gap-3 mb-3">
               <span class="w-12 h-1 bg-[#3B82F6] inline-block"></span>
@@ -893,7 +893,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- TIMELINE GRID / ROADMAP FLOW -->
-        <div class="relative mt-20 select-none">
+        <div class="relative mt-12 select-none">
           
           <!-- Central Connecting Spine -->
           <!-- Desktop: Perfect Center -->
@@ -901,7 +901,7 @@ onBeforeUnmount(() => {
           <!-- Mobile: Left Align -->
           <div class="lg:hidden absolute left-8 top-4 bottom-4 w-1 border-l-4 border-dashed border-slate-300/80 z-0"></div>
 
-          <div class="flex flex-col gap-16 md:gap-20">
+          <div class="flex flex-col gap-10 md:gap-12">
             
             <!-- PHASE 01 -->
             <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
@@ -912,7 +912,7 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#8B5CF6] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #8B5CF6;">
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#8B5CF6] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #8B5CF6;">
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 0 ? -1 : 0"
                     class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
@@ -986,7 +986,7 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#10B981] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #10B981;">
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#10B981] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #10B981;">
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 1 ? -1 : 1"
                     class="flex items-center justify-between border-b border-emerald-100 pb-3 cursor-pointer select-none"
@@ -1032,7 +1032,7 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#3B82F6] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #3B82F6;">
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#3B82F6] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #3B82F6;">
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 2 ? -1 : 2"
                     class="flex items-center justify-between border-b border-blue-100 pb-3 cursor-pointer select-none"
@@ -1098,7 +1098,7 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#F59E0B] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #F59E0B;">
+                <div class="w-full max-w-xl text-left bg-white border-3 border-[#F59E0B] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #F59E0B;">
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 3 ? -1 : 3"
                     class="flex items-center justify-between border-b border-amber-100 pb-3 cursor-pointer select-none"
@@ -1252,7 +1252,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION N: DETAIL KEGIATAN (The Zine Index) -->
-    <section id="detail-kegiatan" class="bg-off-white riso-canvas py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
+    <section id="detail-kegiatan" class="bg-off-white riso-canvas py-10 md:py-14 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.webp')" 
@@ -1263,9 +1263,9 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-12 text-center md:text-left select-none">
+        <div class="mb-8 text-center md:text-left select-none">
           <span class="font-mono text-xs uppercase tracking-widest font-extrabold text-[#04000D]/60">EXPLORE PROPOSAL DETAILS</span>
-          <h2 class="font-bold text-3xl md:text-4xl tracking-tighter text-[#04000D] mt-1 riso-bleed">Detail Kegiatan Index</h2>
+          <h2 class="font-bold text-2xl md:text-3xl tracking-tighter text-[#04000D] mt-1 riso-bleed">Detail Kegiatan Index</h2>
         </div>
 
         <!-- Accordion Rows Container -->
@@ -1275,7 +1275,7 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 0 ? -1 : 0"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
               :class="activeZineIndex === 0 ? 'bg-[#D6FF00]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
@@ -1287,7 +1287,7 @@ onBeforeUnmount(() => {
             
             <div 
               v-show="activeZineIndex === 0" 
-              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
+              class="px-5 sm:px-6 pb-6 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
             >
               <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-4">
@@ -1354,7 +1354,7 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 3 ? -1 : 3"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
               :class="activeZineIndex === 3 ? 'bg-[#D6FF00]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
@@ -1369,7 +1369,7 @@ onBeforeUnmount(() => {
             
             <div 
               v-show="activeZineIndex === 3" 
-              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
+              class="px-5 sm:px-6 pb-6 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
             >
               <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-4">
@@ -1402,7 +1402,7 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 4 ? -1 : 4"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
               :class="activeZineIndex === 4 ? 'bg-[#D6FF00]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
@@ -1417,7 +1417,7 @@ onBeforeUnmount(() => {
             
             <div 
               v-show="activeZineIndex === 4" 
-              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
+              class="px-5 sm:px-6 pb-6 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
             >
               <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-4">
@@ -1450,7 +1450,7 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 5 ? -1 : 5"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
               :class="activeZineIndex === 5 ? 'bg-[#D6FF00]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
@@ -1465,7 +1465,7 @@ onBeforeUnmount(() => {
             
             <div 
               v-show="activeZineIndex === 5" 
-              class="px-6 sm:px-8 pb-8 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
+              class="px-5 sm:px-6 pb-6 pt-2 border-t border-dashed border-[#04000D]/10 bg-off-white/25"
             >
               <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-4">
@@ -1501,7 +1501,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION O: GALERI JEJAK LANGKAH (I-FEST 2025 Historical Archive) -->
-    <section id="galeri-jejak-langkah" class="bg-[#8839FF] py-16 sm:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#F5F5F5]/20 relative overflow-hidden select-none" data-reveal>
+    <section id="galeri-jejak-langkah" class="bg-[#8839FF] py-12 sm:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#F5F5F5]/20 relative overflow-hidden select-none" data-reveal>
       <!-- Coarse dots and noise overlays specifically for dark canvas -->
       <div class="absolute inset-0 bg-[radial-gradient(#F5F5F5_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03] pointer-events-none z-0"></div>
       <div class="absolute inset-0 bg-noise-grain opacity-[0.02] pointer-events-none z-0"></div>
@@ -1516,9 +1516,9 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-12 text-center md:text-left select-none">
+        <div class="mb-8 text-center md:text-left select-none">
           <span class="font-mono text-xs uppercase tracking-widest font-extrabold text-[#D6FF00]">HISTORICAL DOSSIER</span>
-          <h2 class="font-bold text-3xl md:text-4xl tracking-tighter text-[#F5F5F5] mt-1 riso-bleed">Arsip Resonansi 2025.</h2>
+          <h2 class="font-bold text-2xl md:text-3xl tracking-tighter text-[#F5F5F5] mt-1 riso-bleed">Arsip Resonansi 2025.</h2>
         </div>
 
         <!-- Grid of Grainy Analog Photocopy Images -->
@@ -1551,7 +1551,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION M: KONTRIBUSI SYMPHONY (QRIS Treasurer & Saweria Donation) -->
-    <section class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
+    <section class="bg-[#F5F5F5] riso-canvas py-8 md:py-12 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'sg1 1.webp')" 
@@ -1560,15 +1560,15 @@ onBeforeUnmount(() => {
       />
 
       <div class="max-w-container-max mx-auto relative z-10">
-        <div class="mb-10 text-center md:text-left">
+        <div class="mb-6 text-center md:text-left">
           <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D]/60">PARTISIPASI &amp; DUKUNGAN</span>
-          <h2 class="font-bold text-3xl md:text-4xl tracking-tighter text-[#04000D] mt-1 riso-bleed">Kontribusi Symphony</h2>
+          <h2 class="font-bold text-2xl md:text-3xl tracking-tighter text-[#04000D] mt-1 riso-bleed">Kontribusi Symphony</h2>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
           
           <!-- Left Column: The Stamped QRIS (Even width on large screens) -->
-          <div class="flex flex-col justify-between p-6 sm:p-8 bg-white border border-[#04000D] rounded-none select-none">
+          <div class="flex flex-col justify-between p-5 sm:p-6 bg-white border border-[#04000D] rounded-none select-none">
             <div class="flex flex-col items-center">
               <span class="font-mono text-[9px] uppercase tracking-widest text-[#04000D]/40 mb-4">REGISTRATION STAMP: QR-02</span>
               
@@ -1635,7 +1635,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- Right Column: Top Donors Leaderboard (Even width on large screens) -->
-          <div class="flex flex-col justify-between p-6 sm:p-8 bg-white border border-[#04000D] rounded-none">
+          <div class="flex flex-col justify-between p-5 sm:p-6 bg-white border border-[#04000D] rounded-none">
             <div>
               <p class="font-mono text-[9px] uppercase tracking-widest text-[#04000D]/40 mb-6">LIVE DONOR LEADERBOARD (REALTIME)</p>
               
@@ -1643,7 +1643,7 @@ onBeforeUnmount(() => {
               <div class="flex flex-col select-none">
                 
                 <!-- Row 1 -->
-                <div class="flex items-center justify-between py-4 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
+                <div class="flex items-center justify-between py-3 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
                   <div class="flex items-center gap-4">
                     <span class="font-mono text-xs text-[#04000D]/60 font-bold">#01</span>
                     <span class="text-base text-[#04000D]" style="font-weight: 540;">Fauzi &amp; Rian (Sponsorship Team)</span>
@@ -1652,7 +1652,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Row 2 -->
-                <div class="flex items-center justify-between py-4 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
+                <div class="flex items-center justify-between py-3 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
                   <div class="flex items-center gap-4">
                     <span class="font-mono text-xs text-[#04000D]/60 font-bold">#02</span>
                     <span class="text-base text-[#04000D]" style="font-weight: 540;">HMTI Cabinet 2026</span>
@@ -1661,7 +1661,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Row 3 -->
-                <div class="flex items-center justify-between py-4 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
+                <div class="flex items-center justify-between py-3 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
                   <div class="flex items-center gap-4">
                     <span class="font-mono text-xs text-[#04000D]/60 font-bold">#03</span>
                     <span class="text-base text-[#04000D]" style="font-weight: 540;">Hannah Asa Dev Team</span>
@@ -1670,7 +1670,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Row 4 -->
-                <div class="flex items-center justify-between py-4 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
+                <div class="flex items-center justify-between py-3 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
                   <div class="flex items-center gap-4">
                     <span class="font-mono text-xs text-[#04000D]/60 font-bold">#04</span>
                     <span class="text-base text-[#04000D]" style="font-weight: 540;">Alumnus Tadulako 2018</span>
@@ -1679,7 +1679,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Row 5 -->
-                <div class="flex items-center justify-between py-4 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
+                <div class="flex items-center justify-between py-3 border-b border-[#04000D]/20 opacity-70 hover:opacity-100 transition-opacity duration-200">
                   <div class="flex items-center gap-4">
                     <span class="font-mono text-xs text-[#04000D]/60 font-bold">#05</span>
                     <span class="text-base text-[#04000D]" style="font-weight: 540;">Digital Symphony Supporter</span>
@@ -1701,13 +1701,13 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION BPH: Core Management BPH (Command Matrix) -->
-    <section id="bph-matrix" class="bg-[#F5F5F5] riso-canvas py-16 md:py-24 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="bph-matrix" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-16 md:mb-20">
-          <p class="font-mono text-[#04000D] text-xs uppercase tracking-widest mb-4 font-bold">INTERNAL COMMAND MATRIX</p>
-          <h2 class="font-black text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed">Struktur Orkestrasi.</h2>
+        <div class="mb-10 md:mb-14">
+          <p class="font-mono text-[#04000D] text-xs uppercase tracking-widest mb-3 font-bold">INTERNAL COMMAND MATRIX</p>
+          <h2 class="font-black text-4xl md:text-6xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed">Struktur Orkestrasi.</h2>
         </div>
 
         <!-- Asymmetrical Organizational Blueprint Rows -->
@@ -1716,14 +1716,14 @@ onBeforeUnmount(() => {
           <!-- ROW 1: NAKITA SEMESTA (Project Manager) -->
           <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) -->
-            <div class="bg-[#D86BFF] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+            <div class="bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PROJECT MANAGER ✦</span>
               <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-2deg]">
                 NS
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) -->
-            <div class="bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+            <div class="bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
@@ -1740,14 +1740,14 @@ onBeforeUnmount(() => {
           <!-- ROW 2: DAREEAN A. RAFFI (PIC I-FEST 2026) - Reversed Layout -->
           <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
-            <div class="order-1 md:order-2 bg-[#D6FF00] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+            <div class="order-1 md:order-2 bg-[#D6FF00] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PIC I-FEST 2026 ✦</span>
               <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[3deg]">
                 DR
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
-            <div class="order-2 md:order-1 bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+            <div class="order-2 md:order-1 bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">DAREEAN A. RAFFI</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
@@ -1764,14 +1764,14 @@ onBeforeUnmount(() => {
           <!-- ROW 3: GABRIEL KRISTOFAN (Ketua Panitia) -->
           <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) -->
-            <div class="bg-[#8839FF] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+            <div class="bg-[#8839FF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#D6FF00] pb-1 block w-full mb-6 font-bold text-[#D6FF00]">✦ KETUA PANITIA ✦</span>
               <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-1deg]">
                 GK
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) -->
-            <div class="bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+            <div class="bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">GABRIEL KRISTOFAN</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
@@ -1788,14 +1788,14 @@ onBeforeUnmount(() => {
           <!-- ROW 4: REYQAL SYAWALANO (Wakil Ketua Panitia) - Reversed Layout -->
           <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
-            <div class="order-1 md:order-2 bg-[#D86BFF] p-6 md:p-8 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+            <div class="order-1 md:order-2 bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ WAKIL KETUA PANITIA ✦</span>
               <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[2deg]">
                 RS
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
-            <div class="order-2 md:order-1 bg-[#F5F5F5] p-6 md:p-8 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+            <div class="order-2 md:order-1 bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">REYQAL SYAWALANO</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
@@ -1814,7 +1814,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION J: "OUR NETWORK" / SPONSOR HIERARCHY (Placed right above the Footer) -->
-    <section id="partners" class="bg-white riso-canvas py-16 sm:py-24 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+    <section id="partners" class="bg-white riso-canvas py-12 sm:py-16 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'cat3 1.webp')" 
@@ -1825,14 +1825,14 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-16">
+        <div class="mb-10">
           <p class="font-mono text-[#04000D] text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-bold">PARTNERSHIP HIERARCHY</p>
           <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter text-[#04000D] riso-text-shadow-magenta riso-bleed">Ekosistem Kolaborasi.</h2>
         </div>
 
         <!-- Stamped Organizer Logos -->
-        <div class="mb-16">
-          <p class="font-mono text-xs text-[#04000D]/70 uppercase tracking-widest mb-10 text-center md:text-left font-bold">✦ ORGANIZED BY ✦</p>
+        <div class="mb-10">
+          <p class="font-mono text-xs text-[#04000D]/70 uppercase tracking-widest mb-6 text-center md:text-left font-bold">✦ ORGANIZED BY ✦</p>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 items-center justify-items-center">
             
             <!-- UNTAD LOGO -->
@@ -2018,7 +2018,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- SECTION G: Footer Section (Deep Midnight Canvas) -->
-    <footer class="w-full bg-[#04000D] text-[#F5F5F5] py-12 md:py-16 px-6 md:px-lg border-t border-dashed border-[#F5F5F5]/25 relative overflow-hidden select-none">
+    <footer class="w-full bg-[#04000D] text-[#F5F5F5] py-10 md:py-14 px-6 md:px-lg border-t border-dashed border-[#F5F5F5]/25 relative overflow-hidden select-none">
       <div class="max-w-container-max mx-auto relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           
