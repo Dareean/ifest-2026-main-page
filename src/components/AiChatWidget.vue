@@ -220,8 +220,8 @@ const sendChatMessage = async (text) => {
           <div class="flex items-center gap-2">
             <!-- Animated Online Indicator -->
             <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D6FF00] opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-[#D6FF00]"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FDE047] opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-[#FDE047]"></span>
             </span>
             <span class="font-mono text-[10px] sm:text-xs uppercase tracking-wider font-extrabold text-white">IFEST AI Assistant</span>
           </div>
@@ -298,7 +298,7 @@ const sendChatMessage = async (text) => {
     <button 
       @click="toggleChat" 
       class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
-      style="--plate-color: #D6FF00;"
+      style="--plate-color: #FDE047;"
       :aria-label="isChatOpen ? 'Close Assistant' : 'Open Assistant'"
     >
       <!-- Pulse Indicator Overlay -->

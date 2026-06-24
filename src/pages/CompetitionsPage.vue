@@ -318,7 +318,7 @@ watch(() => route.query.id, (newId) => {
               <a 
                 :href="activeCompetition.registrationLink"
                 class="riso-btn-plate flex-1 w-full bg-[#04000D] text-white py-4 rounded-full font-button text-xs text-center font-black select-none tracking-widest transition-transform hover:-translate-y-1 active:translate-y-0"
-                :style="{ '--plate-color': activeCompetition.id === 'REG-03' ? '#D6FF00' : activeCompetition.cardBg }"
+                :style="{ '--plate-color': activeCompetition.id === 'REG-03' ? '#FDE047' : activeCompetition.cardBg }"
               >
                 DAFTAR SEKARANG
               </a>
@@ -328,7 +328,7 @@ watch(() => route.query.id, (newId) => {
                 :href="activeCompetition.guidebookLink"
                 target="_blank"
                 class="riso-btn-plate flex-1 w-full bg-white text-[#04000D] border-2 border-[#04000D] py-4 rounded-full font-button text-xs text-center font-black select-none tracking-widest transition-transform hover:-translate-y-1 active:translate-y-0"
-                style="--plate-color: #D6FF00;"
+                style="--plate-color: #FDE047;"
               >
                 UNDUH JUKNIS LOMBA (GUIDEBOOK) ↓
               </a>

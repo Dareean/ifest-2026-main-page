@@ -444,7 +444,7 @@ onBeforeUnmount(() => {
       </div>
       
       <!-- Ticker Tape Ribbon (Infinite Logo Marquee) -->
-      <div class="absolute bottom-0 left-0 w-full bg-[#D6FF00] border-y-2 border-[#04000D] py-3 md:py-4 overflow-hidden z-20 select-none shadow-[0_-4px_0_0_rgba(4,0,13,0.05)]">
+      <div class="absolute bottom-0 left-0 w-full bg-[#FDE047] border-y-2 border-[#04000D] py-3 md:py-4 overflow-hidden z-20 select-none shadow-[0_-4px_0_0_rgba(4,0,13,0.05)]">
         <div class="flex whitespace-nowrap animate-marquee items-center will-change-transform">
           <!-- We repeat the set of logos twice (using group in 2) to ensure perfect 100% seamless infinite looping -->
           <div v-for="group in 2" :key="group" class="flex items-center flex-shrink-0">
@@ -535,10 +535,10 @@ onBeforeUnmount(() => {
         <div id="trilogy-grid" class="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1.1fr] gap-6 md:gap-8 rounded-none select-none">
           
           <!-- CELL 1: RESONANCE -->
-          <div class="bg-[#D6FF00] p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[280px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
+          <div class="bg-[#FDE047] p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[280px] text-[#04000D] transition-all duration-200 hover:bg-[#d9ff1a] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
-                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#D6FF00] px-2 py-0.5">
+                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#04000D] text-[#FDE047] px-2 py-0.5">
                   DAMPAK NYATA
                 </span>
                 <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-01]</span>
@@ -565,7 +565,7 @@ onBeforeUnmount(() => {
                 </span>
                 <span class="font-mono text-[10px] font-bold text-[#04000D]/60">[PILAR-02]</span>
               </div>
-              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#04000D]" style="text-shadow: 2px 2px 0px #D6FF00;">
+              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#04000D]" style="text-shadow: 2px 2px 0px #FDE047;">
                 02 / SYNERGY
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed opacity-95">
@@ -582,19 +582,19 @@ onBeforeUnmount(() => {
           <div class="bg-[#8839FF] p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[280px] text-white transition-all duration-200 hover:bg-[#9752ff] border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
             <div>
               <div class="flex justify-between items-start mb-6">
-                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">
+                <span class="font-mono text-[10px] font-extrabold uppercase bg-[#FDE047] text-[#04000D] px-2 py-0.5">
                   INKLUSIFITAS
                 </span>
                 <span class="font-mono text-[10px] font-bold text-white/60">[PILAR-03]</span>
               </div>
-              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#D6FF00]" style="text-shadow: 2px 2px 0px #04000D;">
+              <h3 class="font-sans font-black uppercase text-2xl sm:text-3xl tracking-tight leading-none mb-4 text-[#FDE047]" style="text-shadow: 2px 2px 0px #04000D;">
                 03 / INCLUSIVITY
               </h3>
               <p class="font-body text-sm md:text-base leading-relaxed text-[#F5F5F5]/90">
                 Mendorong pemerataan akses dan literasi digital agar seluruh lapisan masyarakat siap menghadapi tantangan disrupsi tanpa terkecuali.
               </p>
             </div>
-            <div class="mt-8 border-t border-white/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#D6FF00]/95">
+            <div class="mt-8 border-t border-white/10 pt-4 flex justify-between items-center font-mono text-[9px] font-bold uppercase tracking-widest text-[#FDE047]/95">
               <span>EQUAL ACCESS</span>
               <span>DIGITAL LITERACY</span>
             </div>
@@ -627,7 +627,7 @@ onBeforeUnmount(() => {
               DIGITAL SYMPHONY TOUR
             </span>
             <h2 class="font-black text-4xl sm:text-5xl md:text-6xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed flex flex-wrap justify-center lg:justify-start gap-y-2 select-none pt-2 pb-2">
-              <span class="bg-[#D6FF00] text-[#04000D] px-3.5 py-1.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[5px_5px_0px_0px_#04000D] mr-2">ROADSHOW INKLUSIF</span> &amp; SOCIAL MOVEMENT.
+              <span class="bg-[#FDE047] text-[#04000D] px-3.5 py-1.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[5px_5px_0px_0px_#04000D] mr-2">ROADSHOW INKLUSIF</span> &amp; SOCIAL MOVEMENT.
             </h2>
             <p class="font-body-md text-base md:text-xl text-[#04000D]/80 mt-6 leading-relaxed">
               Aksi nyata pengabdian masyarakat untuk mengorkestrasi inovasi dan menghadirkan akses literasi digital langsung ke sekolah, desa, dan komunitas disabilitas yang paling membutuhkan di wilayah Palu, Sigi, dan Donggala (Pasigala).
@@ -764,19 +764,19 @@ onBeforeUnmount(() => {
             <div class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-center">
               <div class="text-white text-left flex-1">
                 <div class="flex items-center gap-2 mb-3">
-                  <span class="font-mono text-[9px] font-extrabold uppercase bg-[#D6FF00] text-[#04000D] px-2 py-0.5">HACKATHON + SHOWCASE</span>
+                  <span class="font-mono text-[9px] font-extrabold uppercase bg-[#FDE047] text-[#04000D] px-2 py-0.5">HACKATHON + SHOWCASE</span>
                   <span class="font-mono text-xs font-bold text-white/50">[REG-03]</span>
                 </div>
-                <h3 class="font-black text-2xl sm:text-4xl uppercase tracking-tighter leading-none mb-4 text-[#D6FF00] riso-bleed">
+                <h3 class="font-black text-2xl sm:text-4xl uppercase tracking-tighter leading-none mb-4 text-[#FDE047] riso-bleed">
                   SULTENG DIGITAL INNOVATION HUB (S-DIH)
                 </h3>
                 <div class="flex gap-6 font-mono text-xs text-white/85 border-t border-white/10 pt-4 mt-2">
                   <div>Skala: <span class="font-bold text-white">Regional</span></div>
-                  <div>Biaya Registrasi: <span class="font-bold text-[#D6FF00]">Gratis (Free)</span></div>
+                  <div>Biaya Registrasi: <span class="font-bold text-[#FDE047]">Gratis (Free)</span></div>
                 </div>
               </div>
               <div class="w-full md:w-auto">
-                <router-link :to="{ path: '/kompetisi', query: { id: 'REG-03' }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate bg-[#D6FF00] text-[#04000D] px-8 py-3 rounded-full font-button text-xs text-center font-extrabold block" style="--plate-color: #FF3D8B;">
+                <router-link :to="{ path: '/kompetisi', query: { id: 'REG-03' }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate bg-[#FDE047] text-[#04000D] px-8 py-3 rounded-full font-button text-xs text-center font-extrabold block" style="--plate-color: #FF3D8B;">
                   Lihat Detail Lomba →
                 </router-link>
               </div>
@@ -807,7 +807,7 @@ onBeforeUnmount(() => {
               <div>
                 <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedPartisipan }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
-                  <span class="bg-[#D6FF00] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[2px_2px_0px_0px_#04000D]">8.000+ PARTICIPANTS</span>
+                  <span class="bg-[#FDE047] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[2px_2px_0px_0px_#04000D]">8.000+ PARTICIPANTS</span>
                 </p>
               </div>
             </div>
@@ -815,7 +815,7 @@ onBeforeUnmount(() => {
 
           <!-- Stat 2 -->
           <div class="relative group">
-            <div class="absolute inset-0 bg-[#D6FF00] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
+            <div class="absolute inset-0 bg-[#FDE047] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
               <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">TITIK ROADSHOW INKLUSIF</span>
               <div>
@@ -835,7 +835,7 @@ onBeforeUnmount(() => {
               <div>
                 <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedTalent }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
-                  <span class="bg-[#D6FF00] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[1px] translate-y-[-1px] shadow-[2px_2px_0px_0px_#04000D]">500+ DIGITAL TALENTS</span>
+                  <span class="bg-[#FDE047] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[1px] translate-y-[-1px] shadow-[2px_2px_0px_0px_#04000D]">500+ DIGITAL TALENTS</span>
                 </p>
               </div>
             </div>
@@ -843,7 +843,7 @@ onBeforeUnmount(() => {
 
           <!-- Stat 4 -->
           <div class="relative group">
-            <div class="absolute inset-0 bg-[#D6FF00] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
+            <div class="absolute inset-0 bg-[#FDE047] translate-x-[2px] translate-y-[1.5px] border border-[#04000D] z-0"></div>
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
               <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI MEDIA EXPOSURE</span>
               <div>
@@ -1275,8 +1275,8 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 0 ? -1 : 0"
-              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
-              :class="activeZineIndex === 0 ? 'bg-[#D6FF00]/5' : ''"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#FDE047]/5 transition-colors focus:outline-none select-none gap-4"
+              :class="activeZineIndex === 0 ? 'bg-[#FDE047]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">01/</span>
@@ -1320,7 +1320,7 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <router-link 
               :to="{ path: '/roadshow', state: { fromSection: 'roadshow-section' } }"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4 block"
+              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#FDE047]/5 transition-colors focus:outline-none select-none gap-4 block"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">02/</span>
@@ -1337,7 +1337,7 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <router-link 
               :to="{ path: '/kompetisi', state: { fromSection: 'competitions-section' } }"
-              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4 block"
+              class="w-full text-left py-6 px-6 sm:px-8 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#FDE047]/5 transition-colors focus:outline-none select-none gap-4 block"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">03/</span>
@@ -1354,14 +1354,14 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 3 ? -1 : 3"
-              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
-              :class="activeZineIndex === 3 ? 'bg-[#D6FF00]/5' : ''"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#FDE047]/5 transition-colors focus:outline-none select-none gap-4"
+              :class="activeZineIndex === 3 ? 'bg-[#FDE047]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">04/</span>
                 <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
                   BENCHMARK &amp; EXPLORATION (Visitasi Industri)
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
+                  <span class="inline-block bg-[#04000D] text-[#FDE047] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
                 </span>
               </div>
               <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 3 ? 'rotate-45' : ''">+</span>
@@ -1402,14 +1402,14 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 4 ? -1 : 4"
-              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
-              :class="activeZineIndex === 4 ? 'bg-[#D6FF00]/5' : ''"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#FDE047]/5 transition-colors focus:outline-none select-none gap-4"
+              :class="activeZineIndex === 4 ? 'bg-[#FDE047]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">05/</span>
                 <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
                   LOCAL INTELLECTUAL SERIES (TEDxUNTAD)
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
+                  <span class="inline-block bg-[#04000D] text-[#FDE047] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
                 </span>
               </div>
               <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 4 ? 'rotate-45' : ''">+</span>
@@ -1450,14 +1450,14 @@ onBeforeUnmount(() => {
           <div class="transition-all duration-200">
             <button 
               @click="activeZineIndex = activeZineIndex === 5 ? -1 : 5"
-              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#D6FF00]/5 transition-colors focus:outline-none select-none gap-4"
-              :class="activeZineIndex === 5 ? 'bg-[#D6FF00]/5' : ''"
+              class="w-full text-left py-4 px-5 sm:px-6 flex items-start sm:items-center justify-between font-bold text-[#04000D] hover:bg-[#FDE047]/5 transition-colors focus:outline-none select-none gap-4"
+              :class="activeZineIndex === 5 ? 'bg-[#FDE047]/5' : ''"
             >
               <div class="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
                 <span class="font-mono text-base text-[#04000D]/60 shrink-0">06/</span>
                 <span class="text-lg sm:text-xl tracking-tight uppercase break-words whitespace-normal text-left flex flex-wrap items-center gap-2 sm:gap-3">
                   THE GRAND SYMPHONY (Malam Puncak)
-                  <span class="inline-block bg-[#04000D] text-[#D6FF00] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
+                  <span class="inline-block bg-[#04000D] text-[#FDE047] font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-none leading-none select-none tracking-widest border border-[#04000D] shrink-0">COMING SOON</span>
                 </span>
               </div>
               <span class="shrink-0 font-mono text-xl sm:text-2xl transition-transform duration-200" :class="activeZineIndex === 5 ? 'rotate-45' : ''">+</span>
@@ -1517,7 +1517,7 @@ onBeforeUnmount(() => {
         
         <!-- Section Header -->
         <div class="mb-8 text-center md:text-left select-none">
-          <span class="font-mono text-xs uppercase tracking-widest font-extrabold text-[#D6FF00]">HISTORICAL DOSSIER</span>
+          <span class="font-mono text-xs uppercase tracking-widest font-extrabold text-[#FDE047]">HISTORICAL DOSSIER</span>
           <h2 class="font-bold text-2xl md:text-3xl tracking-tighter text-[#F5F5F5] mt-1 riso-bleed">Arsip Resonansi 2025.</h2>
         </div>
 
@@ -1527,7 +1527,7 @@ onBeforeUnmount(() => {
           <div 
             v-for="(item, index) in galleryImages" 
             :key="index"
-            class="bg-transparent border border-[#F5F5F5]/30 p-4 rounded-none flex flex-col justify-between hover:border-[#D6FF00] transition-colors duration-300 select-none"
+            class="bg-transparent border border-[#F5F5F5]/30 p-4 rounded-none flex flex-col justify-between hover:border-[#FDE047] transition-colors duration-300 select-none"
             :class="[index === 3 ? 'lg:col-start-2' : '']"
           >
             <!-- Photocopy-style high-contrast print filter container -->
@@ -1540,7 +1540,7 @@ onBeforeUnmount(() => {
             </div>
             
             <div class="flex flex-col gap-1">
-              <span class="font-mono text-[9px] uppercase tracking-widest text-[#D6FF00] font-bold">{{ item.title }}</span>
+              <span class="font-mono text-[9px] uppercase tracking-widest text-[#FDE047] font-bold">{{ item.title }}</span>
               <h4 class="font-bold text-base text-[#F5F5F5] tracking-tight leading-snug mt-1">{{ item.description }}</h4>
             </div>
           </div>
@@ -1575,7 +1575,7 @@ onBeforeUnmount(() => {
               <!-- QR Code Stylized Vector Stamp -->
               <div class="relative w-48 h-48 border border-[#04000D] p-3 bg-white flex items-center justify-center shadow-none mb-6">
                 <!-- Stylized QRIS Stamp Overlay in Multiply mode -->
-                <div class="absolute inset-0 bg-[#D6FF00]/5 mix-blend-multiply pointer-events-none"></div>
+                <div class="absolute inset-0 bg-[#FDE047]/5 mix-blend-multiply pointer-events-none"></div>
                 <svg viewBox="0 0 100 100" class="w-full h-full text-[#04000D]" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <!-- QR Patterns -->
                   <rect x="0" y="0" width="25" height="25" />
@@ -1740,7 +1740,7 @@ onBeforeUnmount(() => {
           <!-- ROW 2: DAREEAN A. RAFFI (PIC I-FEST 2026) - Reversed Layout -->
           <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
-            <div class="order-1 md:order-2 bg-[#D6FF00] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
+            <div class="order-1 md:order-2 bg-[#FDE047] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PIC I-FEST 2026 ✦</span>
               <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[3deg]">
                 DR
@@ -1765,7 +1765,7 @@ onBeforeUnmount(() => {
           <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) -->
             <div class="bg-[#8839FF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
-              <span class="font-mono text-xs tracking-widest border-b-2 border-[#D6FF00] pb-1 block w-full mb-6 font-bold text-[#D6FF00]">✦ KETUA PANITIA ✦</span>
+              <span class="font-mono text-xs tracking-widest border-b-2 border-[#FDE047] pb-1 block w-full mb-6 font-bold text-[#FDE047]">✦ KETUA PANITIA ✦</span>
               <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-1deg]">
                 GK
               </div>
@@ -1847,7 +1847,7 @@ onBeforeUnmount(() => {
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
-                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                <div class="bg-[#04000D] text-[#FDE047] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
                   UNIVERSITAS TADULAKO
                 </div>
                 <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
@@ -1866,7 +1866,7 @@ onBeforeUnmount(() => {
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
-                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                <div class="bg-[#04000D] text-[#FDE047] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
                   HIMPUNAN MAHASISWA TEKNIK INFORMATIKA - UNTAD
                 </div>
                 <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
@@ -1885,7 +1885,7 @@ onBeforeUnmount(() => {
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
-                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                <div class="bg-[#04000D] text-[#FDE047] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
                    KABINET ALLBLUE - HMTI UNTAD
                 </div>
                 <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
@@ -1904,7 +1904,7 @@ onBeforeUnmount(() => {
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
-                <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
+                <div class="bg-[#04000D] text-[#FDE047] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none whitespace-nowrap shadow-[3px_3px_0px_0px_#FF3D8B]">
                   DEPARTEMEN RINOYA - HMTI UNTAD
                 </div>
                 <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
@@ -2004,7 +2004,7 @@ onBeforeUnmount(() => {
 
                 <!-- Brutalist Tooltip -->
                 <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
-                  <div class="bg-[#04000D] text-[#D6FF00] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none text-center max-w-[180px] md:max-w-[240px] break-words shadow-[3px_3px_0px_0px_#FF3D8B]">
+                  <div class="bg-[#04000D] text-[#FDE047] border-2 border-[#04000D] px-3.5 py-1.5 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-none text-center max-w-[180px] md:max-w-[240px] break-words shadow-[3px_3px_0px_0px_#FF3D8B]">
                     {{ partner.name }}
                   </div>
                   <div class="w-2.5 h-2.5 bg-[#04000D] rotate-45 -mt-1.5"></div>
@@ -2030,7 +2030,7 @@ onBeforeUnmount(() => {
                 @click="scrollToHero"
               ></button>
             <div class="flex flex-col gap-2">
-              <span class="font-headline-lg text-3xl sm:text-4xl font-bold text-[#D6FF00] riso-text-shadow-double-dark riso-bleed">I-FEST 2026</span>
+              <span class="font-headline-lg text-3xl sm:text-4xl font-bold text-[#FDE047] riso-text-shadow-double-dark riso-bleed">I-FEST 2026</span>
             </div>
             
             <!-- Bottom-Left Institutional Logo flex block -->
@@ -2055,7 +2055,7 @@ onBeforeUnmount(() => {
           
           <div class="flex flex-col md:items-end md:text-right gap-4">
             <p class="font-body-md text-sm md:text-base opacity-80">Ingin menjadi bagian dari simfoni ini?</p>
-            <p class="font-headline-lg text-lg md:text-xl font-medium">Sponsorship &amp; Kemitraan: <br class="md:hidden" /><a href="https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20%5BNama%20Anda%5D%20dari%20%5BNama%20Perusahaan%2FInstansi%5D.%20Kami%20tertarik%20untuk%20mengetahui%20lebih%20lanjut%20mengenai%20peluang%20kerja%20sama%20dan%20paket%20sponsorship%20di%20I-FEST%202026.%20Boleh%20kami%20meminta%20berkas%20Proposal%20Umum%20terbaru%3F%20Terima%20kasih%21" target="_blank" rel="noopener noreferrer" class="text-[#D6FF00] hover:underline transition-all duration-200">Fauzi (+62 821-9543-2152)</a></p>
+            <p class="font-headline-lg text-lg md:text-xl font-medium">Sponsorship &amp; Kemitraan: <br class="md:hidden" /><a href="https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20%5BNama%20Anda%5D%20dari%20%5BNama%20Perusahaan%2FInstansi%5D.%20Kami%20tertarik%20untuk%20mengetahui%20lebih%20lanjut%20mengenai%20peluang%20kerja%20sama%20dan%20paket%20sponsorship%20di%20I-FEST%202026.%20Boleh%20kami%20meminta%20berkas%20Proposal%20Umum%20terbaru%3F%20Terima%20kasih%21" target="_blank" rel="noopener noreferrer" class="text-[#FDE047] hover:underline transition-all duration-200">Fauzi (+62 821-9543-2152)</a></p>
             
             <div class="font-mono text-sm tracking-wider mt-1">
               <span class="opacity-75">Instagram:</span>
@@ -2083,7 +2083,7 @@ onBeforeUnmount(() => {
     <div class="flex flex-col items-center justify-center min-h-[calc(100vh-96px)] gap-y-6 relative z-10">
       <nav class="flex flex-col items-center gap-8 text-center">
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'roadshow-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#FF3D8B]/30 hover:text-accent-magenta'" href="#roadshow-section">Roadshow</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'competitions-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D6FF00]/30 hover:text-accent-magenta'" href="#competitions-section">Kompetisi</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'competitions-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#FDE047]/30 hover:text-accent-magenta'" href="#competitions-section">Kompetisi</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#8839FF]/30 hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
@@ -2132,7 +2132,7 @@ onBeforeUnmount(() => {
     <button 
       @click="isChatActivated = true" 
       class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
-      style="--plate-color: #D6FF00;"
+      style="--plate-color: #FDE047;"
       aria-label="Open Assistant"
     >
       <!-- Pulse Indicator Overlay -->

@@ -134,7 +134,7 @@ h1, h2, h3, h4, h5, h6, button, input, select, textarea {
 }
 
 .riso-text-shadow-lime {
-  text-shadow: -2.5px -1.5px 0px rgba(214, 255, 0, 0.9);
+  text-shadow: -2.5px -1.5px 0px rgba(253, 224, 71, 0.9);
 }
 
 .riso-text-shadow-double {
@@ -222,7 +222,7 @@ h1, h2, h3, h4, h5, h6, button, input, select, textarea {
   content: '';
   position: absolute;
   inset: -1px;
-  background-color: var(--plate-color, #D6FF00);
+  background-color: var(--plate-color, #FDE047);
   border: 1px solid #04000D;
   z-index: -1;
   border-radius: inherit;

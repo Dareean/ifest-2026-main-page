@@ -99,10 +99,10 @@ onMounted(() => {
             }"
             class="absolute inset-0 flex items-center justify-center z-20 mix-blend-multiply -translate-x-[3px] -translate-y-[2px]"
           >
-            <div class="w-64 h-64 md:w-80 md:h-80 border-4 border-[#D6FF00] rounded-3xl flex flex-col items-center justify-center bg-[#D6FF00]/10 p-6">
-              <span class="text-6xl md:text-7xl text-[#D6FF00] mb-2">✦</span>
-              <h2 class="font-mono text-3xl md:text-4xl font-extrabold tracking-widest text-[#D6FF00]">I-FEST</h2>
-              <p class="font-mono text-[10px] md:text-xs tracking-[0.25em] text-[#D6FF00] uppercase mt-2 font-bold">DIGITAL SYMPHONY</p>
+            <div class="w-64 h-64 md:w-80 md:h-80 border-4 border-[#FDE047] rounded-3xl flex flex-col items-center justify-center bg-[#FDE047]/10 p-6">
+              <span class="text-6xl md:text-7xl text-[#FDE047] mb-2">✦</span>
+              <h2 class="font-mono text-3xl md:text-4xl font-extrabold tracking-widest text-[#FDE047]">I-FEST</h2>
+              <p class="font-mono text-[10px] md:text-xs tracking-[0.25em] text-[#FDE047] uppercase mt-2 font-bold">DIGITAL SYMPHONY</p>
             </div>
           </div>
 
@@ -163,7 +163,7 @@ onMounted(() => {
         <!-- Coarse Progress Bar Indicator -->
         <div class="w-64 md:w-80 h-3 border-2 border-[#04000D] p-[2px] bg-white rounded-full overflow-hidden">
           <div 
-            class="h-full bg-[#D6FF00] border border-[#04000D] rounded-full transition-all duration-100 ease-out" 
+            class="h-full bg-[#FDE047] border border-[#04000D] rounded-full transition-all duration-100 ease-out" 
             :style="{ width: `${progress}%` }"
           ></div>
         </div>

@@ -58,7 +58,7 @@ export default {
         'on-secondary-fixed-variant': '#454747',
         'on-primary': '#ffffff',
         midnight: '#04000D',
-        'lime-bright': '#D6FF00',
+        'lime-bright': '#FDE047',
         'off-white': '#F5F5F5',
       },
       borderRadius: {

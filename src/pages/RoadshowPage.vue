@@ -207,7 +207,7 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
             </div>
             
             <div class="border-2 border-dashed border-[#04000D] p-5 bg-[#F5F5F5] relative">
-              <div class="absolute -top-3 left-4 bg-[#D6FF00] text-[#04000D] font-mono text-[9px] px-2 py-0.5 font-bold uppercase">PILLAR 02</div>
+              <div class="absolute -top-3 left-4 bg-[#FDE047] text-[#04000D] font-mono text-[9px] px-2 py-0.5 font-bold uppercase">PILLAR 02</div>
               <h4 class="font-black uppercase text-base tracking-tight leading-none mb-3 text-[#04000D] mt-2">TEKNOLOGI AKSESIBILITAS</h4>
               <p class="text-xs text-[#04000D]/80 leading-relaxed">Pemanfaatan piranti lunak pembaca layar, konverter teks-ke-suara, dan hardware adaptif.</p>
             </div>
@@ -229,7 +229,7 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
         <!-- EXECUTION STEPS & TIMELINE -->
         <div class="p-6 sm:p-8 bg-white border-3 border-[#04000D]" style="box-shadow: 6px 6px 0px 0px #04000D;">
           <div class="flex items-center gap-3 mb-6 border-b border-[#04000D]/10 pb-3 select-none">
-            <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#D6FF00] text-[#04000D] px-2 py-0.5">PLAN</span>
+            <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#FDE047] text-[#04000D] px-2 py-0.5">PLAN</span>
             <h3 class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]">Alur Pelaksanaan Kunjungan</h3>
           </div>
 
@@ -248,7 +248,7 @@ const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${f
 
             <!-- Stage 02 -->
             <div class="relative">
-              <div class="absolute -left-[35px] top-0 w-6 h-6 bg-[#D6FF00] border-2 border-[#04000D] rounded-full flex items-center justify-center font-mono text-[10px] font-bold text-[#04000D] shadow-[2px_2px_0px_0px_#04000D]">
+              <div class="absolute -left-[35px] top-0 w-6 h-6 bg-[#FDE047] border-2 border-[#04000D] rounded-full flex items-center justify-center font-mono text-[10px] font-bold text-[#04000D] shadow-[2px_2px_0px_0px_#04000D]">
                 2
               </div>
               <span class="font-mono text-[10px] font-bold uppercase text-[#04000D]/60 block mb-1">STAGE 02</span>

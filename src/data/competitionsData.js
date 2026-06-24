@@ -105,7 +105,7 @@ export const competitionsData = [
     languages: "CapCut, Premiere, After Effects, DaVinci Resolve",
     babak: "Kurasi Online + Showcase Expo",
     cardBg: "#FFF9E6",
-    accentColor: "#D6FF00",
+    accentColor: "#8839FF",
     textColor: "#04000D",
     description: "Salurkan kreativitas sinematik Anda untuk merancang video edukasi bertema Literasi Digital yang mampu menarik dan mengedukasi masyarakat luas.",
     longDescription: "Creative Video Competition IFeST 2026 (Regional Sulawesi Tengah & Sekitarnya) bertujuan mendorong produksi konten kreatif yang bersifat edukatif. Peserta ditantang membuat video pendek yang memikat dengan memadukan unsur visual storytelling yang modern, humor, atau emosional untuk mengedukasi masyarakat mengenai pentingnya kecakapan digital, keamanan data pribadi, dan etika berselancar di internet.",

@@ -53,7 +53,7 @@ const onLoaded = () => {
     <button 
       @click="isChatActivated = true" 
       class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
-      style="--plate-color: #D6FF00;"
+      style="--plate-color: #FDE047;"
       aria-label="Open Assistant"
     >
       <!-- Pulse Indicator -->
