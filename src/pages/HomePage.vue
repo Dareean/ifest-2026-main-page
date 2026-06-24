@@ -211,6 +211,245 @@ const doc2025AssetModules = import.meta.glob('../assets/dokumentasi_ifest2025/*'
 
 const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${folder}/${fileName}`] ?? ''
 
+const panitiaAssetModules = import.meta.glob('../assets/Fotage Panitia Ifest 2026/**/*', {
+  eager: true,
+  import: 'default',
+})
+
+// Parser for committee photos
+const parseCommitteePhotos = () => {
+  const allFiles = Object.keys(panitiaAssetModules)
+  const divisions = {
+    'Kreativitas': { name: 'Kreativitas', coordinators: [], members: [], groupPhoto: null, color: '#E11D48', textColor: '#ffffff', fruit: 'Apel', emoji: '🍎' },
+    'Koor Inti': { name: 'Koor Inti', coordinators: [], members: [], groupPhoto: null, color: '#DC2626', textColor: '#ffffff', fruit: 'Cabe', emoji: '🌶️🌶️' },
+    'Sponsor': { name: 'Sponsor', coordinators: [], members: [], groupPhoto: null, color: '#10B981', textColor: '#ffffff', fruit: 'Semangka', emoji: '🍉' },
+    'Ekonomi Kreatif': { name: 'Ekonomi Kreatif', coordinators: [], members: [], groupPhoto: null, color: '#FF2E93', textColor: '#ffffff', fruit: 'Strawberry', emoji: '🍓' },
+    'Konsumsi': { name: 'Konsumsi', coordinators: [], members: [], groupPhoto: null, color: '#FF8A65', textColor: '#04000D', fruit: 'Peach', emoji: '🍑' },
+    'Acara': { name: 'Acara', coordinators: [], members: [], groupPhoto: null, color: '#BE123C', textColor: '#ffffff', fruit: 'Cherry', emoji: '🍒' },
+    'Logistik': { name: 'Logistik', coordinators: [], members: [], groupPhoto: null, color: '#65A30D', textColor: '#ffffff', fruit: 'Alpukat', emoji: '🥑' },
+    'Korlap': { name: 'Korlap', coordinators: [], members: [], groupPhoto: null, color: '#FDE047', textColor: '#04000D', fruit: 'Lemon', emoji: '🍋' },
+    'Humas': { name: 'Humas', coordinators: [], members: [], groupPhoto: null, color: '#F97316', textColor: '#ffffff', fruit: 'Jeruk', emoji: '🍊' },
+    'Keamanan': { name: 'Keamanan', coordinators: [], members: [], groupPhoto: null, color: '#2563EB', textColor: '#ffffff', fruit: 'Blueberry', emoji: '🫐' }
+  }
+
+  const isGroupPhoto = (name) => {
+    const n = name.toLowerCase()
+    return n.includes('rame') || n.includes('ramai') || n.includes('boyband') || n.includes('porenjes') || 
+           n.includes('sekretaris i dan ii') || n.includes('ketua dan wakil') || 
+           n.includes('koor inti 3') || n.includes('koor inti 2') || 
+           n.includes('sekertaris.png') || n.includes('divisi lapangan') || 
+           n.includes('foto pertama ya') || n.includes('request pake foto') || 
+           n.includes('not this') || n.includes('anggota humas') ||
+           n.includes('sponsor 1') ||
+           n === 'img_8492.jpg' || n === 'img_8813.jpg' || n === 'img_8815.jpg' || n === 'img_8818.jpg' ||
+           n === 'img_8770.jpg' || n === 'img_8782.jpg' || n === 'img_8789.jpg' ||
+           n === 'img_8808.jpg' || n === 'img_8810.jpg' || n === 'img_8803.jpg' ||
+           n === 'img_8804.jpg' || n === 'img_8805.jpg' || n === 'img_8806.jpg' ||
+           n === 'img_8500.jpg' || n === 'img_8501.jpg' || n === 'img_8518.jpg' ||
+           n === 'img_8519.jpg' || n === 'img_8540.jpg' || n === 'img_8650.jpg' ||
+           n === 'img_8651.jpg' || n === 'img_8472.jpg' || n === 'img_8473.jpg' ||
+           n === 'img_8479.jpg' || n === 'img_8592.jpg' || n === 'img_8412.jpg' ||
+           n === 'img_8413.jpg' || n === 'img_8689.jpg' || n === 'img_8696.jpg' ||
+           n === 'img_8543.jpg' || n === 'img_8546.jpg' || n === 'img_8772.jpg' ||
+           n === 'img_8790.jpg' || n === 'img_8791.jpg' || n === 'img_8703.jpg' ||
+           n === 'img_8704.jpg' || n === 'img_8733.jpg' || n === 'img_8736.jpg' ||
+           n === 'img_8737.jpg' || n === 'img_8738.jpg' || n === 'img_8740.jpg' ||
+           n === 'img_8755.jpg' || n === 'img_8756.jpg' || n === 'img_8642.jpg' ||
+           n === 'img_8648.jpg' || n === 'img.jpg' || n.includes('51882e3c') ||
+           n.includes('866eecd6') || n.includes('f8944255') || n.includes('571c6e37') ||
+           n.includes('a5a56752') || n.includes('d9ff2b37')
+  }
+
+  const peopleMap = new Map()
+
+  allFiles.forEach(path => {
+    const parts = path.split('/')
+    const index = parts.indexOf('Fotage Panitia Ifest 2026')
+    if (index === -1 || index === parts.length - 1) return
+
+    let division = parts[index + 1]
+    if (division === 'Lapangan') {
+      division = 'Korlap'
+    }
+
+    let filename = parts[parts.length - 1]
+    const extIndex = filename.lastIndexOf('.')
+    if (extIndex === -1) return
+    const nameWithoutExt = filename.substring(0, extIndex)
+    const ext = filename.substring(extIndex).toLowerCase()
+
+    if (!divisions[division]) {
+      if (parts[index + 1] === 'Koor Inti' && parts[index + 2]) {
+        division = 'Koor Inti'
+      } else {
+        return
+      }
+    }
+
+    const fileUrl = panitiaAssetModules[path]
+
+    if (isGroupPhoto(filename)) {
+      if (!divisions[division].groupPhoto || ext === '.png') {
+        divisions[division].groupPhoto = fileUrl
+      }
+      return
+    }
+
+    let cleanName = nameWithoutExt
+      .replace(/\(\d+\)/g, '')
+      .replace(/_\(\d+\)/g, '')
+      .replace(/_/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    const uniqueKey = cleanName.toLowerCase()
+    const hasPrevious = peopleMap.has(uniqueKey)
+    const isNewBetter = !hasPrevious || (ext === '.png' && !filename.includes('(1)') && !filename.includes('(2)'))
+
+    if (!hasPrevious || isNewBetter) {
+      let classYear = ''
+      const yearMatch = cleanName.match(/\b(23|24|25)\b/)
+      if (yearMatch) {
+        classYear = yearMatch[0]
+      }
+
+      let subfolder = ''
+      if (parts[index + 1] === 'Koor Inti' && parts[index + 2]) {
+        subfolder = parts[index + 2]
+      }
+
+      let role = 'Anggota'
+      let isCoordinator = false
+
+      if (subfolder === 'Project Manager') {
+        isCoordinator = true
+        role = 'Project Manager'
+      } else if (subfolder === 'PIC') {
+        isCoordinator = true
+        role = 'PIC'
+      } else if (subfolder === 'Ketua & Wakil Ketua Panitia') {
+        isCoordinator = true
+        if (cleanName.toLowerCase().includes('wakil')) {
+          role = 'Wakil Ketua Panitia'
+        } else {
+          role = 'Ketua Panitia'
+        }
+      } else if (subfolder === 'Bendahara') {
+        isCoordinator = true
+        role = 'Bendahara'
+      } else if (subfolder === 'Sekretaris') {
+        isCoordinator = true
+        if (cleanName.toLowerCase().includes('ii') || cleanName.toLowerCase().includes('2')) {
+          role = 'Sekretaris II'
+        } else {
+          role = 'Sekretaris I'
+        }
+      } else {
+        const nameLower = cleanName.toLowerCase()
+        if (
+          nameLower.includes('koordinator') || 
+          nameLower.includes('koord') || 
+          nameLower.includes('ketua') || 
+          nameLower.includes('wakil') || 
+          nameLower.includes('project manager') || 
+          nameLower.includes('sekretaris') || 
+          nameLower.includes('bendahara') || 
+          nameLower.includes('pic')
+        ) {
+          isCoordinator = true
+          if (nameLower.includes('project manager')) role = 'Project Manager'
+          else if (nameLower.includes('pic')) role = 'PIC'
+          else if (nameLower.includes('ketua panitia')) role = 'Ketua Panitia'
+          else if (nameLower.includes('wakil ketua')) role = 'Wakil Ketua Panitia'
+          else if (nameLower.includes('sekretaris i')) role = 'Sekretaris I'
+          else if (nameLower.includes('sekretaris ii')) role = 'Sekretaris II'
+          else if (nameLower.includes('sekretaris')) role = 'Sekretaris'
+          else if (nameLower.includes('bendahara')) role = 'Bendahara'
+          else if (nameLower.includes('wakil koord') || nameLower.includes('wakil kordinator')) role = 'Wakil Koordinator'
+          else if (nameLower.includes('ketua koord') || nameLower.includes('koordinator')) role = 'Koordinator'
+        }
+      }
+
+      let displayName = cleanName
+      const lowerName = cleanName.toLowerCase()
+      if (lowerName.startsWith('dareean')) displayName = 'Dareean A. Raffi'
+      else if (lowerName.startsWith('gabriel')) displayName = 'Gabriel Kristofan Supari'
+      else if (lowerName.startsWith('reyqal')) displayName = 'Reyqal Syawalano'
+      else if (lowerName.startsWith('nakita')) displayName = 'Nakita Semesta'
+      else if (lowerName.startsWith('nur ainun')) displayName = 'Nur Ainun'
+      else if (lowerName.startsWith('yulianingsih')) displayName = 'Yulianingsih'
+      else if (lowerName.startsWith('lara')) displayName = 'Lara Fauzia'
+      else {
+        if (classYear) {
+          const yearIdx = cleanName.indexOf(classYear)
+          if (yearIdx !== -1) {
+            displayName = cleanName.substring(0, yearIdx).trim()
+          }
+        } else {
+          const roleKeywords = ['anggota', 'koordinator', 'koord', 'ketua', 'wakil', 'project manager', 'sekretaris', 'bendahara', 'pic']
+          for (const kw of roleKeywords) {
+            const idx = displayName.toLowerCase().indexOf(kw)
+            if (idx !== -1) {
+              displayName = displayName.substring(0, idx).trim()
+              break
+            }
+          }
+        }
+      }
+
+      displayName = displayName.replace(/[-_,\s]+$/, '').trim()
+
+      peopleMap.set(uniqueKey, {
+        name: displayName,
+        classYear: classYear ? `'${classYear}` : '',
+        role: role,
+        isCoordinator,
+        imgSrc: fileUrl,
+        division
+      })
+    }
+  })
+
+  peopleMap.forEach(person => {
+    const div = divisions[person.division]
+    if (person.isCoordinator) {
+      div.coordinators.push(person)
+    } else {
+      div.members.push(person)
+    }
+  })
+
+  Object.keys(divisions).forEach(key => {
+    const div = divisions[key]
+    div.coordinators.sort((a, b) => {
+      const getPriority = (role) => {
+        const r = role.toLowerCase()
+        if (r.includes('project manager')) return 1
+        if (r.includes('pic')) return 2
+        if (r.includes('ketua panitia')) return 3
+        if (r.includes('wakil ketua')) return 4
+        if (r.includes('sekretaris i')) return 5
+        if (r.includes('sekretaris ii')) return 6
+        if (r.includes('sekretaris')) return 7
+        if (r.includes('bendahara')) return 8
+        if (r.includes('koordinator')) return 9
+        if (r.includes('wakil koordinator')) return 10
+        return 100
+      }
+      return getPriority(a.role) - getPriority(b.role)
+    })
+    div.members.sort((a, b) => a.name.localeCompare(b.name))
+  })
+
+  return divisions
+}
+
+const panitiaData = parseCommitteePhotos()
+const activeDivisionTab = ref('Koor Inti')
+const fotoPanitiaKeseluruhan = computed(() => {
+  return panitiaAssetModules['../assets/Fotage Panitia Ifest 2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
+})
+
 const galleryImages = [
   {
     src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2050.JPG'),
@@ -1019,6 +1258,13 @@ onBeforeUnmount(() => {
                 class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
                 <div class="w-full max-w-xl text-left bg-white border-3 border-[#8B5CF6] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #8B5CF6;">
+                  <!-- Status: Terlaksana -->
+                  <div class="flex items-center gap-1.5 mb-3">
+                    <span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                      Terlaksana
+                    </span>
+                  </div>
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 0 ? -1 : 0"
                     class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
@@ -1064,8 +1310,8 @@ onBeforeUnmount(() => {
               
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#8B5CF6] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#8B5CF6] shadow-[2px_2px_0px_0px_#04000D]">
-                  01
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#8B5CF6] border-4 border-[#8B5CF6] flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D]">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-white"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
                 </div>
               </div>
               
@@ -1080,7 +1326,7 @@ onBeforeUnmount(() => {
               
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#10B981] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#10B981] shadow-[2px_2px_0px_0px_#04000D]">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#10B981] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#10B981] shadow-[2px_2px_0px_0px_#04000D] ring-4 ring-[#10B981]/30 animate-pulse">
                   02
                 </div>
               </div>
@@ -1093,6 +1339,12 @@ onBeforeUnmount(() => {
                 class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
                 <div class="w-full max-w-xl text-left bg-white border-3 border-[#10B981] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #10B981;">
+                  <!-- Status: Segera -->
+                  <div class="flex items-center gap-1.5 mb-3">
+                    <span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                      ◉ Segera — Juli
+                    </span>
+                  </div>
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 1 ? -1 : 1"
                     class="flex items-center justify-between border-b border-emerald-100 pb-3 cursor-pointer select-none"
@@ -1139,6 +1391,12 @@ onBeforeUnmount(() => {
                 class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
                 <div class="w-full max-w-xl text-left bg-white border-3 border-[#3B82F6] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #3B82F6;">
+                  <!-- Status: Segera -->
+                  <div class="flex items-center gap-1.5 mb-3">
+                    <span class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                      ◉ Segera — Juli
+                    </span>
+                  </div>
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 2 ? -1 : 2"
                     class="flex items-center justify-between border-b border-blue-100 pb-3 cursor-pointer select-none"
@@ -1176,7 +1434,7 @@ onBeforeUnmount(() => {
               
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#3B82F6] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#3B82F6] shadow-[2px_2px_0px_0px_#04000D]">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#3B82F6] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#3B82F6] shadow-[2px_2px_0px_0px_#04000D] ring-4 ring-[#3B82F6]/30 animate-pulse">
                   03
                 </div>
               </div>
@@ -1192,7 +1450,7 @@ onBeforeUnmount(() => {
               
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#F59E0B] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#F59E0B] shadow-[2px_2px_0px_0px_#04000D]">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-dashed border-[#F59E0B]/50 flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#F59E0B]/40 shadow-none">
                   04
                 </div>
               </div>
@@ -1204,7 +1462,13 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#F59E0B] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #F59E0B;">
+                <div class="w-full max-w-xl text-left bg-white/80 border-2 border-dashed border-[#F59E0B]/40 rounded-2xl p-5 transition-all duration-300 opacity-60">
+                  <!-- Status: Mendatang -->
+                  <div class="flex items-center gap-1.5 mb-3">
+                    <span class="bg-slate-100 text-slate-400 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
+                      Mendatang
+                    </span>
+                  </div>
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 3 ? -1 : 3"
                     class="flex items-center justify-between border-b border-amber-100 pb-3 cursor-pointer select-none"
@@ -1250,7 +1514,13 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#EF4444] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #EF4444;">
+                <div class="w-full max-w-xl text-left bg-white/80 border-2 border-dashed border-[#EF4444]/40 rounded-2xl p-6 transition-all duration-300 opacity-60">
+                  <!-- Status: Mendatang -->
+                  <div class="flex items-center gap-1.5 mb-3">
+                    <span class="bg-slate-100 text-slate-400 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
+                      Mendatang
+                    </span>
+                  </div>
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 4 ? -1 : 4"
                     class="flex items-center justify-between border-b border-red-100 pb-3 cursor-pointer select-none"
@@ -1288,7 +1558,7 @@ onBeforeUnmount(() => {
               
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#EF4444] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#EF4444] shadow-[2px_2px_0px_0px_#04000D]">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-dashed border-[#EF4444]/50 flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#EF4444]/40 shadow-none">
                   05
                 </div>
               </div>
@@ -1304,7 +1574,7 @@ onBeforeUnmount(() => {
               
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0F172A] border-4 border-[#F59E0B] flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D]">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0F172A] border-4 border-dashed border-[#F59E0B]/50 flex items-center justify-center shadow-none opacity-60">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-[#F59E0B]"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM6.16 5.1a.75.75 0 0 1 1.06 0l1.59 1.59a.75.75 0 1 1-1.06 1.06L6.16 6.16a.75.75 0 0 1 0-1.06Zm10.62 0a.75.75 0 0 1 0 1.06l-1.59 1.59a.75.75 0 1 1-1.06-1.06l1.59-1.59a.75.75 0 0 1 1.06 0ZM2.25 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75Zm15 0a.75.75 0 0 1 .75-.75H21a.75.75 0 0 1 0 1.5h-2.25a.75.75 0 0 1-.75-.75Zm-10.5 5.34a.75.75 0 0 1 1.06 0l1.59 1.59a.75.75 0 1 1-1.06 1.06l-1.59-1.59a.75.75 0 0 1 0-1.06Zm7.06 0a.75.75 0 0 1 0 1.06l-1.59 1.59a.75.75 0 1 1-1.06-1.06l1.59-1.59a.75.75 0 0 1 1.06 0ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5ZM12 18.75a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>
                 </div>
               </div>
@@ -1316,7 +1586,13 @@ onBeforeUnmount(() => {
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-[#0F172A] border-3 border-[#F59E0B] rounded-2xl p-6 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #F59E0B;">
+                <div class="w-full max-w-xl text-left bg-[#0F172A]/80 border-2 border-dashed border-[#F59E0B]/40 rounded-2xl p-6 transition-all duration-300 opacity-60">
+                  <!-- Status: Mendatang -->
+                  <div class="flex items-center gap-1.5 mb-3">
+                    <span class="bg-slate-700 text-slate-400 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
+                      Mendatang
+                    </span>
+                  </div>
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === 5 ? -1 : 5"
                     class="flex items-center justify-between border-b border-slate-700 pb-3 cursor-pointer select-none"
@@ -1981,15 +2257,21 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Asymmetrical Organizational Blueprint Rows -->
-        <div class="border-t-3 border-x-3 border-[#04000D] bg-white pb-0 mb-16 md:mb-24 select-none">
+        <div class="border-t-3 border-x-3 border-[#04000D] bg-white pb-0 mb-10 select-none">
           
           <!-- ROW 1: NAKITA SEMESTA (Project Manager) -->
           <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
             <!-- Left Side Column (Color Ink Block) -->
             <div class="bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PROJECT MANAGER ✦</span>
-              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-2deg]">
-                NS
+              <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[-2deg] transition-all duration-200 group-hover:scale-105 select-none relative">
+                <img 
+                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc"
+                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc" 
+                  alt="Nakita Semesta" 
+                  class="w-full h-full object-cover object-top contrast-110"
+                />
+                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">NS</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) -->
@@ -2012,8 +2294,14 @@ onBeforeUnmount(() => {
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
             <div class="order-1 md:order-2 bg-[#FDE047] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PIC I-FEST 2026 ✦</span>
-              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[3deg]">
-                DR
+              <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[3deg] transition-all duration-200 group-hover:scale-105 select-none relative">
+                <img 
+                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc"
+                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc" 
+                  alt="Dareean A. Raffi" 
+                  class="w-full h-full object-cover object-top contrast-110"
+                />
+                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">DR</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
@@ -2036,8 +2324,14 @@ onBeforeUnmount(() => {
             <!-- Left Side Column (Color Ink Block) -->
             <div class="bg-[#8839FF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#FDE047] pb-1 block w-full mb-6 font-bold text-[#FDE047]">✦ KETUA PANITIA ✦</span>
-              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[-1deg]">
-                GK
+              <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[-1deg] transition-all duration-200 group-hover:scale-105 select-none relative">
+                <img 
+                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc"
+                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc" 
+                  alt="Gabriel Kristofan" 
+                  class="w-full h-full object-cover object-top contrast-110"
+                />
+                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">GK</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) -->
@@ -2060,8 +2354,14 @@ onBeforeUnmount(() => {
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
             <div class="order-1 md:order-2 bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ WAKIL KETUA PANITIA ✦</span>
-              <div class="w-16 h-16 md:w-20 md:h-20 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] flex items-center justify-center font-mono font-black text-xl md:text-2xl text-[#04000D] select-none uppercase tracking-wider rotate-[2deg]">
-                RS
+              <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[2deg] transition-all duration-200 group-hover:scale-105 select-none relative">
+                <img 
+                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc"
+                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc" 
+                  alt="Reyqal Syawalano" 
+                  class="w-full h-full object-cover object-top contrast-110"
+                />
+                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">RS</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
@@ -2079,6 +2379,189 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
+        </div>
+
+        <!-- Division Command Board (Grid selection cards + panel below) -->
+        <div class="mt-16 select-none animate-fade-in" data-reveal>
+          <div class="mb-6 flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 border-b-3 border-[#04000D] pb-3">
+            <h3 class="font-black text-2xl md:text-4xl tracking-[-0.04em] uppercase text-[#04000D] riso-bleed">✦ DIVISI OPERASIONAL</h3>
+            <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-wider font-bold">SELECT A DIVISION TO VIEW INDIVIDUAL ROSTER</span>
+          </div>
+
+          <!-- Polaroid Hero Banner (Foto Bersama Panitia Keseluruhan) -->
+          <div v-if="fotoPanitiaKeseluruhan" class="mb-10 max-w-4xl mx-auto select-none">
+            <div class="border-3 border-[#04000D] bg-white p-3 sm:p-4 shadow-[6px_6px_0px_0px_#04000D] rotate-[-0.5deg] hover:rotate-0 transition-transform duration-350 ease-out">
+              <div class="relative aspect-[16/9] md:aspect-[21/9] overflow-hidden border border-[#04000D]/20 bg-[#04000D]/5">
+                <img 
+                  :src="fotoPanitiaKeseluruhan" 
+                  alt="Foto Bersama Seluruh Panitia I-FEST 2026" 
+                  class="w-full h-full object-cover grayscale contrast-125 brightness-95 hover:grayscale-0 transition-all duration-500 ease-in-out"
+                />
+              </div>
+              <div class="mt-4 text-center">
+                <span class="font-headline font-black text-xs md:text-sm tracking-[0.2em] text-[#04000D] uppercase font-mono">
+                  ✦ ORCHESTRA OF INNOVATION // I-FEST 2026 FULL CREW ⚡ ✦
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Division Selection Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8 select-none">
+            <button
+              v-for="(div, key) in panitiaData"
+              :key="key"
+              @click="activeDivisionTab = key"
+              class="font-mono text-xs font-bold p-3 border-2 border-[#04000D] flex flex-col items-center justify-center gap-1 active:scale-95 transition-all duration-150 rounded-none shadow-[2px_2px_0px_0px_#04000D] cursor-pointer"
+              :style="activeDivisionTab === key ? {
+                backgroundColor: div.color,
+                color: div.textColor,
+                transform: 'translate(-2px, -2px)',
+                boxShadow: '4px 4px 0px 0px #04000D'
+              } : {
+                backgroundColor: '#ffffff',
+                color: '#04000D'
+              }"
+            >
+              <span class="text-2xl mb-1">{{ div.emoji }}</span>
+              <span class="font-black tracking-tight text-[10px] md:text-xs text-center leading-tight">{{ div.name.toUpperCase() }}</span>
+              <span class="text-[9px] opacity-75 font-mono">({{ div.coordinators.length + div.members.length }} P)</span>
+            </button>
+          </div>
+
+          <!-- Active Division Panel (Only selected division shown here) -->
+          <div 
+            v-if="panitiaData[activeDivisionTab]"
+            class="border-3 border-[#04000D] bg-white relative overflow-hidden shadow-[4px_4px_0px_0px_#04000D] transition-all duration-300"
+          >
+            <!-- Division Header Strip -->
+            <div 
+              class="border-b-3 border-[#04000D] px-4 py-3 flex flex-wrap items-center justify-between gap-2 select-none"
+              :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color, color: panitiaData[activeDivisionTab]?.textColor }"
+            >
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-base">{{ panitiaData[activeDivisionTab]?.emoji }}</span>
+                <h4 class="font-black text-lg md:text-xl uppercase tracking-tight">{{ panitiaData[activeDivisionTab]?.name.toUpperCase() }}</h4>
+              </div>
+              <span class="font-mono text-xs font-bold uppercase">
+                {{ panitiaData[activeDivisionTab]?.coordinators.length + panitiaData[activeDivisionTab]?.members.length }} Personil
+              </span>
+            </div>
+
+            <!-- Division Body -->
+            <div class="p-5 md:p-6 bg-white relative z-10">
+              <!-- Decorative Background Stamp Overlay -->
+              <div class="absolute -right-6 -bottom-6 w-48 h-48 opacity-[0.03] pointer-events-none font-mono font-black text-[96px] uppercase tracking-tighter select-none rotate-12 flex items-center justify-center">
+                {{ panitiaData[activeDivisionTab]?.emoji }}
+              </div>
+
+              <!-- Division Grid Layout -->
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 relative z-10">
+                
+                <!-- Left Column: Concept, Coordinators, and Group Photo -->
+                <div class="col-span-1 lg:col-span-4 flex flex-col gap-5">
+                  <!-- Fruit Concept Badge -->
+                  <div 
+                    class="inline-flex items-center self-start gap-2 px-3 py-1.5 border-2 border-[#04000D] font-mono text-[10px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#04000D] select-none"
+                    :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color, color: panitiaData[activeDivisionTab]?.textColor }"
+                  >
+                    <span>KONSEP BUAH: {{ panitiaData[activeDivisionTab]?.fruit.toUpperCase() }} {{ panitiaData[activeDivisionTab]?.emoji }}</span>
+                  </div>
+
+                  <!-- Coordinator Section -->
+                  <div>
+                    <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-3">✦ KOORDINATOR ✦</span>
+                    
+                    <div class="flex flex-col gap-3">
+                      <div 
+                        v-for="coor in panitiaData[activeDivisionTab]?.coordinators" 
+                        :key="coor.name"
+                        class="flex items-center gap-3 bg-[#F5F5F5] border-2 border-[#04000D] p-2.5 shadow-[2px_2px_0px_0px_#04000D] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_#04000D] transition-all duration-150"
+                      >
+                        <!-- Photo Block -->
+                        <div 
+                          class="w-12 h-12 border-2 border-[#04000D] flex-shrink-0 overflow-hidden flex items-center justify-center relative select-none"
+                          :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }"
+                        >
+                          <img 
+                            v-if="coor.imgSrc" 
+                            :src="coor.imgSrc" 
+                            :alt="coor.name" 
+                            class="w-full h-full object-cover object-top contrast-110"
+                          />
+                          <span v-else class="font-mono font-black text-xs text-[#04000D]">{{ coor.name.substring(0, 2).toUpperCase() }}</span>
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="flex flex-col justify-center min-w-0 select-text">
+                          <h5 class="font-black text-xs md:text-sm uppercase tracking-tight text-[#04000D] leading-tight truncate">{{ coor.name }}</h5>
+                          <span class="font-mono text-[9px] text-[#04000D]/70 font-bold uppercase mt-0.5 truncate">{{ coor.role }} {{ coor.classYear }}</span>
+                        </div>
+                      </div>
+
+                      <div v-if="!panitiaData[activeDivisionTab]?.coordinators.length" class="font-mono text-[10px] text-[#04000D]/60 italic p-3 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40">
+                        Tidak ada data koordinator khusus.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Division Group Photo -->
+                  <div v-if="panitiaData[activeDivisionTab]?.groupPhoto" class="select-none">
+                    <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-2.5">✦ DOKUMENTASI UNIT ✦</span>
+                    <div class="border-2 border-[#04000D] bg-white p-2 shadow-[3px_3px_0px_0px_#04000D] rotate-[0.5deg] hover:rotate-0 transition-transform duration-200">
+                      <div class="relative aspect-[3/2] overflow-hidden border border-[#04000D]/20 bg-[#04000D]/5">
+                        <img 
+                          :src="panitiaData[activeDivisionTab]?.groupPhoto" 
+                          alt="Foto Bersama Divisi" 
+                          class="w-full h-full object-cover grayscale contrast-110 brightness-95"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Column: Members Grid -->
+                <div class="col-span-1 lg:col-span-8 flex flex-col">
+                  <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-3">✦ ANGGOTA UNIT ✦</span>
+                  
+                  <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-3">
+                    <div 
+                      v-for="member in panitiaData[activeDivisionTab]?.members" 
+                      :key="member.name"
+                      class="group/member flex flex-col items-center"
+                    >
+                      <!-- Avatar frame -->
+                      <div 
+                        class="w-full aspect-square border-2 border-[#04000D] overflow-hidden flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D] group-hover/member:shadow-[3px_3px_0px_0px_#04000D] group-hover/member:translate-y-[-1px] transition-all duration-150 relative cursor-pointer"
+                        :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }"
+                      >
+                        <img 
+                          v-if="member.imgSrc" 
+                          :src="member.imgSrc" 
+                          :alt="member.name" 
+                          class="w-full h-full object-cover object-top contrast-110 transition-transform duration-200 group-hover/member:scale-105"
+                        />
+                        <span v-else class="font-mono font-black text-sm text-[#04000D]">{{ member.name.substring(0, 2).toUpperCase() }}</span>
+                      </div>
+
+                      <!-- Label -->
+                      <div class="w-full mt-1.5 text-center select-text min-w-0">
+                        <p class="font-black text-[10px] leading-tight uppercase tracking-tight text-[#04000D] truncate" :title="member.name">
+                          {{ member.name.split(' ')[0] }}<span v-if="member.name.split(' ')[1]" class="hidden sm:inline"> {{ member.name.split(' ')[1] }}</span>
+                        </p>
+                        <span class="font-mono text-[8px] text-[#04000D]/60 mt-0.5 block font-bold leading-none">{{ member.classYear }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="!panitiaData[activeDivisionTab]?.members.length" class="font-mono text-[10px] text-[#04000D]/60 italic p-6 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40 text-center mt-3">
+                    Tidak ada data anggota unit.
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
