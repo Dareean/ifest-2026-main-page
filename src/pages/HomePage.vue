@@ -12,6 +12,65 @@ const isLoading = ref(false)
 const isMenuOpen = ref(false)
 const activeZineIndex = ref(0)
 const activeTimelinePhase = ref(-1)
+const activeGalleryIndex = ref(0)
+const isAnimating = ref(false)
+const rotations = [-3, 2, -1, 4, -2, 3, -4, 1, -2, 3, -1]
+
+const getCardStyle = (index) => {
+  const total = galleryImages.length
+  const diff = (index - activeGalleryIndex.value + total) % total
+  const rot = rotations[index % rotations.length]
+
+  if (index === activeGalleryIndex.value && isAnimating.value) {
+    return {
+      transform: 'translate(220px, 15px) rotate(12deg)',
+      opacity: '0',
+      zIndex: '40',
+      pointerEvents: 'none'
+    }
+  }
+
+  if (diff === 0) {
+    return {
+      transform: `translate(0px, 0px) rotate(${rot}deg)`,
+      zIndex: '30',
+      opacity: '1'
+    }
+  } else if (diff === 1) {
+    return {
+      transform: `translate(8px, 6px) rotate(${rot}deg)`,
+      zIndex: '20',
+      opacity: '0.92'
+    }
+  } else if (diff === 2) {
+    return {
+      transform: `translate(-6px, 12px) rotate(${rot}deg)`,
+      zIndex: '10',
+      opacity: '0.85'
+    }
+  } else {
+    return {
+      transform: `translate(0px, 0px) scale(0.95) rotate(${rot}deg)`,
+      zIndex: '0',
+      opacity: '0',
+      pointerEvents: 'none'
+    }
+  }
+}
+
+const nextCard = () => {
+  if (isAnimating.value) return
+  isAnimating.value = true
+  setTimeout(() => {
+    activeGalleryIndex.value = (activeGalleryIndex.value + 1) % galleryImages.length
+    isAnimating.value = false
+  }, 300)
+}
+
+const prevCard = () => {
+  if (isAnimating.value) return
+  activeGalleryIndex.value = (activeGalleryIndex.value - 1 + galleryImages.length) % galleryImages.length
+}
 
 const activeSection = ref('')
 
@@ -145,32 +204,79 @@ const mainLogoAssetModules = import.meta.glob('../assets/logo_utama/*', {
   import: 'default',
 })
 
+const doc2025AssetModules = import.meta.glob('../assets/dokumentasi_ifest2025/*', {
+  eager: true,
+  import: 'default',
+})
+
 const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${folder}/${fileName}`] ?? ''
 
 const galleryImages = [
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'academic_workshop.webp'),
-    alt: 'Tema Utama: Resonansi Digital',
-    title: 'Tema Utama: Resonansi Digital',
-    description: 'Capturing the 2025 spirit of youth collaboration impacting Central Sulawesi technology growth.'
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2050.JPG'),
+    alt: 'Suasana Hackathon Pasigala',
+    title: 'Hackathon Pasigala',
+    description: 'Kolaborasi intensif 24 jam inovator muda memecahkan tantangan riil di Sulawesi Tengah.'
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'palu_dev_day.webp'),
-    alt: '2.525 Penerima Manfaat',
-    title: '2.525 Penerima Manfaat',
-    description: 'Direct impact tracking over 13 High Schools visited and 1,082 participants crowding the Tadulako Main Auditorium.'
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2385.JPG'),
+    alt: 'Awarding Night Pemenang',
+    title: 'Awarding & Penghargaan',
+    description: 'Apresiasi karya teknologi terbaik kepada para pemenang kompetisi nasional.'
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'smart_helmet.webp'),
-    alt: '30 Produk Teknologi Lokal',
-    title: '30 Produk Teknologi Lokal',
-    description: 'Showcasing 30 native inventions across Mobile Apps, VR Megalith Showcases, IoT, and Web Development (Ternary AI).'
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0404.JPG'),
+    alt: 'Pameran Karya Inovatif',
+    title: 'Showcase Expo Teknologi',
+    description: 'Demo produk digital inovatif hasil karya talenta lokal kepada ribuan pengunjung.'
   },
   {
-    src: getAsset(visualAssetModules, 'visual_assets', 'tech_meetup.webp'),
-    alt: '390.1K Instagram Reach',
-    title: '390.1K Instagram Reach',
-    description: 'Capturing our massive digital exposure footprint under the official @ifest_untad network during the campaign.'
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0406.JPG'),
+    alt: 'Demo IoT Smart System',
+    title: 'Prototype IoT Showcase',
+    description: 'Pengunjung mencoba prototype sistem pintar berbasis Internet of Things.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0417.JPG'),
+    alt: 'Sesi Coding & Mentoring',
+    title: 'Developer Mentorship',
+    description: 'Sesi bimbingan langsung bersama praktisi industri teknologi nasional.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_0170.JPG'),
+    alt: 'Sambutan Puncak Acara',
+    title: 'Opening Ceremony',
+    description: 'Pembukaan resmi I-FEST oleh Rektor Universitas Tadulako dan Ketua Jurusan.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_5734.JPG'),
+    alt: 'Auditorium Dipadati Peserta',
+    title: 'Seminar Nasional Tech',
+    description: 'Lebih dari 1.000 peserta memadati auditorium utama untuk mengikuti seminar teknologi.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_5819.JPG'),
+    alt: 'Peserta Bertanya Sesi Diskusi',
+    title: 'Sesi Diskusi Interaktif',
+    description: 'Tanya jawab kritis antara mahasiswa dan pembicara seputar masa depan AI.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6425.JPG'),
+    alt: 'Penampilan Band & Guest Star',
+    title: 'Digital Symphony Concert',
+    description: 'Konser penutup yang menyatukan ribuan penonton dalam harmoni digital.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6476.JPG'),
+    alt: 'Keceriaan Panitia & Crew',
+    title: 'IFEST 2025 Organizer Team',
+    description: 'Dedikasi penuh 80+ panitia HMTI UNTAD menyukseskan festival IT terbesar.'
+  },
+  {
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6481.JPG'),
+    alt: 'Closing Ceremony Foto Bersama',
+    title: 'Fase Akhir & Evaluasi',
+    description: 'Kebersamaan seluruh jajaran panitia, mentor, dan pengisi acara di malam puncak.'
   }
 ]
 
@@ -1516,33 +1622,112 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-8 text-center md:text-left select-none">
+        <div class="mb-12 text-center lg:text-left select-none">
           <span class="font-mono text-xs uppercase tracking-widest font-extrabold text-[#FDE047]">HISTORICAL DOSSIER</span>
           <h2 class="font-bold text-2xl md:text-3xl tracking-tighter text-[#F5F5F5] mt-1 riso-bleed">Arsip Resonansi 2025.</h2>
         </div>
 
-        <!-- Grid of Grainy Analog Photocopy Images -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+        <!-- Two-column grid on desktop (lg:grid-cols-2), single column on mobile -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
-          <div 
-            v-for="(item, index) in galleryImages" 
-            :key="index"
-            class="bg-transparent border border-[#F5F5F5]/30 p-4 rounded-none flex flex-col justify-between hover:border-[#FDE047] transition-colors duration-300 select-none"
-            :class="[index === 3 ? 'lg:col-start-2' : '']"
-          >
-            <!-- Photocopy-style high-contrast print filter container -->
-            <div class="relative w-full aspect-[4/3] rounded-none overflow-hidden bg-transparent border border-[#F5F5F5]/20 mb-4 group pointer-events-auto">
-              <img 
-                :src="item.src" 
-                :alt="item.alt" 
-                class="w-full h-full object-cover grayscale mix-blend-multiply contrast-125 transition-all duration-300 group-hover:scale-105"
-              />
+          <!-- Left Column: The Polaroid Stack -->
+          <div class="flex flex-col items-center justify-center w-full">
+            <!-- Polaroid Card Stack Container -->
+            <div class="relative w-[280px] h-[320px] sm:w-[340px] sm:h-[390px] md:w-[380px] md:h-[420px] select-none flex items-center justify-center">
+              <div
+                v-for="(item, index) in galleryImages"
+                :key="index"
+                class="absolute inset-0 bg-white border-2 md:border-3 border-[#04000D] p-3 pb-8 rounded-none transition-all duration-300 ease-out select-none cursor-pointer flex flex-col justify-between"
+                :style="getCardStyle(index)"
+                @click="index === activeGalleryIndex ? nextCard() : null"
+                style="box-shadow: 6px 6px 0px 0px rgba(4,0,13,0.3);"
+              >
+                <!-- Photo frame -->
+                <div class="relative w-full aspect-[4/3] rounded-none overflow-hidden bg-[#FAF9F6] border-2 border-[#04000D]">
+                  <img 
+                    :src="item.src" 
+                    :alt="item.alt" 
+                    class="w-full h-full object-cover grayscale mix-blend-multiply contrast-125 pointer-events-none select-none"
+                  />
+                  <div class="absolute inset-0 bg-[#04000D]/5 mix-blend-multiply pointer-events-none"></div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                  <span class="font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#04000D]">
+                    ✦ {{ item.title }} ✦
+                  </span>
+                </div>
+              </div>
             </div>
             
-            <div class="flex flex-col gap-1">
-              <span class="font-mono text-[9px] uppercase tracking-widest text-[#FDE047] font-bold">{{ item.title }}</span>
-              <h4 class="font-bold text-base text-[#F5F5F5] tracking-tight leading-snug mt-1">{{ item.description }}</h4>
+            <p class="text-[10px] text-[#F5F5F5]/50 font-mono mt-6 uppercase tracking-widest hidden lg:block">
+              * Klik foto teratas untuk berpindah ke arsip berikutnya
+            </p>
+          </div>
+
+          <!-- Right Column: Controls, Index Panel & Metadata -->
+          <div class="flex flex-col gap-6 w-full max-w-lg mx-auto lg:mx-0">
+            
+            <!-- Index Control Panel -->
+            <div class="bg-[#0D0B14] border border-[#F5F5F5]/15 p-5 text-left">
+              <div class="flex justify-between items-baseline mb-4 font-mono text-[9px] uppercase tracking-widest text-[#F5F5F5]/40 font-bold">
+                <span>DOCUMENT DIRECTORY</span>
+                <span>{{ galleryImages.length }} FILES DETECTED</span>
+              </div>
+              
+              <!-- Grid of buttons -->
+              <div class="grid grid-cols-6 sm:grid-cols-11 lg:grid-cols-6 gap-2">
+                <button
+                  v-for="(_, index) in galleryImages"
+                  :key="index"
+                  @click="activeGalleryIndex = index"
+                  class="font-mono text-xs font-bold p-2 text-center border transition-all duration-150 active:scale-95"
+                  :class="activeGalleryIndex === index 
+                    ? 'bg-[#FDE047] text-[#04000D] border-[#FDE047] shadow-[2px_2px_0px_0px_rgba(255,61,139,0.9)]' 
+                    : 'text-[#F5F5F5]/70 border-[#F5F5F5]/15 hover:bg-white/5 hover:text-white'"
+                >
+                  {{ String(index + 1).padStart(2, '0') }}
+                </button>
+              </div>
             </div>
+
+            <!-- Controls and File Navigation -->
+            <div class="flex items-center justify-between bg-[#0D0B14] border border-[#F5F5F5]/15 p-4 select-none">
+              <button 
+                @click="prevCard" 
+                class="riso-btn-plate bg-[#0D0B14] text-white border border-[#F5F5F5]/20 w-10 h-10 rounded-full flex items-center justify-center font-bold active:scale-95 transition-transform"
+                style="--plate-color: #FF3D8B;"
+              >
+                ←
+              </button>
+              
+              <span class="font-mono text-xs text-[#FDE047] font-extrabold uppercase tracking-widest">
+                FILE_INDEX: [ {{ String(activeGalleryIndex + 1).padStart(2, '0') }} // {{ String(galleryImages.length).padStart(2, '0') }} ]
+              </span>
+              
+              <button 
+                @click="nextCard" 
+                class="riso-btn-plate bg-[#0D0B14] text-white border border-[#F5F5F5]/20 w-10 h-10 rounded-full flex items-center justify-center font-bold active:scale-95 transition-transform"
+                style="--plate-color: #FF3D8B;"
+              >
+                →
+              </button>
+            </div>
+
+            <!-- Active File Metadata Card -->
+            <div class="bg-[#0D0B14] border border-[#F5F5F5]/15 p-6 text-left select-none w-full min-h-[140px] transition-all duration-300 shadow-[6px_6px_0px_0px_rgba(253,224,71,0.1)]">
+              <div class="flex justify-between items-baseline mb-3 font-mono text-[9px] uppercase tracking-widest text-[#FDE047] font-bold">
+                <span>METADATA DOSSIER</span>
+                <span>IFEST_RESONANCE_2025</span>
+              </div>
+              <h4 class="font-mono text-sm sm:text-base text-[#F5F5F5]/90 tracking-wide font-black uppercase">
+                {{ galleryImages[activeGalleryIndex]?.title }}
+              </h4>
+              <p class="font-mono text-xs text-[#F5F5F5]/60 mt-3.5 leading-relaxed">
+                {{ galleryImages[activeGalleryIndex]?.description }}
+              </p>
+            </div>
+
           </div>
 
         </div>
