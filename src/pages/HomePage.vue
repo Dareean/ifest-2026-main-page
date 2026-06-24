@@ -1615,9 +1615,94 @@ onBeforeUnmount(() => {
       <!-- Background Decorative Stamp Shards (Yellow on Purple contrast) -->
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'sy5 1.webp')" 
-        alt="Decorative Riso Plate Shard" 
+        alt="Decorative Riso Plate Shard Right" 
         class="absolute -bottom-8 -right-16 w-36 md:w-56 opacity-35 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry2 1.webp')" 
+        alt="Decorative Riso Plate Shard Left" 
+        class="absolute -top-12 -left-12 w-36 md:w-56 opacity-25 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block rotate-45" 
+      />
+
+      <!-- Left Margin Technical Calibration Strip -->
+      <div class="hidden lg:flex flex-col items-center justify-between absolute left-3 xl:left-6 top-0 bottom-0 py-8 w-10 z-20 pointer-events-none border-r border-dashed border-[#F5F5F5]/10 pr-3">
+        <!-- Top Registration Mark -->
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#FDE047]/60" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="8" />
+          <line x1="12" y1="2" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+        </svg>
+        
+        <!-- Center Group: Color Calibration Bar & Info Text -->
+        <div class="flex flex-col items-center gap-6 my-auto">
+          <!-- Color Calibration Bar -->
+          <div class="flex flex-col border border-[#F5F5F5]/20 p-1 bg-[#0D0B14] gap-1">
+            <div class="w-3 h-3 bg-[#8839FF]" title="Primary Purple"></div>
+            <div class="w-3 h-3 bg-[#FF3D8B]" title="Accent Pink"></div>
+            <div class="w-3 h-3 bg-[#FDE047]" title="Soft Yellow"></div>
+            <div class="w-3 h-3 bg-[#F5F5F5]" title="Off White"></div>
+            <div class="w-3 h-3 bg-[#0D0B14]" title="Dark Charcoal"></div>
+          </div>
+          
+          <!-- Rotated Monospace Text -->
+          <div class="font-mono text-[9px] font-bold tracking-[0.25em] text-[#F5F5F5]/30 uppercase select-none whitespace-nowrap -rotate-90 origin-center my-12">
+            I-FEST 2025 // HISTORICAL DOSSIER // SYS: REG-01
+          </div>
+        </div>
+
+        <!-- Bottom Registration Mark -->
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#FDE047]/60" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="8" />
+          <line x1="12" y1="2" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+        </svg>
+      </div>
+
+      <!-- Right Margin Technical Stamp & Barcode -->
+      <div class="hidden lg:flex flex-col items-center justify-between absolute right-3 xl:right-6 top-0 bottom-0 py-8 w-10 z-20 pointer-events-none border-l border-dashed border-[#F5F5F5]/10 pl-3">
+        <!-- Top Registration Mark -->
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#FDE047]/60" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="8" />
+          <line x1="12" y1="2" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+        </svg>
+
+        <!-- Center Group: Barcode & Status Text -->
+        <div class="flex flex-col items-center gap-6 my-auto">
+          <!-- Rotated Monospace Text -->
+          <div class="font-mono text-[9px] font-bold tracking-[0.25em] text-[#F5F5F5]/30 uppercase select-none whitespace-nowrap rotate-90 origin-center my-12">
+            INK MULTIPLY: TRUE // DENSITY: 85% // REGISTERED
+          </div>
+
+          <!-- Vertical Barcode Block -->
+          <div class="flex flex-col items-center justify-center p-1.5 bg-[#0D0B14] border border-[#F5F5F5]/20 rotate-90 my-2">
+            <svg viewBox="0 0 40 12" class="w-12 h-4 text-[#FDE047]">
+              <!-- Simple barcode lines -->
+              <rect x="0" y="0" width="2" height="12" fill="currentColor" />
+              <rect x="3" y="0" width="1" height="12" fill="currentColor" />
+              <rect x="5" y="0" width="3" height="12" fill="currentColor" />
+              <rect x="9" y="0" width="1" height="12" fill="currentColor" />
+              <rect x="11" y="0" width="2" height="12" fill="currentColor" />
+              <rect x="14" y="0" width="1" height="12" fill="currentColor" />
+              <rect x="16" y="0" width="4" height="12" fill="currentColor" />
+              <rect x="21" y="0" width="2" height="12" fill="currentColor" />
+              <rect x="24" y="0" width="1" height="12" fill="currentColor" />
+              <rect x="26" y="0" width="3" height="12" fill="currentColor" />
+              <rect x="30" y="0" width="2" height="12" fill="currentColor" />
+              <rect x="33" y="0" width="1" height="12" fill="currentColor" />
+              <rect x="35" y="0" width="2" height="12" fill="currentColor" />
+              <rect x="38" y="0" width="2" height="12" fill="currentColor" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Bottom Registration Mark -->
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#FDE047]/60" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="8" />
+          <line x1="12" y1="2" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+        </svg>
+      </div>
 
       <div class="max-w-container-max mx-auto relative z-10">
         
