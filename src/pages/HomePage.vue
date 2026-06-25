@@ -2277,7 +2277,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc" 
                   alt="Nakita Semesta" 
-                  class="w-full h-full object-cover object-top contrast-110"
+                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">NS</span>
               </div>
@@ -2307,7 +2307,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc" 
                   alt="Dareean A. Raffi" 
-                  class="w-full h-full object-cover object-top contrast-110"
+                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">DR</span>
               </div>
@@ -2337,7 +2337,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc" 
                   alt="Gabriel Kristofan" 
-                  class="w-full h-full object-cover object-top contrast-110"
+                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">GK</span>
               </div>
@@ -2367,7 +2367,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc" 
                   alt="Reyqal Syawalano" 
-                  class="w-full h-full object-cover object-top contrast-110"
+                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">RS</span>
               </div>
@@ -2467,7 +2467,10 @@ onBeforeUnmount(() => {
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 relative z-10">
                 
                 <!-- Left Column: Concept, Coordinators, and Group Photo -->
-                <div class="col-span-1 lg:col-span-4 flex flex-col gap-5">
+                <div :class="[
+                  'flex flex-col gap-5',
+                  panitiaData[activeDivisionTab]?.members?.length > 0 ? 'col-span-1 lg:col-span-4' : 'col-span-1 lg:col-span-12'
+                ]">
                   <!-- Fruit Concept Badge -->
                   <div 
                     class="inline-flex items-center self-start gap-2 px-3 py-1.5 border-2 border-[#04000D] font-mono text-[10px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#04000D] select-none"
@@ -2480,7 +2483,12 @@ onBeforeUnmount(() => {
                   <div>
                     <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-3">✦ KOORDINATOR ✦</span>
                     
-                    <div class="flex flex-col gap-3">
+                    <div :class="[
+                      'grid gap-3',
+                      panitiaData[activeDivisionTab]?.members?.length > 0 
+                        ? 'grid-cols-1' 
+                        : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+                    ]">
                       <div 
                         v-for="coor in panitiaData[activeDivisionTab]?.coordinators" 
                         :key="coor.name"
@@ -2495,7 +2503,7 @@ onBeforeUnmount(() => {
                             v-if="coor.imgSrc" 
                             :src="coor.imgSrc" 
                             :alt="coor.name" 
-                            class="w-full h-full object-cover object-top contrast-110"
+                            class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
                           />
                           <span v-else class="font-mono font-black text-xs text-[#04000D]">{{ coor.name.substring(0, 2).toUpperCase() }}</span>
                         </div>
@@ -2507,14 +2515,18 @@ onBeforeUnmount(() => {
                         </div>
                       </div>
 
-                      <div v-if="!panitiaData[activeDivisionTab]?.coordinators.length" class="font-mono text-[10px] text-[#04000D]/60 italic p-3 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40">
+                      <div v-if="!panitiaData[activeDivisionTab]?.coordinators.length" class="font-mono text-[10px] text-[#04000D]/60 italic p-3 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40 col-span-full">
                         Tidak ada data koordinator khusus.
                       </div>
                     </div>
                   </div>
 
                   <!-- Division Group Photo -->
-                  <div v-if="panitiaData[activeDivisionTab]?.groupPhoto" class="select-none">
+                  <div 
+                    v-if="panitiaData[activeDivisionTab]?.groupPhoto" 
+                    class="select-none"
+                    :class="panitiaData[activeDivisionTab]?.members?.length > 0 ? '' : 'max-w-md md:max-w-lg'"
+                  >
                     <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-2.5">✦ DOKUMENTASI UNIT ✦</span>
                     <div class="border-2 border-[#04000D] bg-white p-2 shadow-[3px_3px_0px_0px_#04000D] rotate-[0.5deg] hover:rotate-0 transition-transform duration-200">
                       <div class="relative aspect-[3/2] overflow-hidden border border-[#04000D]/20 bg-[#04000D]/5">
@@ -2529,7 +2541,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Right Column: Members Grid -->
-                <div class="col-span-1 lg:col-span-8 flex flex-col">
+                <div v-if="panitiaData[activeDivisionTab]?.members?.length > 0" class="col-span-1 lg:col-span-8 flex flex-col">
                   <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-3">✦ ANGGOTA UNIT ✦</span>
                   
                   <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-3">
@@ -2547,7 +2559,7 @@ onBeforeUnmount(() => {
                           v-if="member.imgSrc" 
                           :src="member.imgSrc" 
                           :alt="member.name" 
-                          class="w-full h-full object-cover object-top contrast-110 transition-transform duration-200 group-hover/member:scale-105"
+                          class="w-full h-full object-cover object-[center_12%] scale-[1.55] origin-[center_12%] contrast-110 transition-all duration-200 group-hover/member:scale-[1.65]"
                         />
                         <span v-else class="font-mono font-black text-sm text-[#04000D]">{{ member.name.substring(0, 2).toUpperCase() }}</span>
                       </div>
@@ -2561,13 +2573,9 @@ onBeforeUnmount(() => {
                       </div>
                     </div>
                   </div>
-
-                  <div v-if="!panitiaData[activeDivisionTab]?.members.length" class="font-mono text-[10px] text-[#04000D]/60 italic p-6 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40 text-center mt-3">
-                    Tidak ada data anggota unit.
-                  </div>
                 </div>
-
               </div>
+
             </div>
           </div>
         </div>
