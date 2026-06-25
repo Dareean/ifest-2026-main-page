@@ -3,6 +3,7 @@ import { ref, computed, onBeforeUnmount, onMounted, defineAsyncComponent } from 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { competitionsData } from '../data/competitionsData'
+import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock } from 'lucide-vue-next'
 
 const AiChatWidget = defineAsyncComponent(() => import('../components/AiChatWidget.vue'))
 const isChatActivated = ref(false)
@@ -1364,7 +1365,7 @@ onBeforeUnmount(() => {
               <div v-if="!countdown.expired" class="flex flex-col justify-between h-full flex-1">
                 <div>
                   <div class="flex justify-between items-start mb-4">
-                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D]/40 text-white px-2 py-0.5 select-none">🔒 TERKUNCI</span>
+                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D]/40 text-white px-2 py-0.5 select-none flex items-center gap-1"><Lock class="w-2.5 h-2.5" /> TERKUNCI</span>
                     <span class="font-mono text-[9px] font-bold text-[#04000D]/40 select-none">[NAT-0{{ index + 1 }}]</span>
                   </div>
                   <h3 class="font-black uppercase text-lg sm:text-xl tracking-tight leading-none mb-3 text-[#04000D]/40 select-none">
@@ -1376,7 +1377,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="mt-5 select-none">
                   <button disabled class="w-full block bg-gray-200 text-gray-400 py-2.5 rounded-full font-mono text-[10px] text-center font-bold border border-gray-300 cursor-not-allowed">
-                    🔒 Belum Tersedia
+                    <span class="flex items-center justify-center gap-1.5"><Lock class="w-3.5 h-3.5" /> Belum Tersedia</span>
                   </button>
                 </div>
               </div>
@@ -1429,7 +1430,7 @@ onBeforeUnmount(() => {
               <div v-if="!countdown.expired" class="flex flex-col justify-between h-full flex-1 z-10">
                 <div>
                   <div class="flex justify-between items-start mb-6">
-                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D]/40 text-white px-2 py-0.5 select-none">🔒 TERKUNCI</span>
+                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D]/40 text-white px-2 py-0.5 select-none flex items-center gap-1"><Lock class="w-2.5 h-2.5" /> TERKUNCI</span>
                     <span class="font-mono text-[9px] font-bold text-[#04000D]/40 select-none">[REG-0{{ index + 1 }}]</span>
                   </div>
                   <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D]/40 select-none">
@@ -1441,7 +1442,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="mt-8 select-none">
                   <button disabled class="w-full block bg-gray-200 text-gray-400 py-2.5 rounded-full font-mono text-[10px] text-center font-bold border border-gray-300 cursor-not-allowed">
-                    🔒 Belum Tersedia
+                    <span class="flex items-center justify-center gap-1.5"><Lock class="w-3.5 h-3.5" /> Belum Tersedia</span>
                   </button>
                 </div>
               </div>
@@ -1487,19 +1488,19 @@ onBeforeUnmount(() => {
             <div v-if="!countdown.expired" class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-center w-full">
               <div class="text-white text-left flex-1">
                 <div class="flex items-center gap-2 mb-3">
-                  <span class="font-mono text-[9px] font-extrabold uppercase bg-red-500 text-white px-2 py-0.5 select-none">🔒 TERKUNCI</span>
+                  <span class="font-mono text-[9px] font-extrabold uppercase bg-red-500 text-white px-2 py-0.5 select-none flex items-center gap-1"><Lock class="w-2.5 h-2.5" /> TERKUNCI</span>
                   <span class="font-mono text-xs font-bold text-white/40 select-none">[REG-03]</span>
                 </div>
-                <h3 class="font-black text-2xl sm:text-4xl uppercase tracking-tighter leading-none mb-4 text-[#FDE047]/40 select-none">
-                  KATEGORI INOVASI 03 [🔒]
+                <h3 class="font-black text-2xl sm:text-4xl uppercase tracking-tighter leading-none mb-4 text-[#FDE047]/40 select-none flex items-center gap-3">
+                  KATEGORI INOVASI 03 [<Lock class="w-7 h-7 text-[#FDE047]/40" />]
                 </h3>
                 <p class="font-mono text-[11px] text-white/50 leading-relaxed max-w-2xl border-t border-white/10 pt-4 mt-2">
                   Kategori inovasi eksklusif dengan skala dan format yang berbeda. Detail tantangan, panduan teknis, dan formulir pendaftaran masih dirahasiakan hingga rilis resmi.
                 </p>
               </div>
               <div class="w-full md:w-auto">
-                <button disabled class="bg-gray-700 text-gray-500 px-8 py-3 rounded-full font-mono text-xs text-center font-extrabold block border border-gray-600 cursor-not-allowed w-full md:w-auto">
-                  🔒 Belum Tersedia
+                <button disabled class="bg-gray-700 text-gray-500 px-8 py-3 rounded-full font-mono text-xs text-center font-extrabold flex items-center justify-center gap-1.5 border border-gray-600 cursor-not-allowed w-full md:w-auto">
+                  <Lock class="w-3.5 h-3.5" /> Belum Tersedia
                 </button>
               </div>
             </div>
@@ -1660,7 +1661,7 @@ onBeforeUnmount(() => {
                   <!-- Status: Terlaksana -->
                   <div class="flex items-center gap-1.5 mb-3">
                     <span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                      <Check class="w-3 h-3" />
                       Terlaksana
                     </span>
                   </div>
@@ -1671,11 +1672,11 @@ onBeforeUnmount(() => {
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 01: Identity &amp; Foundation</h4>
                     <div class="flex items-center gap-3">
                       <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#8B5CF6] uppercase">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        <Calendar class="w-4 h-4" stroke-width="2.5" />
                         Januari - Maret
                       </span>
                       <!-- Chevron icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#8B5CF6] transition-transform duration-300" :class="activeTimelinePhase === 0 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      <ChevronDown class="w-4 h-4 text-[#8B5CF6] transition-transform duration-300" :class="activeTimelinePhase === 0 ? 'rotate-180' : ''" stroke-width="3.5" />
                     </div>
                   </div>
                   
@@ -1710,7 +1711,7 @@ onBeforeUnmount(() => {
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#8B5CF6] border-4 border-[#8B5CF6] flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D]">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-white"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                  <Check class="w-5 h-5 text-white" stroke-width="2.5" />
                 </div>
               </div>
               
@@ -1751,11 +1752,11 @@ onBeforeUnmount(() => {
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 02: Inklusif Roadshow</h4>
                     <div class="flex items-center gap-3">
                       <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#10B981] uppercase">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        <Calendar class="w-4 h-4" stroke-width="2.5" />
                         Mei - Agustus
                       </span>
                       <!-- Chevron icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#10B981] transition-transform duration-300" :class="activeTimelinePhase === 1 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      <ChevronDown class="w-4 h-4 text-[#10B981] transition-transform duration-300" :class="activeTimelinePhase === 1 ? 'rotate-180' : ''" stroke-width="3.5" />
                     </div>
                   </div>
                   
@@ -1803,11 +1804,11 @@ onBeforeUnmount(() => {
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 03: Awareness &amp; Reg</h4>
                     <div class="flex items-center gap-3">
                       <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#3B82F6] uppercase">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        <Calendar class="w-4 h-4" stroke-width="2.5" />
                         Juli - Agustus
                       </span>
                       <!-- Chevron icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#3B82F6] transition-transform duration-300" :class="activeTimelinePhase === 2 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      <ChevronDown class="w-4 h-4 text-[#3B82F6] transition-transform duration-300" :class="activeTimelinePhase === 2 ? 'rotate-180' : ''" stroke-width="3.5" />
                     </div>
                   </div>
                   
@@ -1875,11 +1876,11 @@ onBeforeUnmount(() => {
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 04: Benchmark &amp; Exploration</h4>
                     <div class="flex items-center gap-3">
                       <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#F59E0B] uppercase">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        <Calendar class="w-4 h-4" stroke-width="2.5" />
                         Agustus - Sept
                       </span>
                       <!-- Chevron icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 3 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      <ChevronDown class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 3 ? 'rotate-180' : ''" stroke-width="3.5" />
                     </div>
                   </div>
                   
@@ -1927,11 +1928,11 @@ onBeforeUnmount(() => {
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 05: Local Intellectual Series</h4>
                     <div class="flex items-center gap-3">
                       <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#EF4444] uppercase">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        <Calendar class="w-4 h-4" stroke-width="2.5" />
                         September
                       </span>
                       <!-- Chevron icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#EF4444] transition-transform duration-300" :class="activeTimelinePhase === 4 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      <ChevronDown class="w-4 h-4 text-[#EF4444] transition-transform duration-300" :class="activeTimelinePhase === 4 ? 'rotate-180' : ''" stroke-width="3.5" />
                     </div>
                   </div>
                   
@@ -1974,7 +1975,7 @@ onBeforeUnmount(() => {
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0F172A] border-4 border-dashed border-[#F59E0B]/50 flex items-center justify-center shadow-none opacity-60">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-[#F59E0B]"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM6.16 5.1a.75.75 0 0 1 1.06 0l1.59 1.59a.75.75 0 1 1-1.06 1.06L6.16 6.16a.75.75 0 0 1 0-1.06Zm10.62 0a.75.75 0 0 1 0 1.06l-1.59 1.59a.75.75 0 1 1-1.06-1.06l1.59-1.59a.75.75 0 0 1 1.06 0ZM2.25 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75Zm15 0a.75.75 0 0 1 .75-.75H21a.75.75 0 0 1 0 1.5h-2.25a.75.75 0 0 1-.75-.75Zm-10.5 5.34a.75.75 0 0 1 1.06 0l1.59 1.59a.75.75 0 1 1-1.06 1.06l-1.59-1.59a.75.75 0 0 1 0-1.06Zm7.06 0a.75.75 0 0 1 0 1.06l-1.59 1.59a.75.75 0 1 1-1.06-1.06l1.59-1.59a.75.75 0 0 1 1.06 0ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5ZM12 18.75a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>
+                  <Sun class="w-5 h-5 text-[#F59E0B]" />
                 </div>
               </div>
 
@@ -1999,11 +2000,11 @@ onBeforeUnmount(() => {
                     <h4 class="font-black text-lg md:text-xl text-white tracking-tight uppercase">PHASE 06: Grand Symphony &amp; Legacy</h4>
                     <div class="flex items-center gap-3">
                       <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#F59E0B] uppercase">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                        <Calendar class="w-4 h-4" stroke-width="2.5" />
                         Nov - Des
                       </span>
                       <!-- Chevron icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3.5" stroke="currentColor" class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 5 ? 'rotate-180' : ''"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      <ChevronDown class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 5 ? 'rotate-180' : ''" stroke-width="3.5" />
                     </div>
                   </div>
                   
@@ -3280,9 +3281,7 @@ onBeforeUnmount(() => {
 
       <div class="flex items-center gap-2 select-none md:hidden ml-auto">
         <button @click="toggleMenu" class="p-1.5 flex items-center justify-center border border-[#04000D] rounded bg-white hover:bg-off-white transition-colors" aria-label="Toggle menu">
-          <span class="material-symbols-outlined text-xl text-[#04000D] font-bold">
-            {{ isMenuOpen ? 'close' : 'menu' }}
-          </span>
+          <component :is="isMenuOpen ? X : Menu" class="w-5 h-5 text-[#04000D]" stroke-width="2.5" />
         </button>
       </div>
     </div>
@@ -3306,24 +3305,8 @@ onBeforeUnmount(() => {
         <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#FF3D8B]"></span>
       </span>
       
-      <!-- SVG Monochromatic Robot Icon -->
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        stroke-width="2" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" 
-        class="w-6 h-6 transition-transform duration-300 group-hover:scale-110"
-      >
-        <path d="M12 8V4H8"/>
-        <rect width="16" height="12" x="4" y="8" rx="2"/>
-        <path d="M2 14h2"/>
-        <path d="M20 14h2"/>
-        <path d="M15 13v2"/>
-        <path d="M9 13v2"/>
-      </svg>
+      <!-- Robot Icon -->
+      <Bot class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
     </button>
   </div>
 
@@ -3345,7 +3328,7 @@ onBeforeUnmount(() => {
           class="absolute -top-3.5 -right-3.5 md:-top-4 md:-right-4 w-9 h-9 bg-[#FF3D8B] hover:bg-[#ff1f76] text-white border-3 border-[#04000D] flex items-center justify-center shadow-[3px_3px_0px_0px_#04000D] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#04000D] cursor-pointer font-bold select-none text-lg transition-all z-[110]"
           aria-label="Close modal"
         >
-          ✕
+          <X class="w-5 h-5" />
         </button>
 
         <!-- Inner Content Scroll Area -->

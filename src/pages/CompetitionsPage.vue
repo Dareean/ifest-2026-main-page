@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { competitionsData } from '../data/competitionsData'
+import { Lock } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -205,7 +206,7 @@ watch(() => route.query.id, (newId) => {
         >
           <!-- Padlock Graphic (Neo-Brutalist Stamp Style) -->
           <div class="w-24 h-24 bg-[#FF3D8B] text-white border-4 border-[#04000D] rounded-none flex items-center justify-center mx-auto mb-8 shadow-[4px_4px_0px_0px_#04000D] transform -rotate-3 hover:rotate-0 transition-transform duration-200">
-            <span class="text-5xl">🔒</span>
+            <Lock class="w-12 h-12" stroke-width="2.5" />
           </div>
 
           <span class="font-mono text-xs uppercase tracking-widest text-[#FF3D8B] font-black block mb-2">

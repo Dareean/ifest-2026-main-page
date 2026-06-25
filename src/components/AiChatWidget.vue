@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { X, Bot } from 'lucide-vue-next'
 
 /**
  * Self-contained Markdown-to-HTML parser.
@@ -226,8 +227,8 @@ const sendChatMessage = async (text) => {
             <span class="font-mono text-[10px] sm:text-xs uppercase tracking-wider font-extrabold text-white">IFEST AI Assistant</span>
           </div>
           <!-- Close Button -->
-          <button @click="toggleChat" class="text-white/60 hover:text-white transition-colors" aria-label="Close chat">
-            <span class="material-symbols-outlined text-base font-bold">close</span>
+          <button @click="toggleChat" class="text-white/60 hover:text-white transition-colors flex items-center justify-center" aria-label="Close chat">
+            <X class="w-4 h-4" />
           </button>
         </div>
 
@@ -307,28 +308,12 @@ const sendChatMessage = async (text) => {
         <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#FF3D8B]"></span>
       </span>
       
-      <!-- SVG Monochromatic Robot Icon -->
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        stroke-width="2" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" 
+      <!-- Lucide Monochromatic Robot / Close Icon -->
+      <component 
+        :is="isChatOpen ? X : Bot"
         class="w-6 h-6 transition-transform duration-300"
         :class="isChatOpen ? 'rotate-90' : 'group-hover:scale-110'"
-      >
-        <path d="M12 8V4H8" v-if="!isChatOpen"/>
-        <rect width="16" height="12" x="4" y="8" rx="2" v-if="!isChatOpen"/>
-        <path d="M2 14h2" v-if="!isChatOpen"/>
-        <path d="M20 14h2" v-if="!isChatOpen"/>
-        <path d="M15 13v2" v-if="!isChatOpen"/>
-        <path d="M9 13v2" v-if="!isChatOpen"/>
-        <!-- X Close Icon in SVG if Open -->
-        <line x1="18" y1="6" x2="6" y2="18" v-if="isChatOpen"></line>
-        <line x1="6" y1="6" x2="18" y2="18" v-if="isChatOpen"></line>
-      </svg>
+      />
     </button>
 
   </div>
