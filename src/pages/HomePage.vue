@@ -211,10 +211,36 @@ const doc2025AssetModules = import.meta.glob('../assets/dokumentasi_ifest2025/*'
 
 const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${folder}/${fileName}`] ?? ''
 
-const panitiaAssetModules = import.meta.glob('../assets/Fotage Panitia Ifest 2026/**/*', {
+const panitiaAssetModules = import.meta.glob('../assets/foto_kepanitiaan_ifest2026/**/*', {
   eager: true,
   import: 'default',
 })
+
+const getNormalizedName = (filename) => {
+  const dotIdx = filename.lastIndexOf('.')
+  let name = dotIdx === -1 ? filename : filename.substring(0, dotIdx)
+  name = name.toLowerCase()
+    .replace(/\(\d+\)/g, '')
+    .replace(/_\(\d+\)/g, '')
+    .replace(/_\d+/g, '')
+    .replace(/#\d+/g, '')
+    .replace(/-\s*\d+/g, '')
+    .replace(/[^a-z0-9&\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return name
+}
+
+const getUniqueKey = (cleanName) => {
+  let k = cleanName.toLowerCase()
+    .replace(/\b(23|24|25)\b/g, '')
+    .replace(/\b(anggota|koordinator|koord|ketua|wakil|project manager|sekretaris|bendahara|pic|sponsorship|ekraf|lapangan)\b/g, '')
+    .replace(/\b(kreativitas|koor inti|sponsor|ekonomi kreatif|konsumsi|acara|logistik|korlap|humas|keamanan)\b/g, '')
+    .replace(/[^a-z]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return k
+}
 
 // Parser for committee photos
 const parseCommitteePhotos = () => {
@@ -232,47 +258,54 @@ const parseCommitteePhotos = () => {
     'Keamanan': { name: 'Keamanan', coordinators: [], members: [], groupPhoto: null, color: '#2563EB', textColor: '#ffffff', fruit: 'Blueberry', emoji: '🫐' }
   }
 
-  const isGroupPhoto = (name) => {
-    const n = name.toLowerCase()
+  const isGroupPhoto = (filename) => {
+    const norm = getNormalizedName(filename)
+    const n = filename.toLowerCase()
+
     if (
-      n.includes('rame') || n.includes('ramai') || n.includes('boyband') || n.includes('porenjes') || 
-      n.includes('sekretaris i dan ii') || n.includes('ketua dan wakil') || 
-      n.includes('koor inti 3') || n.includes('koor inti 2') || 
-      n.includes('sekertaris') || n.includes('divisi lapangan') || 
-      n.includes('foto pertama ya') || n.includes('request pake foto') || 
-      n.includes('not this') || n.includes('anggota humas') ||
-      n.includes('sponsor 1')
+      n.includes('51882e3c') || n.includes('866eecd6') || n.includes('f8944255') ||
+      n.includes('571c6e37') || n.includes('a5a56752') || n.includes('d9ff2b37')
     ) {
       return true
     }
 
-    const dotIdx = n.lastIndexOf('.')
-    const nameWithoutExt = dotIdx === -1 ? n : n.substring(0, dotIdx)
+    if (
+      norm === 'divisi lapangan' ||
+      norm === 'anggota humas' ||
+      norm === 'panitia logistik' ||
+      norm === 'sponsor 1' ||
+      norm === 'sponsor 2' ||
+      norm === 'koor inti 2' ||
+      norm === 'koor inti 3' ||
+      norm === 'sekertaris' ||
+      norm === 'sekretaris i dan ii' ||
+      norm === 'ketua dan wakil ketua' ||
+      norm === 'ketua & wakil koord' ||
+      norm === 'ketua dan wakil' ||
+      norm.includes('rame') ||
+      norm.includes('foto bersama') ||
+      norm.includes('boyband') ||
+      norm.includes('porenjes') ||
+      norm.includes('gabungan') ||
+      norm === 'img' ||
+      ['img 8492', 'img 8813', 'img 8815', 'img 8818', 'img 8770', 'img 8782', 'img 8789', 'img 8808', 'img 8810', 'img 8803', 'img 8804', 'img 8805', 'img 8806', 'img 8500', 'img 8501', 'img 8518', 'img 8519', 'img 8540', 'img 8650', 'img 8651', 'img 8472', 'img 8473', 'img 8479', 'img 8592', 'img 8412', 'img 8413', 'img 8689', 'img 8696', 'img 8543', 'img 8546', 'img 8772', 'img 8790', 'img 8791', 'img 8703', 'img 8704', 'img 8733', 'img 8736', 'img 8737', 'img 8738', 'img 8740', 'img 8755', 'img 8756', 'img 8642', 'img 8648'].includes(norm) ||
+      ((norm.includes(' & ') || norm.includes(' dan ')) && !norm.includes('ketua') && !norm.includes('sekretaris'))
+    ) {
+      return true
+    }
+    return false
+  }
 
-    return nameWithoutExt === 'img_8492' || nameWithoutExt === 'img_8813' || nameWithoutExt === 'img_8815' || nameWithoutExt === 'img_8818' ||
-           nameWithoutExt === 'img_8770' || nameWithoutExt === 'img_8782' || nameWithoutExt === 'img_8789' ||
-           nameWithoutExt === 'img_8808' || nameWithoutExt === 'img_8810' || nameWithoutExt === 'img_8803' ||
-           nameWithoutExt === 'img_8804' || nameWithoutExt === 'img_8805' || nameWithoutExt === 'img_8806' ||
-           nameWithoutExt === 'img_8500' || nameWithoutExt === 'img_8501' || nameWithoutExt === 'img_8518' ||
-           nameWithoutExt === 'img_8519' || nameWithoutExt === 'img_8540' || nameWithoutExt === 'img_8650' ||
-           nameWithoutExt === 'img_8651' || nameWithoutExt === 'img_8472' || nameWithoutExt === 'img_8473' ||
-           nameWithoutExt === 'img_8479' || nameWithoutExt === 'img_8592' || nameWithoutExt === 'img_8412' ||
-           nameWithoutExt === 'img_8413' || nameWithoutExt === 'img_8689' || nameWithoutExt === 'img_8696' ||
-           nameWithoutExt === 'img_8543' || nameWithoutExt === 'img_8546' || nameWithoutExt === 'img_8772' ||
-           nameWithoutExt === 'img_8790' || nameWithoutExt === 'img_8791' || nameWithoutExt === 'img_8703' ||
-           nameWithoutExt === 'img_8704' || nameWithoutExt === 'img_8733' || nameWithoutExt === 'img_8736' ||
-           nameWithoutExt === 'img_8737' || nameWithoutExt === 'img_8738' || nameWithoutExt === 'img_8740' ||
-           nameWithoutExt === 'img_8755' || nameWithoutExt === 'img_8756' || nameWithoutExt === 'img_8642' ||
-           nameWithoutExt === 'img_8648' || nameWithoutExt === 'img' || nameWithoutExt.includes('51882e3c') ||
-           nameWithoutExt.includes('866eecd6') || nameWithoutExt.includes('f8944255') || nameWithoutExt.includes('571c6e37') ||
-           nameWithoutExt.includes('a5a56752') || nameWithoutExt.includes('d9ff2b37')
+  const shouldIgnore = (filename) => {
+    const norm = getNormalizedName(filename)
+    return norm.includes('tidak di pakai') || norm.includes('tidak dipakai') || norm.includes('not this') || norm.includes('request pake foto') || norm.includes('foto pertama ya')
   }
 
   const peopleMap = new Map()
 
   allFiles.forEach(path => {
     const parts = path.split('/')
-    const index = parts.indexOf('Fotage Panitia Ifest 2026')
+    const index = parts.indexOf('foto_kepanitiaan_ifest2026')
     if (index === -1 || index === parts.length - 1) return
 
     let division = parts[index + 1]
@@ -294,11 +327,19 @@ const parseCommitteePhotos = () => {
       }
     }
 
+    if (shouldIgnore(filename)) {
+      return
+    }
+
     const fileUrl = panitiaAssetModules[path]
 
     if (isGroupPhoto(filename)) {
       if (!divisions[division].groupPhoto || ext === '.png') {
-        divisions[division].groupPhoto = fileUrl
+        if (division === 'Koor Inti' && filename.toLowerCase().includes('sekertaris') && divisions[division].groupPhoto) {
+          // don't overwrite general group photos with sekretaris
+        } else {
+          divisions[division].groupPhoto = fileUrl
+        }
       }
       return
     }
@@ -310,7 +351,7 @@ const parseCommitteePhotos = () => {
       .replace(/\s+/g, ' ')
       .trim()
 
-    const uniqueKey = cleanName.toLowerCase()
+    const uniqueKey = getUniqueKey(cleanName)
     const hasPrevious = peopleMap.has(uniqueKey)
     const isNewBetter = !hasPrevious || (ext === '.png' && !filename.includes('(1)') && !filename.includes('(2)'))
 
@@ -364,7 +405,7 @@ const parseCommitteePhotos = () => {
           nameLower.includes('bendahara') || 
           nameLower.includes('pic')
         ) {
-          isCoordinator = true
+          isCoordinator = true;
           if (nameLower.includes('project manager')) role = 'Project Manager'
           else if (nameLower.includes('pic')) role = 'PIC'
           else if (nameLower.includes('ketua panitia')) role = 'Ketua Panitia'
@@ -455,8 +496,180 @@ const parseCommitteePhotos = () => {
 const panitiaData = parseCommitteePhotos()
 const activeDivisionTab = ref('Koor Inti')
 const fotoPanitiaKeseluruhan = computed(() => {
-  return panitiaAssetModules['../assets/Fotage Panitia Ifest 2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
+  return panitiaAssetModules['../assets/foto_kepanitiaan_ifest2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
 })
+
+const selectedPerson = ref(null)
+
+const openModal = (person) => {
+  if (!person) return
+  selectedPerson.value = person
+}
+
+const closeModal = () => {
+  selectedPerson.value = null
+}
+
+const handleKeyDown = (e) => {
+  if (e.key === 'Escape') {
+    closeModal()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
+
+const getPersonDuties = (person) => {
+  if (!person) return []
+  
+  const roleLower = (person.role || '').toLowerCase()
+  const division = person.division
+  
+  // 1. Custom handling for specific core BPH roles
+  if (roleLower.includes('project manager')) {
+    return [
+      'Mengoordinasi seluruh divisi kepanitiaan operasional IFEST 2026.',
+      'Menyelaraskan visi, misi, dan timeline kerja demi kesuksesan acara.',
+      'Menjalin hubungan strategis dengan partner eksternal dan sponsor utama.',
+      'Mengambil keputusan krusial dan strategis di tingkat kepanitiaan.'
+    ]
+  }
+  if (roleLower.includes('pic')) {
+    return [
+      'Mengarsiteki administrasi dan standardisasi birokrasi legal.',
+      'Menyusun timeline checklist Pleno umum panitia.',
+      'Memastikan koordinasi administrasi antar divisi berjalan dengan tertib.',
+      'Mengawasi jalannya koordinasi harian BPH dengan koordinator divisi.'
+    ]
+  }
+  if (roleLower.includes('ketua panitia') && !roleLower.includes('wakil')) {
+    return [
+      'Memimpin eksekusi teknis lapangan dan kelancaran alur acara utama.',
+      'Mengoordinasikan seluruh divisi operasional demi tercapainya target harian.',
+      'Mengontrol kualitas pelaksanaan program kerja kepanitiaan.',
+      'Menjadi penanggung jawab teknis tertinggi di area pelaksanaan event.'
+    ]
+  }
+  if (roleLower.includes('wakil ketua panitia') || roleLower.includes('wakil ketua')) {
+    return [
+      'Mendampingi Ketua Panitia dalam pengawasan operasional harian.',
+      'Mengontrol kualitas teknis divisi dan mengelola manajemen mitigasi risiko.',
+      'Mengisi peran Ketua Panitia jika berhalangan hadir.',
+      'Membantu evaluasi efektivitas kinerja setiap divisi operasional.'
+    ]
+  }
+  if (roleLower.includes('sekretaris i') || (roleLower.includes('sekretaris') && !roleLower.includes('ii') && !roleLower.includes('koord'))) {
+    return [
+      'Mengelola administrasi persuratan resmi, proposal kegiatan, dan perizinan.',
+      'Menyusun notulensi rapat besar BPH dan Pleno umum.',
+      'Mengoordinasikan pembuatan laporan pertanggungjawaban (LPJ) akhir.',
+      'Mengatur arsip dokumen digital kepanitiaan.'
+    ]
+  }
+  if (roleLower.includes('sekretaris ii')) {
+    return [
+      'Membantu Sekretaris I dalam pengelolaan surat menyurat dan dokumentasi administrasi.',
+      'Bertanggung jawab atas pencatatan kehadiran rapat besar panitia.',
+      'Membantu penyusunan draft proposal dan kompilasi laporan akhir divisi.',
+      'Mengelola distribusi undangan ke pihak eksternal/instansi.'
+    ]
+  }
+  if (roleLower.includes('bendahara')) {
+    return [
+      'Mengelola anggaran keuangan, cashflow masuk dan keluar kepanitiaan.',
+      'Mencatat seluruh transaksi dan bukti pengeluaran divisi secara presisi.',
+      'Menyusun laporan keuangan akhir kepanitiaan IFEST 2026.',
+      'Mengatur pencairan dana taktis operasional harian panitia.'
+    ]
+  }
+
+  // 2. Division-specific duties
+  const isCoordinator = person.isCoordinator
+  const baseDuties = []
+  
+  if (isCoordinator) {
+    baseDuties.push(
+      'Mengoordinasikan program kerja divisi, membagi tugas anggota, dan mengontrol target waktu.',
+      'Melaporkan progres kerja divisi secara berkala dalam rapat koordinasi BPH.'
+    )
+  } else {
+    baseDuties.push(
+      'Membantu pelaksanaan tugas divisi di bawah arahan koordinator.',
+      'Menyelesaikan target kerja unit yang didelegasikan secara tepat waktu.'
+    )
+  }
+
+  switch (division) {
+    case 'Sponsor':
+      return [
+        ...baseDuties,
+        'Menyusun prospektus sponsorship dan paket kemitraan IFEST 2026.',
+        'Melakukan negosiasi dan presentasi penawaran kerja sama ke instansi atau perusahaan.',
+        'Mengelola hak dan kewajiban pihak sponsor (logo banner, booth, adlibs) secara profesional.'
+      ]
+    case 'Ekonomi Kreatif':
+      return [
+        ...baseDuties,
+        'Memproduksi dan memasarkan merchandise resmi IFEST 2026.',
+        'Merancang dan mengeksekusi strategi pencarian dana mandiri kreatif (fundraising).',
+        'Mengelola inventaris merchandise serta menyusun laporan laba rugi berkala.'
+      ]
+    case 'Konsumsi':
+      return [
+        ...baseDuties,
+        'Menentukan menu, menghitung porsi, dan mengoordinasikan penyediaan konsumsi panitia, juri, dan tamu VIP.',
+        'Menjalin kerja sama dengan katering/vendor penyedia konsumsi tepercaya.',
+        'Mengatur distribusi konsumsi secara tepat waktu saat acara utama berlangsung.'
+      ]
+    case 'Acara':
+      return [
+        ...baseDuties,
+        'Merancang konsep acara, rundown detail, skenario panggung, dan daftar pengisi acara.',
+        'Memandu jalannya acara sebagai Stage Manager, MC, atau Liaison Officer (LO).',
+        'Berkoordinasi dengan pengisi acara, pemateri, juri lomba, dan tim multimedia.'
+      ]
+    case 'Logistik':
+      return [
+        ...baseDuties,
+        'Menyediakan, mendata, dan menyewa peralatan teknis, sound system, panggung, dan dekorasi.',
+        'Mengatur logistik transportasi barang kebutuhan kepanitiaan.',
+        'Melakukan instalasi teknis (setup) dan pembongkaran (teardown) seluruh area acara.'
+      ]
+    case 'Korlap':
+    case 'Lapangan':
+      return [
+        ...baseDuties,
+        'Mengatur alur lalu lintas manusia, mobilisasi massa, dan pengondisian penonton.',
+        'Menjamin kesiapan venue lapangan dan peralatan pendukung secara real-time.',
+        'Menjadi garda terdepan koordinasi operasional teknis di luar panggung utama.'
+      ]
+    case 'Humas':
+      return [
+        ...baseDuties,
+        'Menyebarluaskan publikasi media dan mengelola akun media sosial resmi IFEST.',
+        'Menjalin kemitraan komunikasi dengan media partner eksternal dan delegasi kampus.',
+        'Merancang konten kreatif pemasaran digital untuk meningkatkan konversi audiens.'
+      ]
+    case 'Keamanan':
+      return [
+        ...baseDuties,
+        'Menyusun SOP keamanan, plot penjagaan titik vital, dan rencana evakuasi darurat.',
+        'Menjaga ketertiban, keamanan barang inventaris, serta keselamatan seluruh pengunjung.',
+        'Mengurus perizinan keramaian dengan pihak kepolisian dan otoritas keamanan setempat.'
+      ]
+    default:
+      return [
+        ...baseDuties,
+        'Mengikuti seluruh instruksi koordinasi divisi demi kesuksesan event.',
+        'Bekerja sama dengan anggota tim lintas divisi saat diperlukan.'
+      ]
+  }
+}
 
 const galleryImages = [
   {
@@ -2268,7 +2481,10 @@ onBeforeUnmount(() => {
         <div class="border-t-3 border-x-3 border-[#04000D] bg-white pb-0 mb-10 select-none">
           
           <!-- ROW 1: NAKITA SEMESTA (Project Manager) -->
-          <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
+          <div 
+            @click="openModal(panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager'))"
+            class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group cursor-pointer hover:bg-white transition-colors duration-150"
+          >
             <!-- Left Side Column (Color Ink Block) -->
             <div class="bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PROJECT MANAGER ✦</span>
@@ -2277,7 +2493,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc" 
                   alt="Nakita Semesta" 
-                  class="w-full h-full object-cover object-center contrast-110"
+                  class="w-full h-full object-cover object-top"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">NS</span>
               </div>
@@ -2287,7 +2503,7 @@ onBeforeUnmount(() => {
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
-                <a href="https://www.instagram.com/semestaaaa.__/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
+                <a href="https://www.instagram.com/semestaaaa.__/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
                   @semestaaaa.__
                 </a>
               </div>
@@ -2298,7 +2514,10 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- ROW 2: DAREEAN A. RAFFI (PIC I-FEST 2026) - Reversed Layout -->
-          <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
+          <div 
+            @click="openModal(panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC'))"
+            class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group cursor-pointer hover:bg-white transition-colors duration-150"
+          >
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
             <div class="order-1 md:order-2 bg-[#FDE047] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PIC I-FEST 2026 ✦</span>
@@ -2307,7 +2526,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc" 
                   alt="Dareean A. Raffi" 
-                  class="w-full h-full object-cover object-center contrast-110"
+                  class="w-full h-full object-cover object-top"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">DR</span>
               </div>
@@ -2317,7 +2536,7 @@ onBeforeUnmount(() => {
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">DAREEAN A. RAFFI</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
-                <a href="https://www.instagram.com/darenrafi/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
+                <a href="https://www.instagram.com/darenrafi/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
                   @darenrafi
                 </a>
               </div>
@@ -2328,7 +2547,10 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- ROW 3: GABRIEL KRISTOFAN (Ketua Panitia) -->
-          <div class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group">
+          <div 
+            @click="openModal(panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia'))"
+            class="grid grid-cols-1 md:grid-cols-[1.2fr_2.8fr] border-b-3 border-[#04000D] overflow-hidden group cursor-pointer hover:bg-white transition-colors duration-150"
+          >
             <!-- Left Side Column (Color Ink Block) -->
             <div class="bg-[#8839FF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#FDE047] pb-1 block w-full mb-6 font-bold text-[#FDE047]">✦ KETUA PANITIA ✦</span>
@@ -2337,7 +2559,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc" 
                   alt="Gabriel Kristofan" 
-                  class="w-full h-full object-cover object-center contrast-110"
+                  class="w-full h-full object-cover object-top"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">GK</span>
               </div>
@@ -2347,7 +2569,7 @@ onBeforeUnmount(() => {
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">GABRIEL KRISTOFAN</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
-                <a href="https://www.instagram.com/gabrielkristofansupari/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
+                <a href="https://www.instagram.com/gabrielkristofansupari/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
                   @gabrielkristofansupari
                 </a>
               </div>
@@ -2358,7 +2580,10 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- ROW 4: REYQAL SYAWALANO (Wakil Ketua Panitia) - Reversed Layout -->
-          <div class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group">
+          <div 
+            @click="openModal(panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia'))"
+            class="grid grid-cols-1 md:grid-cols-[2.8fr_1.2fr] border-b-3 border-[#04000D] overflow-hidden group cursor-pointer hover:bg-white transition-colors duration-150"
+          >
             <!-- Left Side Column (Color Ink Block) - Positioned on the Right on Desktop -->
             <div class="order-1 md:order-2 bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ WAKIL KETUA PANITIA ✦</span>
@@ -2367,7 +2592,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc" 
                   alt="Reyqal Syawalano" 
-                  class="w-full h-full object-cover object-center contrast-110"
+                  class="w-full h-full object-cover object-top"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">RS</span>
               </div>
@@ -2377,7 +2602,7 @@ onBeforeUnmount(() => {
               <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">REYQAL SYAWALANO</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
-                <a href="https://www.instagram.com/reyqalsew/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
+                <a href="https://www.instagram.com/reyqalsew/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
                   @reyqalsew
                 </a>
               </div>
@@ -2403,7 +2628,7 @@ onBeforeUnmount(() => {
                 <img 
                   :src="fotoPanitiaKeseluruhan" 
                   alt="Foto Bersama Seluruh Panitia I-FEST 2026" 
-                  class="w-full h-full object-cover grayscale contrast-125 brightness-95 hover:grayscale-0 transition-all duration-500 ease-in-out"
+                  class="w-full h-full object-cover"
                 />
               </div>
               <div class="mt-4 text-center">
@@ -2414,7 +2639,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <!-- Division Selection Grid -->
+          <!-- Division Selection Cards (Polished Neo-Brutalist Grid) -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8 select-none">
             <button
               v-for="(div, key) in panitiaData"
@@ -2432,150 +2657,141 @@ onBeforeUnmount(() => {
               }"
             >
               <span class="text-2xl mb-1">{{ div.emoji }}</span>
-              <span class="font-black tracking-tight text-[10px] md:text-xs text-center leading-tight">{{ div.name.toUpperCase() }}</span>
+              <span class="font-black tracking-tight text-[10px] md:text-xs text-center leading-tight uppercase">{{ div.name }}</span>
               <span class="text-[9px] opacity-75 font-mono">({{ div.coordinators.length + div.members.length }} P)</span>
             </button>
           </div>
 
-          <!-- Active Division Panel (Only selected division shown here) -->
+          <!-- Active Division Panel (Balanced Neo-Brutalist Layout) -->
           <div 
             v-if="panitiaData[activeDivisionTab]"
-            class="border-3 border-[#04000D] bg-white relative overflow-hidden shadow-[4px_4px_0px_0px_#04000D] transition-all duration-300"
+            class="border-2 border-[#04000D] bg-white relative overflow-hidden shadow-[4px_4px_0px_0px_#04000D] transition-all duration-300"
           >
-            <!-- Division Header Strip -->
+            <!-- Division Header Strip (Brutalist Style) -->
             <div 
-              class="border-b-3 border-[#04000D] px-4 py-3 flex flex-wrap items-center justify-between gap-2 select-none"
+              class="border-b-2 border-[#04000D] px-5 py-3 flex flex-wrap items-center justify-between gap-2 select-none"
               :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color, color: panitiaData[activeDivisionTab]?.textColor }"
             >
               <div class="flex items-center gap-2">
-                <span class="font-mono text-base">{{ panitiaData[activeDivisionTab]?.emoji }}</span>
-                <h4 class="font-black text-lg md:text-xl uppercase tracking-tight">{{ panitiaData[activeDivisionTab]?.name.toUpperCase() }}</h4>
+                <span class="font-mono text-sm leading-none">{{ panitiaData[activeDivisionTab]?.emoji }}</span>
+                <h4 class="font-black text-xs md:text-sm uppercase tracking-tight">{{ panitiaData[activeDivisionTab]?.name.toUpperCase() }}</h4>
               </div>
-              <span class="font-mono text-xs font-bold uppercase">
+              <span class="font-mono text-[9px] md:text-xs font-black uppercase tracking-wider">
                 {{ panitiaData[activeDivisionTab]?.coordinators.length + panitiaData[activeDivisionTab]?.members.length }} Personil
               </span>
             </div>
 
             <!-- Division Body -->
-            <div class="p-5 md:p-6 bg-white relative z-10">
-              <!-- Decorative Background Stamp Overlay -->
-              <div class="absolute -right-6 -bottom-6 w-48 h-48 opacity-[0.03] pointer-events-none font-mono font-black text-[96px] uppercase tracking-tighter select-none rotate-12 flex items-center justify-center">
-                {{ panitiaData[activeDivisionTab]?.emoji }}
-              </div>
-
-              <!-- Division Grid Layout -->
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 relative z-10">
+            <div class="p-4 md:p-6 bg-white relative z-10">
+              <!-- Division Grid Layout (Side-by-Side: Group Photo Left, Roster Right) -->
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
                 
-                <!-- Left Column: Concept, Coordinators, and Group Photo -->
-                <div :class="[
-                  'flex flex-col gap-5',
-                  panitiaData[activeDivisionTab]?.members?.length > 0 ? 'col-span-1 lg:col-span-4' : 'col-span-1 lg:col-span-12'
-                ]">
-                  <!-- Fruit Concept Badge -->
+                <!-- Left Column (lg:col-span-5): Division Group Photo & Concept -->
+                <div class="col-span-1 lg:col-span-5 flex flex-col gap-4">
+                  <!-- Division Group Photo -->
+                  <div v-if="panitiaData[activeDivisionTab]?.groupPhoto" class="select-none w-full">
+                    <span class="font-mono text-[8px] tracking-widest text-[#04000D]/50 uppercase font-black block mb-2">✦ DOKUMENTASI UNIT ✦</span>
+                    <div class="border-2 border-[#04000D] bg-white p-1.5 shadow-[3px_3px_0px_0px_#04000D]">
+                      <div class="relative aspect-[3/2] overflow-hidden border border-[#04000D]/10 bg-[#04000D]/5">
+                        <img 
+                          :src="panitiaData[activeDivisionTab]?.groupPhoto" 
+                          alt="Foto Bersama Divisi" 
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Concept Badge -->
                   <div 
-                    class="inline-flex items-center self-start gap-2 px-3 py-1.5 border-2 border-[#04000D] font-mono text-[10px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#04000D] select-none"
-                    :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color, color: panitiaData[activeDivisionTab]?.textColor }"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-[#04000D] font-mono text-[9px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#04000D] self-start select-none"
+                    :style="{ backgroundColor: `${panitiaData[activeDivisionTab]?.color}15`, color: panitiaData[activeDivisionTab]?.color, borderColor: panitiaData[activeDivisionTab]?.color }"
                   >
                     <span>KONSEP BUAH: {{ panitiaData[activeDivisionTab]?.fruit.toUpperCase() }} {{ panitiaData[activeDivisionTab]?.emoji }}</span>
                   </div>
+                </div>
 
-                  <!-- Coordinator Section -->
+                <!-- Right Column (lg:col-span-7): Roster (Coordinators & Members) -->
+                <div class="col-span-1 lg:col-span-7 flex flex-col gap-4 justify-between">
+                  
+                  <!-- Coordinators Section -->
                   <div>
-                    <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-3">✦ KOORDINATOR ✦</span>
-                    
-                    <div :class="[
-                      'grid gap-3',
-                      panitiaData[activeDivisionTab]?.members?.length > 0 
-                        ? 'grid-cols-1' 
-                        : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                    ]">
+                    <span class="font-mono text-[8px] tracking-widest text-[#04000D]/50 uppercase font-black block mb-2">✦ KOORDINATOR ✦</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div 
                         v-for="coor in panitiaData[activeDivisionTab]?.coordinators" 
                         :key="coor.name"
-                        class="flex items-center gap-3 bg-[#F5F5F5] border-2 border-[#04000D] p-2.5 shadow-[2px_2px_0px_0px_#04000D] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_#04000D] transition-all duration-150"
+                        @click="openModal(coor)"
+                        class="flex items-center bg-white border-2 border-[#04000D] p-2 shadow-[2px_2px_0px_0px_#04000D] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#04000D] cursor-pointer"
                       >
-                        <!-- Photo Block -->
-                        <div 
-                          class="w-12 h-12 border-2 border-[#04000D] flex-shrink-0 overflow-hidden flex items-center justify-center relative select-none"
-                          :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }"
-                        >
+                        <!-- Coordinator Photo -->
+                        <div class="w-12 h-12 border border-[#04000D] overflow-hidden flex-shrink-0 bg-white">
                           <img 
                             v-if="coor.imgSrc" 
                             :src="coor.imgSrc" 
                             :alt="coor.name" 
-                            class="w-full h-full object-cover object-center contrast-110"
+                            class="w-full h-full object-cover object-top"
                           />
-                          <span v-else class="font-mono font-black text-xs text-[#04000D]">{{ coor.name.substring(0, 2).toUpperCase() }}</span>
+                          <div v-else class="w-full h-full flex items-center justify-center font-mono font-black text-xs text-white" :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }">
+                            {{ coor.name.substring(0, 2).toUpperCase() }}
+                          </div>
                         </div>
-                        
-                        <!-- Details -->
-                        <div class="flex flex-col justify-center min-w-0 select-text">
-                          <h5 class="font-black text-xs md:text-sm uppercase tracking-tight text-[#04000D] leading-tight truncate">{{ coor.name }}</h5>
-                          <span class="font-mono text-[9px] text-[#04000D]/70 font-bold uppercase mt-0.5 truncate">{{ coor.role }} {{ coor.classYear }}</span>
+                        <!-- Coordinator Info -->
+                        <div class="min-w-0 flex flex-col justify-center ml-3">
+                          <span 
+                            class="inline-block px-1.5 py-0.5 font-mono text-[8px] font-black uppercase tracking-wider rounded-none border border-[#04000D] self-start mb-1 leading-none"
+                            :style="{ backgroundColor: `${panitiaData[activeDivisionTab]?.color}15`, color: panitiaData[activeDivisionTab]?.color }"
+                          >
+                            {{ coor.role }}
+                          </span>
+                          <h5 class="font-black text-xs uppercase tracking-tight text-[#04000D] leading-tight truncate" :title="coor.name">
+                            {{ coor.name }}
+                          </h5>
+                          <span class="font-mono text-[8px] text-[#04000D]/50 font-bold mt-0.5">ANGKATAN {{ coor.classYear }}</span>
                         </div>
                       </div>
-
-                      <div v-if="!panitiaData[activeDivisionTab]?.coordinators.length" class="font-mono text-[10px] text-[#04000D]/60 italic p-3 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40 col-span-full">
+                      
+                      <div v-if="!panitiaData[activeDivisionTab]?.coordinators.length" class="font-mono text-[9px] text-[#04000D]/50 italic p-3 border border-dashed border-[#04000D]/20 bg-[#F5F5F5]/40 col-span-full">
                         Tidak ada data koordinator khusus.
                       </div>
                     </div>
                   </div>
 
-                  <!-- Division Group Photo -->
-                  <div 
-                    v-if="panitiaData[activeDivisionTab]?.groupPhoto" 
-                    class="select-none"
-                    :class="panitiaData[activeDivisionTab]?.members?.length > 0 ? '' : 'max-w-md md:max-w-lg'"
-                  >
-                    <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-2.5">✦ DOKUMENTASI UNIT ✦</span>
-                    <div class="border-2 border-[#04000D] bg-white p-2 shadow-[3px_3px_0px_0px_#04000D] rotate-[0.5deg] hover:rotate-0 transition-transform duration-200">
-                      <div class="relative aspect-[3/2] overflow-hidden border border-[#04000D]/20 bg-[#04000D]/5">
-                        <img 
-                          :src="panitiaData[activeDivisionTab]?.groupPhoto" 
-                          alt="Foto Bersama Divisi" 
-                          class="w-full h-full object-cover grayscale contrast-110 brightness-95"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Right Column: Members Grid -->
-                <div v-if="panitiaData[activeDivisionTab]?.members?.length > 0" class="col-span-1 lg:col-span-8 flex flex-col">
-                  <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-bold block mb-3">✦ ANGGOTA UNIT ✦</span>
-                  
-                  <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-3">
-                    <div 
-                      v-for="member in panitiaData[activeDivisionTab]?.members" 
-                      :key="member.name"
-                      class="group/member flex flex-col items-center"
-                    >
-                      <!-- Avatar frame -->
+                  <!-- Members Section -->
+                  <div v-if="panitiaData[activeDivisionTab]?.members?.length > 0" class="flex-grow">
+                    <span class="font-mono text-[8px] tracking-widest text-[#04000D]/50 uppercase font-black block mb-2">✦ ANGGOTA UNIT ✦</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       <div 
-                        class="w-full aspect-square border-2 border-[#04000D] overflow-hidden flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D] group-hover/member:shadow-[3px_3px_0px_0px_#04000D] group-hover/member:translate-y-[-1px] transition-all duration-150 relative cursor-pointer"
-                        :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }"
+                        v-for="member in panitiaData[activeDivisionTab]?.members" 
+                        :key="member.name"
+                        @click="openModal(member)"
+                        class="flex items-center bg-[#F9F9F9] border border-[#04000D]/20 p-1.5 hover:bg-white hover:border-[#04000D] transition-all duration-200 shadow-[1px_1px_0px_0px_rgba(4,0,13,0.06)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#04000D] cursor-pointer"
                       >
-                        <img 
-                          v-if="member.imgSrc" 
-                          :src="member.imgSrc" 
-                          :alt="member.name" 
-                          class="w-full h-full object-cover object-center contrast-110 transition-transform duration-200 group-hover/member:scale-105"
-                        />
-                        <span v-else class="font-mono font-black text-sm text-[#04000D]">{{ member.name.substring(0, 2).toUpperCase() }}</span>
-                      </div>
-
-                      <!-- Label -->
-                      <div class="w-full mt-1.5 text-center select-text min-w-0">
-                        <p class="font-black text-[10px] leading-tight uppercase tracking-tight text-[#04000D] truncate" :title="member.name">
-                          {{ member.name.split(' ')[0] }}<span v-if="member.name.split(' ')[1]" class="hidden sm:inline"> {{ member.name.split(' ')[1] }}</span>
-                        </p>
-                        <span class="font-mono text-[8px] text-[#04000D]/60 mt-0.5 block font-bold leading-none">{{ member.classYear }}</span>
+                        <!-- Member Photo -->
+                        <div class="w-10 h-10 border border-[#04000D] overflow-hidden flex-shrink-0 bg-white">
+                          <img 
+                            v-if="member.imgSrc" 
+                            :src="member.imgSrc" 
+                            :alt="member.name" 
+                            class="w-full h-full object-cover object-top"
+                          />
+                          <div v-else class="w-full h-full flex items-center justify-center font-mono font-bold text-[9px] text-white" :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }">
+                            {{ member.name.substring(0, 2).toUpperCase() }}
+                          </div>
+                        </div>
+                        <!-- Member Info -->
+                        <div class="min-w-0 flex flex-col justify-center ml-2.5">
+                          <p class="font-black text-[10px] leading-tight uppercase tracking-tight text-[#04000D] truncate" :title="member.name">
+                            {{ member.name.split(' ')[0] }}<span v-if="member.name.split(' ')[1]" class="hidden sm:inline"> {{ member.name.split(' ')[1] }}</span>
+                          </p>
+                          <span class="font-mono text-[8px] text-[#04000D]/40 mt-0.5 block font-bold leading-none">ANGKATAN {{ member.classYear }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
+
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -2932,6 +3148,97 @@ onBeforeUnmount(() => {
       </svg>
     </button>
   </div>
+
+  <!-- DETAIL COMMITTEE POPUP MODAL (Neo-Brutalist Style) -->
+  <Transition name="modal-fade">
+    <div 
+      v-if="selectedPerson" 
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#04000D]/85 backdrop-blur-sm"
+      @click="closeModal"
+    >
+      <!-- Modal Container -->
+      <div 
+        class="modal-card bg-white border-4 border-[#04000D] shadow-[8px_8px_0px_0px_rgba(4,0,13,1)] max-w-2xl w-full relative rounded-none transition-all transform pointer-events-auto overflow-visible"
+        @click.stop
+      >
+        <!-- Close Button -->
+        <button 
+          @click="closeModal" 
+          class="absolute -top-3.5 -right-3.5 md:-top-4 md:-right-4 w-9 h-9 bg-[#FF3D8B] hover:bg-[#ff1f76] text-white border-3 border-[#04000D] flex items-center justify-center shadow-[3px_3px_0px_0px_#04000D] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#04000D] cursor-pointer font-bold select-none text-lg transition-all z-[110]"
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+
+        <!-- Inner Content Scroll Area -->
+        <div class="w-full max-h-[90vh] md:max-h-[80vh] overflow-y-auto flex flex-col md:flex-row divide-y-4 md:divide-y-0 md:divide-x-4 divide-[#04000D]">
+          <!-- Left Column: Photo Frame -->
+          <div class="w-full md:w-1/2 aspect-[4/5] md:aspect-auto relative overflow-hidden bg-[#FAF9F6] min-h-[320px] md:min-h-full">
+            <img 
+              v-if="selectedPerson.imgSrc" 
+              :src="selectedPerson.imgSrc" 
+              :alt="selectedPerson.name" 
+              class="absolute inset-0 w-full h-full object-cover object-top filter contrast-105"
+            />
+            <div v-else class="absolute inset-0 flex items-center justify-center font-mono font-black text-4xl text-white" :style="{ backgroundColor: panitiaData[selectedPerson.division]?.color || '#8839FF' }">
+              {{ selectedPerson.name.substring(0, 2).toUpperCase() }}
+            </div>
+            <!-- Division Badge Overlay -->
+            <div class="absolute bottom-3 left-3 bg-[#04000D] text-white border border-white font-mono text-[9px] font-black uppercase tracking-wider px-2 py-1 select-none z-10">
+              {{ selectedPerson.division === 'Koor Inti' ? 'BPH INTI' : selectedPerson.division }} {{ panitiaData[selectedPerson.division]?.emoji }}
+            </div>
+          </div>
+
+          <!-- Right Column: Info & Duties -->
+          <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between bg-white text-left">
+            <div>
+              <!-- Dossier Header -->
+              <div class="flex justify-between items-center font-mono text-[9px] uppercase tracking-widest text-[#04000D]/50 font-black border-b border-[#04000D]/10 pb-2.5 mb-4">
+                <span>IFEST DOSSIER: 2026</span>
+                <span>ANGKATAN {{ selectedPerson.classYear }}</span>
+              </div>
+
+              <!-- Name -->
+              <h4 class="font-black text-2xl md:text-3xl tracking-tight text-[#04000D] uppercase leading-none mb-2 riso-bleed">
+                {{ selectedPerson.name }}
+              </h4>
+
+              <!-- Role Badge -->
+              <span 
+                class="inline-block px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-wider rounded-none border-2 border-[#04000D] mb-5 leading-none select-none shadow-[2px_2px_0px_0px_#04000D]"
+                :style="{ backgroundColor: panitiaData[selectedPerson.division]?.color || '#8839FF', color: panitiaData[selectedPerson.division]?.textColor || '#ffffff' }"
+              >
+                {{ selectedPerson.role }}
+              </span>
+
+              <!-- Duties List -->
+              <div class="mt-2">
+                <span class="font-mono text-[9px] tracking-widest text-[#04000D]/50 uppercase font-black block mb-3">
+                  ✦ TUGAS & TANGGUNG JAWAB:
+                </span>
+                <ul class="space-y-2.5">
+                  <li 
+                    v-for="(duty, idx) in getPersonDuties(selectedPerson)" 
+                    :key="idx" 
+                    class="font-mono text-xs text-[#04000D]/85 flex items-start gap-2.5 leading-relaxed"
+                  >
+                    <span class="text-[#04000D] font-black mt-0.5">✦</span>
+                    <span>{{ duty }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Bottom Footer Plate -->
+            <div class="mt-8 pt-4 border-t border-dashed border-[#04000D]/10 flex items-center justify-between font-mono text-[8px] text-[#04000D]/40 uppercase tracking-widest select-none">
+              <span>ORCHESTRA OF INNOVATION</span>
+              <span>NOISE SCREEN OK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
@@ -2944,6 +3251,30 @@ onBeforeUnmount(() => {
   display: none !important;
   content: none !important;
   background-image: none !important;
+}
+
+/* Modal Transitions */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-active .modal-card,
+.modal-fade-leave-active .modal-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-fade-enter-from .modal-card {
+  transform: scale(0.95) translateY(12px);
+}
+
+.modal-fade-leave-to .modal-card {
+  transform: scale(0.95) translateY(12px);
 }
 </style>
 
