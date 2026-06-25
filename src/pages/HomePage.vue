@@ -76,7 +76,7 @@ const activeSection = ref('')
 
 const handleScroll = () => {
   const scrollPosition = window.scrollY + 180 // Navbar offset + padding
-  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'partners']
+  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'bph-matrix', 'partners']
   
   let currentActive = ''
   for (const id of sections) {
@@ -455,7 +455,7 @@ const parseCommitteePhotos = () => {
 const panitiaData = parseCommitteePhotos()
 const activeDivisionTab = ref('Koor Inti')
 const fotoPanitiaKeseluruhan = computed(() => {
-  return panitiaAssetModules['../assets/Fotage Panitia Ifest 2026/Panitia Keseluruhan/Fotooo.webp'] || ''
+  return panitiaAssetModules['../assets/Fotage Panitia Ifest 2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
 })
 
 const galleryImages = [
@@ -2847,6 +2847,7 @@ onBeforeUnmount(() => {
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'competitions-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#FDE047]/30 hover:text-accent-magenta'" href="#competitions-section">Kompetisi</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#8839FF]/30 hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'bph-matrix' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#bph-matrix">Orkestrasi</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
     </div>
@@ -2871,6 +2872,7 @@ onBeforeUnmount(() => {
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'competitions-section' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#competitions-section">Kompetisi</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'bph-matrix' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#bph-matrix">Orkestrasi</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
 
