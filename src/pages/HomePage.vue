@@ -2277,7 +2277,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc" 
                   alt="Nakita Semesta" 
-                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
+                  class="w-full h-full object-cover object-center contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">NS</span>
               </div>
@@ -2307,7 +2307,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc" 
                   alt="Dareean A. Raffi" 
-                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
+                  class="w-full h-full object-cover object-center contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">DR</span>
               </div>
@@ -2337,7 +2337,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc" 
                   alt="Gabriel Kristofan" 
-                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
+                  class="w-full h-full object-cover object-center contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">GK</span>
               </div>
@@ -2367,7 +2367,7 @@ onBeforeUnmount(() => {
                   v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc"
                   :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc" 
                   alt="Reyqal Syawalano" 
-                  class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
+                  class="w-full h-full object-cover object-center contrast-110"
                 />
                 <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">RS</span>
               </div>
@@ -2503,7 +2503,7 @@ onBeforeUnmount(() => {
                             v-if="coor.imgSrc" 
                             :src="coor.imgSrc" 
                             :alt="coor.name" 
-                            class="w-full h-full object-cover object-[center_15%] scale-[1.5] origin-[center_15%] contrast-110"
+                            class="w-full h-full object-cover object-center contrast-110"
                           />
                           <span v-else class="font-mono font-black text-xs text-[#04000D]">{{ coor.name.substring(0, 2).toUpperCase() }}</span>
                         </div>
@@ -2559,7 +2559,7 @@ onBeforeUnmount(() => {
                           v-if="member.imgSrc" 
                           :src="member.imgSrc" 
                           :alt="member.name" 
-                          class="w-full h-full object-cover object-[center_12%] scale-[1.55] origin-[center_12%] contrast-110 transition-all duration-200 group-hover/member:scale-[1.65]"
+                          class="w-full h-full object-cover object-center contrast-110 transition-transform duration-200 group-hover/member:scale-105"
                         />
                         <span v-else class="font-mono font-black text-sm text-[#04000D]">{{ member.name.substring(0, 2).toUpperCase() }}</span>
                       </div>
