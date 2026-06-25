@@ -837,6 +837,11 @@ onMounted(() => {
   updateViewport()
   window.addEventListener('resize', updateViewport)
   window.addEventListener('scroll', handleScroll)
+  
+  // Initialize countdown
+  calculateTimeLeft()
+  countdownInterval = setInterval(calculateTimeLeft, 1000)
+
   // Run once to set initial active section
   handleScroll()
 
@@ -964,10 +969,44 @@ onMounted(() => {
   }
 })
 
+// Countdown Lomba 5 Juli 2026
+const announcementTarget = new Date('2026-07-05T00:00:00+07:00').getTime()
+const countdown = ref({
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+  expired: false
+})
+
+const calculateTimeLeft = () => {
+  const now = new Date().getTime()
+  const difference = announcementTarget - now
+
+  if (difference <= 0) {
+    countdown.value = { days: 0, hours: 0, minutes: 0, seconds: 0, expired: true }
+    return
+  }
+
+  const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+  countdown.value = { days, hours, minutes, seconds, expired: false }
+}
+
+const formatTimeNumber = (num) => {
+  return String(num).padStart(2, '0')
+}
+
+let countdownInterval = null
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateViewport)
   window.removeEventListener('scroll', handleScroll)
   ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+  if (countdownInterval) clearInterval(countdownInterval)
 })
 </script>
 
@@ -1227,17 +1266,83 @@ onBeforeUnmount(() => {
 
       <div class="max-w-container-max mx-auto relative z-10">
         
-        <!-- Section Header -->
-        <div class="mb-8 md:mb-10 text-center lg:text-left">
-          <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
-            IFEST 2026 CHALLENGE
-          </span>
-          <h2 class="font-black text-4xl sm:text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed flex flex-wrap justify-center lg:justify-start gap-y-2 select-none pt-2 pb-2">
-            <span class="bg-[#FF3D8B] text-white px-3.5 py-1.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[5px_5px_0px_0px_#04000D] mr-2">ARENA KOMPETISI</span> DIGITAL.
-          </h2>
-          <p class="font-body-md text-base md:text-xl text-[#04000D]/80 max-w-3xl mt-6 leading-relaxed">
-            Panggung bagi talenta muda Indonesia untuk bersaing, berkarya, dan berinovasi dari algoritma hingga desain, dari video hingga ide bisnis yang mengubah dunia nyata.
-          </p>
+        <!-- Section Header + Countdown Grid -->
+        <div class="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div class="text-center lg:text-left flex-1 max-w-3xl">
+            <span class="font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] block mb-2">
+              IFEST 2026 CHALLENGE
+            </span>
+            <h2 class="font-black text-4xl sm:text-5xl md:text-7xl tracking-[-0.04em] leading-none text-[#04000D] riso-bleed flex flex-wrap justify-center lg:justify-start gap-y-2 select-none pt-2 pb-2">
+              <span class="bg-[#FF3D8B] text-white px-3.5 py-1.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[5px_5px_0px_0px_#04000D] mr-2">ARENA KOMPETISI</span> DIGITAL.
+            </h2>
+            <p class="font-body-md text-base md:text-xl text-[#04000D]/80 mt-6 leading-relaxed">
+              Panggung bagi talenta muda Indonesia untuk bersaing, berkarya, dan berinovasi dari algoritma hingga desain, dari video hingga ide bisnis yang mengubah dunia nyata.
+            </p>
+          </div>
+
+          <!-- Countdown Timer Bento Card (Neo-Brutalist) -->
+          <div class="w-full lg:w-auto flex-shrink-0 self-center lg:self-stretch flex items-center justify-center">
+            <div 
+              class="bg-[#FFF9E6] border-3 border-[#04000D] p-5 sm:p-6 relative select-none max-w-md w-full"
+              style="box-shadow: 6px 6px 0px 0px #FDE047;"
+            >
+              <div class="flex items-center gap-2 mb-3">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF3D8B] opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-[#FF3D8B]"></span>
+                </span>
+                <span class="font-mono text-[10px] font-black uppercase tracking-wider text-[#04000D]/60">
+                  PENGUMUMAN RESMI LOMBA
+                </span>
+              </div>
+              
+              <h3 class="font-black text-lg sm:text-xl uppercase tracking-tight text-[#04000D] mb-4">
+                Pendaftaran & Panduan Dibuka
+              </h3>
+
+              <!-- Timer Ticker Grid -->
+              <div class="flex items-center gap-3 justify-center lg:justify-start mb-4">
+                <div class="flex flex-col items-center">
+                  <div class="bg-white border-2 border-[#04000D] px-3 py-1.5 min-w-[60px] sm:min-w-[68px] text-center shadow-[2px_2px_0px_0px_#04000D]">
+                    <span class="font-mono text-xl sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.days) }}</span>
+                  </div>
+                  <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2">HARI</span>
+                </div>
+                <span class="font-mono font-black text-xl text-[#04000D] mb-5">:</span>
+
+                <div class="flex flex-col items-center">
+                  <div class="bg-white border-2 border-[#04000D] px-3 py-1.5 min-w-[60px] sm:min-w-[68px] text-center shadow-[2px_2px_0px_0px_#04000D]">
+                    <span class="font-mono text-xl sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.hours) }}</span>
+                  </div>
+                  <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2">JAM</span>
+                </div>
+                <span class="font-mono font-black text-xl text-[#04000D] mb-5">:</span>
+
+                <div class="flex flex-col items-center">
+                  <div class="bg-white border-2 border-[#04000D] px-3 py-1.5 min-w-[60px] sm:min-w-[68px] text-center shadow-[2px_2px_0px_0px_#04000D]">
+                    <span class="font-mono text-xl sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.minutes) }}</span>
+                  </div>
+                  <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2">MENIT</span>
+                </div>
+                <span class="font-mono font-black text-xl text-[#04000D] mb-5">:</span>
+
+                <div class="flex flex-col items-center">
+                  <div class="bg-white border-2 border-[#04000D] px-3 py-1.5 min-w-[60px] sm:min-w-[68px] text-center shadow-[2px_2px_0px_0px_#04000D]">
+                    <span class="font-mono text-xl sm:text-2xl font-black text-[#FF3D8B] tracking-tight">{{ formatTimeNumber(countdown.seconds) }}</span>
+                  </div>
+                  <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2">DETIK</span>
+                </div>
+              </div>
+
+              <!-- Date Announcement Badge -->
+              <div class="mt-4 pt-3.5 border-t border-dashed border-[#04000D]/15 flex items-center justify-between">
+                <span class="font-mono text-[10px] font-bold text-[#04000D]/65">TANGGAL RILIS:</span>
+                <span class="bg-[#FF3D8B] text-white font-mono text-[10px] font-black uppercase tracking-wider px-2 py-0.5 border border-[#04000D] shadow-[2px_2px_0px_0px_#04000D]">
+                  5 JULI 2026
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- TIER 1: KATEGORI NASIONAL (3-Column Bento Grid) -->
@@ -1249,29 +1354,54 @@ onBeforeUnmount(() => {
 
           <div id="kompetisi-grid-tier1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div 
-              v-for="comp in competitionsData.slice(0, 3)" 
+              v-for="(comp, index) in competitionsData.slice(0, 3)" 
               :key="comp.id"
-              class="border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200 hover:-rotate-1"
-              :style="{ backgroundColor: comp.cardBg, boxShadow: '6px 6px 0px 0px #04000D' }"
+              class="border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200"
+              :class="!countdown.expired ? 'hover:scale-[1.01]' : 'hover:-rotate-1'"
+              :style="{ backgroundColor: !countdown.expired ? '#F9F9F9' : comp.cardBg, boxShadow: '6px 6px 0px 0px #04000D' }"
             >
-              <div>
-                <div class="flex justify-between items-start mb-4">
-                  <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-white px-2 py-0.5">{{ comp.tagline }}</span>
-                  <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[{{ comp.id }}]</span>
+              <!-- Locked State Content -->
+              <div v-if="!countdown.expired" class="flex flex-col justify-between h-full flex-1">
+                <div>
+                  <div class="flex justify-between items-start mb-4">
+                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D]/40 text-white px-2 py-0.5 select-none">🔒 TERKUNCI</span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D]/40 select-none">[NAT-0{{ index + 1 }}]</span>
+                  </div>
+                  <h3 class="font-black uppercase text-lg sm:text-xl tracking-tight leading-none mb-3 text-[#04000D]/40 select-none">
+                    KATEGORI NASIONAL 0{{ index + 1 }}
+                  </h3>
+                  <p class="font-mono text-[11px] text-[#04000D]/40 leading-normal">
+                    Detail tantangan, panduan teknis, dan formulir pendaftaran masih dirahasiakan hingga rilis resmi.
+                  </p>
                 </div>
-                <h3 class="font-black uppercase text-lg sm:text-xl tracking-tight leading-none mb-3 text-[#04000D] riso-bleed">
-                  {{ comp.title.split(' ')[0] }} <span class="text-accent-magenta">{{ comp.title.split(' ').slice(1).join(' ') }}</span>
-                </h3>
-                <div class="border-t border-dashed border-[#04000D]/20 pt-3 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
-                  <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
-                  <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">{{ comp.fee }}</span></div>
+                <div class="mt-5 select-none">
+                  <button disabled class="w-full block bg-gray-200 text-gray-400 py-2.5 rounded-full font-mono text-[10px] text-center font-bold border border-gray-300 cursor-not-allowed">
+                    🔒 Belum Tersedia
+                  </button>
                 </div>
               </div>
 
-              <div class="mt-5 select-none">
-                <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
-                  Lihat Detail Lomba →
-                </router-link>
+              <!-- Unlocked (Original) Content -->
+              <div v-else class="flex flex-col justify-between h-full flex-1">
+                <div>
+                  <div class="flex justify-between items-start mb-4">
+                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-white px-2 py-0.5">{{ comp.tagline }}</span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[{{ comp.id }}]</span>
+                  </div>
+                  <h3 class="font-black uppercase text-lg sm:text-xl tracking-tight leading-none mb-3 text-[#04000D] riso-bleed">
+                    {{ comp.title.split(' ')[0] }} <span class="text-accent-magenta">{{ comp.title.split(' ').slice(1).join(' ') }}</span>
+                  </h3>
+                  <div class="border-t border-dashed border-[#04000D]/20 pt-3 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
+                    <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
+                    <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">{{ comp.fee }}</span></div>
+                  </div>
+                </div>
+
+                <div class="mt-5 select-none">
+                  <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
+                    Lihat Detail Lomba →
+                  </router-link>
+                </div>
               </div>
             </div>
           </div>
@@ -1286,48 +1416,96 @@ onBeforeUnmount(() => {
 
           <div id="kompetisi-grid-tier2" class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div 
-              v-for="comp in competitionsData.slice(3, 5)" 
+              v-for="(comp, index) in competitionsData.slice(3, 5)" 
               :key="comp.id"
-              class="bg-white border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200 hover:rotate-1"
+              class="bg-white border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200"
+              :class="!countdown.expired ? 'hover:scale-[1.01]' : 'hover:rotate-1'"
               style="box-shadow: 6px 6px 0px 0px #04000D;"
             >
               <!-- Stamp accent plate -->
-              <div class="absolute inset-0 bg-[#04000D]/5 mix-blend-multiply pointer-events-none rounded-none"></div>
-              <div>
-                <div class="flex justify-between items-start mb-6">
-                  <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-white px-2 py-0.5">{{ comp.tagline }}</span>
-                  <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[{{ comp.id }}]</span>
+              <div v-if="countdown.expired" class="absolute inset-0 bg-[#04000D]/5 mix-blend-multiply pointer-events-none rounded-none"></div>
+
+              <!-- Locked State Content -->
+              <div v-if="!countdown.expired" class="flex flex-col justify-between h-full flex-1 z-10">
+                <div>
+                  <div class="flex justify-between items-start mb-6">
+                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D]/40 text-white px-2 py-0.5 select-none">🔒 TERKUNCI</span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D]/40 select-none">[REG-0{{ index + 1 }}]</span>
+                  </div>
+                  <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D]/40 select-none">
+                    KATEGORI REGIONAL 0{{ index + 1 }}
+                  </h3>
+                  <p class="font-mono text-[11px] text-[#04000D]/40 leading-normal">
+                    Detail tantangan kreatif, sub-tema siber, dan kriteria penilaian disembunyikan hingga rilis resmi.
+                  </p>
                 </div>
-                <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
-                  {{ comp.title.split(' ').slice(0, -1).join(' ') }} <span class="text-accent-magenta">{{ comp.title.split(' ').slice(-1)[0] }}</span>
-                </h3>
-                <div class="border-t border-dashed border-[#04000D]/20 pt-4 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
-                  <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
-                  <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">Gratis</span></div>
+                <div class="mt-8 select-none">
+                  <button disabled class="w-full block bg-gray-200 text-gray-400 py-2.5 rounded-full font-mono text-[10px] text-center font-bold border border-gray-300 cursor-not-allowed">
+                    🔒 Belum Tersedia
+                  </button>
                 </div>
               </div>
-              
-              <div class="mt-8 select-none">
-                <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
-                  Lihat Detail Lomba →
-                </router-link>
+
+              <!-- Unlocked State Content -->
+              <div v-else class="flex flex-col justify-between h-full flex-1 z-10">
+                <div>
+                  <div class="flex justify-between items-start mb-6">
+                    <span class="font-mono text-[9px] font-extrabold uppercase bg-[#04000D] text-white px-2 py-0.5">{{ comp.tagline }}</span>
+                    <span class="font-mono text-[9px] font-bold text-[#04000D]/60">[{{ comp.id }}]</span>
+                  </div>
+                  <h3 class="font-black uppercase text-xl sm:text-2xl tracking-tight leading-none mb-4 text-[#04000D] riso-bleed">
+                    {{ comp.title.split(' ').slice(0, -1).join(' ') }} <span class="text-accent-magenta">{{ comp.title.split(' ').slice(-1)[0] }}</span>
+                  </h3>
+                  <div class="border-t border-dashed border-[#04000D]/20 pt-4 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
+                    <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
+                    <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">Gratis</span></div>
+                  </div>
+                </div>
+                
+                <div class="mt-8 select-none">
+                  <router-link :to="{ path: '/kompetisi', query: { id: comp.id }, state: { fromSection: 'competitions-section' } }" class="riso-btn-plate w-full block bg-[#04000D] text-white py-2.5 rounded-full font-button text-xs text-center font-bold" :style="{ '--plate-color': comp.accentColor }">
+                    Lihat Detail Lomba →
+                  </router-link>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- TIER 3: EXPO INOVASI DIGITAL (Hackathon + Showcase) -->
+        <!-- TIER 3: EXPO INOVASI DIGITAL -->
         <div>
           <div class="flex items-center gap-3 mb-8 select-none">
             <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">TIER 03</span>
-            <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">SULTENG INNOVATION ENGINE</span>
+            <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">{{ countdown.expired ? 'SULTENG INNOVATION ENGINE' : 'KATEGORI KHUSUS' }}</span>
           </div>
 
-          <!-- Massive dark contrast bento card for S-DIH -->
+          <!-- Massive dark contrast bento card for Tier 3 -->
           <div class="bg-[#04000D] border-2 md:border-3 border-[#04000D] p-5 sm:p-6 md:p-8 relative overflow-hidden select-none" style="box-shadow: 6px 6px 0px 0px #FF3D8B;">
             <div class="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03] pointer-events-none z-0"></div>
             
-            <div class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-center">
+            <!-- Locked State Content -->
+            <div v-if="!countdown.expired" class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-center w-full">
+              <div class="text-white text-left flex-1">
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="font-mono text-[9px] font-extrabold uppercase bg-red-500 text-white px-2 py-0.5 select-none">🔒 TERKUNCI</span>
+                  <span class="font-mono text-xs font-bold text-white/40 select-none">[REG-03]</span>
+                </div>
+                <h3 class="font-black text-2xl sm:text-4xl uppercase tracking-tighter leading-none mb-4 text-[#FDE047]/40 select-none">
+                  KATEGORI INOVASI 03 [🔒]
+                </h3>
+                <p class="font-mono text-[11px] text-white/50 leading-relaxed max-w-2xl border-t border-white/10 pt-4 mt-2">
+                  Kategori inovasi eksklusif dengan skala dan format yang berbeda. Detail tantangan, panduan teknis, dan formulir pendaftaran masih dirahasiakan hingga rilis resmi.
+                </p>
+              </div>
+              <div class="w-full md:w-auto">
+                <button disabled class="bg-gray-700 text-gray-500 px-8 py-3 rounded-full font-mono text-xs text-center font-extrabold block border border-gray-600 cursor-not-allowed w-full md:w-auto">
+                  🔒 Belum Tersedia
+                </button>
+              </div>
+            </div>
+
+            <!-- Unlocked State Content -->
+            <div v-else class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-center w-full">
               <div class="text-white text-left flex-1">
                 <div class="flex items-center gap-2 mb-3">
                   <span class="font-mono text-[9px] font-extrabold uppercase bg-[#FDE047] text-[#04000D] px-2 py-0.5">HACKATHON + SHOWCASE</span>
