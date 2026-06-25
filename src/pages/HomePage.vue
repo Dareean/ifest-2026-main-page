@@ -234,30 +234,38 @@ const parseCommitteePhotos = () => {
 
   const isGroupPhoto = (name) => {
     const n = name.toLowerCase()
-    return n.includes('rame') || n.includes('ramai') || n.includes('boyband') || n.includes('porenjes') || 
-           n.includes('sekretaris i dan ii') || n.includes('ketua dan wakil') || 
-           n.includes('koor inti 3') || n.includes('koor inti 2') || 
-           n.includes('sekertaris.png') || n.includes('divisi lapangan') || 
-           n.includes('foto pertama ya') || n.includes('request pake foto') || 
-           n.includes('not this') || n.includes('anggota humas') ||
-           n.includes('sponsor 1') ||
-           n === 'img_8492.jpg' || n === 'img_8813.jpg' || n === 'img_8815.jpg' || n === 'img_8818.jpg' ||
-           n === 'img_8770.jpg' || n === 'img_8782.jpg' || n === 'img_8789.jpg' ||
-           n === 'img_8808.jpg' || n === 'img_8810.jpg' || n === 'img_8803.jpg' ||
-           n === 'img_8804.jpg' || n === 'img_8805.jpg' || n === 'img_8806.jpg' ||
-           n === 'img_8500.jpg' || n === 'img_8501.jpg' || n === 'img_8518.jpg' ||
-           n === 'img_8519.jpg' || n === 'img_8540.jpg' || n === 'img_8650.jpg' ||
-           n === 'img_8651.jpg' || n === 'img_8472.jpg' || n === 'img_8473.jpg' ||
-           n === 'img_8479.jpg' || n === 'img_8592.jpg' || n === 'img_8412.jpg' ||
-           n === 'img_8413.jpg' || n === 'img_8689.jpg' || n === 'img_8696.jpg' ||
-           n === 'img_8543.jpg' || n === 'img_8546.jpg' || n === 'img_8772.jpg' ||
-           n === 'img_8790.jpg' || n === 'img_8791.jpg' || n === 'img_8703.jpg' ||
-           n === 'img_8704.jpg' || n === 'img_8733.jpg' || n === 'img_8736.jpg' ||
-           n === 'img_8737.jpg' || n === 'img_8738.jpg' || n === 'img_8740.jpg' ||
-           n === 'img_8755.jpg' || n === 'img_8756.jpg' || n === 'img_8642.jpg' ||
-           n === 'img_8648.jpg' || n === 'img.jpg' || n.includes('51882e3c') ||
-           n.includes('866eecd6') || n.includes('f8944255') || n.includes('571c6e37') ||
-           n.includes('a5a56752') || n.includes('d9ff2b37')
+    if (
+      n.includes('rame') || n.includes('ramai') || n.includes('boyband') || n.includes('porenjes') || 
+      n.includes('sekretaris i dan ii') || n.includes('ketua dan wakil') || 
+      n.includes('koor inti 3') || n.includes('koor inti 2') || 
+      n.includes('sekertaris') || n.includes('divisi lapangan') || 
+      n.includes('foto pertama ya') || n.includes('request pake foto') || 
+      n.includes('not this') || n.includes('anggota humas') ||
+      n.includes('sponsor 1')
+    ) {
+      return true
+    }
+
+    const dotIdx = n.lastIndexOf('.')
+    const nameWithoutExt = dotIdx === -1 ? n : n.substring(0, dotIdx)
+
+    return nameWithoutExt === 'img_8492' || nameWithoutExt === 'img_8813' || nameWithoutExt === 'img_8815' || nameWithoutExt === 'img_8818' ||
+           nameWithoutExt === 'img_8770' || nameWithoutExt === 'img_8782' || nameWithoutExt === 'img_8789' ||
+           nameWithoutExt === 'img_8808' || nameWithoutExt === 'img_8810' || nameWithoutExt === 'img_8803' ||
+           nameWithoutExt === 'img_8804' || nameWithoutExt === 'img_8805' || nameWithoutExt === 'img_8806' ||
+           nameWithoutExt === 'img_8500' || nameWithoutExt === 'img_8501' || nameWithoutExt === 'img_8518' ||
+           nameWithoutExt === 'img_8519' || nameWithoutExt === 'img_8540' || nameWithoutExt === 'img_8650' ||
+           nameWithoutExt === 'img_8651' || nameWithoutExt === 'img_8472' || nameWithoutExt === 'img_8473' ||
+           nameWithoutExt === 'img_8479' || nameWithoutExt === 'img_8592' || nameWithoutExt === 'img_8412' ||
+           nameWithoutExt === 'img_8413' || nameWithoutExt === 'img_8689' || nameWithoutExt === 'img_8696' ||
+           nameWithoutExt === 'img_8543' || nameWithoutExt === 'img_8546' || nameWithoutExt === 'img_8772' ||
+           nameWithoutExt === 'img_8790' || nameWithoutExt === 'img_8791' || nameWithoutExt === 'img_8703' ||
+           nameWithoutExt === 'img_8704' || nameWithoutExt === 'img_8733' || nameWithoutExt === 'img_8736' ||
+           nameWithoutExt === 'img_8737' || nameWithoutExt === 'img_8738' || nameWithoutExt === 'img_8740' ||
+           nameWithoutExt === 'img_8755' || nameWithoutExt === 'img_8756' || nameWithoutExt === 'img_8642' ||
+           nameWithoutExt === 'img_8648' || nameWithoutExt === 'img' || nameWithoutExt.includes('51882e3c') ||
+           nameWithoutExt.includes('866eecd6') || nameWithoutExt.includes('f8944255') || nameWithoutExt.includes('571c6e37') ||
+           nameWithoutExt.includes('a5a56752') || nameWithoutExt.includes('d9ff2b37')
   }
 
   const peopleMap = new Map()
@@ -447,72 +455,72 @@ const parseCommitteePhotos = () => {
 const panitiaData = parseCommitteePhotos()
 const activeDivisionTab = ref('Koor Inti')
 const fotoPanitiaKeseluruhan = computed(() => {
-  return panitiaAssetModules['../assets/Fotage Panitia Ifest 2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
+  return panitiaAssetModules['../assets/Fotage Panitia Ifest 2026/Panitia Keseluruhan/Fotooo.webp'] || ''
 })
 
 const galleryImages = [
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2050.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2050.webp'),
     alt: 'Suasana Hackathon Pasigala',
     title: 'Hackathon Pasigala',
     description: 'Kolaborasi intensif 24 jam inovator muda memecahkan tantangan riil di Sulawesi Tengah.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2385.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSCF2385.webp'),
     alt: 'Awarding Night Pemenang',
     title: 'Awarding & Penghargaan',
     description: 'Apresiasi karya teknologi terbaik kepada para pemenang kompetisi nasional.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0404.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0404.webp'),
     alt: 'Pameran Karya Inovatif',
     title: 'Showcase Expo Teknologi',
     description: 'Demo produk digital inovatif hasil karya talenta lokal kepada ribuan pengunjung.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0406.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0406.webp'),
     alt: 'Demo IoT Smart System',
     title: 'Prototype IoT Showcase',
     description: 'Pengunjung mencoba prototype sistem pintar berbasis Internet of Things.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0417.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'DSC_0417.webp'),
     alt: 'Sesi Coding & Mentoring',
     title: 'Developer Mentorship',
     description: 'Sesi bimbingan langsung bersama praktisi industri teknologi nasional.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_0170.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_0170.webp'),
     alt: 'Sambutan Puncak Acara',
     title: 'Opening Ceremony',
     description: 'Pembukaan resmi I-FEST oleh Rektor Universitas Tadulako dan Ketua Jurusan.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_5734.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_5734.webp'),
     alt: 'Auditorium Dipadati Peserta',
     title: 'Seminar Nasional Tech',
     description: 'Lebih dari 1.000 peserta memadati auditorium utama untuk mengikuti seminar teknologi.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_5819.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', 'IMG_5819.webp'),
     alt: 'Peserta Bertanya Sesi Diskusi',
     title: 'Sesi Diskusi Interaktif',
     description: 'Tanya jawab kritis antara mahasiswa dan pembicara seputar masa depan AI.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6425.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6425.webp'),
     alt: 'Penampilan Band & Guest Star',
     title: 'Digital Symphony Concert',
     description: 'Konser penutup yang menyatukan ribuan penonton dalam harmoni digital.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6476.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6476.webp'),
     alt: 'Keceriaan Panitia & Crew',
     title: 'IFEST 2025 Organizer Team',
     description: 'Dedikasi penuh 80+ panitia HMTI UNTAD menyukseskan festival IT terbesar.'
   },
   {
-    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6481.JPG'),
+    src: getAsset(doc2025AssetModules, 'dokumentasi_ifest2025', '_DSC6481.webp'),
     alt: 'Closing Ceremony Foto Bersama',
     title: 'Fase Akhir & Evaluasi',
     description: 'Kebersamaan seluruh jajaran panitia, mentor, dan pengisi acara di malam puncak.'
