@@ -3,7 +3,7 @@ import { ref, computed, onBeforeUnmount, onMounted, defineAsyncComponent } from 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { competitionsData } from '../data/competitionsData'
-import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock } from 'lucide-vue-next'
+import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock, Plus, Download, ExternalLink } from 'lucide-vue-next'
 
 const AiChatWidget = defineAsyncComponent(() => import('../components/AiChatWidget.vue'))
 const isChatActivated = ref(false)
@@ -77,7 +77,7 @@ const activeSection = ref('')
 
 const handleScroll = () => {
   const scrollPosition = window.scrollY + 180 // Navbar offset + padding
-  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'bph-matrix', 'partners']
+  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'bph-matrix', 'kemitraan-schemes', 'partners']
   
   let currentActive = ''
   for (const id of sections) {
@@ -206,6 +206,11 @@ const mainLogoAssetModules = import.meta.glob('../assets/logo_utama/*', {
 })
 
 const doc2025AssetModules = import.meta.glob('../assets/dokumentasi_ifest2025/*', {
+  eager: true,
+  import: 'default',
+})
+
+const dokumenAssetModules = import.meta.glob('../assets/dokumen/*', {
   eager: true,
   import: 'default',
 })
@@ -832,6 +837,133 @@ const marqueeLogos = [
   { name: 'Google Student Ambasador', src: strategicPartners[1].src, isMedia: false },
   { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.webp'), isMedia: true },
   { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.webp'), isMedia: true },
+]
+
+const activeSchemeTab = ref('tungsten')
+
+const partnershipSchemes = [
+  {
+    id: 'tungsten',
+    name: 'Tungsten',
+    badge: '★ Exclusive Partner',
+    contribution: '~50% Total RAB Event',
+    slots: 1,
+    bgColor: '#C5B0F4',
+    borderColor: '#8839FF',
+    textColor: '#04000D',
+    description: 'Tier tertinggi dan eksklusif untuk satu mitra utama yang ingin menyelaraskan brand mereka secara penuh dengan narasi I-FEST 2026.',
+    benefits: [
+      'Naming rights utama: event menjadi "I-FEST 2026 Presented by [Brand]"',
+      'Naming rights konser penutup: "Digital Symphony Concert Presented by [Brand]"',
+      'Logo co-branding setara logo I-FEST di seluruh aset publikasi (digital, cetak, stage backdrop)',
+      'Hak eksklusif co-creator event dengan keterlibatan dalam keputusan kreatif & strategis',
+      'Booth VVIP Premiere di lokasi paling strategis selama acara',
+      '15 Tiket Konser VIP + slot panggung utama selama 1-2 jam',
+      'Akses database penuh seluruh rangkaian kegiatan (5.000+ partisipan)',
+      'MoU resmi, addendum khusus, dan laporan dampak (LPJ) eksklusif'
+    ],
+    sponsors: []
+  },
+  {
+    id: 'maestro',
+    name: 'Maestro',
+    badge: '✦ Presenting Partner',
+    contribution: 'Rp 80 - 500 Juta',
+    slots: 5,
+    bgColor: '#DCEEB1',
+    borderColor: '#A3E635',
+    textColor: '#04000D',
+    description: 'Tier kemitraan premium untuk organisasi yang ingin menjadi "co-owner" dan terlibat langsung dalam program-program unggulan nasional.',
+    benefits: [
+      'Joint branding nama event: logo Tungsten & Maestro berdampingan langsung dengan logo I-FEST',
+      'Hak eksklusif program nasional: mitra utama National Seminar & Research Visitation',
+      'Booth VIP terluas di area festival',
+      'Logo ukuran XL di seluruh media cetak, digital, baju panitia & PDL',
+      '10 Tiket Konser VIP + slot presentasi panggung utama selama 30-60 menit',
+      'Akses database penuh rangkaian kegiatan untuk talent scouting & rekrutmen',
+      'Konten dedicated mingguan di Instagram & TikTok',
+      'MoU wajib dan Laporan Pertanggungjawaban (LPJ) lengkap'
+    ],
+    sponsors: []
+  },
+  {
+    id: 'diamond',
+    name: 'Diamond',
+    badge: '◆ Strategic Partner',
+    contribution: 'Rp 40 - 80 Juta',
+    slots: 8,
+    bgColor: '#F3C9B6',
+    borderColor: '#F97316',
+    textColor: '#04000D',
+    description: 'Tier kemitraan strategis dengan prioritas keterlibatan pada salah satu program utama pilihan.',
+    benefits: [
+      'Prioritas keterlibatan pada 1 program pilihan (kompetisi/roadshow)',
+      'Booth strategis di area kegiatan utama',
+      'Logo ukuran L di media publikasi cetak & digital serta baju panitia',
+      '5 Tiket Konser + slot presentasi panggung selama 10 menit',
+      'Akses database untuk 1 rangkaian kegiatan pilihan',
+      'Konten eksklusif kolaborasi di Instagram & TikTok',
+      'MoU wajib dan Laporan Pertanggungjawaban (LPJ) lengkap'
+    ],
+    sponsors: []
+  },
+  {
+    id: 'gold',
+    name: 'Gold',
+    badge: '● Corporate Partner',
+    contribution: 'Rp 10 - 40 Juta',
+    slots: 15,
+    bgColor: '#C8E6CD',
+    borderColor: '#22C55E',
+    textColor: '#04000D',
+    description: 'Paket kemitraan korporat menengah yang menawarkan visibilitas brand kuat dan partisipasi aktif dalam ekosistem inovasi.',
+    benefits: [
+      'Booth standar di area pameran/expo',
+      'Hak menjadi juri atau pemateri pada sesi kompetisi/talkshow',
+      'Logo ukuran M di seluruh publikasi media cetak & digital serta baju panitia',
+      '3 Tiket Konser + slot presentasi panggung selama 5 menit',
+      'Konten promosi kolektif di media sosial',
+      'Laporan Dampak Pasca-Event'
+    ],
+    sponsors: []
+  },
+  {
+    id: 'silver',
+    name: 'Silver',
+    badge: '■ Event Partner',
+    contribution: 'Rp 5 - 10 Juta',
+    slots: 30,
+    bgColor: '#EFD4D4',
+    borderColor: '#EC4899',
+    textColor: '#04000D',
+    description: 'Paket kemitraan taktis untuk meningkatkan awareness brand ke ribuan audiens muda di Sulawesi Tengah.',
+    benefits: [
+      'Logo ukuran S/XS di media cetak & digital pendukung',
+      'Penyebutan nama brand (adlibs) oleh MC di sela-sela acara',
+      'Kolaborasi story tag dan penyebutan di postingan media sosial',
+      '1 - 2 Tiket Konser Masuk Umum',
+      'Kesempatan kontribusi dalam bentuk In-Kind (barang/jasa)'
+    ],
+    sponsors: []
+  },
+  {
+    id: 'support',
+    name: 'Support & In-Kind',
+    badge: '▲ Supporting Partner',
+    contribution: 'Mulai Rp 1 - 5 Juta',
+    slots: 12, // Let's make it look like a standard limit or just show 12 placeholders for clean grid
+    bgColor: '#FDF8FA',
+    borderColor: '#7B757C',
+    textColor: '#1D1B1D',
+    description: 'Kemitraan pendukung melalui dana tunai kecil atau penyediaan produk/jasa (in-kind) seperti konsumsi, transportasi, atau media partner.',
+    benefits: [
+      'Penyebutan nama brand oleh MC pada rangkaian pendukung',
+      'Logo ukuran XS di halaman khusus website & media digital',
+      'In-Kind dikonversi ke Rupiah sesuai harga pasar untuk menentukan level setara',
+      'Penyediaan fasilitas/layanan promosi bersama secara fleksibel'
+    ],
+    sponsors: []
+  }
 ]
 
 onMounted(() => {
@@ -2977,6 +3109,179 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
+    <!-- SECTION I: "SPONSORSHIP OPPORTUNITIES" / SCHEMES -->
+    <section id="kemitraan-schemes" class="bg-off-white riso-canvas py-16 sm:py-20 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+      <!-- Background Decorative Stamp Shards -->
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'cat1 1.webp')" 
+        alt="Decorative Riso Plate Shard" 
+        class="absolute top-16 -left-16 w-36 md:w-56 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
+
+      <div class="max-w-container-max mx-auto relative z-10">
+        <!-- Section Header -->
+        <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <p class="font-mono text-[#04000D] text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-bold">SPONSORSHIP SCHEMES</p>
+            <h2 class="font-bold text-3xl sm:text-4xl md:text-6xl tracking-tighter text-[#04000D] riso-text-shadow-magenta riso-bleed">Simfoni Kemitraan.</h2>
+            <p class="font-body-md text-base md:text-lg text-[#04000D]/70 max-w-2xl mt-4">
+              Pilih tingkat kontribusi yang sesuai dengan tujuan brand Anda. Mulai dari kemitraan taktis lokal hingga co-owner event berskala nasional.
+            </p>
+          </div>
+          <!-- Download Proposal CTA -->
+          <div class="flex-shrink-0">
+            <a 
+              :href="getAsset(dokumenAssetModules, 'dokumen', 'Proposal Umum - I-Fest HMTI UNTAD 2026 - Rekomendasi Rektor.pdf')"
+              download
+              class="riso-btn-plate px-6 py-3.5 bg-[#04000D] text-white font-mono text-sm font-bold uppercase tracking-wider rounded-none inline-flex items-center gap-2.5 transition-transform hover:-translate-y-0.5 active:translate-y-0 shadow-[4px_4px_0px_0px_#FF3D8B]"
+              style="--plate-color: #FDE047;"
+            >
+              <Download class="w-4 h-4 text-white" stroke-width="2.5" />
+              Unduh Proposal Umum
+            </a>
+          </div>
+        </div>
+
+        <!-- Interactive Tabs Navigation -->
+        <div class="mb-10 overflow-x-auto pb-4 scrollbar-thin select-none">
+          <div class="flex gap-2 min-w-max border-b border-[#04000D]/20 pb-3">
+            <button
+              v-for="scheme in partnershipSchemes"
+              :key="scheme.id"
+              @click="activeSchemeTab = scheme.id"
+              class="font-mono text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 border-2 border-[#04000D] transition-all duration-150 rounded-none relative"
+              :class="activeSchemeTab === scheme.id ? 'bg-[#04000D] text-[#FDE047] shadow-[3px_3px_0px_0px_#FF3D8B] -translate-x-[2px] -translate-y-[2px]' : 'bg-white text-[#04000D] hover:bg-off-white hover:border-[#04000D] shadow-none'"
+            >
+              {{ scheme.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Tab Content Panel -->
+        <div v-for="scheme in partnershipSchemes" :key="scheme.id">
+          <div v-if="activeSchemeTab === scheme.id" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
+            
+            <!-- Left Column: Scheme Details Card (Brutalist style) -->
+            <div 
+              class="lg:col-span-7 border-4 border-[#04000D] bg-white p-6 sm:p-8 md:p-10 shadow-[8px_8px_0px_0px_#04000D] relative overflow-hidden"
+              :style="{ borderTopColor: scheme.borderColor }"
+            >
+              <!-- Decorative Top Accent Bar -->
+              <div class="absolute top-0 left-0 right-0 h-2.5" :style="{ backgroundColor: scheme.borderColor }"></div>
+              
+              <!-- Badge & Tier Info -->
+              <div class="flex flex-wrap items-center justify-between gap-4 mb-6 mt-2">
+                <span 
+                  class="font-mono text-xs font-bold uppercase tracking-widest px-3 py-1.5 border-2 border-[#04000D] shadow-[2px_2px_0px_0px_#04000D]"
+                  :style="{ backgroundColor: scheme.bgColor, color: scheme.textColor }"
+                >
+                  {{ scheme.badge }}
+                </span>
+                <span class="font-mono text-sm font-black text-[#04000D]/60 uppercase">
+                  Kuota: {{ scheme.slots === 99 ? 'Terbatas / Negosiasi' : `${scheme.slots} Slot` }}
+                </span>
+              </div>
+
+              <!-- Price & Title -->
+              <h3 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[#04000D] tracking-tight mb-2">
+                Tier {{ scheme.name }}
+              </h3>
+              <p class="font-mono text-xl sm:text-2xl font-black text-[#FF3D8B] riso-text-shadow-tight-dark mb-6">
+                {{ scheme.contribution }}
+              </p>
+              
+              <p class="font-body-md text-base md:text-lg text-[#04000D]/85 leading-relaxed mb-8 border-b border-dashed border-[#04000D]/10 pb-6">
+                {{ scheme.description }}
+              </p>
+
+              <!-- Benefits List -->
+              <div>
+                <h4 class="font-mono text-xs uppercase tracking-wider text-[#04000D]/50 font-black mb-4 flex items-center gap-2">
+                  <span>✦ HAK &amp; BENEFIT UTAMA MITRA ✦</span>
+                </h4>
+                <ul class="space-y-4">
+                  <li 
+                    v-for="(benefit, idx) in scheme.benefits" 
+                    :key="idx"
+                    class="flex items-start gap-3 text-sm sm:text-base text-[#04000D]/90"
+                  >
+                    <Check class="w-5 h-5 text-[#04000D] flex-shrink-0 mt-0.5" stroke-width="3" />
+                    <span>{{ benefit }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Right Column: Sponsor Logo Grid (Visual Status / Placeholders) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+              <div class="border-2 border-[#04000D] bg-white p-5 md:p-6 shadow-[5px_5px_0px_0px_#04000D]">
+                <h4 class="font-mono text-xs uppercase tracking-widest text-[#04000D] font-black mb-4 text-center pb-3 border-b border-dashed border-[#04000D]/20">
+                  ✦ ALOKASI LOGO &amp; SPONSOR ✦
+                </h4>
+                
+                <!-- If sponsors are populated -->
+                <div v-if="scheme.sponsors.length > 0" class="grid grid-cols-2 gap-4 items-center justify-items-center mb-4">
+                  <div 
+                    v-for="(sponsor, index) in scheme.sponsors" 
+                    :key="index"
+                    class="border border-[#04000D]/15 p-4 bg-off-white/40 flex items-center justify-center rounded w-full h-24 relative group"
+                  >
+                    <img :src="sponsor.logo" :alt="sponsor.name" class="max-h-16 w-auto object-contain" />
+                    <div class="absolute inset-0 bg-[#04000D]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2 text-center">
+                      <span class="text-white font-mono text-xs font-bold uppercase tracking-wider">{{ sponsor.name }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Open Placeholder Slots (Invitations to Join) -->
+                <div>
+                  <p class="font-mono text-[10px] text-[#04000D]/50 uppercase tracking-widest mb-3 font-bold text-center">
+                    {{ scheme.sponsors.length > 0 ? 'SLOT TERSEDIA LAINNYA' : 'BELUM ADA LOGO TERPASANG (SLOT TERBUKA)' }}
+                  </p>
+                  
+                  <div class="grid grid-cols-2 gap-4">
+                    <!-- Loop for remaining empty slots, capped for display purposes if support -->
+                    <a
+                      v-for="i in Math.min(scheme.slots, 6)"
+                      :key="i"
+                      :href="`https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20tertarik%20untuk%20bermitra%20dalam%20skema%20${scheme.name}%20di%20I-FEST%202026.%20Boleh%20saya%20mendapatkan%20informasi%20lebih%20lanjut%3F`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="border-2 border-dashed border-[#04000D]/30 p-4 bg-off-white/30 hover:bg-[#FDE047]/10 hover:border-[#FF3D8B]/50 transition-all duration-200 flex flex-col items-center justify-center text-center gap-2 h-28 cursor-pointer group"
+                    >
+                      <Plus class="w-5 h-5 text-[#04000D]/40 group-hover:text-[#FF3D8B] group-hover:scale-110 transition-transform duration-200" stroke-width="2.5" />
+                      <span class="font-mono text-[10px] md:text-xs font-black uppercase text-[#04000D]/50 tracking-wider group-hover:text-[#FF3D8B]">
+                        Slot {{ i }} Tersedia
+                      </span>
+                    </a>
+                  </div>
+
+                  <!-- WhatsApp PIC Contact Card -->
+                  <div class="mt-6 pt-5 border-t border-dashed border-[#04000D]/10 text-center">
+                    <p class="font-body-md text-xs sm:text-sm text-[#04000D]/75 leading-relaxed mb-4">
+                      Tertarik mengklaim slot ini untuk perusahaan atau instansi Anda? Hubungi Divisi Sponsorship kami langsung.
+                    </p>
+                    <a
+                      :href="`https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20tertarik%20untuk%20bermitra%20dalam%20skema%20${scheme.name}%20di%20I-FEST%202026.%20Boleh%20saya%20mendapatkan%20informasi%20lebih%20lanjut%3F`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-2 font-mono text-xs font-black text-[#FF3D8B] hover:text-[#04000D] transition-colors uppercase tracking-widest"
+                    >
+                      Hubungi Fauzi via WhatsApp
+                      <ExternalLink class="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- SECTION J: "OUR NETWORK" / SPONSOR HIERARCHY (Placed right above the Footer) -->
     <section id="partners" class="bg-white riso-canvas py-12 sm:py-16 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
@@ -3251,6 +3556,7 @@ onBeforeUnmount(() => {
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#8839FF]/30 hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'bph-matrix' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#bph-matrix">Orkestrasi</a>
+        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'kemitraan-schemes' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#kemitraan-schemes">Kemitraan</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
     </div>
@@ -3276,6 +3582,7 @@ onBeforeUnmount(() => {
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'bph-matrix' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#bph-matrix">Orkestrasi</a>
+        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'kemitraan-schemes' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#kemitraan-schemes">Kemitraan</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
 
