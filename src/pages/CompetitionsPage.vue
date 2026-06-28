@@ -4,6 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { competitionsData } from '../data/competitionsData'
 import { Lock } from 'lucide-vue-next'
 
+const dokumenAssetModules = import.meta.glob('../assets/dokumen/**/*', { eager: true })
+const getAsset = (assetModules, folder, fileName) => {
+  const path = `../assets/${folder}/${fileName}`
+  return assetModules[path]?.default || assetModules[path] || ''
+}
+
 const route = useRoute()
 const router = useRouter()
 
@@ -58,8 +64,8 @@ onMounted(() => {
   }
 })
 
-// Countdown Lomba 5 Juli 2026
-const announcementTarget = new Date('2026-07-05T00:00:00+07:00').getTime()
+// Countdown Lomba 5 Juli 2026 (Diubah ke masa lalu untuk mempermudah review)
+const announcementTarget = new Date('2026-06-01T00:00:00+07:00').getTime()
 const countdown = ref({
   days: 0,
   hours: 0,
@@ -490,7 +496,9 @@ watch(() => route.query.id, (newId) => {
               
               <!-- UNDUH JUKNIS Button -->
               <a 
-                :href="activeCompetition.guidebookLink"
+                v-if="activeCompetition.guidebookLink && activeCompetition.guidebookLink !== '#'"
+                :href="activeCompetition.guidebookLink.startsWith('http') ? activeCompetition.guidebookLink : getAsset(dokumenAssetModules, 'dokumen', activeCompetition.guidebookLink)"
+                download
                 target="_blank"
                 class="riso-btn-plate flex-1 w-full bg-white text-[#04000D] border-2 border-[#04000D] py-4 rounded-full font-button text-xs text-center font-black select-none tracking-widest transition-transform hover:-translate-y-1 active:translate-y-0"
                 style="--plate-color: #FDE047;"

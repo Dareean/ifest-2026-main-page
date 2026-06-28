@@ -1256,6 +1256,11 @@ onBeforeUnmount(() => {
         alt="Decorative Riso Plate Shard" 
         class="absolute top-10 right-10 w-36 md:w-56 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'rg3 1.webp')" 
+        alt="Decorative Riso Plate Shard" 
+        class="absolute bottom-12 left-10 w-24 md:w-36 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
       
       <div class="max-w-container-max mx-auto relative z-10">
         
@@ -1390,6 +1395,11 @@ onBeforeUnmount(() => {
         :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.webp')" 
         alt="Decorative Riso Stamp Shard" 
         class="absolute -top-12 -right-16 w-36 md:w-56 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sr1 1.webp')" 
+        alt="Decorative Riso Stamp Shard" 
+        class="absolute top-24 left-10 w-24 md:w-36 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
       />
       <img 
         :src="getAsset(visualAssetModules, 'visual_assets', 'sb3 1.webp')" 
@@ -1740,6 +1750,18 @@ onBeforeUnmount(() => {
     <section id="timeline" class="bg-off-white riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 animate-fade-in relative overflow-hidden" data-reveal>
       <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.02] pointer-events-none z-0"></div>
       <div class="absolute inset-0 bg-noise-grain opacity-[0.015] pointer-events-none z-0"></div>
+
+      <!-- Background decorative riso shards -->
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sy1 1.webp')" 
+        alt="Decorative Riso Stamp Shard" 
+        class="absolute top-24 -left-12 w-28 md:w-44 opacity-20 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'sp1 1.webp')" 
+        alt="Decorative Riso Stamp Shard" 
+        class="absolute bottom-12 -right-16 w-36 md:w-56 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
 
       <div class="max-w-container-max mx-auto relative z-10">
         
@@ -2780,6 +2802,18 @@ onBeforeUnmount(() => {
 
     <!-- SECTION BPH: Core Management BPH (Command Matrix) -->
     <section id="bph-matrix" class="bg-[#F5F5F5] riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-b border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
+      <!-- Background decorative riso shards -->
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'rp2 1.webp')" 
+        alt="Decorative Riso Stamp Shard" 
+        class="absolute top-24 -left-12 w-24 md:w-36 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
+      <img 
+        :src="getAsset(visualAssetModules, 'visual_assets', 'ry5 1.webp')" 
+        alt="Decorative Riso Stamp Shard" 
+        class="absolute bottom-16 -right-12 w-28 md:w-40 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
+      />
+
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
@@ -3127,18 +3161,6 @@ onBeforeUnmount(() => {
           <div>
             <p class="font-mono text-[#04000D] text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-bold">PARTNERSHIP HIERARCHY</p>
             <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter text-[#04000D] riso-text-shadow-magenta riso-bleed">Ekosistem Kolaborasi.</h2>
-          </div>
-          <!-- Download Proposal CTA -->
-          <div class="flex-shrink-0">
-            <a 
-              :href="getAsset(dokumenAssetModules, 'dokumen', 'Proposal Umum - I-Fest HMTI UNTAD 2026 - Rekomendasi Rektor.pdf')"
-              download
-              class="riso-btn-plate px-5 py-3 bg-[#04000D] text-white font-mono text-xs font-bold uppercase tracking-wider rounded-none inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 active:translate-y-0 shadow-[3px_3px_0px_0px_#FF3D8B]"
-              style="--plate-color: #FDE047;"
-            >
-              <Download class="w-3.5 h-3.5 text-white" stroke-width="2.5" />
-              Unduh Proposal Umum
-            </a>
           </div>
         </div>
 

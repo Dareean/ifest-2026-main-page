@@ -4,64 +4,61 @@ export const competitionsData = [
     title: "Competitive Programming",
     scale: "Nasional",
     tagline: "ALGORITMA & PROBLEM SOLVING",
-    fee: "Rp 100.000 / Tim",
-    target: "SMA/SMK & Mahasiswa",
-    teamRequirements: "Individu / Tim (Maks. 3 orang)",
-    languages: "C, C++, Python, Java",
-    babak: "Online + Final Offline",
+    fee: "Rp 50.000 / Tim",
+    target: "Terbuka untuk Umum (Usia 16-25 Tahun)",
+    teamRequirements: "Tim (2-3 Orang)",
+    languages: "Semua Bahasa Pemrograman (Platform HackerRank)",
+    babak: "Penyisihan & Final Online",
     cardBg: "#DCEEB1",
     accentColor: "#FF3D8B",
     textColor: "#04000D",
     description: "Uji ketajaman pemikiran logis dan kecepatan menyelesaikan persoalan algoritma kompleks di bawah tekanan waktu yang ketat.",
-    longDescription: "Competitive Programming IFeST 2026 adalah ajang kompetisi pemrograman tingkat nasional yang menantang para pelajar dan mahasiswa di seluruh Indonesia untuk memecahkan berbagai persoalan algoritma dan matematika yang kompleks secara cepat dan tepat. Peserta akan dituntut merancang algoritma dengan kompleksitas waktu dan memori yang optimal untuk menyelesaikan skenario problem statement yang diberikan juri.",
+    longDescription: "Competitive Programming I-FEST 2026 adalah ajang kompetisi pemrograman tingkat nasional yang menantang para pelajar dan mahasiswa di seluruh Indonesia untuk memecahkan berbagai persoalan algoritma dan matematika yang kompleks secara daring menggunakan platform HackerRank. Peserta dituntut untuk memecahkan soal algoritma dengan efisiensi memori dan waktu yang optimal.",
     subThemes: [
-      "Optimalisasi Algoritma Graf dan Pohon (Trees)",
-      "Dynamic Programming untuk Efisiensi Komputasi",
-      "Struktur Data Kustom (Segment Tree, Fenwick, Triangles)",
-      "Teori Bilangan dan Kombinatorika Tingkat Lanjut"
+      "Optimalizations: Dynamic Programming, Graph & Trees, advanced data structures (Segment Tree, Fenwick, Triangles), and Number Theory."
     ],
     rules: [
-      "Satu tim terdiri dari maksimal 3 orang dari institusi/sekolah yang sama.",
-      "Bahasa pemrograman yang diizinkan adalah C, C++, Python, dan Java.",
-      "Babak penyisihan dilakukan secara online, di mana tim akan memperebutkan skor tertinggi di platform competitive programming terstandarisasi.",
-      "Babak final akan diselenggarakan secara tatap muka (offline) di Universitas Tadulako.",
-      "Dilarang keras melakukan kecurangan seperti plagiarisme kode atau bertukar jawaban antar tim. Pelanggaran berakibat diskualifikasi instan."
+      "Perlombaan bersifat kelompok yang terdiri dari 2-3 orang/tim.",
+      "Terbuka untuk umum dengan batasan usia 16 - 25 tahun.",
+      "Seluruh babak (penyisihan & final) dilaksanakan secara daring (online) melalui platform HackerRank.",
+      "Di babak penyisihan, setiap tim memiliki hak untuk menggunakan maksimal 3 komputer/laptop dengan webcam menyala (open camera & share screen).",
+      "Dilarang keras menggunakan bantuan AI, melakukan kecurangan seperti plagiarisme kode, atau bertukar jawaban antar tim."
     ],
-    schedule: "Pendaftaran: Juni 2026 | Penyisihan Online: Juli 2026 | Final Offline: Agustus 2026",
-    registrationLink: "#detail-kegiatan",
-    guidebookLink: "https://saweria.co/"
+    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Penyisihan: 24 Agustus 2026 | Final: 3 September 2026",
+    registrationLink: "https://forms.gle/PiRWMLUo9NyKS6Kc8",
+    guidebookLink: "Arena Inovasi Digital/Lomba Competitive Programing/JUKNIS_COMPETITIVE_PROGRAMING.docx"
   },
   {
     id: "NAT-02",
     title: "UI/UX Design",
     scale: "Nasional",
     tagline: "DESAIN DIGITAL BERDAMPAK",
-    fee: "Rp 85.000 / Tim",
-    target: "Terbuka untuk Umum",
-    teamRequirements: "Tim (Maks. 3 orang)",
-    languages: "Figma, Adobe XD, Sketch, Spline",
-    babak: "Kualifikasi Online + Final",
+    fee: "Rp 50.000 / Tim",
+    target: "Terbuka untuk Umum (Usia 17-25 Tahun)",
+    teamRequirements: "Tim (3 Orang)",
+    languages: "Figma, Adobe XD, atau sejenisnya",
+    babak: "Kualifikasi Proposal + Final Online",
     cardBg: "#EFD4D4",
     accentColor: "#FF3D8B",
     textColor: "#04000D",
     description: "Rancang solusi antarmuka digital yang intuitif, inklusif, dan memecahkan permasalahan nyata masyarakat secara kreatif.",
-    longDescription: "UI/UX Design Competition IFeST 2026 mengajak para desainer digital untuk berinovasi merancang purwarupa (high-fidelity prototype) aplikasi mobile maupun web yang fungsional dan ramah pengguna. Fokus utama kompetisi ini adalah memecahkan isu riil masyarakat menggunakan pendekatan metode Design Thinking, dengan hasil akhir berupa rancangan yang tidak hanya indah secara estetika tetapi juga berpusat pada kegunaan nyata (User-Centered Design).",
+    longDescription: "UI/UX Design Competition I-FEST 2026 mengajak desainer digital muda untuk merancang purwarupa (high-fidelity prototype) aplikasi mobile maupun web yang fungsional dan ramah pengguna berdasarkan Design Thinking. Fokus utama adalah memecahkan isu riil masyarakat menggunakan pendekatan User-Centered Design.",
     subThemes: [
-      "Inklusivitas Teknologi untuk Komunitas Disabilitas",
-      "Digitalisasi Layanan Publik & Smart City di Sulawesi Tengah",
-      "E-Health & Platform Dukungan Kesehatan Mental",
-      "Sistem Edukasi Interaktif untuk Daerah Terpencil"
+      "Smart Education: Solusi pembelajaran inklusif & berkualitas (SDG 4)",
+      "Digital Business & Entrepreneurship: Produktivitas & kewirausahaan (SDG 8/9)",
+      "Culture & Social Innovation: Pelestarian budaya & interaksi sosial (SDG 11/16)",
+      "Green Technology & Sustainability: Aksi peduli lingkungan & keberlanjutan (SDG 12/13)"
     ],
     rules: [
-      "Peserta tergabung dalam kelompok beranggotakan 2 hingga 3 orang.",
-      "Tema purwarupa harus memilih salah satu sub-tema yang disediakan.",
-      "Output yang wajib dikumpulkan meliputi: Dokumen UX Case Study (PDF) dan tautan prototype Figma yang aktif secara publik.",
-      "Design system harus dibuat secara mandiri tanpa menggunakan template UI Kit siap pakai instan secara utuh.",
-      "Finalis terpilih akan mempresentasikan hasil karya rancangan mereka di hadapan panel juri nasional."
+      "Perlombaan bersifat kelompok beranggotakan tepat 3 orang.",
+      "Setiap tim wajib mengumpulkan Dokumen Proposal UX Case Study (PDF), tautan Figma Prototype aktif, dan Video UI/UX Demo (3-10 menit).",
+      "Video demonstrasi wajib memuat perkenalan tim, masalah, solusi, penjelasan desain, dan diunggah ke Reels Instagram kolaborator.",
+      "Desain harus orisinal, belum pernah menjuarai kompetisi lain, dan tidak menggunakan UI Kit instan secara utuh.",
+      "Babak final diikuti oleh 5 tim terbaik yang akan mempresentasikan karya mereka secara online di hadapan juri."
     ],
-    schedule: "Pendaftaran: Juni 2026 | Pengumpulan UX Case Study: Juli 2026 | Presentasi Final: Agustus 2026",
-    registrationLink: "#detail-kegiatan",
-    guidebookLink: "https://saweria.co/"
+    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
+    registrationLink: "https://forms.gle/aud4FoHggF3qow1G8",
+    guidebookLink: "Arena Inovasi Digital/Lomba UI-UX/Juknis_UIUX_IFEST_2026.docx"
   },
   {
     id: "NAT-03",
@@ -90,73 +87,73 @@ export const competitionsData = [
       "Wajib menyertakan rancangan model monetisasi dan analisis SWOT yang komprehensif.",
       "Di babak final, peserta diwajibkan memaparkan Pitch Deck di hadapan investor dan juri profesional dalam durasi 10 menit presentasi + tanya jawab."
     ],
-    schedule: "Pendaftaran: Juni 2026 | Pengumpulan Proposal: Juli 2026 | Pitching Final: Agustus 2026",
+    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
     registrationLink: "#detail-kegiatan",
-    guidebookLink: "https://saweria.co/"
+    guidebookLink: "#"
   },
   {
     id: "REG-01",
     title: "Creative Video",
     scale: "Regional",
     tagline: "VIDEO EDUKATIF & KREATIF",
-    fee: "Gratis",
-    target: "Terbuka untuk Umum (Individu/Tim)",
-    teamRequirements: "Individu atau Tim (Maks. 3 orang)",
-    languages: "CapCut, Premiere, After Effects, DaVinci Resolve",
-    babak: "Kurasi Online + Showcase Expo",
+    fee: "Rp 25.000 / Orang",
+    target: "Terbuka untuk Umum (Usia 15-23 Tahun)",
+    teamRequirements: "Individu",
+    languages: "CapCut, Alight Motion, Premiere, dll.",
+    babak: "Kurasi Online (Reels Instagram)",
     cardBg: "#FFF9E6",
     accentColor: "#8839FF",
     textColor: "#04000D",
     description: "Salurkan kreativitas sinematik Anda untuk merancang video edukasi bertema Literasi Digital yang mampu menarik dan mengedukasi masyarakat luas.",
-    longDescription: "Creative Video Competition IFeST 2026 (Regional Sulawesi Tengah & Sekitarnya) bertujuan mendorong produksi konten kreatif yang bersifat edukatif. Peserta ditantang membuat video pendek yang memikat dengan memadukan unsur visual storytelling yang modern, humor, atau emosional untuk mengedukasi masyarakat mengenai pentingnya kecakapan digital, keamanan data pribadi, dan etika berselancar di internet.",
+    longDescription: "Creative Video Competition I-FEST 2026 adalah kompetisi multimedia tingkat regional untuk mewadahi ide kreatif, teknik visual, dan kemampuan storytelling. Peserta ditantang memproduksi video pendek edukatif berdurasi 30 detik hingga 2 menit dengan tema 'Youth Digital Orchestra : Exploring the Future Through Digital Creativity'.",
     subThemes: [
-      "Keamanan Data Pribadi dan Bahaya Social Engineering / Phishing",
-      "Etika Komunikasi Digital di Media Sosial (Anti Hoax & Cyberbullying)",
-      "Pemanfaatan AI secara Positif dan Produktif dalam Belajar",
-      "Jejak Digital: Dampak Rekam Jejak Online untuk Masa Depan"
+      "Kehidupan digital generasi muda & literasi digital",
+      "Perkembangan teknologi masa depan & Artificial Intelligence (AI)",
+      "Pemanfaatan media sosial secara bijak, etis, dan positif",
+      "Solusi inovasi digital untuk masyarakat dan transformasi teknologi harian"
     ],
     rules: [
-      "Terbuka untuk masyarakat umum regional Sulawesi Tengah dan sekitarnya.",
-      "Durasi video berkisar antara 1 hingga 3 menit (format portrait/landscape, disarankan resolusi minimal 1080p).",
-      "Video diunggah ke platform Instagram Reels atau TikTok dengan tag akun resmi @ifest_untad.",
-      "Konten video dilarang mengandung unsur SARA, pornografi, maupun ujaran kebencian.",
-      "Karya terbaik akan dipamerkan langsung di layar expo puncak acara IFeST 2026."
+      "Perlombaan bersifat individu dengan batasan usia peserta 15 - 23 tahun.",
+      "Video berdurasi minimal 30 detik dan maksimal 2 menit, resolusi minimal 1080p, format MP4.",
+      "Rasio video diperbolehkan 16:9 (Landscape) atau 9:16 (Portrait).",
+      "Karya diunggah sebagai Reels ke Instagram ketua tim dengan menandai akun @ifest_untad, akun tidak privat, dan menggunakan caption resmi.",
+      "Wajib menggunakan template logo panitia sebagai opening dan logo sponsor sebagai closing."
     ],
-    schedule: "Batas Unggah Video: Akhir Juli 2026 | Pengumuman & Penayangan Expo: Agustus 2026",
-    registrationLink: "#detail-kegiatan",
-    guidebookLink: "https://saweria.co/"
+    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Video: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026",
+    registrationLink: "https://forms.gle/2AaDqvh8ZKPa8etJA",
+    guidebookLink: "Arena Inovasi Digital/Lomba Video Kreatif/Juknis_Video Creatif_2026.docx"
   },
   {
     id: "REG-02",
     title: "Digital Education Poster",
     scale: "Regional",
     tagline: "DESAIN VISUAL EDUKATIF",
-    fee: "Gratis",
-    target: "SMA/SMK & Mahasiswa",
+    fee: "Rp 25.000 / Orang",
+    target: "Terbuka untuk Umum (Usia 15-23 Tahun)",
     teamRequirements: "Individu",
-    languages: "Canva, Illustrator, Photoshop, Figma",
-    babak: "Kurasi Online + Pameran Fisik Expo",
+    languages: "Canva, Illustrator, Photoshop, Figma, dll.",
+    babak: "Kurasi Online (Instagram Feed)",
     cardBg: "#EFE5FF",
     accentColor: "#8839FF",
     textColor: "#04000D",
     description: "Visualisasikan gagasan Anda dalam bentuk poster edukatif bertema literasi siber untuk menyampaikan pesan penting teknologi secara grafis.",
-    longDescription: "Digital Education Poster mengajak para desainer grafis muda tingkat regional untuk mengekspresikan gagasan dan pesan edukatif mereka secara visual. Melalui karya seni poster digital, peserta diharapkan mampu menyederhanakan pesan keamanan siber dan etika digital yang kompleks menjadi ilustrasi visual yang persuasif, komunikatif, mudah dipahami, serta memiliki daya tarik estetika tinggi.",
+    longDescription: "Digital Education Poster I-FEST 2026 mengajak desainer muda regional menyalurkan ide kreatif dan komunikatif lewat desain visual edukatif. Poster diharapkan menyederhanakan pesan inovasi teknologi menjadi konten visual yang menarik dan mendidik masyarakat umum.",
     subThemes: [
-      "Siber Aman: Melindungi Akun Media Sosial dari Peretasan",
-      "Melawan Berita Palsu (Hoax) dengan Teknik Tabayyun Digital",
-      "Netiket: Sopan Santun dalam Berkomentar di Jagat Digital",
-      "Kecanduan Layar Gadget: Cara Menjaga Keseimbangan Digital Well-being"
+      "Digital Education: Pemanfaatan teknologi digital untuk pendidikan berkualitas (SDG 4)",
+      "Green Technology: Peran teknologi dalam melestarikan lingkungan (SDG 13/15)",
+      "Creative Economy: Kreativitas teknologi untuk ekonomi inovatif (SDG 8)",
+      "Digital Inclusion: Pemerataan akses teknologi & literasi digital (SDG 10)"
     ],
     rules: [
-      "Peserta merupakan individu berstatus aktif sebagai pelajar SMA/SMK atau mahasiswa di Sulawesi.",
-      "Karya poster orisinal, belum pernah memenangkan kompetisi lain sebelumnya.",
-      "Format file pengumpulan: PDF & PNG resolusi cetak tinggi (A3 size, 300 DPI).",
-      "Ilustrasi tidak boleh melanggar hak cipta kekayaan intelektual pihak lain.",
-      "Poster terbaik akan dicetak langsung oleh panitia dan dipajang di galeri expo pameran seni IFeST 2026."
+      "Perlombaan bersifat individu dengan batasan usia peserta 15 - 23 tahun.",
+      "Karya dibuat dalam format A3 (29.7 x 42 cm), resolusi 300 DPI, format PNG/JPEG, portrait.",
+      "Karya diunggah sebagai Feed ke akun Instagram peserta (tidak privat) dengan menandai @ifest_untad, serta diunggah ke link formulir panitia.",
+      "Wajib menyertakan template logo resmi yang disediakan oleh panitia pada karya poster.",
+      "Karya harus orisinal, belum pernah memenangkan kompetisi lain, dan tidak mengandung SARA."
     ],
-    schedule: "Batas Pengiriman Poster: Juli 2026 | Pameran Fisik Expo: Agustus 2026",
-    registrationLink: "#detail-kegiatan",
-    guidebookLink: "https://saweria.co/"
+    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Karya: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026",
+    registrationLink: "https://forms.gle/n6YQRPEqUJX9PrHJ6",
+    guidebookLink: "Arena Inovasi Digital/Lomba Poster Edukasi/DIGITAL EDUCATION POSTER COMPETITION.docx"
   },
   {
     id: "REG-03",
@@ -188,6 +185,6 @@ export const competitionsData = [
     ],
     schedule: "Registrasi: Juni - Juli 2026 | Technical Briefing: Akhir Juli 2026 | Hackathon & Pitching: Agustus 2026",
     registrationLink: "#detail-kegiatan",
-    guidebookLink: "https://saweria.co/"
+    guidebookLink: "#"
   }
 ];

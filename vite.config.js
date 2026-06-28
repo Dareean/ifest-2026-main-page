@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
+  assetsInclude: ['**/*.docx', '**/*.xlsx'],
   plugins: [
     vue(),
     visualizer({
