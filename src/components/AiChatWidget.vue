@@ -203,7 +203,7 @@ const sendChatMessage = async (text) => {
 </script>
 
 <template>
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+  <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
     
     <!-- Chat Window Overlay with Slide-Up Transition -->
     <transition
@@ -214,7 +214,7 @@ const sendChatMessage = async (text) => {
       leave-from-class="opacity-100 translate-y-0 scale-100"
       leave-to-class="opacity-0 translate-y-8 scale-95"
     >
-      <div v-show="isChatOpen" class="w-[300px] sm:w-[360px] h-[450px] bg-white border-2 sm:border-3 border-[#04000D] flex flex-col justify-between overflow-hidden shadow-[6px_6px_0px_0px_#04000D] mb-4 select-none">
+      <div v-show="isChatOpen" class="w-[calc(100vw-32px)] sm:w-[360px] max-w-[360px] h-[450px] bg-white border-2 sm:border-3 border-[#04000D] flex flex-col justify-between overflow-hidden shadow-[6px_6px_0px_0px_#04000D] mb-4 select-none">
         
         <!-- Header Area -->
         <div class="bg-[#04000D] text-white px-4 py-3 flex justify-between items-center border-b-2 border-[#04000D]">

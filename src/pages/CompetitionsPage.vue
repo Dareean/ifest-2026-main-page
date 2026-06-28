@@ -227,36 +227,36 @@ watch(() => route.query.id, (newId) => {
           </p>
 
           <!-- Large Centered Countdown Timer -->
-          <div class="flex items-center gap-3 sm:gap-4 justify-center mb-8">
+          <div class="flex items-center gap-2 sm:gap-4 justify-center mb-8">
             <div class="flex flex-col items-center">
-              <div class="bg-white border-2 border-[#04000D] px-3.5 py-2 min-w-[60px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
-                <span class="font-mono text-xl sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.days) }}</span>
+              <div class="bg-white border-2 border-[#04000D] px-2 py-1 sm:px-3.5 sm:py-2 min-w-[50px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
+                <span class="font-mono text-lg sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.days) }}</span>
               </div>
-              <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">HARI</span>
+              <span class="font-mono text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">HARI</span>
             </div>
-            <span class="font-mono font-black text-xl text-[#04000D] mb-5">:</span>
+            <span class="font-mono font-black text-lg sm:text-xl text-[#04000D] mb-4 sm:mb-5">:</span>
 
             <div class="flex flex-col items-center">
-              <div class="bg-white border-2 border-[#04000D] px-3.5 py-2 min-w-[60px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
-                <span class="font-mono text-xl sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.hours) }}</span>
+              <div class="bg-white border-2 border-[#04000D] px-2 py-1 sm:px-3.5 sm:py-2 min-w-[50px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
+                <span class="font-mono text-lg sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.hours) }}</span>
               </div>
-              <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">JAM</span>
+              <span class="font-mono text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">JAM</span>
             </div>
-            <span class="font-mono font-black text-xl text-[#04000D] mb-5">:</span>
+            <span class="font-mono font-black text-lg sm:text-xl text-[#04000D] mb-4 sm:mb-5">:</span>
 
             <div class="flex flex-col items-center">
-              <div class="bg-white border-2 border-[#04000D] px-3.5 py-2 min-w-[60px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
-                <span class="font-mono text-xl sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.minutes) }}</span>
+              <div class="bg-white border-2 border-[#04000D] px-2 py-1 sm:px-3.5 sm:py-2 min-w-[50px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
+                <span class="font-mono text-lg sm:text-2xl font-black text-[#04000D] tracking-tight">{{ formatTimeNumber(countdown.minutes) }}</span>
               </div>
-              <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">MENIT</span>
+              <span class="font-mono text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">MENIT</span>
             </div>
-            <span class="font-mono font-black text-xl text-[#04000D] mb-5">:</span>
+            <span class="font-mono font-black text-lg sm:text-xl text-[#04000D] mb-4 sm:mb-5">:</span>
 
             <div class="flex flex-col items-center">
-              <div class="bg-white border-2 border-[#04000D] px-3.5 py-2 min-w-[60px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
-                <span class="font-mono text-xl sm:text-2xl font-black text-[#FF3D8B] tracking-tight">{{ formatTimeNumber(countdown.seconds) }}</span>
+              <div class="bg-white border-2 border-[#04000D] px-2 py-1 sm:px-3.5 sm:py-2 min-w-[50px] sm:min-w-[72px] text-center shadow-[3px_3px_0px_0px_#04000D]">
+                <span class="font-mono text-lg sm:text-2xl font-black text-[#FF3D8B] tracking-tight">{{ formatTimeNumber(countdown.seconds) }}</span>
               </div>
-              <span class="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">DETIK</span>
+              <span class="font-mono text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-[#04000D]/55 mt-2.5">DETIK</span>
             </div>
           </div>
 
