@@ -25,7 +25,7 @@ const onLoaded = () => {
 
   <!-- Main Routed Application Shell -->
   <div 
-    class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text pb-12 transition-all duration-700 ease-out"
+    class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text transition-all duration-700 ease-out"
     :class="{ 'opacity-0 scale-[0.98] pointer-events-none h-screen overflow-hidden': !showContent }"
   >
     <router-view v-slot="{ Component, route }">

@@ -77,7 +77,7 @@ const activeSection = ref('')
 
 const handleScroll = () => {
   const scrollPosition = window.scrollY + 180 // Navbar offset + padding
-  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'bph-matrix', 'kemitraan-schemes', 'partners']
+  const sections = ['roadshow-section', 'competitions-section', 'timeline', 'galeri-jejak-langkah', 'bph-matrix', 'partners']
   
   let currentActive = ''
   for (const id of sections) {
@@ -1145,7 +1145,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div 
-    class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text pb-12 transition-all duration-700 ease-out"
+    class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text transition-all duration-700 ease-out"
   >
 
     <!-- SECTION B: Hero Section (Tactile Colored Paper Canvas) -->
@@ -3109,178 +3109,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <!-- SECTION I: "SPONSORSHIP OPPORTUNITIES" / SCHEMES -->
-    <section id="kemitraan-schemes" class="bg-off-white riso-canvas py-16 sm:py-20 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
-      <!-- Background Decorative Stamp Shards -->
-      <img 
-        :src="getAsset(visualAssetModules, 'visual_assets', 'cat1 1.webp')" 
-        alt="Decorative Riso Plate Shard" 
-        class="absolute top-16 -left-16 w-36 md:w-56 opacity-15 mix-blend-multiply contrast-125 pointer-events-none z-0 hidden md:block" 
-      />
 
-      <div class="max-w-container-max mx-auto relative z-10">
-        <!-- Section Header -->
-        <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <p class="font-mono text-[#04000D] text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-bold">SPONSORSHIP SCHEMES</p>
-            <h2 class="font-bold text-3xl sm:text-4xl md:text-6xl tracking-tighter text-[#04000D] riso-text-shadow-magenta riso-bleed">Simfoni Kemitraan.</h2>
-            <p class="font-body-md text-base md:text-lg text-[#04000D]/70 max-w-2xl mt-4">
-              Pilih tingkat kontribusi yang sesuai dengan tujuan brand Anda. Mulai dari kemitraan taktis lokal hingga co-owner event berskala nasional.
-            </p>
-          </div>
-          <!-- Download Proposal CTA -->
-          <div class="flex-shrink-0">
-            <a 
-              :href="getAsset(dokumenAssetModules, 'dokumen', 'Proposal Umum - I-Fest HMTI UNTAD 2026 - Rekomendasi Rektor.pdf')"
-              download
-              class="riso-btn-plate px-6 py-3.5 bg-[#04000D] text-white font-mono text-sm font-bold uppercase tracking-wider rounded-none inline-flex items-center gap-2.5 transition-transform hover:-translate-y-0.5 active:translate-y-0 shadow-[4px_4px_0px_0px_#FF3D8B]"
-              style="--plate-color: #FDE047;"
-            >
-              <Download class="w-4 h-4 text-white" stroke-width="2.5" />
-              Unduh Proposal Umum
-            </a>
-          </div>
-        </div>
-
-        <!-- Interactive Tabs Navigation -->
-        <div class="mb-10 overflow-x-auto pb-4 scrollbar-thin select-none">
-          <div class="flex gap-2 min-w-max border-b border-[#04000D]/20 pb-3">
-            <button
-              v-for="scheme in partnershipSchemes"
-              :key="scheme.id"
-              @click="activeSchemeTab = scheme.id"
-              class="font-mono text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 border-2 border-[#04000D] transition-all duration-150 rounded-none relative"
-              :class="activeSchemeTab === scheme.id ? 'bg-[#04000D] text-[#FDE047] shadow-[3px_3px_0px_0px_#FF3D8B] -translate-x-[2px] -translate-y-[2px]' : 'bg-white text-[#04000D] hover:bg-off-white hover:border-[#04000D] shadow-none'"
-            >
-              {{ scheme.name }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Active Tab Content Panel -->
-        <div v-for="scheme in partnershipSchemes" :key="scheme.id">
-          <div v-if="activeSchemeTab === scheme.id" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
-            
-            <!-- Left Column: Scheme Details Card (Brutalist style) -->
-            <div 
-              class="lg:col-span-7 border-4 border-[#04000D] bg-white p-6 sm:p-8 md:p-10 shadow-[8px_8px_0px_0px_#04000D] relative overflow-hidden"
-              :style="{ borderTopColor: scheme.borderColor }"
-            >
-              <!-- Decorative Top Accent Bar -->
-              <div class="absolute top-0 left-0 right-0 h-2.5" :style="{ backgroundColor: scheme.borderColor }"></div>
-              
-              <!-- Badge & Tier Info -->
-              <div class="flex flex-wrap items-center justify-between gap-4 mb-6 mt-2">
-                <span 
-                  class="font-mono text-xs font-bold uppercase tracking-widest px-3 py-1.5 border-2 border-[#04000D] shadow-[2px_2px_0px_0px_#04000D]"
-                  :style="{ backgroundColor: scheme.bgColor, color: scheme.textColor }"
-                >
-                  {{ scheme.badge }}
-                </span>
-                <span class="font-mono text-sm font-black text-[#04000D]/60 uppercase">
-                  Kuota: {{ scheme.slots === 99 ? 'Terbatas / Negosiasi' : `${scheme.slots} Slot` }}
-                </span>
-              </div>
-
-              <!-- Price & Title -->
-              <h3 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[#04000D] tracking-tight mb-2">
-                Tier {{ scheme.name }}
-              </h3>
-              <p class="font-mono text-xl sm:text-2xl font-black text-[#FF3D8B] riso-text-shadow-tight-dark mb-6">
-                {{ scheme.contribution }}
-              </p>
-              
-              <p class="font-body-md text-base md:text-lg text-[#04000D]/85 leading-relaxed mb-8 border-b border-dashed border-[#04000D]/10 pb-6">
-                {{ scheme.description }}
-              </p>
-
-              <!-- Benefits List -->
-              <div>
-                <h4 class="font-mono text-xs uppercase tracking-wider text-[#04000D]/50 font-black mb-4 flex items-center gap-2">
-                  <span>✦ HAK &amp; BENEFIT UTAMA MITRA ✦</span>
-                </h4>
-                <ul class="space-y-4">
-                  <li 
-                    v-for="(benefit, idx) in scheme.benefits" 
-                    :key="idx"
-                    class="flex items-start gap-3 text-sm sm:text-base text-[#04000D]/90"
-                  >
-                    <Check class="w-5 h-5 text-[#04000D] flex-shrink-0 mt-0.5" stroke-width="3" />
-                    <span>{{ benefit }}</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- Right Column: Sponsor Logo Grid (Visual Status / Placeholders) -->
-            <div class="lg:col-span-5 flex flex-col gap-6">
-              <div class="border-2 border-[#04000D] bg-white p-5 md:p-6 shadow-[5px_5px_0px_0px_#04000D]">
-                <h4 class="font-mono text-xs uppercase tracking-widest text-[#04000D] font-black mb-4 text-center pb-3 border-b border-dashed border-[#04000D]/20">
-                  ✦ ALOKASI LOGO &amp; SPONSOR ✦
-                </h4>
-                
-                <!-- If sponsors are populated -->
-                <div v-if="scheme.sponsors.length > 0" class="grid grid-cols-2 gap-4 items-center justify-items-center mb-4">
-                  <div 
-                    v-for="(sponsor, index) in scheme.sponsors" 
-                    :key="index"
-                    class="border border-[#04000D]/15 p-4 bg-off-white/40 flex items-center justify-center rounded w-full h-24 relative group"
-                  >
-                    <img :src="sponsor.logo" :alt="sponsor.name" class="max-h-16 w-auto object-contain" />
-                    <div class="absolute inset-0 bg-[#04000D]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2 text-center">
-                      <span class="text-white font-mono text-xs font-bold uppercase tracking-wider">{{ sponsor.name }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Open Placeholder Slots (Invitations to Join) -->
-                <div>
-                  <p class="font-mono text-[10px] text-[#04000D]/50 uppercase tracking-widest mb-3 font-bold text-center">
-                    {{ scheme.sponsors.length > 0 ? 'SLOT TERSEDIA LAINNYA' : 'BELUM ADA LOGO TERPASANG (SLOT TERBUKA)' }}
-                  </p>
-                  
-                  <div class="grid grid-cols-2 gap-4">
-                    <!-- Loop for remaining empty slots, capped for display purposes if support -->
-                    <a
-                      v-for="i in Math.min(scheme.slots, 6)"
-                      :key="i"
-                      :href="`https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20tertarik%20untuk%20bermitra%20dalam%20skema%20${scheme.name}%20di%20I-FEST%202026.%20Boleh%20saya%20mendapatkan%20informasi%20lebih%20lanjut%3F`"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="border-2 border-dashed border-[#04000D]/30 p-4 bg-off-white/30 hover:bg-[#FDE047]/10 hover:border-[#FF3D8B]/50 transition-all duration-200 flex flex-col items-center justify-center text-center gap-2 h-28 cursor-pointer group"
-                    >
-                      <Plus class="w-5 h-5 text-[#04000D]/40 group-hover:text-[#FF3D8B] group-hover:scale-110 transition-transform duration-200" stroke-width="2.5" />
-                      <span class="font-mono text-[10px] md:text-xs font-black uppercase text-[#04000D]/50 tracking-wider group-hover:text-[#FF3D8B]">
-                        Slot {{ i }} Tersedia
-                      </span>
-                    </a>
-                  </div>
-
-                  <!-- WhatsApp PIC Contact Card -->
-                  <div class="mt-6 pt-5 border-t border-dashed border-[#04000D]/10 text-center">
-                    <p class="font-body-md text-xs sm:text-sm text-[#04000D]/75 leading-relaxed mb-4">
-                      Tertarik mengklaim slot ini untuk perusahaan atau instansi Anda? Hubungi Divisi Sponsorship kami langsung.
-                    </p>
-                    <a
-                      :href="`https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20tertarik%20untuk%20bermitra%20dalam%20skema%20${scheme.name}%20di%20I-FEST%202026.%20Boleh%20saya%20mendapatkan%20informasi%20lebih%20lanjut%3F`"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center gap-2 font-mono text-xs font-black text-[#FF3D8B] hover:text-[#04000D] transition-colors uppercase tracking-widest"
-                    >
-                      Hubungi Fauzi via WhatsApp
-                      <ExternalLink class="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            
-          </div>
-        </div>
-
-      </div>
-    </section>
 
     <!-- SECTION J: "OUR NETWORK" / SPONSOR HIERARCHY (Placed right above the Footer) -->
     <section id="partners" class="bg-white riso-canvas py-12 sm:py-16 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
@@ -3294,9 +3123,23 @@ onBeforeUnmount(() => {
       <div class="max-w-container-max mx-auto relative z-10">
         
         <!-- Section Header -->
-        <div class="mb-10">
-          <p class="font-mono text-[#04000D] text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-bold">PARTNERSHIP HIERARCHY</p>
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter text-[#04000D] riso-text-shadow-magenta riso-bleed">Ekosistem Kolaborasi.</h2>
+        <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <p class="font-mono text-[#04000D] text-xs md:text-sm uppercase tracking-[0.25em] mb-4 font-bold">PARTNERSHIP HIERARCHY</p>
+            <h2 class="font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter text-[#04000D] riso-text-shadow-magenta riso-bleed">Ekosistem Kolaborasi.</h2>
+          </div>
+          <!-- Download Proposal CTA -->
+          <div class="flex-shrink-0">
+            <a 
+              :href="getAsset(dokumenAssetModules, 'dokumen', 'Proposal Umum - I-Fest HMTI UNTAD 2026 - Rekomendasi Rektor.pdf')"
+              download
+              class="riso-btn-plate px-5 py-3 bg-[#04000D] text-white font-mono text-xs font-bold uppercase tracking-wider rounded-none inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 active:translate-y-0 shadow-[3px_3px_0px_0px_#FF3D8B]"
+              style="--plate-color: #FDE047;"
+            >
+              <Download class="w-3.5 h-3.5 text-white" stroke-width="2.5" />
+              Unduh Proposal Umum
+            </a>
+          </div>
         </div>
 
         <!-- Stamped Organizer Logos -->
@@ -3385,6 +3228,161 @@ onBeforeUnmount(() => {
 
         <!-- HAIRLINE DIVIDER -->
         <div class="border-b border-[#04000D]/10 mb-16"></div>
+
+        <!-- SUBSECTION: SKEMA & PAKET KEMITRAAN -->
+        <div class="mb-12">
+          <p class="font-mono text-xs text-[#04000D]/70 uppercase tracking-widest mb-2 font-bold">✦ SPONSORSHIP OPPORTUNITIES ✦</p>
+          <h3 class="font-bold text-xl sm:text-2xl md:text-3xl text-[#04000D]">Skema &amp; Paket Kemitraan</h3>
+          <p class="font-body-md text-sm md:text-base text-[#04000D]/75 mt-2">
+            Pilih tingkat kontribusi yang sesuai untuk menyelaraskan brand Anda dengan ekosistem I-FEST 2026.
+          </p>
+        </div>
+
+        <!-- Interactive Tabs Navigation -->
+        <div class="mb-8 overflow-x-auto pb-4 scrollbar-thin select-none">
+          <div class="flex gap-2 min-w-max border-b border-[#04000D]/20 pb-3">
+            <button
+              v-for="scheme in partnershipSchemes"
+              :key="scheme.id"
+              @click="activeSchemeTab = scheme.id"
+              class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 border-2 border-[#04000D] transition-all duration-150 rounded-none relative"
+              :class="activeSchemeTab === scheme.id ? 'bg-[#04000D] text-[#FDE047] shadow-[2.5px_2.5px_0px_0px_#FF3D8B] -translate-x-[1.5px] -translate-y-[1.5px]' : 'bg-white text-[#04000D] hover:bg-off-white hover:border-[#04000D] shadow-none'"
+            >
+              {{ scheme.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Tab Content Panel -->
+        <div v-for="scheme in partnershipSchemes" :key="scheme.id" class="mb-16">
+          <div v-if="activeSchemeTab === scheme.id" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-fade-in">
+            
+            <!-- Left Column: Scheme Details Card (Brutalist style) -->
+            <div 
+              class="lg:col-span-7 border-4 border-[#04000D] bg-white p-5 sm:p-6 md:p-8 shadow-[6px_6px_0px_0px_#04000D] relative overflow-hidden"
+              :style="{ borderTopColor: scheme.borderColor }"
+            >
+              <!-- Decorative Top Accent Bar -->
+              <div class="absolute top-0 left-0 right-0 h-2" :style="{ backgroundColor: scheme.borderColor }"></div>
+              
+              <!-- Badge & Tier Info -->
+              <div class="flex flex-wrap items-center justify-between gap-4 mb-4 mt-2">
+                <span 
+                  class="font-mono text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 border-2 border-[#04000D] shadow-[1.5px_1.5px_0px_0px_#04000D]"
+                  :style="{ backgroundColor: scheme.bgColor, color: scheme.textColor }"
+                >
+                  {{ scheme.badge }}
+                </span>
+                <span class="font-mono text-xs font-black text-[#04000D]/60 uppercase">
+                  Kuota: {{ scheme.slots === 99 ? 'Terbatas / Negosiasi' : `${scheme.slots} Slot` }}
+                </span>
+              </div>
+
+              <!-- Price & Title -->
+              <h3 class="font-bold text-xl sm:text-2xl md:text-3xl text-[#04000D] tracking-tight mb-1">
+                Tier {{ scheme.name }}
+              </h3>
+              <p class="font-mono text-lg sm:text-xl font-black text-[#FF3D8B] riso-text-shadow-tight-dark mb-4">
+                {{ scheme.contribution }}
+              </p>
+              
+              <p class="font-body-md text-sm md:text-base text-[#04000D]/85 leading-relaxed mb-6 border-b border-dashed border-[#04000D]/10 pb-4">
+                {{ scheme.description }}
+              </p>
+
+              <!-- Benefits List -->
+              <div>
+                <h4 class="font-mono text-[10px] uppercase tracking-wider text-[#04000D]/50 font-black mb-3 flex items-center gap-1.5">
+                  <span>✦ HAK &amp; BENEFIT UTAMA MITRA ✦</span>
+                </h4>
+                <ul class="space-y-3">
+                  <li 
+                    v-for="(benefit, idx) in scheme.benefits" 
+                    :key="idx"
+                    class="flex items-start gap-2.5 text-xs sm:text-sm text-[#04000D]/90"
+                  >
+                    <Check class="w-4 h-4 text-[#04000D] flex-shrink-0 mt-0.5" stroke-width="3" />
+                    <span>{{ benefit }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Right Column: Sponsor Logo Grid (Visual Status / Placeholders) -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+              <div class="border-2 border-[#04000D] bg-white p-4 md:p-5 shadow-[4px_4px_0px_0px_#04000D]">
+                <h4 class="font-mono text-[10px] uppercase tracking-widest text-[#04000D] font-black mb-3 text-center pb-2.5 border-b border-dashed border-[#04000D]/20">
+                  ✦ ALOKASI LOGO &amp; SPONSOR ✦
+                </h4>
+                
+                <!-- If sponsors are populated -->
+                <div v-if="scheme.sponsors.length > 0" class="grid grid-cols-2 gap-3 items-center justify-items-center mb-3">
+                  <div 
+                    v-for="(sponsor, index) in scheme.sponsors" 
+                    :key="index"
+                    class="border border-[#04000D]/15 p-3 bg-off-white/40 flex items-center justify-center rounded w-full h-20 relative group"
+                  >
+                    <img :src="sponsor.logo" :alt="sponsor.name" class="max-h-12 w-auto object-contain" />
+                    <div class="absolute inset-0 bg-[#04000D]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-1.5 text-center">
+                      <span class="text-white font-mono text-[10px] font-bold uppercase tracking-wider">{{ sponsor.name }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Open Placeholder Slots (Invitations to Join) -->
+                <div>
+                  <p class="font-mono text-[9px] text-[#04000D]/50 uppercase tracking-widest mb-2.5 font-bold text-center">
+                    {{ scheme.sponsors.length > 0 ? 'SLOT TERSEDIA LAINNYA' : 'BELUM ADA LOGO TERPASANG (SLOT TERBUKA)' }}
+                  </p>
+                  
+                  <div class="grid grid-cols-2 gap-3">
+                    <!-- Loop for remaining empty slots, capped for display purposes if support -->
+                    <a
+                      v-for="i in Math.min(scheme.slots, 6)"
+                      :key="i"
+                      :href="`https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20tertarik%20untuk%20bermitra%20dalam%20skema%20${scheme.name}%20di%20I-FEST%202026.%20Boleh%20saya%20mendapatkan%20informasi%20lebih%20lanjut%3F`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="border-2 border-dashed border-[#04000D]/30 p-3 bg-off-white/30 hover:bg-[#FDE047]/10 hover:border-[#FF3D8B]/50 transition-all duration-200 flex flex-col items-center justify-center text-center gap-1.5 h-24 cursor-pointer group"
+                    >
+                      <Plus class="w-4 h-4 text-[#04000D]/40 group-hover:text-[#FF3D8B] group-hover:scale-110 transition-transform duration-200" stroke-width="2.5" />
+                      <span class="font-mono text-[9px] md:text-[10px] font-black uppercase text-[#04000D]/50 tracking-wider group-hover:text-[#FF3D8B]">
+                        Slot {{ i }} Tersedia
+                      </span>
+                    </a>
+                  </div>
+
+                  <!-- WhatsApp PIC Contact Card -->
+                  <div class="mt-4 pt-4 border-t border-dashed border-[#04000D]/10 text-center">
+                    <p class="font-body-md text-[11px] text-[#04000D]/75 leading-normal mb-3">
+                      Tertarik mengklaim slot ini untuk instansi Anda? Hubungi divisi sponsorship kami.
+                    </p>
+                    <a
+                      :href="`https://wa.me/6282195432152?text=Halo%20Fauzi%2C%20saya%20tertarik%20untuk%20bermitra%20dalam%20skema%20${scheme.name}%20di%20I-FEST%202026.%20Boleh%20saya%20mendapatkan%20informasi%20lebih%20lanjut%3F`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1.5 font-mono text-[10px] font-black text-[#FF3D8B] hover:text-[#04000D] transition-colors uppercase tracking-widest"
+                    >
+                      Hubungi Fauzi via WhatsApp
+                      <ExternalLink class="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- HAIRLINE DIVIDER -->
+        <div class="border-b border-[#04000D]/10 mb-16"></div>
+
+        <!-- Confirmed Sponsors Section Header -->
+        <div class="mb-10">
+          <p class="font-mono text-xs text-[#04000D]/70 uppercase tracking-widest mb-2 font-bold">✦ CONFIRMED PARTNERS ✦</p>
+          <h3 class="font-bold text-xl sm:text-2xl md:text-3xl text-[#04000D]">Mitra yang Telah Bergabung</h3>
+        </div>
 
         <!-- Stepped Flat Layout Sponsor Hierarchy Container -->
         <div class="border border-[#04000D]/20 divide-y divide-[#04000D]/20 bg-white animate-fade-in">
@@ -3556,7 +3554,7 @@ onBeforeUnmount(() => {
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#8839FF]/30 hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'bph-matrix' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#D86BFF]/30 hover:text-accent-magenta'" href="#bph-matrix">Orkestrasi</a>
-        <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'kemitraan-schemes' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#kemitraan-schemes">Kemitraan</a>
+
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
     </div>
@@ -3582,7 +3580,7 @@ onBeforeUnmount(() => {
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'timeline' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#timeline">Timeline</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'galeri-jejak-langkah' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#galeri-jejak-langkah">Arsip 2025</a>
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'bph-matrix' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#bph-matrix">Orkestrasi</a>
-        <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'kemitraan-schemes' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#kemitraan-schemes">Kemitraan</a>
+
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
 
