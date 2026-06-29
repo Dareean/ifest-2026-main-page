@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./laravel-temp
+      dockerfile: ../docker/php/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./laravel-temp:/var/www
+      - /var/www/vendor
+    working_dir: /var/www
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    networks:
+      - ifest-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    networks:
+      - ifest-network
+    depends_on:
+      - backend
+
+networks:
+  ifest-network:
+    driver: bridge

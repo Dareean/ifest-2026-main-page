@@ -2,24 +2,173 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Lomba;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $lombas = [
+            [
+                'kode' => 'NAT-01',
+                'title' => 'Competitive Programming',
+                'scale' => 'Nasional',
+                'tagline' => 'ALGORITMA & PROBLEM SOLVING',
+                'fee' => 'Rp 50.000 / Tim',
+                'target' => 'Terbuka untuk Umum (Usia 16-25 Tahun)',
+                'team_requirements' => 'Tim (2-3 Orang)',
+                'languages' => 'Semua Bahasa Pemrograman (Platform HackerRank)',
+                'babak' => 'Penyisihan & Final Online',
+                'description' => 'Uji ketajaman pemikiran logis dan kecepatan menyelesaikan persoalan algoritma kompleks di bawah tekanan waktu yang ketat.',
+                'long_description' => 'Competitive Programming I-FEST 2026 adalah ajang kompetisi pemrograman tingkat nasional yang menantang para pelajar dan mahasiswa di seluruh Indonesia untuk memecahkan berbagai persoalan algoritma dan matematika yang kompleks secara daring menggunakan platform HackerRank. Peserta dituntut untuk memecahkan soal algoritma dengan efisiensi memori dan waktu yang optimal.',
+                'rules' => json_encode([
+                    'Perlombaan bersifat kelompok yang terdiri dari 2-3 orang/tim.',
+                    'Terbuka untuk umum dengan batasan usia 16 - 25 tahun.',
+                    'Seluruh babak (penyisihan & final) dilaksanakan secara daring (online) melalui platform HackerRank.',
+                    'Di babak penyisihan, setiap tim memiliki hak untuk menggunakan maksimal 3 komputer/laptop dengan webcam menyala (open camera & share screen).',
+                    'Dilarang keras menggunakan bantuan AI, melakukan kecurangan seperti plagiarisme kode, atau bertukar jawaban antar tim.',
+                ]),
+                'schedule' => 'Pendaftaran: 5 Juli - 5 Agustus 2026 | Penyisihan: 24 Agustus 2026 | Final: 3 September 2026',
+                'registration_link' => 'https://forms.gle/PiRWMLUo9NyKS6Kc8',
+                'guidebook_link' => 'Arena Inovasi Digital/Lomba Competitive Programing/JUKNIS_COMPETITIVE_PROGRAMING.docx',
+                'card_bg' => '#DCEEB1',
+                'accent_color' => '#FF3D8B',
+                'text_color' => '#04000D',
+            ],
+            [
+                'kode' => 'NAT-02',
+                'title' => 'UI/UX Design',
+                'scale' => 'Nasional',
+                'tagline' => 'DESAIN DIGITAL BERDAMPAK',
+                'fee' => 'Rp 50.000 / Tim',
+                'target' => 'Terbuka untuk Umum (Usia 17-25 Tahun)',
+                'team_requirements' => 'Tim (3 Orang)',
+                'languages' => 'Figma, Adobe XD, atau sejenisnya',
+                'babak' => 'Kualifikasi Proposal + Final Online',
+                'description' => 'Rancang solusi antarmuka digital yang intuitif, inklusif, dan memecahkan permasalahan nyata masyarakat secara kreatif.',
+                'long_description' => 'UI/UX Design Competition I-FEST 2026 mengajak desainer digital muda untuk merancang purwarupa (high-fidelity prototype) aplikasi mobile maupun web yang fungsional dan ramah pengguna berdasarkan Design Thinking. Fokus utama adalah memecahkan isu riil masyarakat menggunakan pendekatan User-Centered Design.',
+                'rules' => json_encode([
+                    'Perlombaan bersifat kelompok beranggotakan tepat 3 orang.',
+                    'Setiap tim wajib mengumpulkan Dokumen Proposal UX Case Study (PDF), tautan Figma Prototype aktif, dan Video UI/UX Demo (3-10 menit).',
+                    'Video demonstrasi wajib memuat perkenalan tim, masalah, solusi, penjelasan desain, dan diunggah ke Reels Instagram kolaborator.',
+                    'Desain harus orisinal, belum pernah menjuarai kompetisi lain, dan tidak menggunakan UI Kit instan secara utuh.',
+                    'Babak final diikuti oleh 5 tim terbaik yang akan mempresentasikan karya mereka secara online di hadapan juri.',
+                ]),
+                'schedule' => 'Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026',
+                'registration_link' => 'https://forms.gle/aud4FoHggF3qow1G8',
+                'guidebook_link' => 'Arena Inovasi Digital/Lomba UI-UX/Juknis_UIUX_IFEST_2026.docx',
+                'card_bg' => '#EFD4D4',
+                'accent_color' => '#FF3D8B',
+                'text_color' => '#04000D',
+            ],
+            [
+                'kode' => 'NAT-03',
+                'title' => 'Digital Business Plan',
+                'scale' => 'Nasional',
+                'tagline' => 'IDE BISNIS INOVATIF',
+                'fee' => 'Rp 85.000 / Tim',
+                'target' => 'Terbuka untuk Umum',
+                'team_requirements' => 'Tim (Maks. 3 orang)',
+                'languages' => 'Pitch Deck, Canva, Excel (Financial Modeling)',
+                'babak' => 'Kualifikasi Online + Final',
+                'description' => 'Ubah gagasan bisnis kreatif berbasis digital menjadi rancangan proposal bisnis yang matang, realistis, dan siap investasi.',
+                'long_description' => 'Digital Business Plan mengajak inovator muda dan calon wirausahawan untuk menyusun model bisnis digital yang berdaya saing tinggi, berkelanjutan, dan memiliki potensi skalabilitas pasar yang besar. Peserta akan ditantang memformulasikan riset pasar yang solid, strategi go-to-market yang cerdas, rancangan operasional yang matang, serta proyeksi keuangan (financial modeling) yang realistis.',
+                'rules' => json_encode([
+                    'Tim terdiri dari maksimal 3 orang peserta umum.',
+                    'Format proposal harus mengikuti template standar sistematika BMC (Business Model Canvas) dan Executive Summary resmi panitia.',
+                    'Wajib menyertakan rancangan model monetisasi dan analisis SWOT yang komprehensif.',
+                    'Di babak final, peserta diwajibkan memaparkan Pitch Deck di hadapan investor dan juri profesional dalam durasi 10 menit presentasi + tanya jawab.',
+                ]),
+                'schedule' => 'Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026',
+                'registration_link' => '#detail-kegiatan',
+                'guidebook_link' => '#',
+                'card_bg' => '#C8E6CD',
+                'accent_color' => '#FF3D8B',
+                'text_color' => '#04000D',
+            ],
+            [
+                'kode' => 'REG-01',
+                'title' => 'Creative Video',
+                'scale' => 'Regional',
+                'tagline' => 'VIDEO EDUKATIF & KREATIF',
+                'fee' => 'Rp 25.000 / Orang',
+                'target' => 'Terbuka untuk Umum (Usia 15-23 Tahun)',
+                'team_requirements' => 'Individu',
+                'languages' => 'CapCut, Alight Motion, Premiere, dll.',
+                'babak' => 'Kurasi Online (Reels Instagram)',
+                'description' => 'Salurkan kreativitas sinematik Anda untuk merancang video edukasi bertema Literasi Digital yang mampu menarik dan mengedukasi masyarakat luas.',
+                'long_description' => 'Creative Video Competition I-FEST 2026 adalah kompetisi multimedia tingkat regional untuk mewadahi ide kreatif, teknik visual, dan kemampuan storytelling. Peserta ditantang memproduksi video pendek edukatif berdurasi 30 detik hingga 2 menit dengan tema \'Youth Digital Orchestra : Exploring the Future Through Digital Creativity\'.',
+                'rules' => json_encode([
+                    'Perlombaan bersifat individu dengan batasan usia peserta 15 - 23 tahun.',
+                    'Video berdurasi minimal 30 detik dan maksimal 2 menit, resolusi minimal 1080p, format MP4.',
+                    'Rasio video diperbolehkan 16:9 (Landscape) atau 9:16 (Portrait).',
+                    'Karya diunggah sebagai Reels ke Instagram ketua tim dengan menandai akun @ifest_untad, akun tidak privat, dan menggunakan caption resmi.',
+                    'Wajib menggunakan template logo panitia sebagai opening dan logo sponsor sebagai closing.',
+                ]),
+                'schedule' => 'Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Video: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026',
+                'registration_link' => 'https://forms.gle/2AaDqvh8ZKPa8etJA',
+                'guidebook_link' => 'Arena Inovasi Digital/Lomba Video Kreatif/Juknis_Video Creatif_2026.docx',
+                'card_bg' => '#FFF9E6',
+                'accent_color' => '#8839FF',
+                'text_color' => '#04000D',
+            ],
+            [
+                'kode' => 'REG-02',
+                'title' => 'Digital Education Poster',
+                'scale' => 'Regional',
+                'tagline' => 'DESAIN VISUAL EDUKATIF',
+                'fee' => 'Rp 25.000 / Orang',
+                'target' => 'Terbuka untuk Umum (Usia 15-23 Tahun)',
+                'team_requirements' => 'Individu',
+                'languages' => 'Canva, Illustrator, Photoshop, Figma, dll.',
+                'babak' => 'Kurasi Online (Instagram Feed)',
+                'description' => 'Visualisasikan gagasan Anda dalam bentuk poster edukatif bertema literasi siber untuk menyampaikan pesan penting teknologi secara grafis.',
+                'long_description' => 'Digital Education Poster I-FEST 2026 mengajak desainer muda regional menyalurkan ide kreatif dan komunikatif lewat desain visual edukatif. Poster diharapkan menyederhanakan pesan inovasi teknologi menjadi konten visual yang menarik dan mendidik masyarakat umum.',
+                'rules' => json_encode([
+                    'Perlombaan bersifat individu dengan batasan usia peserta 15 - 23 tahun.',
+                    'Karya dibuat dalam format A3 (29.7 x 42 cm), resolusi 300 DPI, format PNG/JPEG, portrait.',
+                    'Karya diunggah sebagai Feed ke akun Instagram peserta (tidak privat) dengan menandai @ifest_untad, serta diunggah ke link formulir panitia.',
+                    'Wajib menyertakan template logo resmi yang disediakan oleh panitia pada karya poster.',
+                    'Karya harus orisinal, belum pernah memenangkan kompetisi lain, dan tidak mengandung SARA.',
+                ]),
+                'schedule' => 'Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Karya: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026',
+                'registration_link' => 'https://forms.gle/n6YQRPEqUJX9PrHJ6',
+                'guidebook_link' => 'Arena Inovasi Digital/Lomba Poster Edukasi/DIGITAL EDUCATION POSTER COMPETITION.docx',
+                'card_bg' => '#EFE5FF',
+                'accent_color' => '#8839FF',
+                'text_color' => '#04000D',
+            ],
+            [
+                'kode' => 'REG-03',
+                'title' => 'Sulteng Digital Innovation Hub (S-DIH)',
+                'scale' => 'Regional',
+                'tagline' => 'HACKATHON + SHOWCASE',
+                'fee' => 'Gratis',
+                'target' => 'Terbuka untuk Umum',
+                'team_requirements' => 'Tim (Maks. 3 - 5 orang)',
+                'languages' => 'Web/Mobile Stack (React, Vue, Flutter, Laravel, Node.js, IoT Tools)',
+                'babak' => 'Intensive Hackathon + Showcase',
+                'description' => 'Inkubator inovasi digital murni untuk melahirkan solusi lokal. Ikuti kompetisi Hackathon multi-hari intensif untuk memecahkan problem statement krusial daerah.',
+                'long_description' => 'Sulteng Digital Innovation Hub (S-DIH) Engine adalah puncak wadah inkubator teknologi IFeST 2026. Ini merupakan kompetisi Hackathon regional yang intensif di mana tim desainer, programmer, dan pemikir bisnis bersinergi memecahkan problem statement krusial yang dihadapi Sulawesi Tengah saat ini.',
+                'rules' => json_encode([
+                    'Satu kelompok beranggotakan 3 hingga maksimal 5 orang.',
+                    'Peserta diwajibkan membuat produk digital (web app, mobile app, atau IoT mockup prototype) yang berfungsi.',
+                    'Seluruh kode pemrograman harus dibuat selama durasi hackathon berlangsung (Greenfield code).',
+                    'Wajib melakukan commit kode ke repositori GitHub yang dipantau mentor berkala.',
+                    'Hasil akhir wajib dipamerkan secara interaktif di Paviliun S-DIH pada Expo Utama Hari-H.',
+                ]),
+                'schedule' => 'Registrasi: Juni - Juli 2026 | Technical Briefing: Akhir Juli 2026 | Hackathon & Pitching: Agustus 2026',
+                'registration_link' => '#detail-kegiatan',
+                'guidebook_link' => '#',
+                'card_bg' => '#04000D',
+                'accent_color' => '#FF3D8B',
+                'text_color' => '#FFFFFF',
+            ],
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($lombas as $lomba) {
+            Lomba::create($lomba);
+        }
     }
 }

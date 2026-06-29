@@ -8,6 +8,8 @@ import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock, Plus, Download, 
 const AiChatWidget = defineAsyncComponent(() => import('../components/AiChatWidget.vue'))
 const isChatActivated = ref(false)
 
+const isLoggedIn = computed(() => !!localStorage.getItem('auth_token'))
+
 const showContent = ref(true)
 const isLoading = ref(false)
 const isMenuOpen = ref(false)
@@ -3579,6 +3581,15 @@ onBeforeUnmount(() => {
 
         <a @click="toggleMenu" class="font-mono text-2xl font-bold border-b-2 border-dashed pb-1 transition-colors duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D] border-[#04000D]/30 hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
+
+      <div class="flex flex-col items-center gap-4 mt-6 pt-6 border-t border-dashed border-[#04000D]/20 w-full max-w-xs">
+        <router-link v-if="!isLoggedIn" @click="toggleMenu" to="/login" class="riso-btn-plate text-center w-full bg-[#04000D] text-white py-3 rounded-full font-button text-sm font-black tracking-widest select-none" style="--plate-color: #FDE047;">
+          Masuk
+        </router-link>
+        <router-link v-else @click="toggleMenu" to="/dashboard" class="riso-btn-plate text-center w-full bg-[#04000D] text-white py-3 rounded-full font-button text-sm font-black tracking-widest select-none" style="--plate-color: #FF3D8B;">
+          Dashboard
+        </router-link>
+      </div>
     </div>
   </div>
 
@@ -3605,6 +3616,16 @@ onBeforeUnmount(() => {
 
         <a class="font-mono text-xs lg:text-[13px] xl:text-sm font-bold uppercase tracking-wider pb-1 border-b-2 transition-all duration-200" :class="activeSection === 'partners' ? 'text-[#FF3D8B] border-[#FF3D8B]' : 'text-[#04000D]/70 border-transparent hover:text-accent-magenta'" href="#partners">Network</a>
       </nav>
+
+      <!-- Auth Button -->
+      <div class="hidden md:flex items-center">
+        <router-link v-if="!isLoggedIn" to="/login" class="riso-btn-plate bg-[#04000D] text-white text-[10px] lg:text-xs font-black tracking-widest uppercase px-4 py-2 rounded-full select-none" style="--plate-color: #FDE047;">
+          Masuk
+        </router-link>
+        <router-link v-else to="/dashboard" class="riso-btn-plate bg-[#04000D] text-white text-[10px] lg:text-xs font-black tracking-widest uppercase px-4 py-2 rounded-full select-none" style="--plate-color: #FF3D8B;">
+          Dashboard
+        </router-link>
+      </div>
 
       <div class="flex items-center gap-2 select-none md:hidden ml-auto">
         <button @click="toggleMenu" class="p-1.5 flex items-center justify-center border border-[#04000D] rounded bg-white hover:bg-off-white transition-colors" aria-label="Toggle menu">
