@@ -13,9 +13,30 @@ class PendaftaranController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $pendaftarans = $request->user()->pendaftarans()->with('lomba', 'submission')->latest()->get();
+        $user = $request->user();
+        
+        $owned = Pendaftaran::where('user_id', $user->id)
+            ->with('lomba', 'submission', 'user')
+            ->get();
+            
+        $memberOf = Pendaftaran::where('status', 'verified')
+            ->whereNotNull('team_members')
+            ->with('lomba', 'submission', 'user')
+            ->get()
+            ->filter(function ($p) use ($user) {
+                $mList = $p->team_members ?: [];
+                foreach ($mList as $m) {
+                    if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'joined') {
+                        return true;
+                    }
+                }
+                return false;
+            })
+            ->values();
 
-        return response()->json(['data' => $pendaftarans]);
+        $all = $owned->merge($memberOf)->sortByDesc('created_at')->values();
+
+        return response()->json(['data' => $all]);
     }
 
     public function store(Request $request, Lomba $lomba): JsonResponse
@@ -60,10 +81,22 @@ class PendaftaranController extends Controller
 
     public function show(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
-        if ($pendaftaran->user_id !== $request->user()->id) {
+        $user = $request->user();
+        $isLeader = $pendaftaran->user_id === $user->id;
+        $isMember = false;
+        
+        $mList = $pendaftaran->team_members ?: [];
+        foreach ($mList as $m) {
+            if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'joined') {
+                $isMember = true;
+                break;
+            }
+        }
+
+        if (!$isLeader && !$isMember) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json(['data' => $pendaftaran->load('lomba', 'submission')]);
+        return response()->json(['data' => $pendaftaran->load('lomba', 'submission', 'user')]);
     }
 }

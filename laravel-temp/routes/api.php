@@ -24,8 +24,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/user', [AuthController::class, 'user']);
 
     Route::post('/lombas/{lomba}/daftar', [PendaftaranController::class, 'store']);
+    Route::get('/pendaftarans/invitations', [\App\Http\Controllers\TeamController::class, 'invitations']);
     Route::get('/pendaftarans', [PendaftaranController::class, 'index']);
     Route::get('/pendaftarans/{pendaftaran}', [PendaftaranController::class, 'show']);
+
+    Route::post('/pendaftarans/{pendaftaran}/invite', [\App\Http\Controllers\TeamController::class, 'invite']);
+    Route::post('/pendaftarans/{pendaftaran}/accept-invite', [\App\Http\Controllers\TeamController::class, 'acceptInvite']);
+    Route::post('/pendaftarans/{pendaftaran}/decline-invite', [\App\Http\Controllers\TeamController::class, 'declineInvite']);
+    Route::delete('/pendaftarans/{pendaftaran}/members/{user_id}', [\App\Http\Controllers\TeamController::class, 'removeMember']);
+    Route::post('/pendaftarans/{pendaftaran}/lock', [\App\Http\Controllers\TeamController::class, 'lockTeam']);
+    Route::post('/pendaftarans/{pendaftaran}/request-unlock', [\App\Http\Controllers\TeamController::class, 'requestUnlock']);
+    Route::post('/pendaftarans/{pendaftaran}/admin-approve-unlock', [\App\Http\Controllers\TeamController::class, 'adminApproveUnlock']);
 
     Route::post('/pendaftarans/{pendaftaran}/submit', [SubmissionController::class, 'store']);
     Route::get('/submissions', [SubmissionController::class, 'index']);

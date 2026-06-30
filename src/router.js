@@ -38,6 +38,12 @@ const routes = [
     component: () => import('./pages/AuthCallbackPage.vue'),
   },
   {
+    path: '/invoice/:id',
+    name: 'Invoice',
+    component: () => import('./pages/InvoicePage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/dashboard',
     component: () => import('./pages/dashboard/DashboardLayout.vue'),
     meta: { requiresAuth: true },
@@ -61,6 +67,11 @@ const routes = [
         path: 'profile',
         name: 'DashboardProfile',
         component: () => import('./pages/dashboard/DashboardProfile.vue'),
+      },
+      {
+        path: 'help',
+        name: 'DashboardHelp',
+        component: () => import('./pages/dashboard/DashboardHelp.vue'),
       },
     ],
   },

@@ -28,21 +28,17 @@ const onLoaded = () => {
     class="riso-canvas bg-off-white min-h-screen text-[#04000D] font-body-md select-text transition-all duration-700 ease-out"
     :class="{ 'opacity-0 scale-[0.98] pointer-events-none h-screen overflow-hidden': !showContent }"
   >
-    <router-view v-slot="{ Component, route }">
-      <transition name="fade" mode="out-in">
-        <Suspense>
-          <template #default>
-            <div :key="route.fullPath">
-              <component :is="Component" />
-            </div>
-          </template>
-          <template #fallback>
-            <div class="w-full h-screen bg-[#f4f4f4] flex items-center justify-center font-mono text-xs text-[#04000D] uppercase tracking-widest font-bold">
-              Loading Section...
-            </div>
-          </template>
-        </Suspense>
-      </transition>
+    <router-view v-slot="{ Component }">
+      <Suspense>
+        <template #default>
+          <component :is="Component" />
+        </template>
+        <template #fallback>
+          <div class="w-full h-screen bg-[#f4f4f4] flex items-center justify-center font-mono text-xs text-[#04000D] uppercase tracking-widest font-bold">
+            Loading Section...
+          </div>
+        </template>
+      </Suspense>
     </router-view>
   </div>
 
@@ -70,19 +66,4 @@ const onLoaded = () => {
 </template>
 
 <style>
-/* Smooth global fade transition for page routes */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  transform: translateY(6px);
-}
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
-}
 </style>

@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Pendaftaran extends Model
 {
     protected $fillable = [
-        'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'notes',
+        'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'notes', 'team_locked', 'unlock_requested',
     ];
 
     protected function casts(): array
     {
         return [
             'team_members' => 'array',
+            'team_locked' => 'boolean',
+            'unlock_requested' => 'boolean',
         ];
     }
 
