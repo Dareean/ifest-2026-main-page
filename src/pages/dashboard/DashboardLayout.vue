@@ -64,8 +64,14 @@ onMounted(() => {
 
       <!-- User card -->
       <div class="mx-4 mt-5 p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-black text-[#DCEEB1] flex items-center justify-center font-mono font-black text-sm flex-shrink-0">
-          {{ auth.user?.name?.charAt(0)?.toUpperCase() || '?' }}
+        <div class="w-9 h-9 rounded-lg bg-black text-[#DCEEB1] flex items-center justify-center font-mono font-black text-sm flex-shrink-0 overflow-hidden">
+          <img 
+            v-if="auth.user?.avatar && auth.user.avatar !== 'null' && auth.user.avatar !== 'undefined'"
+            :src="auth.user.avatar.startsWith('/storage') ? 'http://localhost:8000' + auth.user.avatar : auth.user.avatar"
+            class="w-full h-full object-cover"
+            alt="Avatar"
+          />
+          <span v-else>{{ auth.user?.name?.charAt(0)?.toUpperCase() || '?' }}</span>
         </div>
         <div class="min-w-0 flex-1">
           <p class="font-bold text-xs text-on-surface truncate leading-tight">{{ auth.user?.name }}</p>

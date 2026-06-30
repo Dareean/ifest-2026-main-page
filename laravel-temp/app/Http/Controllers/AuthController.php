@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,10 +43,17 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
+        // Kirim notifikasi selamat datang ke inbox dashboard
+        Notification::create([
+            'user_id' => $user->id,
+            'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
+            'pesan'   => "Halo, {$user->name}! Akun kamu berhasil dibuat. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan tim kamu sekarang!",
+        ]);
+
         return response()->json([
             'message' => 'Registrasi berhasil',
-            'user' => $user,
-            'token' => $token,
+            'user'    => $user,
+            'token'   => $token,
         ], 201);
     }
 
@@ -111,15 +119,24 @@ class AuthController extends Controller
             ->orWhere('email', $googleUser->getEmail())
             ->first();
 
-        if (!$user) {
+        $isNewUser = !$user;
+
+        if ($isNewUser) {
             $user = User::create([
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-                'password' => Hash::make(str()->random(32)),
-                'google_token' => $googleUser->token,
+                'name'                 => $googleUser->getName(),
+                'email'                => $googleUser->getEmail(),
+                'google_id'            => $googleUser->getId(),
+                'avatar'               => $googleUser->getAvatar(),
+                'password'             => Hash::make(str()->random(32)),
+                'google_token'         => $googleUser->token,
                 'google_refresh_token' => $googleUser->refreshToken,
+            ]);
+
+            // Kirim notifikasi selamat datang hanya untuk user baru
+            Notification::create([
+                'user_id' => $user->id,
+                'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
+                'pesan'   => "Halo, {$user->name}! Akun kamu berhasil dibuat via Google. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan diri kamu sekarang!",
             ]);
         } else {
             $user->update([
@@ -193,6 +210,7 @@ class AuthController extends Controller
         }
 
         $user->update([
+            'name' => $googleUser->getName(),
             'google_id' => $googleUser->getId(),
             'avatar' => $googleUser->getAvatar(),
             'google_token' => $googleUser->token,

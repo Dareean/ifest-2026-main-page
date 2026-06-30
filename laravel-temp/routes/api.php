@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::put('/password', [ProfileController::class, 'updatePassword']);
+    Route::post('/avatar', [ProfileController::class, 'uploadAvatar']);
 
     Route::get('/auth/google/connect', [AuthController::class, 'googleConnect']);
     Route::post('/auth/google/disconnect', [AuthController::class, 'googleDisconnect']);

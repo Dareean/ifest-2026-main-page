@@ -17,10 +17,10 @@ class Notification extends Model
     {
         static::created(function ($notification) {
             try {
-                // Mengirim email secara otomatis menggunakan queue
-                Mail::to($notification->user->email)->send(new NotificationMail($notification));
+                // Gunakan queue() bukan send() — agar API response tidak tertahan oleh email dispatch
+                Mail::to($notification->user->email)->queue(new NotificationMail($notification));
             } catch (\Exception $e) {
-                Log::error('Gagal mengirim email notifikasi ke ' . $notification->user->email . ': ' . $e->getMessage());
+                Log::error('Gagal mengantri email notifikasi ke ' . $notification->user->email . ': ' . $e->getMessage());
             }
         });
     }

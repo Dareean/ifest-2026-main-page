@@ -29,17 +29,25 @@ class TeamController extends Controller
     public function invitations(Request $request): JsonResponse
     {
         $user = $request->user();
-        
-        // Find pendaftarans where team_members has a pending invite for this user
+        $email = strtolower($user->email);
+
+        // Filter at DB level using PostgreSQL JSON text search — avoids PHP-side full table scan
         $pendaftarans = Pendaftaran::with('lomba', 'user')
             ->where('status', 'verified')
             ->whereNotNull('team_members')
+            ->whereRaw("team_members::text ILIKE ?", ['%"email":"' . $email . '"%'])
+            ->whereRaw("team_members::text ILIKE ?", ['%"status":"pending"%'])
             ->get()
-            ->filter(function ($pendaftaran) use ($user) {
+            // Secondary PHP filter to ensure both conditions are on the same element
+            ->filter(function ($pendaftaran) use ($email) {
                 $members = $pendaftaran->team_members;
                 if (!is_array($members)) return false;
                 foreach ($members as $m) {
-                    if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'pending') {
+                    if (
+                        isset($m['email'], $m['status']) &&
+                        strtolower($m['email']) === $email &&
+                        $m['status'] === 'pending'
+                    ) {
                         return true;
                     }
                 }
@@ -48,20 +56,19 @@ class TeamController extends Controller
             ->values();
 
         // Format return values
-        $formatted = $pendaftarans->map(function ($p) {
-            return [
-                'id' => $p->id,
-                'team_name' => $p->team_name,
-                'lomba' => $p->lomba,
-                'leader' => $p->user,
-            ];
-        });
+        $formatted = $pendaftarans->map(fn($p) => [
+            'id'        => $p->id,
+            'team_name' => $p->team_name,
+            'lomba'     => $p->lomba,
+            'leader'    => $p->user,
+        ]);
 
         return response()->json(['data' => $formatted]);
     }
 
     public function invite(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
+        $pendaftaran->loadMissing('lomba'); // ensure relation loaded (avoid N+1)
         $user = $request->user();
 
         if ($pendaftaran->user_id !== $user->id) {
@@ -84,7 +91,10 @@ class TeamController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $targetUser = User::where('email', $request->email)->first();
+        $email = strtolower($request->email);
+
+        // Single DB query — no full table load
+        $targetUser = User::where('email', $email)->first();
 
         if (!$targetUser) {
             return response()->json(['message' => 'Email tidak terdaftar di sistem. Silakan minta rekan Anda membuat akun terlebih dahulu.'], 404);
@@ -106,14 +116,14 @@ class TeamController extends Controller
             return response()->json(['message' => 'Jumlah anggota tim sudah mencapai batas maksimal (' . $maxSize . ' orang).'], 400);
         }
 
-        // Check duplicate in this team
+        // Check duplicate in this team (in-memory array, fast)
         foreach ($currentMembers as $m) {
-            if (strtolower($m['email']) === strtolower($targetUser->email)) {
+            if (strtolower($m['email']) === $email) {
                 return response()->json(['message' => 'Rekan Anda sudah diundang atau bergabung dalam tim ini.'], 400);
             }
         }
 
-        // Check if already registered in the same competition as leader
+        // Check if already registered in the same competition as leader — single targeted EXISTS query
         $isLeader = Pendaftaran::where('user_id', $targetUser->id)
             ->where('lomba_id', $pendaftaran->lomba_id)
             ->exists();
@@ -122,40 +132,39 @@ class TeamController extends Controller
             return response()->json(['message' => 'Rekan Anda sudah terdaftar di lomba ini sebagai ketua tim lain.'], 400);
         }
 
-        // Check if already registered in the same competition as joined member
-        $otherRegs = Pendaftaran::where('lomba_id', $pendaftaran->lomba_id)
+        // Check if already a joined member in another team for the same competition
+        // Uses PostgreSQL JSON contains operator to avoid fetching all rows into PHP
+        $alreadyJoinedOtherTeam = Pendaftaran::where('lomba_id', $pendaftaran->lomba_id)
+            ->where('id', '!=', $pendaftaran->id)
             ->whereNotNull('team_members')
-            ->get();
+            ->whereRaw("team_members::text ILIKE ?", ['%"email":"' . $email . '"%'])
+            ->whereRaw("team_members::text ILIKE ?", ['%"status":"joined"%'])
+            ->exists();
 
-        foreach ($otherRegs as $otherReg) {
-            $mList = $otherReg->team_members ?: [];
-            foreach ($mList as $m) {
-                if (strtolower($m['email']) === strtolower($targetUser->email) && $m['status'] === 'joined') {
-                    return response()->json(['message' => 'Rekan Anda sudah terdaftar dan bergabung di tim lain untuk lomba ini.'], 400);
-                }
-            }
+        if ($alreadyJoinedOtherTeam) {
+            return response()->json(['message' => 'Rekan Anda sudah terdaftar dan bergabung di tim lain untuk lomba ini.'], 400);
         }
 
-        // Add member
+        // Add member to JSON array and save in a single update
         $currentMembers[] = [
             'user_id' => $targetUser->id,
-            'name' => $targetUser->name,
-            'email' => $targetUser->email,
-            'status' => 'pending'
+            'name'    => $targetUser->name,
+            'email'   => $targetUser->email,
+            'status'  => 'pending'
         ];
 
         $pendaftaran->update(['team_members' => $currentMembers]);
 
-        // Notify target user
+        // Create notification — email is now queued (non-blocking)
         Notification::create([
             'user_id' => $targetUser->id,
-            'judul' => 'Undangan Bergabung Tim',
-            'pesan' => "Kamu diundang oleh {$user->name} untuk bergabung ke dalam tim {$pendaftaran->team_name} untuk kompetisi {$pendaftaran->lomba->title}.",
+            'judul'   => 'Undangan Bergabung Tim',
+            'pesan'   => "Kamu diundang oleh {$user->name} untuk bergabung ke dalam tim {$pendaftaran->team_name} untuk kompetisi {$pendaftaran->lomba->title}.",
         ]);
 
         return response()->json([
             'message' => 'Undangan berhasil dikirim.',
-            'data' => $pendaftaran
+            'data'    => $pendaftaran->fresh(['lomba', 'user'])
         ]);
     }
 

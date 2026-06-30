@@ -206,13 +206,21 @@ async function handleInvite() {
   inviting.value = true
   const reg = getRegistration(selectedLombaForDetail.value.id)
   try {
-    await api.post(`/pendaftarans/${reg.id}/invite`, { email: inviteEmail.value })
+    const res = await api.post(`/pendaftarans/${reg.id}/invite`, { email: inviteEmail.value })
     inviteSuccess.value = 'Undangan berhasil dikirim!'
     inviteEmail.value = ''
-    await fetchData()
-    // reload details
-    const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
-    if (updated) openDetail(updated)
+
+    // Optimistic update — patch local state directly from API response, no full reload
+    const updatedPendaftaran = res.data.data
+    if (updatedPendaftaran) {
+      const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
+      if (idx !== -1) {
+        pendaftarans.value[idx] = updatedPendaftaran
+        localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
+      }
+    }
+    // Background refresh to ensure server truth without blocking UI
+    fetchData()
   } catch (e) {
     inviteError.value = e.response?.data?.message || 'Gagal mengirim undangan'
   } finally {

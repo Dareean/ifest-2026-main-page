@@ -113,7 +113,7 @@
         <!-- Footer -->
         <div class="footer">
             <p>Email ini dikirim secara otomatis oleh sistem I-FEST 2026.</p>
-            <p style="margin-top: 8px;">&copy; 2026 HMTI - Universitas Yogyakarta. All rights reserved.</p>
+            <p style="margin-top: 8px;">&copy; 2026 HMTI — Universitas Tadulako (UNTAD). All rights reserved.</p>
         </div>
     </div>
 </body>
