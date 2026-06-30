@@ -1,8 +1,8 @@
 FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libsqlite3-dev \
-    && docker-php-ext-install zip pdo pdo_sqlite bcmath ctype \
+    git unzip libzip-dev libsqlite3-dev libpq-dev \
+    && docker-php-ext-install zip pdo pdo_sqlite pdo_pgsql bcmath ctype \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

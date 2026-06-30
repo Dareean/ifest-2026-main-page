@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
     "@vercel/speed-insights": "^2.0.0",
     "@vueuse/motion": "^3.0.3",
     "axios": "^1.18.1",
