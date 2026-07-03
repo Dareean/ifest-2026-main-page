@@ -283,7 +283,7 @@ watch(() => route.query.id, (newId) => {
             <button 
               v-for="comp in competitionsData" 
               :key="comp.id"
-              @click="selectCompetition(comp)"
+              @click="selectCompetitionAndScroll(comp)"
               class="flex-shrink-0 lg:flex-shrink text-left font-mono font-bold text-xs uppercase border-2 md:border-3 border-[#04000D] p-4 flex flex-col justify-between transition-all duration-150 cursor-pointer min-w-[200px] lg:w-full select-none"
               :style="{ 
                 backgroundColor: activeCompetition.id === comp.id ? comp.cardBg : '#F5F5F5',

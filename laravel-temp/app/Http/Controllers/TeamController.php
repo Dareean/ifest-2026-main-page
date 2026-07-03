@@ -2,325 +2,279 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pendaftaran;
-use App\Models\User;
 use App\Models\Notification;
+use App\Models\Pendaftaran;
+use App\Models\TeamInvitation;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class TeamController extends Controller
 {
-    private function getMaxMembers($req): int
+    private function checkOwnership(Request $request, Pendaftaran $pendaftaran): bool
     {
-        if (!$req) return 3;
-        if (stripos($req, 'individu') !== false) {
-            return 1;
-        }
-        if (preg_match('/(\d+)\s*-\s*(\d+)/', $req, $matches)) {
-            return (int)$matches[2];
-        }
-        if (preg_match('/(\d+)/', $req, $matches)) {
-            return (int)$matches[1];
-        }
-        return 3;
-    }
-
-    public function invitations(Request $request): JsonResponse
-    {
-        $user = $request->user();
-        $email = strtolower($user->email);
-
-        // Filter at DB level using PostgreSQL JSON text search — avoids PHP-side full table scan
-        $pendaftarans = Pendaftaran::with('lomba', 'user')
-            ->where('status', 'verified')
-            ->whereNotNull('team_members')
-            ->whereRaw("team_members::text ILIKE ?", ['%"email":"' . $email . '"%'])
-            ->whereRaw("team_members::text ILIKE ?", ['%"status":"pending"%'])
-            ->get()
-            // Secondary PHP filter to ensure both conditions are on the same element
-            ->filter(function ($pendaftaran) use ($email) {
-                $members = $pendaftaran->team_members;
-                if (!is_array($members)) return false;
-                foreach ($members as $m) {
-                    if (
-                        isset($m['email'], $m['status']) &&
-                        strtolower($m['email']) === $email &&
-                        $m['status'] === 'pending'
-                    ) {
-                        return true;
-                    }
-                }
-                return false;
-            })
-            ->values();
-
-        // Format return values
-        $formatted = $pendaftarans->map(fn($p) => [
-            'id'        => $p->id,
-            'team_name' => $p->team_name,
-            'lomba'     => $p->lomba,
-            'leader'    => $p->user,
-        ]);
-
-        return response()->json(['data' => $formatted]);
+        return $pendaftaran->user_id === $request->user()->id;
     }
 
     public function invite(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
-        $pendaftaran->loadMissing('lomba'); // ensure relation loaded (avoid N+1)
-        $user = $request->user();
-
-        if ($pendaftaran->user_id !== $user->id) {
-            return response()->json(['message' => 'Hanya ketua tim yang dapat mengundang anggota.'], 403);
+        if (!$this->checkOwnership($request, $pendaftaran)) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
         if ($pendaftaran->status !== 'verified') {
-            return response()->json(['message' => 'Pendaftaran harus diverifikasi terlebih dahulu oleh admin.'], 400);
+            return response()->json(['message' => 'Pendaftaran belum diverifikasi'], 400);
         }
 
         if ($pendaftaran->team_locked) {
-            return response()->json(['message' => 'Tim sudah dikunci. Silakan ajukan pembukaan kunci jika ingin mengubah anggota.'], 400);
+            return response()->json(['message' => 'Tim sedang terkunci. Ajukan permohonan perubahan terlebih dahulu'], 400);
         }
 
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|max:255',
+        $request->validate(['email' => 'required|email']);
+
+        $maxMembers = $pendaftaran->lomba->getMaxMembers();
+        $acceptedCount = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('status', 'accepted')
+            ->count();
+
+        // +1 for the ketua (user_id)
+        if ($acceptedCount + 1 >= $maxMembers) {
+            return response()->json(['message' => 'Tim sudah penuh (maksimal ' . $maxMembers . ' anggota)'], 400);
+        }
+
+        $email = $request->email;
+
+        // Check if already invited
+        $existing = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('email', $email)
+            ->first();
+
+        if ($existing) {
+            if ($existing->status === 'pending') {
+                return response()->json(['message' => 'Anggota ini sudah diundang, tunggu konfirmasi'], 400);
+            }
+            if ($existing->status === 'accepted') {
+                return response()->json(['message' => 'Anggota ini sudah bergabung'], 400);
+            }
+            // If rejected, allow re-invite by updating
+            $existing->update(['status' => 'pending', 'invited_user_id' => null]);
+            return $this->sendInviteResponse($existing, $pendaftaran, $request->user());
+        }
+
+        $invitedUser = User::where('email', $email)->first();
+
+        if (!$invitedUser) {
+            return response()->json([
+                'message' => 'Email ' . $email . ' belum terdaftar di sistem',
+                'found' => false,
+            ], 404);
+        }
+
+        // Check if invited user is the ketua themselves
+        if ($invitedUser->id === $request->user()->id) {
+            return response()->json(['message' => 'Tidak bisa mengundang diri sendiri'], 400);
+        }
+
+        // Check if user already has a pendaftaran for this lomba (already on another team)
+        $alreadyRegistered = Pendaftaran::where('user_id', $invitedUser->id)
+            ->where('lomba_id', $pendaftaran->lomba_id)
+            ->where('status', 'verified')
+            ->exists();
+        if ($alreadyRegistered) {
+            return response()->json(['message' => 'User sudah terdaftar di tim lain untuk lomba ini'], 400);
+        }
+
+        $invitation = TeamInvitation::create([
+            'pendaftaran_id' => $pendaftaran->id,
+            'email' => $email,
+            'invited_by_user_id' => $request->user()->id,
+            'invited_user_id' => $invitedUser->id,
+            'status' => 'pending',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $email = strtolower($request->email);
-
-        // Single DB query — no full table load
-        $targetUser = User::where('email', $email)->first();
-
-        if (!$targetUser) {
-            return response()->json(['message' => 'Email tidak terdaftar di sistem. Silakan minta rekan Anda membuat akun terlebih dahulu.'], 404);
-        }
-
-        if ($targetUser->id === $pendaftaran->user_id) {
-            return response()->json(['message' => 'Anda adalah ketua tim.'], 400);
-        }
-
-        $maxSize = $this->getMaxMembers($pendaftaran->lomba->team_requirements);
-        if ($maxSize <= 1) {
-            return response()->json(['message' => 'Kompetisi ini adalah kompetisi individu.'], 400);
-        }
-
-        $currentMembers = $pendaftaran->team_members ?: [];
-        $currentSize = 1 + count($currentMembers);
-
-        if ($currentSize >= $maxSize) {
-            return response()->json(['message' => 'Jumlah anggota tim sudah mencapai batas maksimal (' . $maxSize . ' orang).'], 400);
-        }
-
-        // Check duplicate in this team (in-memory array, fast)
-        foreach ($currentMembers as $m) {
-            if (strtolower($m['email']) === $email) {
-                return response()->json(['message' => 'Rekan Anda sudah diundang atau bergabung dalam tim ini.'], 400);
-            }
-        }
-
-        // Check if already registered in the same competition as leader — single targeted EXISTS query
-        $isLeader = Pendaftaran::where('user_id', $targetUser->id)
-            ->where('lomba_id', $pendaftaran->lomba_id)
-            ->exists();
-
-        if ($isLeader) {
-            return response()->json(['message' => 'Rekan Anda sudah terdaftar di lomba ini sebagai ketua tim lain.'], 400);
-        }
-
-        // Check if already a joined member in another team for the same competition
-        // Uses PostgreSQL JSON contains operator to avoid fetching all rows into PHP
-        $alreadyJoinedOtherTeam = Pendaftaran::where('lomba_id', $pendaftaran->lomba_id)
-            ->where('id', '!=', $pendaftaran->id)
-            ->whereNotNull('team_members')
-            ->whereRaw("team_members::text ILIKE ?", ['%"email":"' . $email . '"%'])
-            ->whereRaw("team_members::text ILIKE ?", ['%"status":"joined"%'])
-            ->exists();
-
-        if ($alreadyJoinedOtherTeam) {
-            return response()->json(['message' => 'Rekan Anda sudah terdaftar dan bergabung di tim lain untuk lomba ini.'], 400);
-        }
-
-        // Add member to JSON array and save in a single update
-        $currentMembers[] = [
-            'user_id' => $targetUser->id,
-            'name'    => $targetUser->name,
-            'email'   => $targetUser->email,
-            'status'  => 'pending'
-        ];
-
-        $pendaftaran->update(['team_members' => $currentMembers]);
-
-        // Create notification — email is now queued (non-blocking)
         Notification::create([
-            'user_id' => $targetUser->id,
-            'judul'   => 'Undangan Bergabung Tim',
-            'pesan'   => "Kamu diundang oleh {$user->name} untuk bergabung ke dalam tim {$pendaftaran->team_name} untuk kompetisi {$pendaftaran->lomba->title}.",
+            'user_id' => $invitedUser->id,
+            'judul' => 'Undangan Tim',
+            'pesan' => 'Kamu diundang bergabung ke tim "' . ($pendaftaran->team_name ?: 'Tim ' . $request->user()->name) . '" oleh ' . $request->user()->name . '. Klik untuk menerima atau menolak.',
         ]);
 
         return response()->json([
-            'message' => 'Undangan berhasil dikirim.',
-            'data'    => $pendaftaran->fresh(['lomba', 'user'])
+            'message' => 'Undangan berhasil dikirim ke ' . $email,
+            'invitation' => $invitation->load('invitedUser'),
+            'found' => true,
+        ], 201);
+    }
+
+    public function pendingInvitations(Request $request): JsonResponse
+    {
+        $invitations = TeamInvitation::where('email', $request->user()->email)
+            ->where('status', 'pending')
+            ->with(['pendaftaran.lomba', 'invitedBy'])
+            ->latest()
+            ->get();
+
+        return response()->json(['data' => $invitations]);
+    }
+
+    public function byPendaftaran(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    {
+        if (!$this->checkOwnership($request, $pendaftaran)) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $invitations = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->with(['invitedUser', 'invitedBy'])
+            ->latest()
+            ->get();
+
+        return response()->json(['data' => $invitations]);
+    }
+
+    public function myTeam(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    {
+        if (!$this->checkOwnership($request, $pendaftaran)) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $pendaftaran->load('lomba', 'user');
+        $ketua = $pendaftaran->user;
+        $accepted = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('status', 'accepted')
+            ->with('invitedUser')
+            ->get();
+
+        $pending = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('status', 'pending')
+            ->with('invitedUser')
+            ->get();
+
+        $maxMembers = $pendaftaran->lomba->getMaxMembers();
+
+        return response()->json([
+            'pendaftaran' => $pendaftaran,
+            'ketua' => $ketua,
+            'accepted_members' => $accepted->map(fn($i) => [
+                'invitation_id' => $i->id,
+                'id' => $i->invitedUser->id,
+                'name' => $i->invitedUser->name,
+                'email' => $i->invitedUser->email,
+            ]),
+            'pending_invitations' => $pending->map(fn($i) => [
+                'id' => $i->id,
+                'email' => $i->email,
+                'name' => $i->invitedUser?->name,
+                'created_at' => $i->created_at,
+            ]),
+            'max_members' => $maxMembers,
+            'current_count' => 1 + $accepted->count(),
+            'team_locked' => $pendaftaran->team_locked,
+            'unlock_requested' => $pendaftaran->unlock_requested,
+            'status' => $pendaftaran->status,
         ]);
     }
 
-    public function acceptInvite(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    public function accept(Request $request, TeamInvitation $invitation): JsonResponse
     {
-        $user = $request->user();
-        $members = $pendaftaran->team_members ?: [];
-
-        $found = false;
-        $joinedCount = 1; // Start with leader
-        $hasPending = false;
-
-        foreach ($members as &$m) {
-            if (strtolower($m['email']) === strtolower($user->email)) {
-                if ($m['status'] !== 'pending') {
-                    return response()->json(['message' => 'Anda sudah bergabung di tim ini.'], 400);
-                }
-                $m['status'] = 'joined';
-                $found = true;
-            }
-            if ($m['status'] === 'joined') {
-                $joinedCount++;
-            } else {
-                $hasPending = true;
-            }
+        if ($invitation->email !== $request->user()->email) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        if (!$found) {
-            return response()->json(['message' => 'Undangan tidak ditemukan.'], 404);
+        if ($invitation->status !== 'pending') {
+            return response()->json(['message' => 'Undangan sudah tidak aktif'], 400);
         }
 
-        $pendaftaran->team_members = $members;
-        
-        $maxSize = $this->getMaxMembers($pendaftaran->lomba->team_requirements);
-        if ($joinedCount >= $maxSize && !$hasPending) {
-            $pendaftaran->team_locked = true;
-        }
+        $invitation->update([
+            'status' => 'accepted',
+            'invited_user_id' => $request->user()->id,
+        ]);
 
-        $pendaftaran->save();
-
-        // Notify leader
+        // Notify ketua
         Notification::create([
-            'user_id' => $pendaftaran->user_id,
+            'user_id' => $invitation->invited_by_user_id,
             'judul' => 'Undangan Diterima',
-            'pesan' => "{$user->name} telah bergabung ke dalam tim Anda ({$pendaftaran->team_name})." . ($pendaftaran->team_locked ? " Tim Anda sekarang penuh dan dikunci." : ""),
+            'pesan' => $request->user()->name . ' telah menerima undangan bergabung ke tim.',
         ]);
 
-        return response()->json(['message' => 'Berhasil bergabung dengan tim.']);
+        return response()->json(['message' => 'Berhasil bergabung ke tim', 'invitation' => $invitation]);
     }
 
-    public function declineInvite(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    public function reject(Request $request, TeamInvitation $invitation): JsonResponse
     {
-        $user = $request->user();
-        $members = $pendaftaran->team_members ?: [];
-
-        $found = false;
-        $newMembers = [];
-
-        foreach ($members as $m) {
-            if (strtolower($m['email']) === strtolower($user->email)) {
-                if ($m['status'] !== 'pending') {
-                    return response()->json(['message' => 'Anda sudah menjadi bagian dari tim ini.'], 400);
-                }
-                $found = true;
-            } else {
-                $newMembers[] = $m;
-            }
+        if ($invitation->email !== $request->user()->email) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        if (!$found) {
-            return response()->json(['message' => 'Undangan tidak ditemukan.'], 404);
+        if ($invitation->status !== 'pending') {
+            return response()->json(['message' => 'Undangan sudah tidak aktif'], 400);
         }
 
-        $pendaftaran->team_members = $newMembers;
-        $pendaftaran->save();
+        $invitation->update(['status' => 'rejected']);
 
-        // Notify leader
+        // Notify ketua
         Notification::create([
-            'user_id' => $pendaftaran->user_id,
+            'user_id' => $invitation->invited_by_user_id,
             'judul' => 'Undangan Ditolak',
-            'pesan' => "{$user->name} menolak undangan bergabung ke tim {$pendaftaran->team_name}.",
+            'pesan' => $request->user()->name . ' menolak undangan bergabung ke tim.',
         ]);
 
-        return response()->json(['message' => 'Undangan berhasil ditolak.']);
+        return response()->json(['message' => 'Undangan ditolak']);
     }
 
-    public function removeMember(Request $request, Pendaftaran $pendaftaran, $userId): JsonResponse
+    public function removeMember(Request $request, Pendaftaran $pendaftaran, TeamInvitation $invitation): JsonResponse
     {
-        $user = $request->user();
-
-        if ($pendaftaran->user_id !== $user->id) {
-            return response()->json(['message' => 'Hanya ketua tim yang dapat mengeluarkan anggota.'], 403);
+        if (!$this->checkOwnership($request, $pendaftaran)) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        if ($pendaftaran->team_locked) {
-            return response()->json(['message' => 'Tim sudah dikunci. Silakan ajukan pembukaan kunci terlebih dahulu.'], 400);
+        if ($invitation->pendaftaran_id !== $pendaftaran->id) {
+            return response()->json(['message' => 'Anggota tidak terdaftar di tim ini'], 400);
         }
 
-        $members = $pendaftaran->team_members ?: [];
-        $newMembers = [];
-        $removedMember = null;
-
-        foreach ($members as $m) {
-            if ((int)$m['user_id'] === (int)$userId) {
-                $removedMember = $m;
-            } else {
-                $newMembers[] = $m;
-            }
+        if ($invitation->status !== 'accepted') {
+            return response()->json(['message' => 'Anggota belum bergabung'], 400);
         }
 
-        if (!$removedMember) {
-            return response()->json(['message' => 'Anggota tidak ditemukan.'], 404);
+        $userName = $invitation->invitedUser?->name ?? 'Anggota';
+        $invitation->update(['status' => 'rejected']);
+
+        // Notify removed member
+        if ($invitation->invited_user_id) {
+            Notification::create([
+                'user_id' => $invitation->invited_user_id,
+                'judul' => 'Dikeluarkan dari Tim',
+                'pesan' => 'Kamu telah dikeluarkan dari tim "' . ($pendaftaran->team_name ?: 'Tim') . '" oleh ketua tim.',
+            ]);
         }
 
-        $pendaftaran->team_members = $newMembers;
-        $pendaftaran->save();
-
-        // Notify target user
-        Notification::create([
-            'user_id' => $userId,
-            'judul' => 'Dikeluarkan dari Tim',
-            'pesan' => "Kamu telah dikeluarkan dari tim {$pendaftaran->team_name} untuk kompetisi {$pendaftaran->lomba->title} oleh ketua tim.",
-        ]);
-
-        return response()->json(['message' => 'Anggota berhasil dikeluarkan.']);
+        return response()->json(['message' => $userName . ' berhasil dikeluarkan dari tim']);
     }
 
-    public function lockTeam(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    public function requestChanges(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
-        if ($pendaftaran->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Hanya ketua tim yang dapat mengunci tim.'], 403);
+        if (!$this->checkOwnership($request, $pendaftaran)) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $pendaftaran->update(['team_locked' => true]);
-
-        return response()->json(['message' => 'Tim berhasil dikunci.']);
-    }
-
-    public function requestUnlock(Request $request, Pendaftaran $pendaftaran): JsonResponse
-    {
-        if ($pendaftaran->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Hanya ketua tim yang dapat mengajukan permohonan buka kunci.'], 403);
+        if (!$pendaftaran->team_locked) {
+            return response()->json(['message' => 'Tim tidak dalam keadaan terkunci'], 400);
         }
 
         $pendaftaran->update(['unlock_requested' => true]);
 
-        return response()->json(['message' => 'Permohonan buka kunci berhasil diajukan ke admin.']);
-    }
+        // Notify admin users (skip if role column doesn't exist yet — admin panel pending)
+        try {
+            $admins = User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'judul' => 'Permohonan Perubahan Tim',
+                    'pesan' => 'Tim "' . ($pendaftaran->team_name ?: $request->user()->name) . '" meminta untuk membuka perubahan anggota.',
+                ]);
+            }
+        } catch (\Exception $e) {
+            // admin role column not available yet
+        }
 
-    public function adminApproveUnlock(Request $request, Pendaftaran $pendaftaran): JsonResponse
-    {
-        $pendaftaran->update([
-            'team_locked' => false,
-            'unlock_requested' => false
-        ]);
-
-        return response()->json(['message' => 'Simulasi Admin: Kunci tim berhasil dibuka.']);
+        return response()->json(['message' => 'Permohonan perubahan dikirim ke admin']);
     }
 }

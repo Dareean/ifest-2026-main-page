@@ -3,12 +3,19 @@
 namespace Database\Seeders;
 
 use App\Models\Lomba;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        User::create([
+            'name' => 'Admin I-FEST',
+            'email' => 'admin@ifest.com',
+            'password' => bcrypt('admin123'),
+            'role' => 'admin',
+        ]);
         $lombas = [
             [
                 'kode' => 'NAT-01',

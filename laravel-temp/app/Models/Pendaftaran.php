@@ -10,6 +10,8 @@ class Pendaftaran extends Model
         'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'notes', 'team_locked', 'unlock_requested',
     ];
 
+    protected $appends = ['max_members'];
+
     protected function casts(): array
     {
         return [
@@ -17,6 +19,11 @@ class Pendaftaran extends Model
             'team_locked' => 'boolean',
             'unlock_requested' => 'boolean',
         ];
+    }
+
+    public function getMaxMembersAttribute(): int
+    {
+        return $this->lomba?->getMaxMembers() ?? 1;
     }
 
     public function user()
@@ -32,5 +39,10 @@ class Pendaftaran extends Model
     public function submission()
     {
         return $this->hasOne(Submission::class);
+    }
+
+    public function teamInvitations()
+    {
+        return $this->hasMany(TeamInvitation::class);
     }
 }

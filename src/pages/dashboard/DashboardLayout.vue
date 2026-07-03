@@ -1,29 +1,41 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 
 import {
   LayoutDashboard, Trophy, Bell, User, LogOut, Menu, X,
-  Home, ChevronRight, HelpCircle,
+  Home, ChevronRight, HelpCircle, Mail, Shield,
 } from 'lucide-vue-next'
+import api from '../../utils/api'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 const sidebarOpen = ref(false)
-const unreadCount = ref(0)
+const unreadNotifCount = ref(0)
+const unreadInvCount = ref(0)
 
 const navItems = [
   { path: '/dashboard', name: 'Overview', icon: LayoutDashboard },
   { path: '/dashboard/competitions', name: 'Lomba', icon: Trophy },
+  { path: '/dashboard/undangan', name: 'Undangan', icon: Mail },
   { path: '/dashboard/notifications', name: 'Notifikasi', icon: Bell },
   { path: '/dashboard/profile', name: 'Profil', icon: User },
   { path: '/dashboard/help', name: 'Bantuan', icon: HelpCircle },
 ]
 
+async function fetchInvitationCount() {
+  try {
+    const res = await api.get('/invitations/pending')
+    unreadInvCount.value = res.data.data?.length || 0
+  } catch {
+    unreadInvCount.value = 0
+  }
+}
+
 watch(() => auth.user, (u) => {
-  unreadCount.value = u?.unread_notifications_count || 0
+  unreadNotifCount.value = u?.unread_notifications_count || 0
 }, { immediate: true })
 
 async function handleLogout() {
@@ -31,15 +43,26 @@ async function handleLogout() {
   router.push('/')
 }
 
+const isAdminRoute = computed(() => route.path.startsWith('/dashboard/admin'))
+
 onMounted(() => {
   if (!auth.isAuthenticated) {
     router.push('/login')
+  }
+  if (!isAdminRoute.value) {
+    fetchInvitationCount()
   }
 })
 </script>
 
 <template>
-  <div v-if="auth.isAuthenticated" class="min-h-screen riso-canvas bg-background flex">
+  <!-- Admin routes: render child directly without user sidebar -->
+  <div v-if="isAdminRoute" class="min-h-screen riso-canvas bg-background">
+    <router-view />
+  </div>
+
+  <!-- User dashboard: full layout with sidebar -->
+  <div v-else-if="auth.isAuthenticated" class="min-h-screen riso-canvas bg-background flex">
     <!-- Mobile overlay -->
     <Transition name="fade">
       <div v-if="sidebarOpen" class="fixed inset-0 bg-[#04000D]/30 z-40 md:hidden" @click="sidebarOpen = false"></div>
@@ -93,13 +116,17 @@ onMounted(() => {
         >
           <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
           <span>{{ item.name }}</span>
-          <span v-if="item.name === 'Notifikasi' && unreadCount > 0" class="ml-auto bg-accent-magenta text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadCount }}</span>
+          <span v-if="item.name === 'Notifikasi' && unreadNotifCount > 0" class="ml-auto bg-accent-magenta text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadNotifCount }}</span>
+          <span v-if="item.name === 'Undangan' && unreadInvCount > 0" class="ml-auto bg-amber-500 text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadInvCount }}</span>
           <ChevronRight v-if="route.path === item.path" class="w-3.5 h-3.5 ml-auto opacity-60" />
         </router-link>
       </nav>
 
       <!-- Bottom -->
       <div class="p-3 border-t border-[#04000D]/5 space-y-1">
+        <router-link v-if="auth.isAdmin" to="/dashboard/admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-[#04000D] bg-[#DCEEB1] hover:bg-[#DCEEB1]/80 transition-all w-full shadow-sm">
+          <Shield class="w-4 h-4" /> Admin Panel
+        </router-link>
         <router-link to="/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:bg-slate-50 hover:text-on-surface transition-all w-full">
           <Home class="w-4 h-4" /> Beranda
         </router-link>

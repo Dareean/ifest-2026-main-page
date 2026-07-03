@@ -19,8 +19,8 @@ async function handleLogin() {
   error.value = ''
   isSubmitting.value = true
   try {
-    await auth.login(form.value)
-    router.push('/dashboard')
+    const res = await auth.login(form.value)
+    router.push(res?.user?.role === 'admin' ? '/dashboard/admin' : '/dashboard')
   } catch (e) {
     error.value = e.response?.data?.message || 'Email atau password salah'
   } finally {

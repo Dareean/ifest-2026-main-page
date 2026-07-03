@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
+  const isAdmin = computed(() => user.value?.role === 'admin')
   const unreadNotifications = computed(() => user.value?.notifications?.length || 0)
 
   async function register(data) {

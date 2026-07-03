@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import { 
@@ -44,11 +45,11 @@ const getMaxMembers = (req) => {
 
 // Competition opening dates config
 const openDates = {
-  'NAT-01': new Date('2026-07-05T00:00:00'),
-  'NAT-02': new Date('2026-07-05T00:00:00'),
-  'NAT-03': new Date('2026-07-05T00:00:00'),
-  'REG-01': new Date('2026-07-05T00:00:00'),
-  'REG-02': new Date('2026-07-05T00:00:00'),
+  'NAT-01': new Date('2026-06-01T00:00:00'),
+  'NAT-02': new Date('2026-06-01T00:00:00'),
+  'NAT-03': new Date('2026-06-01T00:00:00'),
+  'REG-01': new Date('2026-06-01T00:00:00'),
+  'REG-02': new Date('2026-06-01T00:00:00'),
   'REG-03': new Date('2026-06-01T00:00:00'), // Sulteng Digital Innovation Hub is already open
 }
 
@@ -98,7 +99,7 @@ const statusConfig = {
 
 async function fetchInvitations() {
   try {
-    const res = await api.get('/pendaftarans/invitations')
+    const res = await api.get('/invitations/pending')
     invitations.value = res.data.data
     localStorage.setItem('cached_invitations', JSON.stringify(res.data.data))
   } catch (e) {
@@ -111,7 +112,7 @@ async function fetchData() {
     const [pendaftaranRes, lombaRes, invitationsRes] = await Promise.all([
       api.get('/pendaftarans'),
       api.get('/lombas'),
-      api.get('/pendaftarans/invitations')
+      api.get('/invitations/pending')
     ])
     pendaftarans.value = pendaftaranRes.data.data
     lombaList.value = lombaRes.data.data
@@ -165,7 +166,12 @@ async function handleDaftar() {
     const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
     if (updated) openDetail(updated)
   } catch (e) {
-    error.value = e.response?.data?.message || 'Gagal mendaftar'
+    const data = e.response?.data
+    if (data?.errors) {
+      error.value = Object.values(data.errors).flat().join('. ')
+    } else {
+      error.value = data?.message || 'Gagal mendaftar'
+    }
   } finally {
     submitting.value = false
   }
@@ -231,9 +237,9 @@ async function handleInvite() {
 async function handleAcceptInvite(invitationId) {
   actionLoading.value = invitationId
   try {
-    await api.post(`/pendaftarans/${invitationId}/accept-invite`)
-    await fetchData()
+    await api.put(`/invitations/${invitationId}/accept`)
     await fetchInvitations()
+    await fetchData()
   } catch (e) {
     alert(e.response?.data?.message || 'Gagal menerima undangan')
   } finally {
@@ -244,8 +250,7 @@ async function handleAcceptInvite(invitationId) {
 async function handleDeclineInvite(invitationId) {
   actionLoading.value = invitationId
   try {
-    await api.post(`/pendaftarans/${invitationId}/decline-invite`)
-    await fetchData()
+    await api.put(`/invitations/${invitationId}/reject`)
     await fetchInvitations()
   } catch (e) {
     alert(e.response?.data?.message || 'Gagal menolak undangan')
@@ -271,43 +276,12 @@ async function handleRemoveMember(memberId) {
   }
 }
 
-async function handleLockTeam() {
-  if (!selectedLombaForDetail.value) return
-  const reg = getRegistration(selectedLombaForDetail.value.id)
-  if (!confirm('Apakah Anda yakin ingin mengunci tim ini? Setelah dikunci, Anda tidak dapat mengubah anggota lagi.')) return
-  try {
-    await api.post(`/pendaftarans/${reg.id}/lock`)
-    await fetchData()
-    const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
-    if (updated) openDetail(updated)
-  } catch (e) {
-    alert(e.response?.data?.message || 'Gagal mengunci tim')
-  }
-}
+const router = useRouter()
 
-async function handleRequestUnlock() {
-  if (!selectedLombaForDetail.value) return
-  const reg = getRegistration(selectedLombaForDetail.value.id)
-  try {
-    await api.post(`/pendaftarans/${reg.id}/request-unlock`)
-    await fetchData()
-    const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
-    if (updated) openDetail(updated)
-  } catch (e) {
-    alert(e.response?.data?.message || 'Gagal mengajukan permohonan')
-  }
-}
-
-async function handleAdminApproveUnlock() {
-  if (!selectedLombaForDetail.value) return
-  const reg = getRegistration(selectedLombaForDetail.value.id)
-  try {
-    await api.post(`/pendaftarans/${reg.id}/admin-approve-unlock`)
-    await fetchData()
-    const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
-    if (updated) openDetail(updated)
-  } catch (e) {
-    alert(e.response?.data?.message || 'Gagal memproses simulasi')
+function goToTeamPage() {
+  const reg = getRegistration(selectedLombaForDetail.value?.id)
+  if (reg) {
+    router.push(`/dashboard/tim/${reg.id}`)
   }
 }
 
@@ -377,10 +351,10 @@ onUnmounted(() => {
             class="bg-[#DCEEB1]/10 border border-[#DCEEB1]/45 shadow-sm rounded-2xl p-5 flex flex-col justify-between gap-4 animate-fade-in"
           >
             <div class="text-xs">
-              <span class="font-mono text-[9px] font-bold uppercase tracking-wider text-accent-magenta">{{ invite.lomba.kode }}</span>
-              <h4 class="font-extrabold text-sm text-on-surface mt-1">{{ invite.team_name || 'Tanpa Nama Tim' }}</h4>
+              <span class="font-mono text-[9px] font-bold uppercase tracking-wider text-accent-magenta">{{ invite.pendaftaran?.lomba?.kode }}</span>
+              <h4 class="font-extrabold text-sm text-on-surface mt-1">{{ invite.pendaftaran?.team_name || 'Tanpa Nama Tim' }}</h4>
               <p class="text-on-surface-variant/80 mt-2 leading-relaxed">
-                Anda diundang untuk bergabung di kompetisi <strong>{{ invite.lomba.title }}</strong> oleh Ketua Tim <strong>{{ invite.leader.name }}</strong> ({{ invite.leader.email }}).
+                Anda diundang untuk bergabung di kompetisi <strong>{{ invite.pendaftaran?.lomba?.title }}</strong> oleh Ketua Tim <strong>{{ invite.invited_by?.name }}</strong> ({{ invite.email }}).
               </p>
             </div>
             
@@ -575,126 +549,46 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Team Details & Management -->
-          <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 md:p-6 space-y-6">
+          <!-- Team Details -->
+          <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 md:p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
               <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
-                <Users class="w-4 h-4 text-accent-magenta" /> Detail & Kelola Anggota Tim
+                <Users class="w-4 h-4 text-accent-magenta" /> Anggota Tim
               </h4>
               <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white border border-slate-200 text-on-surface-variant">
-                Max Anggota: {{ getMaxMembers(selectedLombaForDetail?.team_requirements) }} Orang
+                Max: {{ getMaxMembers(selectedLombaForDetail?.team_requirements) }} Orang
               </span>
             </div>
 
-            <!-- Team status locked warnings -->
-            <div v-if="getRegistration(selectedLombaForDetail?.id)?.team_locked" class="bg-[#FF3D8B]/5 border border-accent-magenta/10 rounded-xl p-4 flex items-start gap-3">
-              <Lock class="w-5 h-5 text-accent-magenta mt-0.5 flex-shrink-0" />
-              <div class="text-xs leading-relaxed flex-1">
-                <p class="font-bold text-on-surface">Anggota Tim Terkunci</p>
-                <p class="text-on-surface-variant/80 mt-0.5">Struktur tim Anda telah dikunci. Perubahan anggota tidak dapat dilakukan.</p>
-                <div v-if="getRegistration(selectedLombaForDetail?.id)?.user_id === auth.user?.id" class="mt-3 flex items-center gap-3">
-                  <span v-if="getRegistration(selectedLombaForDetail?.id)?.unlock_requested" class="inline-flex items-center gap-1 text-[10px] font-bold uppercase text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg">
-                    <Clock class="w-3.5 h-3.5" /> Menunggu Persetujuan Buka Kunci...
-                  </span>
-                  <button v-else @click="handleRequestUnlock" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-4 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all">
-                    Ajukan Buka Kunci
-                  </button>
-                  <button @click="handleAdminApproveUnlock" class="bg-white hover:bg-slate-50 text-accent-magenta border border-slate-200 px-4 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all">
-                    Simulasi Admin: Setujui Buka Kunci
-                  </button>
+            <!-- Ketua -->
+            <div class="bg-white border border-slate-100 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-on-surface">{{ getRegistration(selectedLombaForDetail?.id)?.user?.name || auth.user?.name }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
                 </div>
+                <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ getRegistration(selectedLombaForDetail?.id)?.user?.email || auth.user?.email }}</p>
               </div>
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 text-on-surface">Joined</span>
             </div>
 
-            <!-- Team list -->
-            <div class="space-y-3">
-              <!-- Leader (Ketua) -->
-              <div class="bg-white border border-slate-100 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="font-bold text-on-surface">{{ getRegistration(selectedLombaForDetail?.id)?.user?.name || auth.user?.name }}</span>
-                    <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
-                  </div>
-                  <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ getRegistration(selectedLombaForDetail?.id)?.user?.email || auth.user?.email }}</p>
+            <!-- Other members from old JSON format -->
+            <div v-for="member in getRegistration(selectedLombaForDetail?.id)?.team_members" :key="member.user_id" class="bg-white border border-slate-100 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-on-surface">{{ member.name }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
                 </div>
-                <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 text-on-surface">
-                  Joined
-                </span>
+                <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ member.email }}</p>
               </div>
-
-              <!-- Other Members -->
-              <div 
-                v-for="member in getRegistration(selectedLombaForDetail?.id)?.team_members" 
-                :key="member.user_id"
-                class="bg-white border border-slate-100 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm"
-              >
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="font-bold text-on-surface">{{ member.name }}</span>
-                    <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
-                  </div>
-                  <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ member.email }}</p>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                  <span 
-                    class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                    :class="member.status === 'joined' ? 'bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 text-on-surface' : 'bg-[#FFF9E6] border border-amber-200 text-amber-600'"
-                  >
-                    {{ member.status === 'joined' ? 'Joined' : 'Pending' }}
-                  </span>
-                  
-                  <!-- Remove / Cancel button (Only for Leader & if team is NOT locked) -->
-                  <button 
-                    v-if="getRegistration(selectedLombaForDetail?.id)?.user_id === auth.user?.id && !getRegistration(selectedLombaForDetail?.id)?.team_locked"
-                    @click="handleRemoveMember(member.user_id)"
-                    :disabled="actionLoading === member.user_id"
-                    class="text-on-surface-variant/60 hover:text-accent-magenta transition-colors p-1.5 rounded-lg hover:bg-slate-50"
-                    title="Keluarkan anggota"
-                  >
-                    <UserMinus class="w-4.5 h-4.5 text-accent-magenta" />
-                  </button>
-                </div>
-              </div>
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full" :class="member.status === 'joined' ? 'bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 text-on-surface' : 'bg-[#FFF9E6] border border-amber-200 text-amber-600'">
+                {{ member.status === 'joined' ? 'Joined' : 'Pending' }}
+              </span>
             </div>
 
-            <!-- Manual Lock Team button (Only for Leader & if not locked & has members) -->
-            <div 
-              v-if="getRegistration(selectedLombaForDetail?.id)?.user_id === auth.user?.id && !getRegistration(selectedLombaForDetail?.id)?.team_locked && getRegistration(selectedLombaForDetail?.id)?.team_members?.length > 0"
-              class="pt-1"
-            >
-              <button @click="handleLockTeam" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-accent-magenta hover:text-on-surface transition-colors">
-                <Lock class="w-3.5 h-3.5" /> Kunci Susunan Tim Manual
-              </button>
-            </div>
-
-            <!-- Invite Form (Only for Leader & if not locked & team not full) -->
-            <div 
-              v-if="getRegistration(selectedLombaForDetail?.id)?.user_id === auth.user?.id && !getRegistration(selectedLombaForDetail?.id)?.team_locked && (1 + (getRegistration(selectedLombaForDetail?.id)?.team_members?.length || 0)) < getMaxMembers(selectedLombaForDetail?.team_requirements)"
-              class="border-t border-slate-200/60 pt-5 space-y-3"
-            >
-              <h5 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Undang Anggota Baru</h5>
-              <div class="flex items-center gap-2">
-                <div class="relative flex-1">
-                  <Mail class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-                  <input 
-                    v-model="inviteEmail" 
-                    type="email" 
-                    placeholder="Masukkan alamat email rekan Anda" 
-                    class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all"
-                  />
-                </div>
-                <button 
-                  @click="handleInvite" 
-                  :disabled="inviting || !inviteEmail" 
-                  class="bg-[#04000D] hover:bg-black text-[#DCEEB1] hover:text-[#DCEEB1]/90 px-5 py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm whitespace-nowrap"
-                >
-                  {{ inviting ? 'Mengundang...' : 'Kirim Undangan' }}
-                </button>
-              </div>
-              <div v-if="inviteError" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-2.5 text-[11px] font-semibold text-accent-magenta">{{ inviteError }}</div>
-              <div v-if="inviteSuccess" class="bg-[#DCEEB1]/10 border border-[#DCEEB1]/45 rounded-xl px-4 py-2.5 text-[11px] font-semibold text-green-600">{{ inviteSuccess }}</div>
-            </div>
+            <button @click="goToTeamPage" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] hover:text-[#DCEEB1]/90 px-4 py-3 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+              <Users class="w-3.5 h-3.5" /> Kelola Tim & Undang Anggota
+            </button>
           </div>
 
           <!-- Actions: Print & Certificate -->
@@ -736,8 +630,12 @@ onUnmounted(() => {
               <div v-if="error" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-3 text-xs font-semibold text-accent-magenta">{{ error }}</div>
 
               <div>
-                <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Nama Tim <span class="text-on-surface-variant/50">(opsional jika individu)</span></label>
-                <input v-model="daftarForm.team_name" placeholder="Masukkan nama tim kamu" class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+                <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">
+                  Nama Tim
+                  <span v-if="getMaxMembers(selectedLombaForDetail?.team_requirements) > 1" class="text-accent-magenta">*</span>
+                  <span v-else class="text-on-surface-variant/50">(opsional)</span>
+                </label>
+                <input v-model="daftarForm.team_name" :placeholder="getMaxMembers(selectedLombaForDetail?.team_requirements) > 1 ? 'Masukkan nama tim kamu' : 'Nama tim (opsional)'" class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
               </div>
 
               <button @click="handleDaftar" :disabled="submitting" class="w-full bg-[#04000D] text-white hover:bg-black py-3.5 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm mt-4 flex items-center justify-center gap-1.5">

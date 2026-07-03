@@ -154,9 +154,11 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'role' => $user->role,
             'avatar' => $user->avatar,
             'phone' => $user->phone,
             'institution' => $user->institution,
+            'google_id' => $user->google_id,
         ]));
 
         return redirect($this->frontendUrl() . '/auth/callback?token=' . $token . '&user=' . $userData);

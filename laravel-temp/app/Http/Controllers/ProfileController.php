@@ -69,19 +69,33 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'current_password' => 'required|string',
-            'new_password'     => 'required|string|min:8|confirmed',
-        ]);
+        $user = $request->user();
+        $hasGoogleId = !empty($user->google_id);
+
+        $rules = [
+            'new_password' => 'required|string|min:8|confirmed',
+        ];
+
+        if (!$hasGoogleId) {
+            $rules['current_password'] = 'required|string';
+        } else {
+            $rules['current_password'] = 'nullable|string';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user = $request->user();
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json(['message' => 'Password saat ini salah'], 400);
+        if ($request->filled('current_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json(['message' => 'Password saat ini salah'], 400);
+            }
+        } else {
+            if (!$hasGoogleId) {
+                return response()->json(['message' => 'Password saat ini diperlukan'], 400);
+            }
         }
 
         $user->update(['password' => Hash::make($request->new_password)]);

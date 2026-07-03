@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lomba;
 use App\Models\Pendaftaran;
 use App\Models\Notification;
+use App\Models\TeamInvitation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -18,8 +19,12 @@ class PendaftaranController extends Controller
         $owned = Pendaftaran::where('user_id', $user->id)
             ->with('lomba', 'submission', 'user')
             ->get();
-            
-        $memberOf = Pendaftaran::where('status', 'verified')
+
+        $memberOfViaInvitation = Pendaftaran::whereHas('teamInvitations', function ($q) use ($user) {
+            $q->where('invited_user_id', $user->id)->where('status', 'accepted');
+        })->with('lomba', 'submission', 'user')->get();
+
+        $memberOfViaJson = Pendaftaran::where('status', 'verified')
             ->whereNotNull('team_members')
             ->with('lomba', 'submission', 'user')
             ->get()
@@ -34,7 +39,7 @@ class PendaftaranController extends Controller
             })
             ->values();
 
-        $all = $owned->merge($memberOf)->sortByDesc('created_at')->values();
+        $all = $owned->merge($memberOfViaInvitation)->merge($memberOfViaJson)->unique('id')->sortByDesc('created_at')->values();
 
         return response()->json(['data' => $all]);
     }
@@ -49,21 +54,43 @@ class PendaftaranController extends Controller
             return response()->json(['message' => 'Kamu sudah terdaftar di lomba ini'], 409);
         }
 
-        $validator = Validator::make($request->all(), [
-            'team_name' => 'nullable|string|max:255',
+        $isTeam = $lomba->getMaxMembers() > 1;
+
+        $rules = [
+            'team_name' => $isTeam ? 'required|string|max:255' : 'nullable|string|max:255',
             'team_members' => 'nullable|array',
             'team_members.*.name' => 'required_with:team_members|string|max:255',
             'team_members.*.email' => 'required_with:team_members|email|max:255',
-        ]);
+        ];
+
+        $messages = $isTeam ? [
+            'team_name.required' => 'Nama tim wajib diisi untuk lomba beregu',
+        ] : [];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $teamName = $request->has('team_name') ? trim($request->team_name) : null;
+
+        if ($teamName && $isTeam) {
+            $duplicate = Pendaftaran::where('lomba_id', $lomba->id)
+                ->whereRaw('LOWER(team_name) = ?', [strtolower($teamName)])
+                ->exists();
+
+            if ($duplicate) {
+                return response()->json([
+                    'errors' => ['team_name' => ["Nama tim '$teamName' sudah digunakan. Silakan pilih nama lain."]]
+                ], 422);
+            }
+        }
+
         $pendaftaran = Pendaftaran::create([
             'user_id' => $request->user()->id,
             'lomba_id' => $lomba->id,
-            'team_name' => $request->team_name,
+            'team_name' => $teamName,
             'team_members' => $request->team_members,
         ]);
 
@@ -83,13 +110,18 @@ class PendaftaranController extends Controller
     {
         $user = $request->user();
         $isLeader = $pendaftaran->user_id === $user->id;
-        $isMember = false;
-        
-        $mList = $pendaftaran->team_members ?: [];
-        foreach ($mList as $m) {
-            if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'joined') {
-                $isMember = true;
-                break;
+        $isMember = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('invited_user_id', $user->id)
+            ->where('status', 'accepted')
+            ->exists();
+
+        if (!$isMember) {
+            $mList = $pendaftaran->team_members ?: [];
+            foreach ($mList as $m) {
+                if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'joined') {
+                    $isMember = true;
+                    break;
+                }
             }
         }
 

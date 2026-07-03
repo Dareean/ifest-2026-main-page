@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LombaController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -24,17 +26,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/user', [AuthController::class, 'user']);
 
     Route::post('/lombas/{lomba}/daftar', [PendaftaranController::class, 'store']);
-    Route::get('/pendaftarans/invitations', [\App\Http\Controllers\TeamController::class, 'invitations']);
     Route::get('/pendaftarans', [PendaftaranController::class, 'index']);
     Route::get('/pendaftarans/{pendaftaran}', [PendaftaranController::class, 'show']);
 
-    Route::post('/pendaftarans/{pendaftaran}/invite', [\App\Http\Controllers\TeamController::class, 'invite']);
-    Route::post('/pendaftarans/{pendaftaran}/accept-invite', [\App\Http\Controllers\TeamController::class, 'acceptInvite']);
-    Route::post('/pendaftarans/{pendaftaran}/decline-invite', [\App\Http\Controllers\TeamController::class, 'declineInvite']);
-    Route::delete('/pendaftarans/{pendaftaran}/members/{user_id}', [\App\Http\Controllers\TeamController::class, 'removeMember']);
-    Route::post('/pendaftarans/{pendaftaran}/lock', [\App\Http\Controllers\TeamController::class, 'lockTeam']);
-    Route::post('/pendaftarans/{pendaftaran}/request-unlock', [\App\Http\Controllers\TeamController::class, 'requestUnlock']);
-    Route::post('/pendaftarans/{pendaftaran}/admin-approve-unlock', [\App\Http\Controllers\TeamController::class, 'adminApproveUnlock']);
+    Route::post('/pendaftarans/{pendaftaran}/invite', [TeamController::class, 'invite']);
+    Route::get('/pendaftarans/{pendaftaran}/team', [TeamController::class, 'myTeam']);
+    Route::get('/pendaftarans/{pendaftaran}/invitations', [TeamController::class, 'byPendaftaran']);
+    Route::delete('/pendaftarans/{pendaftaran}/members/{invitation}', [TeamController::class, 'removeMember']);
+    Route::post('/pendaftarans/{pendaftaran}/request-changes', [TeamController::class, 'requestChanges']);
+
+    Route::get('/invitations/pending', [TeamController::class, 'pendingInvitations']);
+    Route::put('/invitations/{invitation}/accept', [TeamController::class, 'accept']);
+    Route::put('/invitations/{invitation}/reject', [TeamController::class, 'reject']);
 
     Route::post('/pendaftarans/{pendaftaran}/submit', [SubmissionController::class, 'store']);
     Route::get('/submissions', [SubmissionController::class, 'index']);
@@ -49,4 +52,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/auth/google/connect', [AuthController::class, 'googleConnect']);
     Route::post('/auth/google/disconnect', [AuthController::class, 'googleDisconnect']);
+});
+
+// Admin routes
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/stats', [AdminController::class, 'stats']);
+    Route::get('/pendaftarans', [AdminController::class, 'pendaftarans']);
+    Route::get('/pendaftarans/{pendaftaran}', [AdminController::class, 'pendaftaranDetail']);
+    Route::put('/pendaftarans/{pendaftaran}/verify', [AdminController::class, 'verify']);
+    Route::put('/pendaftarans/{pendaftaran}/reject', [AdminController::class, 'reject']);
+    Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
+    Route::get('/users', [AdminController::class, 'users']);
+    Route::post('/notifications', [AdminController::class, 'broadcastNotification']);
 });

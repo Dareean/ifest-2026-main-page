@@ -1,6 +1,7 @@
 <script setup>
-import { ref, defineAsyncComponent } from 'vue'
+import { ref, defineAsyncComponent, onMounted } from 'vue'
 import RisoLoader from './components/RisoLoader.vue'
+import { useAuthStore } from './stores/auth'
 import { Bot } from 'lucide-vue-next'
 
 const AiChatWidget = defineAsyncComponent(() => import('./components/AiChatWidget.vue'))
@@ -17,6 +18,13 @@ const onSplit = () => {
 const onLoaded = () => {
   isLoading.value = false
 }
+
+onMounted(() => {
+  const auth = useAuthStore()
+  if (auth.isAuthenticated) {
+    auth.fetchUser()
+  }
+})
 </script>
 
 <template>

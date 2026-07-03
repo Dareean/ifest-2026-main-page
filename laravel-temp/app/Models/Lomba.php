@@ -25,4 +25,28 @@ class Lomba extends Model
     {
         return $this->hasMany(Pendaftaran::class);
     }
+
+    public function getMaxMembers(): int
+    {
+        if (str_contains(strtolower($this->team_requirements), 'individu')) {
+            return 1;
+        }
+
+        preg_match('/(\d+)\s*[-–]\s*(\d+)/', $this->team_requirements, $matches);
+        if ($matches) {
+            return (int) $matches[2];
+        }
+
+        preg_match('/(?:maxs?\.?|mak?s\.?)\s*(\d+)/i', $this->team_requirements, $matches);
+        if ($matches) {
+            return (int) $matches[1];
+        }
+
+        preg_match('/(\d+)\s*orang/i', $this->team_requirements, $matches);
+        if ($matches) {
+            return (int) $matches[1];
+        }
+
+        return 3;
+    }
 }

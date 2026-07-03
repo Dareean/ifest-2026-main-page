@@ -1,6 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import HomePage from './pages/HomePage.vue'
+import CompetitionsPage from './pages/CompetitionsPage.vue'
+import RoadshowPage from './pages/RoadshowPage.vue'
+import LoginPage from './pages/LoginPage.vue'
+import RegisterPage from './pages/RegisterPage.vue'
+import AuthCallbackPage from './pages/AuthCallbackPage.vue'
+import InvoicePage from './pages/InvoicePage.vue'
+
+import DashboardLayout from './pages/dashboard/DashboardLayout.vue'
+import DashboardOverview from './pages/dashboard/DashboardOverview.vue'
+import DashboardCompetitions from './pages/dashboard/DashboardCompetitions.vue'
+import DashboardNotifications from './pages/dashboard/DashboardNotifications.vue'
+import DashboardProfile from './pages/dashboard/DashboardProfile.vue'
+import DashboardTim from './pages/dashboard/DashboardTim.vue'
+import DashboardInvitations from './pages/dashboard/DashboardInvitations.vue'
+import DashboardHelp from './pages/dashboard/DashboardHelp.vue'
+
+import DashboardAdminLayout from './pages/dashboard/admin/DashboardAdminLayout.vue'
+import AdminDashboard from './pages/dashboard/admin/AdminDashboard.vue'
+import AdminPendaftaran from './pages/dashboard/admin/AdminPendaftaran.vue'
+import AdminPendaftaranDetail from './pages/dashboard/admin/AdminPendaftaranDetail.vue'
+import AdminUsers from './pages/dashboard/admin/AdminUsers.vue'
+import AdminNotifications from './pages/dashboard/admin/AdminNotifications.vue'
 
 const routes = [
   {
@@ -11,7 +33,7 @@ const routes = [
   {
     path: '/kompetisi',
     name: 'Competitions',
-    component: () => import('./pages/CompetitionsPage.vue'),
+    component: CompetitionsPage,
   },
   {
     path: '/competitions',
@@ -20,58 +42,101 @@ const routes = [
   {
     path: '/roadshow',
     name: 'Roadshow',
-    component: () => import('./pages/RoadshowPage.vue'),
+    component: RoadshowPage,
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('./pages/LoginPage.vue'),
+    component: LoginPage,
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('./pages/RegisterPage.vue'),
+    component: RegisterPage,
   },
   {
     path: '/auth/callback',
     name: 'AuthCallback',
-    component: () => import('./pages/AuthCallbackPage.vue'),
+    component: AuthCallbackPage,
   },
   {
     path: '/invoice/:id',
     name: 'Invoice',
-    component: () => import('./pages/InvoicePage.vue'),
+    component: InvoicePage,
     meta: { requiresAuth: true }
   },
   {
     path: '/dashboard',
-    component: () => import('./pages/dashboard/DashboardLayout.vue'),
+    component: DashboardLayout,
     meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'Dashboard',
-        component: () => import('./pages/dashboard/DashboardOverview.vue'),
+        component: DashboardOverview,
       },
       {
         path: 'competitions',
         name: 'DashboardCompetitions',
-        component: () => import('./pages/dashboard/DashboardCompetitions.vue'),
+        component: DashboardCompetitions,
       },
       {
         path: 'notifications',
         name: 'DashboardNotifications',
-        component: () => import('./pages/dashboard/DashboardNotifications.vue'),
+        component: DashboardNotifications,
       },
       {
         path: 'profile',
         name: 'DashboardProfile',
-        component: () => import('./pages/dashboard/DashboardProfile.vue'),
+        component: DashboardProfile,
+      },
+      {
+        path: 'tim/:id',
+        name: 'DashboardTim',
+        component: DashboardTim,
+      },
+      {
+        path: 'undangan',
+        name: 'DashboardInvitations',
+        component: DashboardInvitations,
       },
       {
         path: 'help',
         name: 'DashboardHelp',
-        component: () => import('./pages/dashboard/DashboardHelp.vue'),
+        component: DashboardHelp,
+      },
+    ],
+  },
+  // Admin routes (moved to top level to prevent nesting under DashboardLayout)
+  {
+    path: '/dashboard/admin',
+    component: DashboardAdminLayout,
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'AdminDashboard',
+        component: AdminDashboard,
+      },
+      {
+        path: 'pendaftaran',
+        name: 'AdminPendaftaran',
+        component: AdminPendaftaran,
+      },
+      {
+        path: 'pendaftaran/:id',
+        name: 'AdminPendaftaranDetail',
+        component: AdminPendaftaranDetail,
+      },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: AdminUsers,
+      },
+      {
+        path: 'notifications',
+        name: 'AdminNotifications',
+        component: AdminNotifications,
       },
     ],
   },
@@ -94,14 +159,34 @@ router.afterEach(() => {
 })
 
 router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('auth_token')
+  const user = JSON.parse(localStorage.getItem('auth_user') || 'null')
+  const isAdmin = user && user.role === 'admin'
+
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('auth_token')
     if (!token) {
       next({ name: 'Login' })
-    } else {
-      next()
+      return
     }
+    if (to.meta.requiresAdmin) {
+      if (!isAdmin) {
+        next({ name: 'Dashboard' })
+        return
+      }
+    } else {
+      // Prevent admin from accessing participant-facing dashboard pages
+      if (isAdmin && to.path.startsWith('/dashboard') && !to.path.startsWith('/dashboard/admin')) {
+        next({ name: 'AdminDashboard' })
+        return
+      }
+    }
+    next()
   } else {
+    // If admin is logged in, redirect login/register back to admin dashboard
+    if (token && isAdmin && (to.name === 'Login' || to.name === 'Register')) {
+      next({ name: 'AdminDashboard' })
+      return
+    }
     next()
   }
 })

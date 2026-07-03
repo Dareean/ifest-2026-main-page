@@ -88,7 +88,7 @@ export const competitionsData = [
       "Di babak final, peserta diwajibkan memaparkan Pitch Deck di hadapan investor dan juri profesional dalam durasi 10 menit presentasi + tanya jawab."
     ],
     schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
-    registrationLink: "#detail-kegiatan",
+    registrationLink: "/#detail-kegiatan",
     guidebookLink: "#"
   },
   {
@@ -184,7 +184,7 @@ export const competitionsData = [
       "Hasil akhir wajib dipamerkan secara interaktif di Paviliun S-DIH pada Expo Utama Hari-H."
     ],
     schedule: "Registrasi: Juni - Juli 2026 | Technical Briefing: Akhir Juli 2026 | Hackathon & Pitching: Agustus 2026",
-    registrationLink: "#detail-kegiatan",
+    registrationLink: "/#detail-kegiatan",
     guidebookLink: "#"
   }
 ];
