@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,5 +44,13 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        ResetPassword::createUrlUsing(function ($notifiable, $token) {
+            return config('app.frontend_url') . '/reset-password/' . $token . '?email=' . $notifiable->email;
+        });
+        $this->notify(new ResetPassword($token));
     }
 }

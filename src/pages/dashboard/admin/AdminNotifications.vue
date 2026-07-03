@@ -1,13 +1,28 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
-import { Send, Bell, AlertTriangle, CheckCircle } from 'lucide-vue-next'
+import { Send, Bell, AlertTriangle, CheckCircle, History } from 'lucide-vue-next'
 
 const form = ref({ judul: '', pesan: '' })
 const submitting = ref(false)
 const sendToAll = ref(true)
 const error = ref('')
 const success = ref('')
+
+const notifications = ref([])
+const historyLoading = ref(true)
+
+async function fetchHistory() {
+  historyLoading.value = true
+  try {
+    const res = await api.get('/admin/notifications')
+    notifications.value = res.data.data
+  } catch (e) {
+    console.error(e)
+  } finally {
+    historyLoading.value = false
+  }
+}
 
 async function handleBroadcast() {
   if (!form.value.judul || !form.value.pesan) return
@@ -26,6 +41,7 @@ async function handleBroadcast() {
     const res = await api.post('/admin/notifications', payload)
     success.value = res.data.message
     form.value = { judul: '', pesan: '' }
+    fetchHistory()
   } catch (e) {
     const data = e.response?.data
     if (data?.errors) {
@@ -37,6 +53,8 @@ async function handleBroadcast() {
     submitting.value = false
   }
 }
+
+onMounted(fetchHistory)
 </script>
 
 <template>
@@ -46,8 +64,9 @@ async function handleBroadcast() {
       <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Notifikasi</h1>
     </div>
 
-    <div class="max-w-xl">
-      <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 space-y-5">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Form Block (Left Column) -->
+      <div class="lg:col-span-5 bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 space-y-5">
         <div>
           <h2 class="font-extrabold text-sm text-on-surface flex items-center gap-2 mb-1">
             <Bell class="w-4 h-4 text-accent-magenta" /> Kirim Notifikasi Broadcast
@@ -80,6 +99,42 @@ async function handleBroadcast() {
         <button @click="handleBroadcast" :disabled="submitting || !form.judul || !form.pesan" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5">
           <Send class="w-4 h-4" /> {{ submitting ? 'Mengirim...' : 'Kirim Notifikasi' }}
         </button>
+      </div>
+
+      <!-- History Block (Right Column) -->
+      <div class="lg:col-span-7 bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6">
+        <div class="mb-4">
+          <h2 class="font-extrabold text-sm text-on-surface flex items-center gap-2 mb-1">
+            <History class="w-4 h-4 text-accent-magenta" /> Riwayat Notifikasi
+          </h2>
+          <p class="text-xs text-on-surface-variant/70">Daftar notifikasi yang telah dikirim sebelumnya</p>
+        </div>
+
+        <div v-if="historyLoading" class="space-y-3">
+          <div v-for="i in 3" :key="i" class="h-20 bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+        </div>
+
+        <div v-else-if="notifications.length === 0" class="py-12 text-center border border-dashed border-[#04000D]/10 rounded-2xl bg-slate-50/50">
+          <Bell class="w-8 h-8 text-on-surface-variant/30 mx-auto mb-3" />
+          <p class="text-xs font-semibold text-on-surface-variant/60">Belum ada riwayat notifikasi</p>
+        </div>
+
+        <div v-else class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+          <div
+            v-for="notif in notifications"
+            :key="notif.id"
+            class="p-4 bg-slate-50 hover:bg-slate-100/80 border border-slate-100 rounded-xl transition-all duration-200"
+          >
+            <div class="flex items-start justify-between gap-4 mb-1.5">
+              <h3 class="text-xs font-bold text-on-surface">{{ notif.judul }}</h3>
+              <span class="font-mono text-[9px] text-on-surface-variant/50 whitespace-nowrap">{{ new Date(notif.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) }}</span>
+            </div>
+            <p class="text-xs text-on-surface-variant/90 leading-relaxed">{{ notif.pesan }}</p>
+            <div class="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-slate-200/50 text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/50">
+              <span class="bg-slate-200/60 px-1.5 py-0.5 rounded">Penerima: {{ notif.user?.name || 'Semua Pengguna' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

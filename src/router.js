@@ -57,7 +57,17 @@ const routes = [
   {
     path: '/auth/callback',
     name: 'AuthCallback',
-    component: AuthCallbackPage,
+    component: () => import('./pages/AuthCallbackPage.vue'),
+  },
+  {
+    path: '/lupa-password',
+    name: 'ForgotPassword',
+    component: () => import('./pages/ForgotPasswordPage.vue'),
+  },
+  {
+    path: '/reset-password/:token',
+    name: 'ResetPassword',
+    component: () => import('./pages/ResetPasswordPage.vue'),
   },
   {
     path: '/invoice/:id',

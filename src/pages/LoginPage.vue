@@ -72,7 +72,10 @@ async function handleGoogle() {
           </div>
 
           <div>
-            <label class="block font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Password</label>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Password</label>
+              <router-link to="/lupa-password" class="font-mono text-[10px] font-bold text-accent-magenta hover:text-accent-magenta/80 transition-colors">Lupa Password?</router-link>
+            </div>
             <div class="relative">
               <Lock class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
               <input v-model="form.password" :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" class="w-full bg-[#F5F5F5] border border-[#04000D]/30 rounded-xl py-3 pl-11 pr-11 font-mono text-sm font-bold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-[#04000D] transition-colors" />

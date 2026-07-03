@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 Route::get('/auth/google/callback/connect', [AuthController::class, 'googleConnectCallback']);
@@ -64,4 +66,5 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
     Route::post('/notifications', [AdminController::class, 'broadcastNotification']);
+    Route::get('/notifications', [AdminController::class, 'notifications']);
 });

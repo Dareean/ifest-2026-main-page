@@ -21,9 +21,9 @@ const navItems = [
   { path: '/dashboard/admin/notifications', name: 'Notifikasi', icon: Bell },
 ]
 
-function handleLogout() {
-  auth.logout()
-  router.push('/')
+async function handleLogout() {
+  await auth.logout()
+  router.push('/login')
 }
 
 onMounted(() => {

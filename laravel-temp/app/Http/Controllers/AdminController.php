@@ -171,4 +171,12 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Notifikasi terkirim ke ' . $users->count() . ' pengguna']);
     }
+
+    public function notifications(): JsonResponse
+    {
+        $data = Notification::with('user:id,name,email')
+            ->latest()
+            ->paginate(20);
+        return response()->json($data);
+    }
 }
