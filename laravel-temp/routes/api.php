@@ -10,6 +10,20 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
+// Debug
+Route::get('/debug/mail', function () {
+    return [
+        'MAIL_MAILER' => env('MAIL_MAILER'),
+        'MAIL_HOST' => env('MAIL_HOST'),
+        'MAIL_PORT' => env('MAIL_PORT'),
+        'MAIL_USERNAME' => env('MAIL_USERNAME'),
+        'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION'),
+        'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS'),
+        'config_mailer' => config('mail.default'),
+        'config_host' => config('mail.mailers.smtp.host'),
+    ];
+});
+
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);

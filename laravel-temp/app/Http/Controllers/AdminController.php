@@ -183,7 +183,11 @@ class AdminController extends Controller
                 try {
                     Mail::to($user->email)->send(new NotificationMail($notif));
                 } catch (\Exception $e) {
-                    // log email failure silently
+                    \Illuminate\Support\Facades\Log::error('Send email failed: ' . $e->getMessage(), [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                        'notification_id' => $notif->id,
+                    ]);
                 }
             }
         }
