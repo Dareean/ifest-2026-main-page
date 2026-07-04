@@ -5,6 +5,8 @@ import { useAuthStore } from '../../stores/auth'
 import api from '../../utils/api'
 import { Save, Lock, Eye, EyeOff, CheckCircle, User, Building, Phone, Chrome, Camera, X } from 'lucide-vue-next'
 
+const apiBase = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || 'http://localhost:8000'
+
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
@@ -200,7 +202,7 @@ async function savePassword() {
                 <!-- Preview (picked file or current avatar) -->
                 <img 
                   v-if="avatarPreview || currentAvatar()" 
-                  :src="avatarPreview || (currentAvatar()?.startsWith('/storage') ? 'http://localhost:8000' + currentAvatar() : currentAvatar())" 
+                  :src="avatarPreview || (currentAvatar()?.startsWith('/storage') ? apiBase + currentAvatar() : currentAvatar())" 
                   class="w-full h-full object-cover"
                   alt="Avatar"
                 />

@@ -7,32 +7,37 @@ use App\Models\Pendaftaran;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
     public function stats(): JsonResponse
     {
-        $totalUsers = User::count();
-        $totalPendaftarans = Pendaftaran::count();
-        $byStatus = Pendaftaran::selectRaw("status, count(*) as total")
-            ->groupBy('status')
-            ->pluck('total', 'status');
-        $byLomba = \App\Models\Lomba::withCount('pendaftarans')
-            ->get()
-            ->map(fn($l) => ['lomba' => $l->kode . ' - ' . $l->title, 'total' => $l->pendaftarans_count]);
-        $pendingUnlock = Pendaftaran::where('unlock_requested', true)->count();
-        $recentRegistrations = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title')
-            ->latest()->take(5)->get();
+        $data = Cache::remember('admin_stats', 60, function () {
+            $totalUsers = User::count();
+            $totalPendaftarans = Pendaftaran::count();
+            $byStatus = Pendaftaran::selectRaw("status, count(*) as total")
+                ->groupBy('status')
+                ->pluck('total', 'status');
+            $byLomba = \App\Models\Lomba::withCount('pendaftarans')
+                ->get()
+                ->map(fn($l) => ['lomba' => $l->kode . ' - ' . $l->title, 'total' => $l->pendaftarans_count]);
+            $pendingUnlock = Pendaftaran::where('unlock_requested', true)->count();
+            $recentRegistrations = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title')
+                ->latest()->take(5)->get();
 
-        return response()->json([
-            'total_users' => $totalUsers,
-            'total_pendaftarans' => $totalPendaftarans,
-            'by_status' => $byStatus,
-            'by_lomba' => $byLomba,
-            'pending_unlock_requests' => $pendingUnlock,
-            'recent_registrations' => $recentRegistrations,
-        ]);
+            return [
+                'total_users' => $totalUsers,
+                'total_pendaftarans' => $totalPendaftarans,
+                'by_status' => $byStatus,
+                'by_lomba' => $byLomba,
+                'pending_unlock_requests' => $pendingUnlock,
+                'recent_registrations' => $recentRegistrations,
+            ];
+        });
+
+        return response()->json($data);
     }
 
     public function pendaftarans(Request $request): JsonResponse
@@ -81,6 +86,8 @@ class AdminController extends Controller
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Tim telah terkunci secara otomatis.",
         ]);
 
+        Cache::forget('admin_stats');
+
         return response()->json(['message' => 'Pendaftaran berhasil diverifikasi', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
     }
 
@@ -105,6 +112,8 @@ class AdminController extends Controller
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
         ]);
 
+        Cache::forget('admin_stats');
+
         return response()->json(['message' => 'Pendaftaran ditolak', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
     }
 
@@ -124,6 +133,8 @@ class AdminController extends Controller
             'judul' => 'Buka Kunci Tim Disetujui',
             'pesan' => 'Permohonan buka kunci tim telah disetujui. Kamu sekarang dapat mengubah anggota tim. Jangan lupa kunci kembali setelah selesai.',
         ]);
+
+        Cache::forget('admin_stats');
 
         return response()->json(['message' => 'Buka kunci tim disetujui', 'data' => $pendaftaran->fresh()]);
     }

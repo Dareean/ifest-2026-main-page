@@ -9,6 +9,8 @@ import {
 } from 'lucide-vue-next'
 import api from '../../utils/api'
 
+const apiBase = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || 'http://localhost:8000'
+
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
@@ -90,7 +92,7 @@ onMounted(() => {
         <div class="w-9 h-9 rounded-lg bg-black text-[#DCEEB1] flex items-center justify-center font-mono font-black text-sm flex-shrink-0 overflow-hidden">
           <img 
             v-if="auth.user?.avatar && auth.user.avatar !== 'null' && auth.user.avatar !== 'undefined'"
-            :src="auth.user.avatar.startsWith('/storage') ? 'http://localhost:8000' + auth.user.avatar : auth.user.avatar"
+            :src="auth.user.avatar.startsWith('/storage') ? apiBase + auth.user.avatar : auth.user.avatar"
             class="w-full h-full object-cover"
             alt="Avatar"
           />
