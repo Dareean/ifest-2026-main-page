@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
+import { useAuthStore } from '../../../stores/auth'
 import { Search, Shield, User } from 'lucide-vue-next'
 
+const auth = useAuthStore()
 const loading = ref(true)
+const updatingUserId = ref(null)
 const data = ref(null)
 const searchQuery = ref('')
 
@@ -18,6 +21,33 @@ async function fetch() {
     console.error(e)
   } finally {
     loading.value = false
+  }
+}
+
+async function changeRole(user, newRole) {
+  if (auth.user?.id === user.id) {
+    alert('Anda tidak bisa mengubah role Anda sendiri!')
+    return
+  }
+
+  const confirmMsg = `Apakah Anda yakin ingin mengubah role ${user.name} menjadi ${newRole.toUpperCase()}?`
+  if (!confirm(confirmMsg)) {
+    // Reset select to original value by re-fetching or forcing re-render
+    fetch()
+    return
+  }
+
+  updatingUserId.value = user.id
+  try {
+    const res = await api.put(`/admin/users/${user.id}/role`, { role: newRole })
+    user.role = newRole
+    alert(res.data.message || 'Role berhasil diubah')
+  } catch (e) {
+    const errorMsg = e.response?.data?.message || 'Gagal mengubah role'
+    alert(errorMsg)
+    fetch()
+  } finally {
+    updatingUserId.value = null
   }
 }
 
@@ -62,12 +92,26 @@ onMounted(fetch)
               <td class="px-5 py-3.5 font-bold text-on-surface">{{ user.name }}</td>
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/70">{{ user.email }}</td>
               <td class="px-5 py-3.5">
-                <span v-if="user.role === 'admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
-                  <Shield class="w-2.5 h-2.5" /> Admin
-                </span>
-                <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-on-surface-variant bg-slate-100 px-2 py-0.5 rounded-full">
-                  <User class="w-2.5 h-2.5" /> User
-                </span>
+                <!-- Self is static to prevent lockout -->
+                <div v-if="auth.user?.id === user.id" class="inline-flex items-center gap-1">
+                  <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
+                    <Shield class="w-2.5 h-2.5" /> Admin (Anda)
+                  </span>
+                </div>
+                
+                <!-- Others can be toggled via select dropdown -->
+                <div v-else class="inline-block relative">
+                  <select
+                    :value="user.role"
+                    @change="changeRole(user, $event.target.value)"
+                    :disabled="updatingUserId === user.id"
+                    class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 focus:border-[#04000D]/40 rounded-lg py-1 pl-2 pr-6 text-[10px] font-mono font-bold uppercase text-on-surface focus:outline-none transition-all cursor-pointer appearance-none disabled:opacity-50"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
+                </div>
               </td>
               <td class="px-5 py-3.5 font-semibold text-on-surface">{{ user.pendaftarans_count }}</td>
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/60">{{ new Date(user.created_at).toLocaleDateString('id-ID') }}</td>

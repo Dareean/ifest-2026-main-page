@@ -79,6 +79,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::put('/pendaftarans/{pendaftaran}/reject', [AdminController::class, 'reject']);
     Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
+    Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
     Route::post('/notifications', [AdminController::class, 'broadcastNotification']);
     Route::get('/notifications', [AdminController::class, 'notifications']);
 });

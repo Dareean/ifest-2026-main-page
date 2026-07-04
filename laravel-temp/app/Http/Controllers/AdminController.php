@@ -202,4 +202,28 @@ class AdminController extends Controller
             ->paginate(20);
         return response()->json($data);
     }
+
+    public function updateRole(Request $request, User $user): JsonResponse
+    {
+        if ($request->user()->id === $user->id) {
+            return response()->json(['message' => 'Anda tidak bisa mengubah role Anda sendiri'], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'role' => 'required|string|in:user,admin',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user->update([
+            'role' => $request->role,
+        ]);
+
+        return response()->json([
+            'message' => "Role user {$user->name} berhasil diubah menjadi {$request->role}",
+            'data' => $user,
+        ]);
+    }
 }
