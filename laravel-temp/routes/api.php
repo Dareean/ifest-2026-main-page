@@ -10,6 +10,35 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
+// Debug
+Route::get('/debug/send-test-email', function () {
+    $start = microtime(true);
+    try {
+        Mail::raw('Test email from Render', function ($msg) {
+            $msg->to('dmardin@gmail.com')->subject('Test Render Email');
+        });
+        $elapsed = (microtime(true) - $start) * 1000;
+        return "Email sent in {$elapsed}ms. Mailer: " . config('mail.default');
+    } catch (\Exception $e) {
+        $elapsed = (microtime(true) - $start) * 1000;
+        return "Failed after {$elapsed}ms: " . $e->getMessage();
+    }
+});
+
+Route::get('/debug/mail-config', function () {
+    return [
+        'MAIL_MAILER' => env('MAIL_MAILER'),
+        'MAIL_HOST' => env('MAIL_HOST'),
+        'MAIL_PORT' => env('MAIL_PORT'),
+        'MAIL_USERNAME' => env('MAIL_USERNAME') ? 'SET' : 'NULL',
+        'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS') ?: 'NULL',
+        'config_default' => config('mail.default'),
+        'config_from_address' => config('mail.from.address') ?: 'NULL',
+        'config_smtp_host' => config('mail.mailers.smtp.host'),
+        'config_smtp_timeout' => config('mail.mailers.smtp.timeout'),
+    ];
+});
+
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
