@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\Pendaftaran;
 use App\Models\User;
+use App\Mail\NotificationMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -171,11 +173,19 @@ class AdminController extends Controller
             : User::all();
 
         foreach ($users as $user) {
-            Notification::create([
+            $notif = Notification::create([
                 'user_id' => $user->id,
                 'judul' => $request->judul,
                 'pesan' => $request->pesan,
             ]);
+
+            if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    Mail::to($user->email)->send(new NotificationMail($notif));
+                } catch (\Exception $e) {
+                    // log email failure silently
+                }
+            }
         }
 
         return response()->json(['message' => 'Notifikasi terkirim ke ' . $users->count() . ' pengguna']);
