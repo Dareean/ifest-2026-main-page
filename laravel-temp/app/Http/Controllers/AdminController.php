@@ -9,6 +9,7 @@ use App\Mail\NotificationMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -172,25 +173,32 @@ class AdminController extends Controller
             ? User::whereIn('id', $request->user_ids)->get()
             : User::all();
 
+        $emails = [];
         foreach ($users as $user) {
             $notif = Notification::create([
                 'user_id' => $user->id,
                 'judul' => $request->judul,
                 'pesan' => $request->pesan,
             ]);
-
             if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                try {
-                    Mail::to($user->email)->send(new NotificationMail($notif));
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Send email failed: ' . $e->getMessage(), [
-                        'user_id' => $user->id,
-                        'email' => $user->email,
-                        'notification_id' => $notif->id,
-                    ]);
-                }
+                $emails[] = ['email' => $user->email, 'notif_id' => $notif->id];
             }
         }
+
+        $judul = $request->judul;
+        $pesan = $request->pesan;
+
+        app()->terminating(function () use ($emails, $judul, $pesan) {
+            foreach ($emails as $item) {
+                $notif = Notification::find($item['notif_id']);
+                if (!$notif) continue;
+                try {
+                    Mail::to($item['email'])->send(new NotificationMail($notif));
+                } catch (\Exception $e) {
+                    Log::error('Send email failed: ' . $e->getMessage(), $item);
+                }
+            }
+        });
 
         return response()->json(['message' => 'Notifikasi terkirim ke ' . $users->count() . ' pengguna']);
     }
