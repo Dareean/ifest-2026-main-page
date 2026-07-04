@@ -14,28 +14,26 @@ class AdminController extends Controller
 {
     public function stats(): JsonResponse
     {
-        $data = Cache::remember('admin_stats', 60, function () {
-            $totalUsers = User::count();
-            $totalPendaftarans = Pendaftaran::count();
-            $byStatus = Pendaftaran::selectRaw("status, count(*) as total")
-                ->groupBy('status')
-                ->pluck('total', 'status');
-            $byLomba = \App\Models\Lomba::withCount('pendaftarans')
-                ->get()
-                ->map(fn($l) => ['lomba' => $l->kode . ' - ' . $l->title, 'total' => $l->pendaftarans_count]);
-            $pendingUnlock = Pendaftaran::where('unlock_requested', true)->count();
-            $recentRegistrations = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title')
-                ->latest()->take(5)->get();
+        $totalUsers = User::count();
+        $totalPendaftarans = Pendaftaran::count();
+        $byStatus = Pendaftaran::selectRaw("status, count(*) as total")
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $byLomba = \App\Models\Lomba::withCount('pendaftarans')
+            ->get()
+            ->map(fn($l) => ['lomba' => $l->kode . ' - ' . $l->title, 'total' => $l->pendaftarans_count]);
+        $pendingUnlock = Pendaftaran::where('unlock_requested', true)->count();
+        $recentRegistrations = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title')
+            ->latest()->take(5)->get();
 
-            return [
-                'total_users' => $totalUsers,
-                'total_pendaftarans' => $totalPendaftarans,
-                'by_status' => $byStatus,
-                'by_lomba' => $byLomba,
-                'pending_unlock_requests' => $pendingUnlock,
-                'recent_registrations' => $recentRegistrations,
-            ];
-        });
+        $data = [
+            'total_users' => $totalUsers,
+            'total_pendaftarans' => $totalPendaftarans,
+            'by_status' => $byStatus,
+            'by_lomba' => $byLomba,
+            'pending_unlock_requests' => $pendingUnlock,
+            'recent_registrations' => $recentRegistrations,
+        ];
 
         return response()->json($data);
     }
