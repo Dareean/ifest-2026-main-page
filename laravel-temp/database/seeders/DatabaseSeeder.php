@@ -10,12 +10,14 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin I-FEST',
-            'email' => 'admin@ifest.com',
-            'password' => bcrypt('admin123'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@ifest.com'],
+            [
+                'name' => 'Admin I-FEST',
+                'password' => bcrypt('admin123'),
+                'role' => 'admin',
+            ]
+        );
         $lombas = [
             [
                 'kode' => 'NAT-01',
@@ -175,7 +177,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($lombas as $lomba) {
-            Lomba::create($lomba);
+            Lomba::updateOrCreate(
+                ['kode' => $lomba['kode']],
+                $lomba
+            );
         }
     }
 }
