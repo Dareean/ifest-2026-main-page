@@ -54,7 +54,7 @@ onMounted(() => {
   <template v-if="isChatActivated">
     <AiChatWidget @close="isChatActivated = false" />
   </template>
-  <div v-else class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
+  <div v-else class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end">
     <button 
       @click="isChatActivated = true" 
       class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 

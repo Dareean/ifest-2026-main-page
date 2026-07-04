@@ -203,7 +203,7 @@ const sendChatMessage = async (text) => {
 </script>
 
 <template>
-  <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
+  <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end">
     
     <!-- Chat Window Overlay with Slide-Up Transition -->
     <transition
