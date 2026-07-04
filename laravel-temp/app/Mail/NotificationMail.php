@@ -28,8 +28,9 @@ class NotificationMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $from = config('mail.from.address') ?: config('mail.mailers.smtp.username') ?: 'noreply@ifest2026.com';
         return new Envelope(
-            from: config('mail.from.address', 'noreply@ifest2026.com'),
+            from: $from,
             subject: 'I-FEST 2026: ' . $this->notification->judul,
         );
     }
