@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\EmailVerification;
-use App\Models\Invitation;
 use App\Models\Notification;
 use App\Models\Pendaftaran;
 use App\Models\Submission;
+use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -341,7 +341,7 @@ class AdminController extends Controller
 
         // Delete related data
         Pendaftaran::where('user_id', $user->id)->delete();
-        Invitation::where('user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
+        TeamInvitation::where('user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
         Notification::where('user_id', $user->id)->delete();
         EmailVerification::where('email', $user->email)->delete();
         Submission::whereHas('pendaftaran', fn($q) => $q->where('user_id', $user->id))->delete();
