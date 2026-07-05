@@ -105,7 +105,9 @@ async function handleRejectPayment() {
 }
 
 async function handleSendNotification() {
-  const msg = prompt('Tulis pesan notifikasi untuk ketua tim:')
+  const msg = await confirmModal.prompt('Tulis pesan notifikasi untuk ketua tim:', 'Kirim Notifikasi', {
+    placeholder: 'Masukkan pesan notifikasi...',
+  })
   if (!msg) return
   actionLoading.value = true
   try {

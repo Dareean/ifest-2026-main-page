@@ -5,9 +5,11 @@ const state = reactive({
   title: '',
   message: '',
   resolve: null,
-  type: 'confirm', // 'confirm' | 'alert'
+  type: 'confirm', // 'confirm' | 'alert' | 'prompt'
   confirmText: 'Ya',
   cancelText: 'Batal',
+  inputValue: '',
+  placeholder: '',
 })
 
 export function useConfirm() {
@@ -36,20 +38,48 @@ export function useConfirm() {
     })
   }
 
+  function prompt(message, title = 'Input', options = {}) {
+    state.title = title
+    state.message = message
+    state.isOpen = true
+    state.type = 'prompt'
+    state.confirmText = options.confirmText || 'Kirim'
+    state.cancelText = options.cancelText || 'Batal'
+    state.inputValue = options.defaultValue || ''
+    state.placeholder = options.placeholder || 'Tulis di sini...'
+
+    return new Promise((resolve) => {
+      state.resolve = resolve
+    })
+  }
+
   function handleConfirm() {
     state.isOpen = false
-    if (state.resolve) state.resolve(true)
+    if (state.resolve) {
+      if (state.type === 'prompt') {
+        state.resolve(state.inputValue)
+      } else {
+        state.resolve(true)
+      }
+    }
   }
 
   function handleCancel() {
     state.isOpen = false
-    if (state.resolve) state.resolve(false)
+    if (state.resolve) {
+      if (state.type === 'prompt') {
+        state.resolve(null)
+      } else {
+        state.resolve(false)
+      }
+    }
   }
 
   return {
     state,
     confirm,
     alert,
+    prompt,
     handleConfirm,
     handleCancel,
   }
