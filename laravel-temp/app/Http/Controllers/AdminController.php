@@ -122,11 +122,13 @@ class AdminController extends Controller
             'notes' => $request->notes,
         ]);
 
-        Notification::create([
+        $notif = Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Ditolak',
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
         ]);
+
+        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => $request->user()->id,
@@ -190,11 +192,13 @@ class AdminController extends Controller
             'payment_notes' => $request->payment_notes,
         ]);
 
-        Notification::create([
+        $notif = Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Bukti Pembayaran Ditolak',
             'pesan' => "Bukti pembayaran untuk lomba {$pendaftaran->lomba->title} ditolak. Alasan: {$request->payment_notes}. Silakan upload ulang bukti pembayaran yang valid.",
         ]);
+
+        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => $request->user()->id,
@@ -207,6 +211,29 @@ class AdminController extends Controller
         Cache::forget('admin_stats');
 
         return response()->json(['message' => 'Bukti pembayaran ditolak', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
+    }
+
+    private function sendEmailBrevo(Notification $notif): void
+    {
+        if (!filter_var($notif->user->email, FILTER_VALIDATE_EMAIL)) return;
+
+        $apiKey = env('BREVO_API_KEY');
+        if (!$apiKey) return;
+
+        try {
+            $html = view('emails.notification', ['notification' => $notif])->render();
+            Http::timeout(10)->withHeaders([
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.brevo.com/v3/smtp/email', [
+                'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
+                'to' => [['email' => $notif->user->email]],
+                'subject' => 'I-FEST 2026: ' . $notif->judul,
+                'htmlContent' => $html,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Send Brevo email failed: ' . $e->getMessage(), ['to' => $notif->user->email]);
+        }
     }
 
     public function approveUnlock(Pendaftaran $pendaftaran): JsonResponse
