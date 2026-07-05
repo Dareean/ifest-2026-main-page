@@ -45,12 +45,12 @@ const getMaxMembers = (req) => {
 
 // Competition opening dates config
 const openDates = {
-  'NAT-01': new Date('2026-07-11T00:00:00'),
-  'NAT-02': new Date('2026-07-11T00:00:00'),
-  'NAT-03': new Date('2026-07-11T00:00:00'),
-  'REG-01': new Date('2026-07-11T00:00:00'),
-  'REG-02': new Date('2026-07-11T00:00:00'),
-  'REG-03': new Date('2026-07-11T00:00:00'),
+  'NAT-01': new Date('2025-01-01T00:00:00'),
+  'NAT-02': new Date('2025-01-01T00:00:00'),
+  'NAT-03': new Date('2025-01-01T00:00:00'),
+  'REG-01': new Date('2025-01-01T00:00:00'),
+  'REG-02': new Date('2025-01-01T00:00:00'),
+  'REG-03': new Date('2025-01-01T00:00:00'),
 }
 
 const now = ref(new Date())

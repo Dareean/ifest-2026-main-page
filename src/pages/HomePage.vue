@@ -1102,7 +1102,7 @@ onMounted(() => {
 })
 
 // Countdown Lomba 11 Juli 2026
-const announcementTarget = new Date('2026-07-11T00:00:00+07:00').getTime()
+const announcementTarget = new Date('2025-01-01T00:00:00+07:00').getTime()
 const countdown = ref({
   days: 0,
   hours: 0,
