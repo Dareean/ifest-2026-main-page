@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Crypt;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -166,17 +165,13 @@ class AuthController extends Controller
             return redirect($this->frontendUrl() . '/login?error=google_failed');
         }
 
-        // Detect connect mode via encrypted state
+        // Detect connect mode via state parameter
         $state = $request->input('state');
         $connectUserId = null;
 
         if ($state) {
-            try {
-                $data = json_decode(Crypt::decryptString($state), true);
-                $connectUserId = $data['user_id'] ?? null;
-            } catch (\Exception $e) {
-                // Not a connect state, proceed as regular login
-            }
+            $data = json_decode(base64_decode($state), true);
+            $connectUserId = is_array($data) ? ($data['user_id'] ?? null) : null;
         }
 
         if ($connectUserId) {
@@ -269,13 +264,8 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            Log::info('googleConnect: user_id=' . $user->id);
 
-            $state = Crypt::encryptString(json_encode(['user_id' => $user->id]));
-
-            $clientId = config('services.google.client_id');
-            $redirectUrl = config('services.google.redirect');
-            Log::info('googleConnect: client_id=' . ($clientId ? 'set' : 'NULL') . ' redirect=' . ($redirectUrl ?? 'NULL'));
+            $state = base64_encode(json_encode(['user_id' => $user->id]));
 
             $url = Socialite::driver('google')
                 ->stateless()
