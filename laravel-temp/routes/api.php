@@ -10,6 +10,24 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
+// Debug
+Route::get('/debug/brevo', function () {
+    $apiKey = env('BREVO_API_KEY');
+    if (!$apiKey) return 'BREVO_API_KEY not set';
+
+    $res = Http::withHeaders([
+        'api-key' => $apiKey,
+        'Content-Type' => 'application/json',
+    ])->post('https://api.brevo.com/v3/smtp/email', [
+        'sender' => ['email' => 'noreply@ifest2026.com', 'name' => 'I-FEST 2026'],
+        'to' => [['email' => 'dmardin@gmail.com']],
+        'subject' => 'Test from Render via Brevo API',
+        'htmlContent' => '<h1>Test</h1><p>If you see this, API works!</p>',
+    ]);
+
+    return "Status: {$res->status()}\nBody: {$res->body()}";
+});
+
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
