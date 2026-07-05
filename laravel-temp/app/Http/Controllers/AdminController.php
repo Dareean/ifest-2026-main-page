@@ -341,10 +341,11 @@ class AdminController extends Controller
 
         // Delete related data
         Pendaftaran::where('user_id', $user->id)->delete();
-        TeamInvitation::where('user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
+        TeamInvitation::where('invited_by_user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
         Notification::where('user_id', $user->id)->delete();
         EmailVerification::where('email', $user->email)->delete();
         Submission::whereHas('pendaftaran', fn($q) => $q->where('user_id', $user->id))->delete();
+        ActivityLog::where('admin_id', $user->id)->delete();
 
         ActivityLog::create([
             'admin_id' => $request->user()->id,
