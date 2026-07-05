@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useConfirm } from '../composables/useConfirm'
+import { useToast } from '../composables/useToast'
 import api from '../utils/api'
 import { CheckCircle, Printer, ArrowLeft, Loader, Clock, AlertTriangle } from 'lucide-vue-next'
 
@@ -10,6 +11,7 @@ const router = useRouter()
 const pendaftaran = ref(null)
 const loading = ref(true)
 const confirmModal = useConfirm()
+const { showToast } = useToast()
 
 async function fetchInvoice() {
   try {
@@ -18,12 +20,12 @@ async function fetchInvoice() {
     if (match) {
       pendaftaran.value = match
     } else {
-      await confirmModal.alert('Pendaftaran tidak ditemukan', 'Error')
+      showToast('Pendaftaran tidak ditemukan', 'error')
       router.push('/dashboard/competitions')
     }
   } catch (e) {
     console.error(e)
-    await confirmModal.alert('Gagal mengambil data kuitansi', 'Error')
+    showToast('Gagal mengambil data kuitansi', 'error')
   } finally {
     loading.value = false
   }

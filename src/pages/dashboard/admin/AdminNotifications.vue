@@ -3,6 +3,11 @@ import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { Send, Bell, AlertTriangle, CheckCircle, History, Search } from 'lucide-vue-next'
 
+function autoResize(el) {
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
+
 const form = ref({ judul: '', pesan: '' })
 const submitting = ref(false)
 const targetType = ref('all') // 'all' | 'specific'
@@ -184,7 +189,7 @@ onMounted(fetchHistory)
 
         <div>
           <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Pesan <span class="text-accent-magenta">*</span></label>
-          <textarea v-model="form.pesan" rows="5" placeholder="Tulis pesan notifikasi..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all resize-none"></textarea>
+          <textarea v-model="form.pesan" rows="5" placeholder="Tulis pesan notifikasi..." @input="autoResize($event.target)" class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all resize-none overflow-hidden"></textarea>
         </div>
 
         <button @click="handleBroadcast" :disabled="submitting || !form.judul || !form.pesan || (targetType === 'specific' && !selectedUser)" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5">

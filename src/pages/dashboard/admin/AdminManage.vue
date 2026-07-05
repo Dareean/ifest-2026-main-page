@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
 import { useConfirm } from '../../../composables/useConfirm'
+import { useToast } from '../../../composables/useToast'
 import { Search, Shield, Crown, User, UserCog } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 const confirmModal = useConfirm()
+const { showToast } = useToast()
 const loading = ref(true)
 const updatingUserId = ref(null)
 const data = ref(null)
@@ -25,7 +27,7 @@ async function fetch() {
 
 async function changeRole(user, newRole) {
   if (auth.user?.id === user.id) {
-    await confirmModal.alert('Anda tidak bisa mengubah role Anda sendiri!', 'Peringatan')
+    showToast('Anda tidak bisa mengubah role Anda sendiri!', 'error')
     fetch()
     return
   }
@@ -41,10 +43,10 @@ async function changeRole(user, newRole) {
   try {
     const res = await api.put(`/admin/users/${user.id}/role`, { role: newRole })
     user.role = newRole
-    await confirmModal.alert(res.data.message || 'Role berhasil diubah', 'Sukses')
+    showToast(res.data.message || 'Role berhasil diubah', 'success')
   } catch (e) {
     const errorMsg = e.response?.data?.message || 'Gagal mengubah role'
-    await confirmModal.alert(errorMsg, 'Gagal')
+    showToast(errorMsg, 'error')
     fetch()
   } finally {
     updatingUserId.value = null

@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../../utils/api'
+import { useToast } from '../../composables/useToast'
 import { Mail, Check, X, Inbox, ExternalLink } from 'lucide-vue-next'
 
 const invitations = ref([])
+const { showToast } = useToast()
 const loading = ref(true)
 const actionLoading = ref(null)
 
@@ -24,7 +26,7 @@ async function handleAccept(invitation) {
     await api.put(`/invitations/${invitation.id}/accept`)
     await fetchInvitations()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menerima undangan')
+    showToast(e.response?.data?.message || 'Gagal menerima undangan', 'error')
   } finally {
     actionLoading.value = null
   }
@@ -36,7 +38,7 @@ async function handleReject(invitation) {
     await api.put(`/invitations/${invitation.id}/reject`)
     await fetchInvitations()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menolak undangan')
+    showToast(e.response?.data?.message || 'Gagal menolak undangan', 'error')
   } finally {
     actionLoading.value = null
   }

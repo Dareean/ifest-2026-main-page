@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useConfirm } from '../../composables/useConfirm'
+import { useToast } from '../../composables/useToast'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
@@ -13,6 +14,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const confirmModal = useConfirm()
+const { showToast } = useToast()
 
 const loading = ref(true)
 const error = ref('')
@@ -68,7 +70,7 @@ async function handleRemoveMember(invitationId) {
     await api.delete(`/pendaftarans/${route.params.id}/members/${invitationId}`)
     await fetchTeam()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal mengeluarkan anggota', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal mengeluarkan anggota', 'error')
   } finally {
     actionLoading.value = null
   }
@@ -89,7 +91,7 @@ async function handleRequestUnlock() {
     await api.post(`/pendaftarans/${route.params.id}/request-changes`)
     await fetchTeam()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal mengajukan permohonan', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal mengajukan permohonan', 'error')
   }
 }
 

@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useConfirm } from '../../../composables/useConfirm'
+import { useToast } from '../../../composables/useToast'
 import api from '../../../utils/api'
 import {
   ArrowLeft, Clock, CheckCircle, AlertTriangle, Lock, Unlock,
@@ -11,6 +12,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const confirmModal = useConfirm()
+const { showToast } = useToast()
 const loading = ref(true)
 const error = ref('')
 const data = ref(null)
@@ -41,7 +43,7 @@ async function handleVerify() {
     await api.put(`/admin/pendaftarans/${route.params.id}/verify`)
     await fetchDetail()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal verifikasi', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal verifikasi', 'error')
   } finally {
     actionLoading.value = false
   }
@@ -55,7 +57,7 @@ async function handleReject() {
     showRejectForm.value = false
     rejectNotes.value = ''
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal menolak', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal menolak', 'error')
   } finally {
     actionLoading.value = false
   }
@@ -67,7 +69,7 @@ async function handleApproveUnlock() {
     await api.put(`/admin/pendaftarans/${route.params.id}/approve-unlock`)
     await fetchDetail()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal memproses', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal memproses', 'error')
   } finally {
     actionLoading.value = false
   }
@@ -80,7 +82,7 @@ async function handleVerifyPayment() {
     await api.put(`/admin/pendaftarans/${route.params.id}/verify-payment`)
     await fetchDetail()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal verifikasi pembayaran', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal verifikasi pembayaran', 'error')
   } finally {
     actionLoading.value = false
   }
@@ -88,7 +90,7 @@ async function handleVerifyPayment() {
 
 async function handleRejectPayment() {
   if (!rejectPaymentNotes.value) {
-    await confirmModal.alert('Alasan penolakan wajib diisi', 'Validasi')
+    showToast('Alasan penolakan wajib diisi', 'error')
     return
   }
   actionLoading.value = true
@@ -98,7 +100,7 @@ async function handleRejectPayment() {
     showRejectPaymentForm.value = false
     rejectPaymentNotes.value = ''
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal menolak pembayaran', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal menolak pembayaran', 'error')
   } finally {
     actionLoading.value = false
   }
@@ -116,9 +118,9 @@ async function handleSendNotification() {
       pesan: msg,
       user_ids: [reg.value.user_id],
     })
-    await confirmModal.alert('Notifikasi terkirim', 'Sukses')
+    showToast('Notifikasi terkirim', 'success')
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal', 'error')
   } finally {
     actionLoading.value = false
   }

@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useConfirm } from '../../composables/useConfirm'
+import { useToast } from '../../composables/useToast'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
@@ -14,6 +15,7 @@ const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 const confirmModal = useConfirm()
+const { showToast } = useToast()
 const pendaftarans = ref([])
 const loading = ref(true)
 const lombaList = ref([])
@@ -339,7 +341,7 @@ async function handleAcceptInvite(invitationId) {
     await fetchInvitations()
     await fetchData()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal menerima undangan', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal menerima undangan', 'error')
   } finally {
     actionLoading.value = null
   }
@@ -351,7 +353,7 @@ async function handleDeclineInvite(invitationId) {
     await api.put(`/invitations/${invitationId}/reject`)
     await fetchInvitations()
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal menolak undangan', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal menolak undangan', 'error')
   } finally {
     actionLoading.value = null
   }
@@ -368,7 +370,7 @@ async function handleRemoveMember(memberId) {
     const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
     if (updated) selectedLombaForDetail.value = updated
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal mengeluarkan anggota', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal mengeluarkan anggota', 'error')
   } finally {
     actionLoading.value = null
   }
@@ -389,7 +391,7 @@ async function handleRequestChanges() {
     await api.post(`/pendaftarans/${reg.id}/request-changes`)
     reg.unlock_requested = true
   } catch (e) {
-    await confirmModal.alert(e.response?.data?.message || 'Gagal mengirim permohonan', 'Gagal')
+    showToast(e.response?.data?.message || 'Gagal mengirim permohonan', 'error')
   }
 }
 
