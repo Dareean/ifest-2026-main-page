@@ -10,6 +10,12 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
+// Debug
+Route::get('/debug/ip', function () {
+    $ip = @file_get_contents('https://api.ipify.org');
+    return ['render_outbound_ip' => $ip ?: 'failed to detect'];
+});
+
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
