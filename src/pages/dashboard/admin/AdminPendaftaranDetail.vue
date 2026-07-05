@@ -240,6 +240,15 @@ onMounted(fetchDetail)
         <!-- Info -->
         <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 text-xs space-y-3">
           <div>
+            <span class="text-[9px] font-bold uppercase text-on-surface-variant/50 tracking-wider">Gelombang</span>
+            <p class="font-bold text-on-surface mt-0.5">
+              <span v-if="reg?.gelombang" class="inline-block font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="reg.gelombang === '1' ? 'bg-pink-100 text-pink-700 border border-pink-200' : 'bg-blue-100 text-blue-700 border border-blue-200'">
+                Gelombang {{ reg.gelombang }}
+              </span>
+              <span v-else class="text-on-surface-variant/60">-</span>
+            </p>
+          </div>
+          <div>
             <span class="text-[9px] font-bold uppercase text-on-surface-variant/50 tracking-wider">Terkunci</span>
             <p class="font-bold text-on-surface mt-0.5">{{ reg?.team_locked ? 'Ya' : 'Tidak' }}</p>
           </div>

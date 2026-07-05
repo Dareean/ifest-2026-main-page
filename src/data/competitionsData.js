@@ -5,6 +5,8 @@ export const competitionsData = [
     scale: "Nasional",
     tagline: "ALGORITMA & PROBLEM SOLVING",
     fee: "Rp 50.000 / Tim",
+    feeGelombang1: "Rp 40.000 / Tim",
+    feeGelombang2: "Rp 50.000 / Tim",
     target: "Terbuka untuk Umum (Usia 16-25 Tahun)",
     teamRequirements: "Tim (2-3 Orang)",
     languages: "Semua Bahasa Pemrograman (Platform HackerRank)",
@@ -24,7 +26,7 @@ export const competitionsData = [
       "Di babak penyisihan, setiap tim memiliki hak untuk menggunakan maksimal 3 komputer/laptop dengan webcam menyala (open camera & share screen).",
       "Dilarang keras menggunakan bantuan AI, melakukan kecurangan seperti plagiarisme kode, atau bertukar jawaban antar tim."
     ],
-    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Penyisihan: 24 Agustus 2026 | Final: 3 September 2026",
+    schedule: "Pendaftaran: 11 Juli - 5 Agustus 2026 | Penyisihan: 24 Agustus 2026 | Final: 3 September 2026",
     registrationLink: "https://forms.gle/PiRWMLUo9NyKS6Kc8",
     guidebookLink: "Arena Inovasi Digital/Lomba Competitive Programing/JUKNIS_COMPETITIVE_PROGRAMING.docx"
   },
@@ -34,6 +36,8 @@ export const competitionsData = [
     scale: "Nasional",
     tagline: "DESAIN DIGITAL BERDAMPAK",
     fee: "Rp 50.000 / Tim",
+    feeGelombang1: "Rp 40.000 / Tim",
+    feeGelombang2: "Rp 50.000 / Tim",
     target: "Terbuka untuk Umum (Usia 17-25 Tahun)",
     teamRequirements: "Tim (3 Orang)",
     languages: "Figma, Adobe XD, atau sejenisnya",
@@ -56,7 +60,7 @@ export const competitionsData = [
       "Desain harus orisinal, belum pernah menjuarai kompetisi lain, dan tidak menggunakan UI Kit instan secara utuh.",
       "Babak final diikuti oleh 5 tim terbaik yang akan mempresentasikan karya mereka secara online di hadapan juri."
     ],
-    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
+    schedule: "Pendaftaran: 11 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
     registrationLink: "https://forms.gle/aud4FoHggF3qow1G8",
     guidebookLink: "Arena Inovasi Digital/Lomba UI-UX/Juknis_UIUX_IFEST_2026.docx"
   },
@@ -66,6 +70,8 @@ export const competitionsData = [
     scale: "Nasional",
     tagline: "IDE BISNIS INOVATIF",
     fee: "Rp 85.000 / Tim",
+    feeGelombang1: "Rp 70.000 / Tim",
+    feeGelombang2: "Rp 85.000 / Tim",
     target: "Terbuka untuk Umum",
     teamRequirements: "Tim (Maks. 3 orang)",
     languages: "Pitch Deck, Canva, Excel (Financial Modeling)",
@@ -87,7 +93,7 @@ export const competitionsData = [
       "Wajib menyertakan rancangan model monetisasi dan analisis SWOT yang komprehensif.",
       "Di babak final, peserta diwajibkan memaparkan Pitch Deck di hadapan investor dan juri profesional dalam durasi 10 menit presentasi + tanya jawab."
     ],
-    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
+    schedule: "Pendaftaran: 11 Juli - 5 Agustus 2026 | Pengumpulan Proposal: 24 Agustus 2026 | Final: 7 September 2026",
     registrationLink: "/#detail-kegiatan",
     guidebookLink: "#"
   },
@@ -97,6 +103,8 @@ export const competitionsData = [
     scale: "Regional",
     tagline: "VIDEO EDUKATIF & KREATIF",
     fee: "Rp 25.000 / Orang",
+    feeGelombang1: "Rp 20.000 / Orang",
+    feeGelombang2: "Rp 25.000 / Orang",
     target: "Terbuka untuk Umum (Usia 15-23 Tahun)",
     teamRequirements: "Individu",
     languages: "CapCut, Alight Motion, Premiere, dll.",
@@ -119,7 +127,7 @@ export const competitionsData = [
       "Karya diunggah sebagai Reels ke Instagram ketua tim dengan menandai akun @ifest_untad, akun tidak privat, dan menggunakan caption resmi.",
       "Wajib menggunakan template logo panitia sebagai opening dan logo sponsor sebagai closing."
     ],
-    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Video: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026",
+    schedule: "Pendaftaran: 11 Juli - 5 Agustus 2026 | Pengumpulan Video: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026",
     registrationLink: "https://forms.gle/2AaDqvh8ZKPa8etJA",
     guidebookLink: "Arena Inovasi Digital/Lomba Video Kreatif/Juknis_Video Creatif_2026.docx"
   },
@@ -129,6 +137,8 @@ export const competitionsData = [
     scale: "Regional",
     tagline: "DESAIN VISUAL EDUKATIF",
     fee: "Rp 25.000 / Orang",
+    feeGelombang1: "Rp 20.000 / Orang",
+    feeGelombang2: "Rp 25.000 / Orang",
     target: "Terbuka untuk Umum (Usia 15-23 Tahun)",
     teamRequirements: "Individu",
     languages: "Canva, Illustrator, Photoshop, Figma, dll.",
@@ -151,7 +161,7 @@ export const competitionsData = [
       "Wajib menyertakan template logo resmi yang disediakan oleh panitia pada karya poster.",
       "Karya harus orisinal, belum pernah memenangkan kompetisi lain, dan tidak mengandung SARA."
     ],
-    schedule: "Pendaftaran: 5 Juli - 5 Agustus 2026 | Pengumpulan Karya: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026",
+    schedule: "Pendaftaran: 11 Juli - 5 Agustus 2026 | Pengumpulan Karya: 24 Agustus 2026 | Pengumuman Top 5: 1 September 2026",
     registrationLink: "https://forms.gle/n6YQRPEqUJX9PrHJ6",
     guidebookLink: "Arena Inovasi Digital/Lomba Poster Edukasi/DIGITAL EDUCATION POSTER COMPETITION.docx"
   },
@@ -161,6 +171,8 @@ export const competitionsData = [
     scale: "Regional",
     tagline: "HACKATHON + SHOWCASE",
     fee: "Gratis",
+    feeGelombang1: "Gratis",
+    feeGelombang2: "Gratis",
     target: "Terbuka untuk Umum",
     teamRequirements: "Tim (Maks. 3 - 5 orang)",
     languages: "Web/Mobile Stack (React, Vue, Flutter, Laravel, Node.js, IoT Tools)",
@@ -183,7 +195,7 @@ export const competitionsData = [
       "Wajib melakukan commit kode ke repositori GitHub yang dipantau mentor berkala.",
       "Hasil akhir wajib dipamerkan secara interaktif di Paviliun S-DIH pada Expo Utama Hari-H."
     ],
-    schedule: "Registrasi: Juni - Juli 2026 | Technical Briefing: Akhir Juli 2026 | Hackathon & Pitching: Agustus 2026",
+    schedule: "Registrasi: 11 Juli - 5 Agustus 2026 | Technical Briefing: Akhir Juli 2026 | Hackathon & Pitching: Agustus 2026",
     registrationLink: "/#detail-kegiatan",
     guidebookLink: "#"
   }

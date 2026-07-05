@@ -72,7 +72,7 @@ onMounted(() => {
 
     <!-- Sidebar -->
     <aside :class="[
-      'fixed md:sticky top-0 left-0 z-50 h-screen bg-white flex flex-col transition-transform duration-300 w-64 flex-shrink-0 border-r border-[#04000D]/5',
+      'fixed md:sticky top-0 left-0 z-50 h-screen bg-white flex flex-col transition-transform duration-300 w-72 md:w-64 lg:w-72 flex-shrink-0 border-r border-[#04000D]/5 overflow-y-auto',
       sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
     ]">
       <!-- Logo -->

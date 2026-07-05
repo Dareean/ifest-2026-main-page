@@ -64,8 +64,8 @@ onMounted(() => {
   }
 })
 
-// Countdown Lomba 5 Juli 2026 (Diubah ke masa lalu untuk mempermudah review)
-const announcementTarget = new Date('2026-06-01T00:00:00+07:00').getTime()
+// Countdown Lomba 11 Juli 2026
+const announcementTarget = new Date('2026-07-11T00:00:00+07:00').getTime()
 const countdown = ref({
   days: 0,
   hours: 0,
@@ -376,7 +376,7 @@ watch(() => route.query.id, (newId) => {
             <div class="mt-3 pt-2.5 border-t border-dashed border-[#04000D]/15 flex items-center justify-between">
               <span class="font-mono text-[8px] font-bold text-[#04000D]/65">RILIS:</span>
               <span class="bg-[#FF3D8B] text-white font-mono text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-[#04000D] shadow-[1.5px_1.5px_0px_0px_#04000D]">
-                5 JULI 2026
+                11 JULI 2026
               </span>
             </div>
           </div>
@@ -436,7 +436,10 @@ watch(() => route.query.id, (newId) => {
               <!-- Biaya Registrasi -->
               <div class="bg-[#F5F5F5] p-5 flex flex-col justify-between">
                 <span class="font-mono text-[9px] uppercase tracking-widest font-bold text-[#04000D]/50 mb-4 block">Biaya Registrasi</span>
-                <span class="font-mono text-xs font-extrabold text-[#FF3D8B] leading-tight uppercase font-mono">{{ activeCompetition.fee }}</span>
+                <div class="text-xs font-extrabold text-[#FF3D8B] leading-tight uppercase font-mono">
+                  <span class="block">Gel 1: {{ activeCompetition.feeGelombang1 || activeCompetition.fee }}</span>
+                  <span class="block text-[10px] text-[#04000D]/60">Gel 2: {{ activeCompetition.feeGelombang2 || activeCompetition.fee }}</span>
+                </div>
               </div>
 
             </div>

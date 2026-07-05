@@ -22,7 +22,7 @@ async function fetchAnnouncements() {
 }
 
 // Countdown configuration
-const targetDate = new Date('2026-06-01T00:00:00')
+const targetDate = new Date('2026-07-11T00:00:00')
 const countdownText = ref('')
 const countdownActive = ref(true)
 let timerId = null

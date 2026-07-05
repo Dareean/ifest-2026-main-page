@@ -68,9 +68,9 @@ onMounted(fetch)
       <div v-for="i in 5" :key="i" class="h-16 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
     </div>
 
-    <!-- Table -->
+    <!-- Table (desktop) + Cards (mobile) -->
     <div v-else-if="data?.data?.length" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl overflow-hidden">
-      <div class="overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
             <tr class="border-b border-slate-100 bg-slate-50/50">
@@ -110,6 +110,39 @@ onMounted(fetch)
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Cards (mobile) -->
+      <div class="md:hidden divide-y divide-slate-100">
+        <div v-for="user in data.data" :key="user.id" class="p-4">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <p class="font-bold text-sm text-on-surface leading-tight">{{ user.name }}</p>
+            <div v-if="auth.user?.id === user.id">
+              <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
+                <Crown class="w-2.5 h-2.5" /> Anda
+              </span>
+              <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
+                <Shield class="w-2.5 h-2.5" /> Anda
+              </span>
+            </div>
+            <div v-else class="inline-block relative">
+              <select
+                :value="user.role"
+                @change="changeRole(user, $event.target.value)"
+                :disabled="updatingUserId === user.id"
+                class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 focus:border-[#04000D]/40 rounded-lg py-1.5 pl-2 pr-7 text-[10px] font-mono font-bold uppercase text-on-surface focus:outline-none transition-all cursor-pointer appearance-none disabled:opacity-50 min-h-[32px]"
+              >
+                <option value="admin">Admin</option>
+                <option value="super_admin">Super Admin</option>
+              </select>
+              <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
+            </div>
+          </div>
+          <div class="space-y-1 text-xs text-on-surface-variant/70">
+            <p class="font-mono text-[10px] truncate">{{ user.email }}</p>
+            <p class="text-[10px]">{{ new Date(user.created_at).toLocaleDateString('id-ID') }}</p>
+          </div>
+        </div>
       </div>
     </div>
 

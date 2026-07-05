@@ -1101,8 +1101,8 @@ onMounted(() => {
   }
 })
 
-// Countdown Lomba 5 Juli 2026
-const announcementTarget = new Date('2026-07-05T00:00:00+07:00').getTime()
+// Countdown Lomba 11 Juli 2026
+const announcementTarget = new Date('2026-07-11T00:00:00+07:00').getTime()
 const countdown = ref({
   days: 0,
   hours: 0,
@@ -1480,7 +1480,7 @@ onBeforeUnmount(() => {
               <div class="mt-4 pt-3.5 border-t border-dashed border-[#04000D]/15 flex items-center justify-between">
                 <span class="font-mono text-[10px] font-bold text-[#04000D]/65">TANGGAL RILIS:</span>
                 <span class="bg-[#FF3D8B] text-white font-mono text-[10px] font-black uppercase tracking-wider px-2 py-0.5 border border-[#04000D] shadow-[2px_2px_0px_0px_#04000D]">
-                  5 JULI 2026
+                  11 JULI 2026
                 </span>
               </div>
             </div>
@@ -1535,7 +1535,10 @@ onBeforeUnmount(() => {
                   </h3>
                   <div class="border-t border-dashed border-[#04000D]/20 pt-3 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
                     <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
-                    <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">{{ comp.fee }}</span></div>
+                    <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono text-right">
+                      <span class="block">Gel 1: {{ comp.feeGelombang1 || comp.fee }}</span>
+                      <span class="block text-[9px] text-[#04000D]/60">Gel 2: {{ comp.feeGelombang2 || comp.fee }}</span>
+                    </span></div>
                   </div>
                 </div>
 
@@ -1600,7 +1603,9 @@ onBeforeUnmount(() => {
                   </h3>
                   <div class="border-t border-dashed border-[#04000D]/20 pt-4 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
                     <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
-                    <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono">Gratis</span></div>
+                    <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono text-right">
+                      <span>Gratis</span>
+                    </span></div>
                   </div>
                 </div>
                 

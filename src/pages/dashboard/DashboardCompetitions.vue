@@ -45,12 +45,12 @@ const getMaxMembers = (req) => {
 
 // Competition opening dates config
 const openDates = {
-  'NAT-01': new Date('2026-06-01T00:00:00'),
-  'NAT-02': new Date('2026-06-01T00:00:00'),
-  'NAT-03': new Date('2026-06-01T00:00:00'),
-  'REG-01': new Date('2026-06-01T00:00:00'),
-  'REG-02': new Date('2026-06-01T00:00:00'),
-  'REG-03': new Date('2026-06-01T00:00:00'), // Sulteng Digital Innovation Hub is already open
+  'NAT-01': new Date('2026-07-11T00:00:00'),
+  'NAT-02': new Date('2026-07-11T00:00:00'),
+  'NAT-03': new Date('2026-07-11T00:00:00'),
+  'REG-01': new Date('2026-07-11T00:00:00'),
+  'REG-02': new Date('2026-07-11T00:00:00'),
+  'REG-03': new Date('2026-07-11T00:00:00'),
 }
 
 const now = ref(new Date())
@@ -414,7 +414,11 @@ onUnmounted(() => {
             </div>
             <div v-else class="min-w-0">
               <p class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Biaya</p>
-              <p class="text-xs font-extrabold text-on-surface mt-0.5">{{ l.fee }}</p>
+              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mt-0.5">
+                <span class="text-[10px] font-extrabold text-on-surface">Gel 1: {{ l.fee_gelombang_1 || l.fee }}</span>
+                <span class="text-[9px] text-on-surface-variant/50">|</span>
+                <span class="text-[10px] font-extrabold text-on-surface">Gel 2: {{ l.fee_gelombang_2 || l.fee }}</span>
+              </div>
             </div>
             
             <!-- Button -->
@@ -535,6 +539,11 @@ onUnmounted(() => {
             <component :is="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.icon || Clock" class="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div>
               <p class="font-bold">Status Pendaftaran: {{ statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.label }}</p>
+              <div v-if="getRegistration(selectedLombaForDetail?.id)?.gelombang" class="flex items-center gap-1.5 mt-1.5">
+                <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="getRegistration(selectedLombaForDetail?.id)?.gelombang === '1' ? 'bg-pink-100 text-pink-700 border border-pink-200' : 'bg-blue-100 text-blue-700 border border-blue-200'">
+                  Gelombang {{ getRegistration(selectedLombaForDetail?.id)?.gelombang }}
+                </span>
+              </div>
               
               <!-- Custom status notes -->
               <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending'">
@@ -649,7 +658,10 @@ onUnmounted(() => {
               <div class="space-y-3 text-xs border-b border-slate-100 pb-4">
                 <div class="flex justify-between">
                   <span class="text-on-surface-variant/70">Biaya Pendaftaran</span>
-                  <span class="font-extrabold text-on-surface">{{ selectedLombaForDetail?.fee }}</span>
+                  <span class="font-extrabold text-on-surface text-right">
+                    <span class="block">Gel 1: {{ selectedLombaForDetail?.fee_gelombang_1 || selectedLombaForDetail?.fee }}</span>
+                    <span class="block text-[10px] text-on-surface-variant/60">Gel 2: {{ selectedLombaForDetail?.fee_gelombang_2 || selectedLombaForDetail?.fee }}</span>
+                  </span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-on-surface-variant/70">Kategori Peserta</span>

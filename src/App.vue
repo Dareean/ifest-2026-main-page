@@ -54,21 +54,21 @@ onMounted(() => {
   <template v-if="isChatActivated">
     <AiChatWidget @close="isChatActivated = false" />
   </template>
-  <div v-else class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end">
+  <div v-else class="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end">
     <button 
       @click="isChatActivated = true" 
-      class="riso-btn-plate w-14 h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
+      class="riso-btn-plate w-12 h-12 sm:w-14 sm:h-14 bg-[#04000D] text-white rounded-full flex items-center justify-center relative active:scale-95 group" 
       style="--plate-color: #FDE047;"
       aria-label="Open Assistant"
     >
       <!-- Pulse Indicator -->
-      <span class="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5">
+      <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3 sm:h-3.5 sm:w-3.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF3D8B] opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#FF3D8B]"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 sm:h-3.5 sm:w-3.5 bg-[#FF3D8B]"></span>
       </span>
       
       <!-- Robot Icon -->
-      <Bot class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
+      <Bot class="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:scale-110" />
     </button>
   </div>
 </template>

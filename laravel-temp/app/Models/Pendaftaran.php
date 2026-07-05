@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pendaftaran extends Model
 {
     protected $fillable = [
-        'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'notes', 'team_locked', 'unlock_requested',
+        'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'gelombang', 'notes', 'team_locked', 'unlock_requested',
     ];
 
     protected $appends = ['max_members'];

@@ -82,23 +82,23 @@ onMounted(() => {
     </div>
 
     <!-- Filters -->
-    <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-5 mb-6">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="relative flex-1">
+    <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-4 sm:p-5 mb-6">
+      <div class="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-3">
+        <div class="relative col-span-2 sm:flex-1">
           <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-          <input v-model="searchQuery" @input="fetch" placeholder="Cari nama tim, nama peserta, email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+          <input v-model="searchQuery" @input="fetch" placeholder="Cari nama tim, peserta, email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
         </div>
-        <select v-model="statusFilter" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface focus:outline-none">
+        <select v-model="statusFilter" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 sm:px-4 text-xs font-semibold text-on-surface focus:outline-none">
           <option value="">Semua Status</option>
           <option value="pending">Pending</option>
           <option value="verified">Terverifikasi</option>
           <option value="rejected">Ditolak</option>
         </select>
-        <select v-model="selectedLomba" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface focus:outline-none">
+        <select v-model="selectedLomba" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 sm:px-4 text-xs font-semibold text-on-surface focus:outline-none">
           <option value="">Semua Lomba</option>
-          <option v-for="l in lombas" :key="l.id" :value="l.id">{{ l.kode }} - {{ l.title }}</option>
+          <option v-for="l in lombas" :key="l.id" :value="l.id">{{ l.kode }}</option>
         </select>
-        <button @click="exportCsv" class="inline-flex items-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-sm flex-shrink-0 whitespace-nowrap">
+        <button @click="exportCsv" class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-sm flex-shrink-0 whitespace-nowrap">
           <Download class="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
@@ -114,9 +114,9 @@ onMounted(() => {
       <p class="text-sm text-on-surface-variant/60">Tidak ada pendaftaran</p>
     </div>
 
-    <!-- Table -->
+    <!-- Table (desktop) -->
     <div v-else class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl overflow-hidden">
-      <div class="overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
             <tr class="border-b border-slate-100 bg-slate-50/50">
@@ -151,6 +151,27 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Cards (mobile) -->
+      <div class="md:hidden divide-y divide-slate-100">
+        <div v-for="reg in data.data" :key="reg.id" @click="goToDetail(reg.id)" class="p-4 hover:bg-slate-50/50 transition-colors cursor-pointer active:bg-slate-100">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <p class="font-bold text-sm text-on-surface leading-tight">{{ reg.team_name || '-' }}</p>
+            <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0" :class="statusConfig[reg.status]?.class || ''">
+              <component :is="statusConfig[reg.status]?.icon" class="w-2.5 h-2.5" />
+              {{ statusConfig[reg.status]?.label }}
+            </span>
+          </div>
+          <div class="space-y-1 text-xs text-on-surface-variant/70">
+            <p class="font-semibold text-on-surface">{{ reg.user?.name }}</p>
+            <p class="font-mono text-[10px] truncate">{{ reg.user?.email }}</p>
+            <div class="flex items-center gap-2 pt-1">
+              <span class="font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">{{ reg.lomba?.kode }}</span>
+              <span class="text-[10px]">{{ new Date(reg.created_at).toLocaleDateString('id-ID') }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
