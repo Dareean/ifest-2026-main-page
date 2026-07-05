@@ -192,7 +192,7 @@ class AdminController extends Controller
             try {
                 $html = view('emails.notification', ['notification' => $notif])->render();
                 if ($apiKey) {
-                    Http::timeout(10)->withHeaders([
+                    $res = Http::timeout(10)->withHeaders([
                         'api-key' => $apiKey,
                         'Content-Type' => 'application/json',
                     ])->post('https://api.brevo.com/v3/smtp/email', [
@@ -200,6 +200,11 @@ class AdminController extends Controller
                         'to' => [['email' => $item['email']]],
                         'subject' => $judul,
                         'htmlContent' => $html,
+                    ]);
+                    Log::info('Brevo response', [
+                        'to' => $item['email'],
+                        'status' => $res->status(),
+                        'body' => $res->body(),
                     ]);
                 }
             } catch (\Exception $e) {

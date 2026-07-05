@@ -19,6 +19,13 @@ Route::get('/debug/env', function () {
     ];
 });
 
+Route::get('/debug/log', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (!file_exists($logFile)) return 'No log file';
+    $lines = array_slice(file($logFile), -50);
+    return '<pre>' . implode('', array_map('htmlspecialchars', $lines)) . '</pre>';
+});
+
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
