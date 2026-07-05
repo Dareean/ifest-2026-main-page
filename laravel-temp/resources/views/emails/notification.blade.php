@@ -31,30 +31,10 @@
             max-width: 600px;
             margin: 0 auto;
         }
-        .header {
-            background-color: #1E3A5F;
-            padding: 36px 32px 28px;
-            text-align: center;
-            border-radius: 12px 12px 0 0;
-        }
-        .header-logos-table {
-            margin: 0 auto 16px auto;
-            border-collapse: collapse;
-        }
-        .header-logos-table td {
-            padding: 0 12px;
-            vertical-align: middle;
-        }
-        .header-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #94A3B8;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
         .body-content {
             background-color: #FFFFFF;
             padding: 40px 36px;
+            border-radius: 12px 12px 0 0;
         }
         .salutation {
             font-size: 15px;
@@ -137,8 +117,7 @@
             color: #94A3B8;
             line-height: 1.6;
         }
-        @@media only screen and (max-width: 480px) {
-            .header { padding: 28px 20px 22px; }
+        @media only screen and (max-width: 480px) {
             .body-content { padding: 28px 20px; }
             .footer { padding: 20px; }
         }
@@ -149,11 +128,7 @@
         <tr>
             <td align="center">
                 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:24px auto;">
-                    <tr>
-                        <td class="header" align="center">
-                            <div class="header-title">Informatics Festival 2026</div>
-                        </td>
-                    </tr>
+
                     <tr>
                         <td class="body-content">
                             <p class="salutation">Yth. {{ $notification->user->name }},</p>
