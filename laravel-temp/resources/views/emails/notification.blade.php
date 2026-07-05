@@ -1,14 +1,14 @@
 @php
     $isLocal = config('app.env') === 'local' || \Illuminate\Support\Str::contains(config('app.url'), 'loca.lt');
     $untadUrl = $isLocal 
-        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/logo_untad.webp' 
-        : asset('logo-untad.webp');
+        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/logo_utama_png/logo_untad.png' 
+        : asset('logo-untad.png');
     $hmtiUrl = $isLocal 
-        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/HMTI%20LOGO.webp' 
-        : asset('logo-hmti.webp');
+        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/logo_utama_png/HMTI%20LOGO.png' 
+        : asset('logo-hmti.png');
     $ifestUrl = $isLocal 
-        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/Logo-IFEST-2026.webp' 
-        : asset('logo-ifest.webp');
+        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/logo_utama_png/Logo-IFEST-2026.png' 
+        : asset('logo-ifest.png');
 @endphp
 <!DOCTYPE html>
 <html lang="id">
