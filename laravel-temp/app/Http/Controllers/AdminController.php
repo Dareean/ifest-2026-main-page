@@ -9,6 +9,7 @@ use App\Mail\NotificationMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -188,12 +189,24 @@ class AdminController extends Controller
         $judul = $request->judul;
         $pesan = $request->pesan;
 
-        app()->terminating(function () use ($emails, $judul, $pesan) {
+        $apiKey = env('BREVO_API_KEY');
+        app()->terminating(function () use ($emails, $judul, $pesan, $apiKey) {
             foreach ($emails as $item) {
                 $notif = Notification::find($item['notif_id']);
                 if (!$notif) continue;
                 try {
-                    Mail::to($item['email'])->send(new NotificationMail($notif));
+                    $html = view('emails.notification', ['notification' => $notif])->render();
+                    if ($apiKey) {
+                        Http::withHeaders([
+                            'api-key' => $apiKey,
+                            'Content-Type' => 'application/json',
+                        ])->post('https://api.brevo.com/v3/smtp/email', [
+                            'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
+                            'to' => [['email' => $item['email']]],
+                            'subject' => $judul,
+                            'htmlContent' => $html,
+                        ]);
+                    }
                 } catch (\Exception $e) {
                     Log::error('Send email failed: ' . $e->getMessage(), $item);
                 }
