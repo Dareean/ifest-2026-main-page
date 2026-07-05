@@ -2,9 +2,11 @@
 import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
+import { useToast } from '../../../composables/useToast'
 import { Search, Shield, User, Crown, Trash2 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
+const toast = useToast()
 const loading = ref(true)
 const updatingUserId = ref(null)
 const data = ref(null)
@@ -27,16 +29,17 @@ async function fetch() {
 async function deleteUser(user) {
   if (!confirm(`Yakin ingin menghapus akun "${user.name}" (${user.email})? Semua data terkait akan ikut terhapus.`)) return
   try {
-    await api.delete(`/admin/users/${user.id}`)
+    const res = await api.delete(`/admin/users/${user.id}`)
     data.value.data = data.value.data.filter(u => u.id !== user.id)
+    toast.showToast(res.data.message || 'Akun berhasil dihapus', 'success')
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menghapus akun')
+    toast.showToast(e.response?.data?.message || 'Gagal menghapus akun', 'error')
   }
 }
 
 async function changeRole(user, newRole) {
   if (auth.user?.id === user.id) {
-    alert('Anda tidak bisa mengubah role Anda sendiri!')
+    toast.showToast('Anda tidak bisa mengubah role Anda sendiri!', 'error')
     return
   }
 
@@ -51,10 +54,9 @@ async function changeRole(user, newRole) {
   try {
     const res = await api.put(`/admin/users/${user.id}/role`, { role: newRole })
     user.role = newRole
-    alert(res.data.message || 'Role berhasil diubah')
+    toast.showToast(res.data.message || 'Role berhasil diubah', 'success')
   } catch (e) {
-    const errorMsg = e.response?.data?.message || 'Gagal mengubah role'
-    alert(errorMsg)
+    toast.showToast(e.response?.data?.message || 'Gagal mengubah role', 'error')
     fetch()
   } finally {
     updatingUserId.value = null
