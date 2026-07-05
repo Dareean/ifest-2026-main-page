@@ -10,22 +10,6 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
-// Debug
-Route::get('/debug/env', function () {
-    return [
-        'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS') ?: 'NULL',
-        'config_from_address' => config('mail.from.address') ?: 'NULL',
-        'BREVO_API_KEY' => env('BREVO_API_KEY') ? 'SET' : 'NULL',
-    ];
-});
-
-Route::get('/debug/log', function () {
-    $logFile = storage_path('logs/laravel.log');
-    if (!file_exists($logFile)) return 'No log file';
-    $lines = array_slice(file($logFile), -50);
-    return '<pre>' . implode('', array_map('htmlspecialchars', $lines)) . '</pre>';
-});
-
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);

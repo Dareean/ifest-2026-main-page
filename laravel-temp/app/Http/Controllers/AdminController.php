@@ -201,11 +201,9 @@ class AdminController extends Controller
                         'subject' => $judul,
                         'htmlContent' => $html,
                     ]);
-                    Log::info('Brevo response', [
-                        'to' => $item['email'],
-                        'status' => $res->status(),
-                        'body' => $res->body(),
-                    ]);
+                    if ($res->failed()) {
+                        Log::error('Brevo API error', ['to' => $item['email'], 'status' => $res->status(), 'body' => $res->body()]);
+                    }
                 }
             } catch (\Exception $e) {
                 Log::error('Send email failed: ' . $e->getMessage(), $item);
