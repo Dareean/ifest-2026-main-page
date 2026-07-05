@@ -68,6 +68,13 @@ const statusConfig = {
   rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
 }
 
+const paymentStatusConfig = {
+  unpaid: { icon: Clock, label: 'Belum Bayar', class: 'bg-slate-100 text-slate-500 border-slate-200' },
+  pending: { icon: Clock, label: 'Pending', class: 'bg-[#FFF9E6] text-amber-600 border-amber-200' },
+  verified: { icon: CheckCircle, label: 'Lunas', class: 'bg-[#DCEEB1]/30 text-green-700 border-[#DCEEB1]' },
+  rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
+}
+
 onMounted(() => {
   fetchLombas()
   fetch()
@@ -123,6 +130,7 @@ onMounted(() => {
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Tim</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Ketua</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Lomba</th>
+              <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Pembayaran</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Status</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Tanggal</th>
               <th class="text-right px-5 py-3"></th>
@@ -137,6 +145,12 @@ onMounted(() => {
               </td>
               <td class="px-5 py-3.5">
                 <span class="font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">{{ reg.lomba?.kode }}</span>
+              </td>
+              <td class="px-5 py-3.5">
+                <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" :class="paymentStatusConfig[reg.payment_status]?.class || ''">
+                  <component :is="paymentStatusConfig[reg.payment_status]?.icon" class="w-2.5 h-2.5" />
+                  {{ paymentStatusConfig[reg.payment_status]?.label }}
+                </span>
               </td>
               <td class="px-5 py-3.5">
                 <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" :class="statusConfig[reg.status]?.class || ''">
@@ -168,6 +182,10 @@ onMounted(() => {
             <p class="font-mono text-[10px] truncate">{{ reg.user?.email }}</p>
             <div class="flex items-center gap-2 pt-1">
               <span class="font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">{{ reg.lomba?.kode }}</span>
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" :class="paymentStatusConfig[reg.payment_status]?.class || ''">
+                <component :is="paymentStatusConfig[reg.payment_status]?.icon" class="w-2.5 h-2.5" />
+                {{ paymentStatusConfig[reg.payment_status]?.label }}
+              </span>
               <span class="text-[10px]">{{ new Date(reg.created_at).toLocaleDateString('id-ID') }}</span>
             </div>
           </div>

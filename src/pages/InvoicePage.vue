@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useConfirm } from '../composables/useConfirm'
 import api from '../utils/api'
-import { CheckCircle, Printer, ArrowLeft, Loader } from 'lucide-vue-next'
+import { CheckCircle, Printer, ArrowLeft, Loader, Clock, AlertTriangle } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -115,12 +115,21 @@ onMounted(fetchInvoice)
           <!-- Fee & Payment details -->
           <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4 print:border-slate-200">
             <div>
-              <span class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Biaya Lunas</span>
+              <span class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Biaya Pendaftaran</span>
               <p class="text-base font-extrabold text-on-surface mt-0.5">{{ pendaftaran.lomba?.fee }}</p>
             </div>
             <div class="flex flex-col items-end justify-center">
-              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-[#DCEEB1] text-on-surface border border-[#DCEEB1]/70 print:border-slate-400">
-                <CheckCircle class="w-3.5 h-3.5" /> Lunas / Verified
+              <span v-if="pendaftaran.payment_status === 'verified'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-[#DCEEB1] text-on-surface border border-[#DCEEB1]/70 print:border-slate-400">
+                <CheckCircle class="w-3.5 h-3.5" /> Lunas
+              </span>
+              <span v-else-if="pendaftaran.payment_status === 'pending'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-[#FFF9E6] text-amber-700 border border-amber-200">
+                <Clock class="w-3.5 h-3.5" /> Menunggu Verifikasi
+              </span>
+              <span v-else-if="pendaftaran.payment_status === 'rejected'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-[#FF3D8B]/10 text-accent-magenta border border-accent-magenta/20">
+                <AlertTriangle class="w-3.5 h-3.5" /> Ditolak
+              </span>
+              <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                <Clock class="w-3.5 h-3.5" /> Belum Bayar
               </span>
             </div>
           </div>

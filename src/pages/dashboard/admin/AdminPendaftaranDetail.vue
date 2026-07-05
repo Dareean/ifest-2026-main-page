@@ -5,7 +5,7 @@ import { useConfirm } from '../../../composables/useConfirm'
 import api from '../../../utils/api'
 import {
   ArrowLeft, Clock, CheckCircle, AlertTriangle, Lock, Unlock,
-  Users, Mail, Send, Shield
+  Users, Mail, Send, Shield, Image, X
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -17,6 +17,8 @@ const data = ref(null)
 const actionLoading = ref(false)
 const rejectNotes = ref('')
 const showRejectForm = ref(false)
+const showRejectPaymentForm = ref(false)
+const rejectPaymentNotes = ref('')
 
 const reg = computed(() => data.value)
 
@@ -71,6 +73,43 @@ async function handleApproveUnlock() {
   }
 }
 
+async function handleVerifyPayment() {
+  if (!await confirmModal.confirm('Verifikasi pembayaran ini?', 'Verifikasi Pembayaran?')) return
+  actionLoading.value = true
+  try {
+    await api.put(`/admin/pendaftarans/${route.params.id}/verify-payment`)
+    await fetchDetail()
+  } catch (e) {
+    await confirmModal.alert(e.response?.data?.message || 'Gagal verifikasi pembayaran', 'Gagal')
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function handleRejectPayment() {
+  if (!rejectPaymentNotes.value) {
+    await confirmModal.alert('Alasan penolakan wajib diisi', 'Validasi')
+    return
+  }
+  actionLoading.value = true
+  try {
+    await api.put(`/admin/pendaftarans/${route.params.id}/reject-payment`, { payment_notes: rejectPaymentNotes.value })
+    await fetchDetail()
+    showRejectPaymentForm.value = false
+    rejectPaymentNotes.value = ''
+  } catch (e) {
+    await confirmModal.alert(e.response?.data?.message || 'Gagal menolak pembayaran', 'Gagal')
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+const paymentProofFullUrl = (proof) => {
+  if (!proof) return ''
+  const baseUrl = import.meta.env.VITE_API_URL || ''
+  return `${baseUrl}/storage/${proof}`
+}
+
 async function handleSendNotification() {
   const msg = prompt('Tulis pesan notifikasi untuk ketua tim:')
   if (!msg) return
@@ -92,6 +131,13 @@ async function handleSendNotification() {
 const statusConfig = {
   pending: { icon: Clock, label: 'Pending', class: 'bg-[#FFF9E6] text-amber-600 border-amber-200' },
   verified: { icon: CheckCircle, label: 'Terverifikasi', class: 'bg-[#DCEEB1]/30 text-green-700 border-[#DCEEB1]' },
+  rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
+}
+
+const paymentStatusConfig = {
+  unpaid: { icon: Clock, label: 'Belum Bayar', class: 'bg-slate-100 text-slate-500 border-slate-200' },
+  pending: { icon: Clock, label: 'Pending', class: 'bg-[#FFF9E6] text-amber-600 border-amber-200' },
+  verified: { icon: CheckCircle, label: 'Lunas', class: 'bg-[#DCEEB1]/30 text-green-700 border-[#DCEEB1]' },
   rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
 }
 
@@ -200,6 +246,36 @@ onMounted(fetchDetail)
           </div>
         </div>
 
+        <!-- Payment info -->
+        <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6">
+          <h2 class="font-extrabold text-sm text-on-surface mb-4 flex items-center gap-2">
+            <Shield class="w-4 h-4 text-accent-magenta" /> Pembayaran
+          </h2>
+          <div class="flex items-center gap-3 mb-4">
+            <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border" :class="paymentStatusConfig[reg?.payment_status]?.class || ''">
+              <component :is="paymentStatusConfig[reg?.payment_status]?.icon" class="w-3 h-3" />
+              {{ paymentStatusConfig[reg?.payment_status]?.label }}
+            </span>
+            <span v-if="reg?.payment_verified_at" class="font-mono text-[10px] text-on-surface-variant/60">
+              {{ new Date(reg.payment_verified_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+            </span>
+          </div>
+
+          <!-- Payment Proof -->
+          <div v-if="reg?.payment_proof" class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Bukti Pembayaran</span>
+            <a :href="paymentProofFullUrl(reg.payment_proof)" target="_blank" class="flex items-center gap-2 mt-2 text-xs font-bold text-sky-600 hover:underline">
+              <Image class="w-4 h-4" /> Lihat / Download Bukti Bayar
+            </a>
+          </div>
+
+          <!-- Payment Notes (rejected) -->
+          <div v-if="reg?.payment_notes" class="mt-4 bg-accent-magenta/5 border border-accent-magenta/20 rounded-xl p-3.5 text-xs">
+            <span class="text-[9px] font-bold uppercase text-accent-magenta">Catatan Penolakan</span>
+            <p class="text-on-surface-variant/90 mt-1">{{ reg.payment_notes }}</p>
+          </div>
+        </div>
+
         <!-- Submission -->
         <div v-if="reg?.submission" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6">
           <h2 class="font-extrabold text-sm text-on-surface mb-4 flex items-center gap-2">
@@ -216,9 +292,9 @@ onMounted(fetchDetail)
       <div class="space-y-4">
         <!-- Quick actions -->
         <div v-if="reg?.status === 'pending'" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-5 space-y-3">
-          <h3 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Aksi</h3>
-          <button @click="handleVerify" :disabled="actionLoading" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5">
-            <CheckCircle class="w-4 h-4" /> {{ actionLoading ? 'Memproses...' : 'Verifikasi' }}
+          <h3 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Aksi Tim</h3>
+          <button @click="handleVerify" :disabled="actionLoading || reg.payment_status !== 'verified'" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5" :title="reg.payment_status !== 'verified' && reg.lomba?.fee?.toLowerCase() !== 'gratis' ? 'Verifikasi pembayaran terlebih dahulu' : ''">
+            <CheckCircle class="w-4 h-4" /> {{ actionLoading ? 'Memproses...' : 'Verifikasi Tim' }}
           </button>
           <button @click="showRejectForm = !showRejectForm" class="w-full bg-white hover:bg-slate-50 text-accent-magenta border border-slate-200 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
             <AlertTriangle class="w-4 h-4" /> Tolak
@@ -226,6 +302,23 @@ onMounted(fetchDetail)
           <div v-if="showRejectForm" class="space-y-2.5 pt-2 border-t border-slate-100">
             <textarea v-model="rejectNotes" rows="3" placeholder="Catatan penolakan (opsional)" class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl p-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all resize-none"></textarea>
             <button @click="handleReject" :disabled="actionLoading" class="w-full bg-accent-magenta hover:bg-accent-magenta/90 text-white py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40">
+              {{ actionLoading ? 'Memproses...' : 'Konfirmasi Tolak' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Payment actions -->
+        <div v-if="reg?.payment_status === 'pending'" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-5 space-y-3">
+          <h3 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Aksi Pembayaran</h3>
+          <button @click="handleVerifyPayment" :disabled="actionLoading" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5">
+            <CheckCircle class="w-4 h-4" /> {{ actionLoading ? 'Memproses...' : 'Verifikasi Pembayaran' }}
+          </button>
+          <button @click="showRejectPaymentForm = !showRejectPaymentForm" class="w-full bg-white hover:bg-slate-50 text-accent-magenta border border-slate-200 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+            <X class="w-4 h-4" /> Tolak Bukti Bayar
+          </button>
+          <div v-if="showRejectPaymentForm" class="space-y-2.5 pt-2 border-t border-slate-100">
+            <textarea v-model="rejectPaymentNotes" rows="3" placeholder="Alasan penolakan (wajib diisi)" class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl p-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all resize-none"></textarea>
+            <button @click="handleRejectPayment" :disabled="actionLoading || !rejectPaymentNotes" class="w-full bg-accent-magenta hover:bg-accent-magenta/90 text-white py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40">
               {{ actionLoading ? 'Memproses...' : 'Konfirmasi Tolak' }}
             </button>
           </div>

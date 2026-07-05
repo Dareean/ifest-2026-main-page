@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/pendaftarans/{pendaftaran}/members/{invitation}', [TeamController::class, 'removeMember']);
     Route::post('/pendaftarans/{pendaftaran}/request-changes', [TeamController::class, 'requestChanges']);
 
+    Route::post('/pendaftarans/{pendaftaran}/payment/upload', [PendaftaranController::class, 'uploadPayment']);
+
     Route::get('/invitations/pending', [TeamController::class, 'pendingInvitations']);
     Route::put('/invitations/{invitation}/accept', [TeamController::class, 'accept']);
     Route::put('/invitations/{invitation}/reject', [TeamController::class, 'reject']);
@@ -65,6 +67,8 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/pendaftarans/{pendaftaran}', [AdminController::class, 'pendaftaranDetail']);
     Route::put('/pendaftarans/{pendaftaran}/verify', [AdminController::class, 'verify']);
     Route::put('/pendaftarans/{pendaftaran}/reject', [AdminController::class, 'reject']);
+    Route::put('/pendaftarans/{pendaftaran}/verify-payment', [AdminController::class, 'verifyPayment']);
+    Route::put('/pendaftarans/{pendaftaran}/reject-payment', [AdminController::class, 'rejectPayment']);
     Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
     Route::get('/activity-logs', [AdminController::class, 'activityLogs']);

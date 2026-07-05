@@ -6,8 +6,10 @@ use App\Models\Lomba;
 use App\Models\Pendaftaran;
 use App\Models\Notification;
 use App\Models\TeamInvitation;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PendaftaranController extends Controller
@@ -117,6 +119,7 @@ class PendaftaranController extends Controller
             'team_name' => $teamName,
             'team_members' => $request->team_members,
             'gelombang' => $gelombang,
+            'payment_status' => strtolower(trim($lomba->fee)) === 'gratis' ? 'verified' : 'unpaid',
         ]);
 
         Notification::create([
@@ -155,5 +158,64 @@ class PendaftaranController extends Controller
         }
 
         return response()->json(['data' => $pendaftaran->load('lomba', 'submission', 'user')]);
+    }
+
+    public function uploadPayment(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    {
+        if ($pendaftaran->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($pendaftaran->payment_status === 'verified') {
+            return response()->json(['message' => 'Pembayaran sudah diverifikasi'], 400);
+        }
+
+        if ($pendaftaran->isFree()) {
+            return response()->json(['message' => 'Lomba ini gratis, tidak perlu upload bukti bayar'], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'payment_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Delete old proof if exists
+        if ($pendaftaran->payment_proof) {
+            Storage::disk('public')->delete($pendaftaran->payment_proof);
+        }
+
+        $path = $request->file('payment_proof')->store('payment-proofs', 'public');
+
+        $pendaftaran->update([
+            'payment_proof' => $path,
+            'payment_status' => 'pending',
+            'payment_notes' => null,
+        ]);
+
+        Notification::create([
+            'user_id' => $pendaftaran->user_id,
+            'judul' => 'Bukti Pembayaran Terkirim',
+            'pesan' => "Bukti pembayaran untuk lomba {$pendaftaran->lomba->title} telah diterima. Tim kami akan memverifikasinya.",
+        ]);
+
+        // Notify admins
+        try {
+            $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'judul' => 'Bukti Pembayaran Baru',
+                    'pesan' => "Tim {$pendaftaran->team_name} mengupload bukti pembayaran untuk {$pendaftaran->lomba->title}.",
+                ]);
+            }
+        } catch (\Exception $e) {}
+
+        return response()->json([
+            'message' => 'Bukti pembayaran berhasil diupload',
+            'data' => $pendaftaran->fresh()->load('lomba'),
+        ]);
     }
 }

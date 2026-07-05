@@ -5,9 +5,9 @@ import { useConfirm } from '../../composables/useConfirm'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
-  Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
+  Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle, Upload,
   Send, X, Users, BookOpen, Calendar, ArrowLeft,
-  ChevronRight, Award, FileText, Printer, Lock, Unlock, UserMinus, Mail, Check
+  ChevronRight, Award, FileText, Printer, Lock, Unlock, UserMinus, Mail, Check, Image
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
@@ -37,6 +37,11 @@ const inviting = ref(false)
 const inviteError = ref('')
 const inviteSuccess = ref('')
 const actionLoading = ref(null)
+
+const paymentFile = ref(null)
+const uploadingPayment = ref(false)
+const paymentUploadError = ref('')
+const paymentUploadSuccess = ref('')
 
 const isTeamLocked = computed(() => {
   return getRegistration(selectedLombaForDetail.value?.id)?.team_locked ?? true
@@ -141,6 +146,13 @@ const statusConfig = {
   rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
 }
 
+const paymentStatusConfig = {
+  unpaid: { icon: Clock, label: 'Belum Bayar', class: 'bg-slate-100 text-on-surface-variant border-slate-200' },
+  pending: { icon: Clock, label: 'Pending', class: 'bg-[#FFF9E6] text-on-surface border-amber-200' },
+  verified: { icon: CheckCircle, label: 'Terverifikasi', class: 'bg-[#DCEEB1] text-on-surface border-[#DCEEB1]' },
+  rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
+}
+
 async function fetchInvitations() {
   try {
     const res = await api.get('/invitations/pending')
@@ -161,6 +173,34 @@ async function fetchTeamInvitations() {
   } catch (e) {
     console.error(e)
   }
+}
+
+async function handleUploadPayment() {
+  const reg = getRegistration(selectedLombaForDetail.value?.id)
+  if (!reg || !paymentFile.value) return
+  uploadingPayment.value = true
+  paymentUploadError.value = ''
+  paymentUploadSuccess.value = ''
+  try {
+    const formData = new FormData()
+    formData.append('payment_proof', paymentFile.value)
+    const res = await api.post(`/pendaftarans/${reg.id}/payment/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    paymentUploadSuccess.value = 'Bukti pembayaran berhasil diupload!'
+    paymentFile.value = null
+    await fetchData()
+  } catch (e) {
+    paymentUploadError.value = e.response?.data?.message || e.response?.data?.errors?.payment_proof?.[0] || 'Gagal upload bukti bayar'
+  } finally {
+    uploadingPayment.value = false
+  }
+}
+
+const paymentProofUrl = (proof) => {
+  if (!proof) return ''
+  const baseUrl = import.meta.env.VITE_API_URL || ''
+  return `${baseUrl}/storage/${proof}`
 }
 
 async function fetchData() {
@@ -568,23 +608,93 @@ onUnmounted(() => {
 
       <!-- Tab Content: Registrasi & Tim -->
       <div v-else-if="activeTab === 'team'" class="space-y-6">
-        <!-- Status: Registered (pending/verified/rejected) -->
+        <!-- Status: Registered -->
         <div v-if="sudahTerdaftar(selectedLombaForDetail?.id)">
           <div
             class="p-4 border rounded-2xl flex items-start gap-3 shadow-sm text-xs"
             :class="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.class || ''"
           >
             <component :is="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.icon || Clock" class="w-5 h-5 mt-0.5 flex-shrink-0" />
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="font-bold">Status: {{ statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.label }}</p>
               <div v-if="getRegistration(selectedLombaForDetail?.id)?.gelombang" class="flex items-center gap-1.5 mt-1.5">
                 <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="getRegistration(selectedLombaForDetail?.id)?.gelombang === '1' ? 'bg-pink-100 text-pink-700 border border-pink-200' : 'bg-blue-100 text-blue-700 border border-blue-200'">
                   Gelombang {{ getRegistration(selectedLombaForDetail?.id)?.gelombang }}
                 </span>
               </div>
-              <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending'">
-                Pendaftaran tim Anda telah masuk sistem. Mohon tunggu verifikasi administrasi oleh panitia.
-              </p>
+
+              <!-- Pending + Unpaid (not free) → show upload payment -->
+              <template v-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'unpaid'">
+                <div v-if="selectedLombaForDetail?.fee && selectedLombaForDetail.fee.toLowerCase() !== 'gratis'" class="mt-3">
+                  <p class="text-[11px] opacity-80 leading-relaxed">Silakan upload bukti pembayaran untuk melanjutkan proses verifikasi.</p>
+                  <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
+                    <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
+                    <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
+                    <label class="flex items-center gap-3 cursor-pointer bg-white hover:bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 transition-colors">
+                      <Upload class="w-5 h-5 text-on-surface-variant/40" />
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-on-surface">{{ paymentFile ? paymentFile.name : 'Pilih file bukti bayar' }}</p>
+                        <p class="font-mono text-[10px] text-on-surface-variant/40">JPG, PNG, atau PDF (max 2MB)</p>
+                      </div>
+                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" @change="e => paymentFile = e.target.files[0] || null" class="hidden" />
+                    </label>
+                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentFile" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+                      {{ uploadingPayment ? 'Mengupload...' : 'Upload Bukti Bayar' }}
+                    </button>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Pending + Payment Pending -->
+              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'pending'">
+                <div class="mt-3 space-y-3">
+                  <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran sedang diverifikasi oleh admin.</p>
+                  <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_proof" class="bg-white/60 rounded-xl p-3 border border-slate-200/60">
+                    <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Bukti Bayar Terupload</span>
+                    <a :href="paymentProofUrl(getRegistration(selectedLombaForDetail?.id)?.payment_proof)" target="_blank" class="flex items-center gap-2 mt-1.5 text-xs font-bold text-sky-600 hover:underline">
+                      <Image class="w-4 h-4" /> Lihat File
+                    </a>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Pending + Payment Rejected -->
+              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'rejected'">
+                <div class="mt-3">
+                  <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran ditolak.</p>
+                  <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_notes" class="mt-2 bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px]">
+                    <span class="font-bold text-accent-magenta">Alasan:</span>
+                    <span class="text-on-surface-variant/80 ml-1">{{ getRegistration(selectedLombaForDetail?.id)?.payment_notes }}</span>
+                  </div>
+                  <p class="text-[11px] mt-2">Silakan upload ulang bukti pembayaran yang valid.</p>
+                  <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
+                    <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
+                    <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
+                    <label class="flex items-center gap-3 cursor-pointer bg-white hover:bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 transition-colors">
+                      <Upload class="w-5 h-5 text-on-surface-variant/40" />
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-on-surface">{{ paymentFile ? paymentFile.name : 'Pilih file bukti bayar' }}</p>
+                        <p class="font-mono text-[10px] text-on-surface-variant/40">JPG, PNG, atau PDF (max 2MB)</p>
+                      </div>
+                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" @change="e => paymentFile = e.target.files[0] || null" class="hidden" />
+                    </label>
+                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentFile" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+                      {{ uploadingPayment ? 'Mengupload...' : 'Upload Ulang Bukti Bayar' }}
+                    </button>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Pending + Payment Verified (waiting for team verification) -->
+              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified'">
+                <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Pembayaran terverifikasi! Tim kami akan segera memverifikasi pendaftaran tim Anda.</p>
+              </template>
+
+              <!-- Free competition (auto payment verified) -->
+              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && selectedLombaForDetail?.fee && selectedLombaForDetail.fee.toLowerCase() === 'gratis'">
+                <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Lomba gratis — pendaftaran Anda sedang menunggu verifikasi admin.</p>
+              </template>
+
               <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'verified'">
                 Tim Anda telah diverifikasi! Kelola anggota tim di tab <strong>Anggota Tim</strong>.
               </p>

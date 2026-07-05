@@ -296,6 +296,13 @@ class TeamController extends Controller
 
         $pendaftaran->update(['unlock_requested' => true]);
 
+        // Notify requesting user
+        Notification::create([
+            'user_id' => $request->user()->id,
+            'judul' => 'Permohonan Buka Kunci Dikirim',
+            'pesan' => 'Permohonan buka kunci untuk tim "' . ($pendaftaran->team_name ?: 'Tim Anda') . '" telah dikirim ke admin. Kami akan mengirimkan notifikasi email setelah disetujui.',
+        ]);
+
         // Notify admin users (skip if role column doesn't exist yet — admin panel pending)
         try {
             $admins = User::where('role', 'admin')->get();

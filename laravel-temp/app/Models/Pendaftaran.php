@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Pendaftaran extends Model
 {
     protected $fillable = [
-        'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'gelombang', 'notes', 'team_locked', 'unlock_requested', 'auto_lock_at',
+        'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'gelombang', 'notes',
+        'team_locked', 'unlock_requested', 'auto_lock_at',
+        'payment_proof', 'payment_status', 'payment_verified_at', 'payment_notes',
     ];
 
     protected $appends = ['max_members'];
@@ -19,7 +21,14 @@ class Pendaftaran extends Model
             'team_locked' => 'boolean',
             'unlock_requested' => 'boolean',
             'auto_lock_at' => 'datetime',
+            'payment_verified_at' => 'datetime',
         ];
+    }
+
+    public function isFree(): bool
+    {
+        $fee = $this->lomba?->fee;
+        return $fee && strtolower(trim($fee)) === 'gratis';
     }
 
     public function getMaxMembersAttribute(): int

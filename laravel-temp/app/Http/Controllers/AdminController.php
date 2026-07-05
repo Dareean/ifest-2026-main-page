@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -79,6 +80,11 @@ class AdminController extends Controller
             return response()->json(['message' => 'Pendaftaran sudah diverifikasi sebelumnya'], 400);
         }
 
+        // If not free, payment must be verified first
+        if (!$pendaftaran->isFree() && $pendaftaran->payment_status !== 'verified') {
+            return response()->json(['message' => 'Pembayaran belum diverifikasi. Verifikasi pembayaran terlebih dahulu sebelum memverifikasi tim.'], 400);
+        }
+
         $pendaftaran->update([
             'status' => 'verified',
         ]);
@@ -134,6 +140,74 @@ class AdminController extends Controller
         Cache::forget('admin_stats');
 
         return response()->json(['message' => 'Pendaftaran ditolak', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
+    }
+
+    public function verifyPayment(Pendaftaran $pendaftaran): JsonResponse
+    {
+        if ($pendaftaran->payment_status !== 'pending') {
+            return response()->json(['message' => 'Tidak ada bukti pembayaran yang perlu diverifikasi'], 400);
+        }
+
+        $pendaftaran->update([
+            'payment_status' => 'verified',
+            'payment_verified_at' => now(),
+        ]);
+
+        Notification::create([
+            'user_id' => $pendaftaran->user_id,
+            'judul' => 'Pembayaran Diverifikasi',
+            'pesan' => "Pembayaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Tim kamu akan segera diverifikasi oleh admin.",
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => request()->user()->id,
+            'action' => 'verify_payment',
+            'target_type' => 'pendaftaran',
+            'target_id' => $pendaftaran->id,
+            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name],
+        ]);
+
+        Cache::forget('admin_stats');
+
+        return response()->json(['message' => 'Pembayaran berhasil diverifikasi', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
+    }
+
+    public function rejectPayment(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    {
+        if ($pendaftaran->payment_status !== 'pending') {
+            return response()->json(['message' => 'Tidak ada bukti pembayaran yang perlu diverifikasi'], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'payment_notes' => 'required|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $pendaftaran->update([
+            'payment_status' => 'rejected',
+            'payment_notes' => $request->payment_notes,
+        ]);
+
+        Notification::create([
+            'user_id' => $pendaftaran->user_id,
+            'judul' => 'Bukti Pembayaran Ditolak',
+            'pesan' => "Bukti pembayaran untuk lomba {$pendaftaran->lomba->title} ditolak. Alasan: {$request->payment_notes}. Silakan upload ulang bukti pembayaran yang valid.",
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => $request->user()->id,
+            'action' => 'reject_payment',
+            'target_type' => 'pendaftaran',
+            'target_id' => $pendaftaran->id,
+            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name, 'notes' => $request->payment_notes],
+        ]);
+
+        Cache::forget('admin_stats');
+
+        return response()->json(['message' => 'Bukti pembayaran ditolak', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
     }
 
     public function approveUnlock(Pendaftaran $pendaftaran): JsonResponse

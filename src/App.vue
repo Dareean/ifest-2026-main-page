@@ -1,6 +1,8 @@
 <script setup>
-import { ref, defineAsyncComponent, onMounted, computed } from 'vue'
+import { ref, defineAsyncComponent, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useToast } from './composables/useToast'
+import api from './utils/api'
 import RisoLoader from './components/RisoLoader.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import ConfirmContainer from './components/ConfirmContainer.vue'
@@ -28,11 +30,69 @@ const onLoaded = () => {
   isLoading.value = false
 }
 
-onMounted(() => {
-  const auth = useAuthStore()
-  if (auth.isAuthenticated) {
-    auth.fetchUser()
+const auth = useAuthStore()
+const toast = useToast()
+let pollInterval = null
+
+function startNotificationPolling() {
+  if (pollInterval) return
+  let lastUnreadCount = auth.user?.unread_notifications_count || 0
+  
+  pollInterval = setInterval(async () => {
+    if (!auth.isAuthenticated) {
+      stopNotificationPolling()
+      return
+    }
+    
+    try {
+      const res = await api.get('/auth/user')
+      const newUser = res.data.user
+      const newCount = newUser.unread_notifications_count || 0
+      
+      if (newCount > lastUnreadCount) {
+        // Fetch new unread notification text
+        const notifRes = await api.get('/notifications')
+        const unreadNotifs = notifRes.data.data.filter(n => !n.is_read)
+        if (unreadNotifs.length > 0) {
+          const latestNotif = unreadNotifs[0]
+          toast.showToast(`${latestNotif.judul}: ${latestNotif.pesan}`, 'info')
+        }
+      }
+      
+      auth.user = newUser
+      localStorage.setItem('auth_user', JSON.stringify(newUser))
+      lastUnreadCount = newCount
+    } catch (e) {
+      console.error('Polling error:', e)
+    }
+  }, 8000) // Poll every 8 seconds
+}
+
+function stopNotificationPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
   }
+}
+
+onMounted(() => {
+  if (auth.isAuthenticated) {
+    auth.fetchUser().then(() => {
+      startNotificationPolling()
+    })
+  }
+})
+
+watch(() => auth.isAuthenticated, (newVal) => {
+  if (newVal) {
+    startNotificationPolling()
+  } else {
+    stopNotificationPolling()
+  }
+})
+
+onUnmounted(() => {
+  stopNotificationPolling()
 })
 </script>
 
