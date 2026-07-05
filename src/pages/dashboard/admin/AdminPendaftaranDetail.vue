@@ -5,7 +5,7 @@ import { useConfirm } from '../../../composables/useConfirm'
 import api from '../../../utils/api'
 import {
   ArrowLeft, Clock, CheckCircle, AlertTriangle, Lock, Unlock,
-  Users, Mail, Send, Shield, Image, X
+  Users, Mail, Send, Shield, X
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -102,12 +102,6 @@ async function handleRejectPayment() {
   } finally {
     actionLoading.value = false
   }
-}
-
-const paymentProofFullUrl = (proof) => {
-  if (!proof) return ''
-  const baseUrl = import.meta.env.VITE_API_URL || ''
-  return `${baseUrl}/storage/${proof}`
 }
 
 async function handleSendNotification() {
@@ -263,9 +257,9 @@ onMounted(fetchDetail)
 
           <!-- Payment Proof -->
           <div v-if="reg?.payment_proof" class="bg-slate-50 rounded-xl p-4 border border-slate-100">
-            <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Bukti Pembayaran</span>
-            <a :href="paymentProofFullUrl(reg.payment_proof)" target="_blank" class="flex items-center gap-2 mt-2 text-xs font-bold text-sky-600 hover:underline">
-              <Image class="w-4 h-4" /> Lihat / Download Bukti Bayar
+            <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Bukti Pembayaran</span>
+            <a :href="reg.payment_proof" target="_blank" class="flex items-center gap-2 mt-2 text-xs font-bold text-sky-600 hover:underline truncate">
+              {{ reg.payment_proof }}
             </a>
           </div>
 

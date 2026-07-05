@@ -9,7 +9,6 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PendaftaranController extends Controller
@@ -175,22 +174,15 @@ class PendaftaranController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'payment_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'payment_proof' => 'required|url|max:1000',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Delete old proof if exists
-        if ($pendaftaran->payment_proof) {
-            Storage::disk('public')->delete($pendaftaran->payment_proof);
-        }
-
-        $path = $request->file('payment_proof')->store('payment-proofs', 'public');
-
         $pendaftaran->update([
-            'payment_proof' => $path,
+            'payment_proof' => $request->payment_proof,
             'payment_status' => 'pending',
             'payment_notes' => null,
         ]);
@@ -208,13 +200,13 @@ class PendaftaranController extends Controller
                 Notification::create([
                     'user_id' => $admin->id,
                     'judul' => 'Bukti Pembayaran Baru',
-                    'pesan' => "Tim {$pendaftaran->team_name} mengupload bukti pembayaran untuk {$pendaftaran->lomba->title}.",
+                    'pesan' => "Tim {$pendaftaran->team_name} mengirimkan bukti pembayaran untuk {$pendaftaran->lomba->title}.",
                 ]);
             }
         } catch (\Exception $e) {}
 
         return response()->json([
-            'message' => 'Bukti pembayaran berhasil diupload',
+            'message' => 'Bukti pembayaran berhasil dikirim',
             'data' => $pendaftaran->fresh()->load('lomba'),
         ]);
     }

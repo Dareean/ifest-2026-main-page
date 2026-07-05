@@ -5,9 +5,9 @@ import { useConfirm } from '../../composables/useConfirm'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
-  Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle, Upload,
+  Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
   Send, X, Users, BookOpen, Calendar, ArrowLeft,
-  ChevronRight, Award, FileText, Printer, Lock, Unlock, UserMinus, Mail, Check, Image
+  ChevronRight, Award, FileText, Printer, Lock, Unlock, UserMinus, Mail, Check
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
@@ -38,7 +38,7 @@ const inviteError = ref('')
 const inviteSuccess = ref('')
 const actionLoading = ref(null)
 
-const paymentFile = ref(null)
+const paymentLink = ref('')
 const uploadingPayment = ref(false)
 const paymentUploadError = ref('')
 const paymentUploadSuccess = ref('')
@@ -177,30 +177,20 @@ async function fetchTeamInvitations() {
 
 async function handleUploadPayment() {
   const reg = getRegistration(selectedLombaForDetail.value?.id)
-  if (!reg || !paymentFile.value) return
+  if (!reg || !paymentLink.value) return
   uploadingPayment.value = true
   paymentUploadError.value = ''
   paymentUploadSuccess.value = ''
   try {
-    const formData = new FormData()
-    formData.append('payment_proof', paymentFile.value)
-    const res = await api.post(`/pendaftarans/${reg.id}/payment/upload`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    paymentUploadSuccess.value = 'Bukti pembayaran berhasil diupload!'
-    paymentFile.value = null
+    await api.post(`/pendaftarans/${reg.id}/payment/upload`, { payment_proof: paymentLink.value })
+    paymentUploadSuccess.value = 'Bukti pembayaran berhasil dikirim!'
+    paymentLink.value = ''
     await fetchData()
   } catch (e) {
-    paymentUploadError.value = e.response?.data?.message || e.response?.data?.errors?.payment_proof?.[0] || 'Gagal upload bukti bayar'
+    paymentUploadError.value = e.response?.data?.message || e.response?.data?.errors?.payment_proof?.[0] || 'Gagal mengirim link bukti bayar'
   } finally {
     uploadingPayment.value = false
   }
-}
-
-const paymentProofUrl = (proof) => {
-  if (!proof) return ''
-  const baseUrl = import.meta.env.VITE_API_URL || ''
-  return `${baseUrl}/storage/${proof}`
 }
 
 async function fetchData() {
@@ -630,16 +620,12 @@ onUnmounted(() => {
                   <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
                     <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
                     <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
-                    <label class="flex items-center gap-3 cursor-pointer bg-white hover:bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 transition-colors">
-                      <Upload class="w-5 h-5 text-on-surface-variant/40" />
-                      <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-on-surface">{{ paymentFile ? paymentFile.name : 'Pilih file bukti bayar' }}</p>
-                        <p class="font-mono text-[10px] text-on-surface-variant/40">JPG, PNG, atau PDF (max 2MB)</p>
-                      </div>
-                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" @change="e => paymentFile = e.target.files[0] || null" class="hidden" />
-                    </label>
-                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentFile" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
-                      {{ uploadingPayment ? 'Mengupload...' : 'Upload Bukti Bayar' }}
+                    <div>
+                      <label class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider mb-1.5 block">Link Google Drive Bukti Bayar</label>
+                      <input v-model="paymentLink" placeholder="https://drive.google.com/file/d/..." class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                    </div>
+                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+                      {{ uploadingPayment ? 'Mengirim...' : 'Kirim Bukti Bayar' }}
                     </button>
                   </div>
                 </div>
@@ -650,9 +636,9 @@ onUnmounted(() => {
                 <div class="mt-3 space-y-3">
                   <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran sedang diverifikasi oleh admin.</p>
                   <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_proof" class="bg-white/60 rounded-xl p-3 border border-slate-200/60">
-                    <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Bukti Bayar Terupload</span>
-                    <a :href="paymentProofUrl(getRegistration(selectedLombaForDetail?.id)?.payment_proof)" target="_blank" class="flex items-center gap-2 mt-1.5 text-xs font-bold text-sky-600 hover:underline">
-                      <Image class="w-4 h-4" /> Lihat File
+                    <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Bukti Bayar</span>
+                    <a :href="getRegistration(selectedLombaForDetail?.id)?.payment_proof" target="_blank" class="flex items-center gap-2 mt-1.5 text-xs font-bold text-sky-600 hover:underline truncate">
+                      {{ getRegistration(selectedLombaForDetail?.id)?.payment_proof }}
                     </a>
                   </div>
                 </div>
@@ -666,20 +652,16 @@ onUnmounted(() => {
                     <span class="font-bold text-accent-magenta">Alasan:</span>
                     <span class="text-on-surface-variant/80 ml-1">{{ getRegistration(selectedLombaForDetail?.id)?.payment_notes }}</span>
                   </div>
-                  <p class="text-[11px] mt-2">Silakan upload ulang bukti pembayaran yang valid.</p>
+                  <p class="text-[11px] mt-2">Silakan kirim ulang link bukti pembayaran yang valid.</p>
                   <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
                     <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
                     <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
-                    <label class="flex items-center gap-3 cursor-pointer bg-white hover:bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 transition-colors">
-                      <Upload class="w-5 h-5 text-on-surface-variant/40" />
-                      <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-on-surface">{{ paymentFile ? paymentFile.name : 'Pilih file bukti bayar' }}</p>
-                        <p class="font-mono text-[10px] text-on-surface-variant/40">JPG, PNG, atau PDF (max 2MB)</p>
-                      </div>
-                      <input type="file" accept=".jpg,.jpeg,.png,.pdf" @change="e => paymentFile = e.target.files[0] || null" class="hidden" />
-                    </label>
-                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentFile" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
-                      {{ uploadingPayment ? 'Mengupload...' : 'Upload Ulang Bukti Bayar' }}
+                    <div>
+                      <label class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider mb-1.5 block">Link Google Drive Bukti Bayar</label>
+                      <input v-model="paymentLink" placeholder="https://drive.google.com/file/d/..." class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                    </div>
+                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+                      {{ uploadingPayment ? 'Mengirim...' : 'Kirim Ulang Bukti Bayar' }}
                     </button>
                   </div>
                 </div>
