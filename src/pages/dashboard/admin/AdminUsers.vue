@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
-import { Search, Shield, User, Crown } from 'lucide-vue-next'
+import { Search, Shield, User, Crown, Trash2 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 const loading = ref(true)
@@ -21,6 +21,16 @@ async function fetch() {
     console.error(e)
   } finally {
     loading.value = false
+  }
+}
+
+async function deleteUser(user) {
+  if (!confirm(`Yakin ingin menghapus akun "${user.name}" (${user.email})? Semua data terkait akan ikut terhapus.`)) return
+  try {
+    await api.delete(`/admin/users/${user.id}`)
+    data.value.data = data.value.data.filter(u => u.id !== user.id)
+  } catch (e) {
+    alert(e.response?.data?.message || 'Gagal menghapus akun')
   }
 }
 
@@ -85,6 +95,7 @@ onMounted(fetch)
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Role</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Pendaftaran</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Bergabung</th>
+              <th v-if="auth.isSuperAdmin" class="text-right font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -128,6 +139,11 @@ onMounted(fetch)
               </td>
               <td class="px-5 py-3.5 font-semibold text-on-surface">{{ user.pendaftarans_count }}</td>
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/60">{{ new Date(user.created_at).toLocaleDateString('id-ID') }}</td>
+              <td v-if="auth.isSuperAdmin && auth.user?.id !== user.id" class="px-5 py-3.5 text-right">
+                <button @click="deleteUser(user)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors" title="Hapus akun">
+                  <Trash2 class="w-3.5 h-3.5" />
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -146,18 +162,23 @@ onMounted(fetch)
                 <Shield class="w-2.5 h-2.5" /> Anda
               </span>
             </div>
-            <div v-else-if="auth.isSuperAdmin" class="inline-block relative">
-              <select
-                :value="user.role"
-                @change="changeRole(user, $event.target.value)"
-                :disabled="updatingUserId === user.id"
-                class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 focus:border-[#04000D]/40 rounded-lg py-1.5 pl-2 pr-7 text-[10px] font-mono font-bold uppercase text-on-surface focus:outline-none transition-all cursor-pointer appearance-none disabled:opacity-50 min-h-[32px]"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="super_admin">Super Admin</option>
-              </select>
-              <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
+            <div v-else-if="auth.isSuperAdmin" class="flex items-center gap-1.5">
+              <div class="inline-block relative">
+                <select
+                  :value="user.role"
+                  @change="changeRole(user, $event.target.value)"
+                  :disabled="updatingUserId === user.id"
+                  class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 focus:border-[#04000D]/40 rounded-lg py-1.5 pl-2 pr-7 text-[10px] font-mono font-bold uppercase text-on-surface focus:outline-none transition-all cursor-pointer appearance-none disabled:opacity-50 min-h-[32px]"
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+                <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
+              </div>
+              <button v-if="auth.user?.id !== user.id" @click="deleteUser(user)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Hapus akun">
+                <Trash2 class="w-3.5 h-3.5" />
+              </button>
             </div>
             <div v-else>
               <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">

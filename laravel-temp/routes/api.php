@@ -75,5 +75,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::middleware('super_admin')->group(function () {
         Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
         Route::get('/super/admins', [AdminController::class, 'admins']);
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
     });
 });

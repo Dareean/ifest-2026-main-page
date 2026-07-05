@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\EmailVerification;
+use App\Models\Invitation;
 use App\Models\Notification;
 use App\Models\Pendaftaran;
+use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -326,6 +329,34 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function destroyUser(Request $request, User $user): JsonResponse
+    {
+        if ($request->user()->id === $user->id) {
+            return response()->json(['message' => 'Anda tidak bisa menghapus akun Anda sendiri'], 400);
+        }
+
+        $userName = $user->name;
+
+        // Delete related data
+        Pendaftaran::where('user_id', $user->id)->delete();
+        Invitation::where('user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
+        Notification::where('user_id', $user->id)->delete();
+        EmailVerification::where('email', $user->email)->delete();
+        Submission::whereHas('pendaftaran', fn($q) => $q->where('user_id', $user->id))->delete();
+
+        ActivityLog::create([
+            'admin_id' => $request->user()->id,
+            'action' => 'delete_user',
+            'target_type' => 'user',
+            'target_id' => $user->id,
+            'metadata' => ['name' => $userName, 'email' => $user->email],
+        ]);
+
+        $user->delete();
+
+        return response()->json(['message' => "Akun {$userName} berhasil dihapus"]);
     }
 
     public function admins(): JsonResponse
