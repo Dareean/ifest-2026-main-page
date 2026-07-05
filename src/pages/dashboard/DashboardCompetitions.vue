@@ -1,15 +1,17 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
-import { 
-  Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle, 
+import {
+  Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
   Send, X, Users, BookOpen, Calendar, ArrowLeft,
   ChevronRight, Award, FileText, Printer, Lock, Unlock, UserMinus, Mail, Check
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
+const router = useRouter()
+const route = useRoute()
 const pendaftarans = ref([])
 const loading = ref(true)
 const lombaList = ref([])
@@ -149,6 +151,7 @@ function openDetail(lomba) {
 
 function closeDetail() {
   selectedLombaForDetail.value = null
+  router.push('/dashboard')
 }
 
 async function handleDaftar() {
@@ -276,8 +279,6 @@ async function handleRemoveMember(memberId) {
   }
 }
 
-const router = useRouter()
-
 function goToTeamPage() {
   const reg = getRegistration(selectedLombaForDetail.value?.id)
   if (reg) {
@@ -301,7 +302,13 @@ onMounted(() => {
     loading.value = true
   }
 
-  fetchData()
+  fetchData().then(() => {
+    // Open competition from query param
+    if (route.query.id) {
+      const found = lombaList.value.find(l => l.id == route.query.id)
+      if (found) selectedLombaForDetail.value = found
+    }
+  })
   timerId = setInterval(() => {
     now.value = new Date()
   }, 1000) // update every second for ticking countdown
@@ -315,20 +322,20 @@ onUnmounted(() => {
 <template>
   <div>
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-      <div v-if="!selectedLombaForDetail">
-        <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-accent-magenta mb-1 block">Daftar Kompetisi</span>
-        <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Lomba</h1>
-      </div>
-      <div v-else class="flex items-center gap-3">
-        <button @click="closeDetail" class="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors flex items-center justify-center text-on-surface-variant shadow-sm">
-          <ArrowLeft class="w-5 h-5" />
+    <div class="mb-8">
+      <template v-if="selectedLombaForDetail">
+        <button @click="closeDetail" class="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors mb-3 group">
+          <ArrowLeft class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" /> Kembali ke Overview
         </button>
         <div>
           <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-accent-magenta mb-1 block">{{ selectedLombaForDetail.kode }}</span>
           <h1 class="font-extrabold text-2xl md:text-3xl tracking-tight text-on-surface leading-tight">{{ selectedLombaForDetail.title }}</h1>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-accent-magenta mb-1 block">Panel Manajemen</span>
+        <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Lomba</h1>
+      </template>
     </div>
 
     <!-- Loading -->
@@ -336,102 +343,20 @@ onUnmounted(() => {
       <div v-for="i in 3" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
     </div>
 
-    <!-- View 1: Grid Lomba -->
-    <div v-else-if="!selectedLombaForDetail" class="space-y-8">
-      
-      <!-- Section: Undangan Tim Masuk -->
-      <div v-if="invitations.length > 0" class="space-y-4">
-        <h2 class="font-extrabold text-sm text-on-surface uppercase tracking-wider flex items-center gap-2">
-          <Mail class="w-4 h-4 text-accent-magenta" /> Undangan Bergabung Tim
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div 
-            v-for="invite in invitations" 
-            :key="invite.id" 
-            class="bg-[#DCEEB1]/10 border border-[#DCEEB1]/45 shadow-sm rounded-2xl p-5 flex flex-col justify-between gap-4 animate-fade-in"
-          >
-            <div class="text-xs">
-              <span class="font-mono text-[9px] font-bold uppercase tracking-wider text-accent-magenta">{{ invite.pendaftaran?.lomba?.kode }}</span>
-              <h4 class="font-extrabold text-sm text-on-surface mt-1">{{ invite.pendaftaran?.team_name || 'Tanpa Nama Tim' }}</h4>
-              <p class="text-on-surface-variant/80 mt-2 leading-relaxed">
-                Anda diundang untuk bergabung di kompetisi <strong>{{ invite.pendaftaran?.lomba?.title }}</strong> oleh Ketua Tim <strong>{{ invite.invited_by?.name }}</strong> ({{ invite.email }}).
-              </p>
-            </div>
-            
-            <div class="flex items-center gap-3 pt-2 border-t border-slate-100">
-              <button 
-                @click="handleAcceptInvite(invite.id)" 
-                :disabled="actionLoading !== null"
-                class="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] hover:text-[#DCEEB1]/90 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm disabled:opacity-50"
-              >
-                <Check class="w-3.5 h-3.5" /> {{ actionLoading === invite.id ? 'Memproses...' : 'Terima' }}
-              </button>
-              <button 
-                @click="handleDeclineInvite(invite.id)" 
-                :disabled="actionLoading !== null"
-                class="flex-1 inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 text-accent-magenta border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm disabled:opacity-50"
-              >
-                <X class="w-3.5 h-3.5" /> {{ actionLoading === invite.id ? 'Memproses...' : 'Tolak' }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div 
-          v-for="l in lombaList" 
-          :key="l.id" 
-          class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-[#04000D]/10 flex flex-col justify-between h-full min-h-[220px]"
-        >
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <span class="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-on-surface-variant/70">{{ l.scale }}</span>
-              
-              <!-- Status Badges -->
-              <span v-if="sudahTerdaftar(l.id)" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm animate-fade-in" :class="statusConfig[getRegistration(l.id)?.status]?.class || ''">
-                <component :is="statusConfig[getRegistration(l.id)?.status]?.icon" class="w-2.5 h-2.5" />
-                {{ statusConfig[getRegistration(l.id)?.status]?.label }}
-              </span>
-              <span v-else-if="!isLombaOpen(l)" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 text-accent-magenta/60">
-                <Clock class="w-2.5 h-2.5 text-accent-magenta" />
-                Belum Buka
-              </span>
-              <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 text-on-surface">
-                Buka
-              </span>
-            </div>
-            
-            <h3 class="font-extrabold text-lg text-on-surface leading-snug">{{ l.title }}</h3>
-            <p class="text-xs text-on-surface-variant/75 mt-1.5 line-clamp-2 leading-relaxed">{{ l.description }}</p>
-          </div>
-          
-          <div class="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between gap-4">
-            <!-- Left aspect: Fee or Countdown -->
-            <div v-if="!sudahTerdaftar(l.id) && !isLombaOpen(l)" class="min-w-0">
-              <p class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Mulai Dalam</p>
-              <p class="font-mono text-[11px] font-extrabold text-accent-magenta tracking-wide mt-0.5">{{ getLombaCountdownText(l) }}</p>
-            </div>
-            <div v-else class="min-w-0">
-              <p class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Biaya</p>
-              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mt-0.5">
-                <span class="text-[10px] font-extrabold text-on-surface">Gel 1: {{ l.fee_gelombang_1 || l.fee }}</span>
-                <span class="text-[9px] text-on-surface-variant/50">|</span>
-                <span class="text-[10px] font-extrabold text-on-surface">Gel 2: {{ l.fee_gelombang_2 || l.fee }}</span>
-              </div>
-            </div>
-            
-            <!-- Button -->
-            <button @click="openDetail(l)" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] hover:text-[#DCEEB1]/90 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1">
-              Detail & Kelola <ChevronRight class="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
+    <!-- Fallback: No competition selected -->
+    <div v-else-if="!selectedLombaForDetail" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-12 md:p-16 text-center">
+      <Trophy class="w-10 h-10 text-on-surface-variant/20 mx-auto mb-4" />
+      <h2 class="font-extrabold text-lg text-on-surface mb-2">Belum Ada Lomba Dipilih</h2>
+      <p class="text-xs text-on-surface-variant/60 max-w-sm mx-auto leading-relaxed">
+        Pilih lomba dari halaman Overview untuk melihat detail dan mengelola pendaftaran.
+      </p>
+      <router-link to="/dashboard" class="inline-flex items-center gap-1.5 mt-6 bg-[#04000D] hover:bg-black text-[#DCEEB1] px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm">
+        <ArrowLeft class="w-3.5 h-3.5" /> Ke Overview
+      </router-link>
     </div>
 
-    <!-- View 2: Focused Detail View -->
-    <div v-else class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 md:p-8">
+    <!-- View: Focused Detail View -->
+    <div v-if="selectedLombaForDetail" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 md:p-8">
       <!-- Tabs -->
       <div class="flex border-b border-slate-100 overflow-x-auto gap-6 mb-8 scrollbar-none">
         <button 
