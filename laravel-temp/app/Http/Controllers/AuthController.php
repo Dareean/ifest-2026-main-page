@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
@@ -266,15 +267,27 @@ class AuthController extends Controller
 
     public function googleConnect(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $state = Crypt::encryptString(json_encode(['user_id' => $user->id]));
-        $url = Socialite::driver('google')
-            ->stateless()
-            ->with(['state' => $state])
-            ->redirect()
-            ->getTargetUrl();
+        try {
+            $user = $request->user();
+            Log::info('googleConnect: user_id=' . $user->id);
 
-        return response()->json(['url' => $url]);
+            $state = Crypt::encryptString(json_encode(['user_id' => $user->id]));
+
+            $clientId = config('services.google.client_id');
+            $redirectUrl = config('services.google.redirect');
+            Log::info('googleConnect: client_id=' . ($clientId ? 'set' : 'NULL') . ' redirect=' . ($redirectUrl ?? 'NULL'));
+
+            $url = Socialite::driver('google')
+                ->stateless()
+                ->with(['state' => $state])
+                ->redirect()
+                ->getTargetUrl();
+
+            return response()->json(['url' => $url]);
+        } catch (\Exception $e) {
+            Log::error('googleConnect error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return response()->json(['message' => 'Gagal menghubungkan Google: ' . $e->getMessage()], 500);
+        }
     }
 
     public function googleDisconnect(Request $request): JsonResponse

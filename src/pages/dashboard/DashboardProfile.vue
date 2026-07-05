@@ -121,8 +121,8 @@ async function handleConnectGoogle() {
   connectLoading.value = true
   try {
     await auth.connectGoogle()
-  } catch {
-    googleMsg.value = 'Gagal membuka Google'
+  } catch (e) {
+    googleMsg.value = e.response?.data?.message || 'Gagal membuka Google'
     connectLoading.value = false
   }
 }
