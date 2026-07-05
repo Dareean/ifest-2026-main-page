@@ -16,11 +16,40 @@ class TeamController extends Controller
         return $pendaftaran->user_id === $request->user()->id;
     }
 
+    private function applyAutoLock(Pendaftaran $pendaftaran): void
+    {
+        if (!$pendaftaran->team_locked && $pendaftaran->auto_lock_at && now()->greaterThanOrEqualTo($pendaftaran->auto_lock_at)) {
+            $pendaftaran->update([
+                'team_locked' => true,
+                'auto_lock_at' => null,
+            ]);
+        }
+    }
+
+    private function checkAndAutoLockIfFull(Pendaftaran $pendaftaran): void
+    {
+        if ($pendaftaran->team_locked) return;
+
+        $maxMembers = $pendaftaran->lomba->getMaxMembers();
+        $acceptedCount = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('status', 'accepted')
+            ->count();
+
+        if (1 + $acceptedCount >= $maxMembers) {
+            $pendaftaran->update([
+                'team_locked' => true,
+                'auto_lock_at' => null,
+            ]);
+        }
+    }
+
     public function invite(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
         if (!$this->checkOwnership($request, $pendaftaran)) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
+
+        $this->applyAutoLock($pendaftaran);
 
         if ($pendaftaran->status !== 'verified') {
             return response()->json(['message' => 'Pendaftaran belum diverifikasi'], 400);
@@ -136,6 +165,8 @@ class TeamController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
+        $this->applyAutoLock($pendaftaran);
+
         $pendaftaran->load('lomba', 'user');
         $ketua = $pendaftaran->user;
         $accepted = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
@@ -169,6 +200,7 @@ class TeamController extends Controller
             'current_count' => 1 + $accepted->count(),
             'team_locked' => $pendaftaran->team_locked,
             'unlock_requested' => $pendaftaran->unlock_requested,
+            'auto_lock_at' => $pendaftaran->auto_lock_at,
             'status' => $pendaftaran->status,
         ]);
     }
@@ -194,6 +226,9 @@ class TeamController extends Controller
             'judul' => 'Undangan Diterima',
             'pesan' => $request->user()->name . ' telah menerima undangan bergabung ke tim.',
         ]);
+
+        // Auto-lock if team is now full
+        $this->checkAndAutoLockIfFull($invitation->pendaftaran);
 
         return response()->json(['message' => 'Berhasil bergabung ke tim', 'invitation' => $invitation]);
     }

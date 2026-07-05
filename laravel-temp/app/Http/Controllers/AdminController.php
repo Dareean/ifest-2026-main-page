@@ -81,13 +81,12 @@ class AdminController extends Controller
 
         $pendaftaran->update([
             'status' => 'verified',
-            'team_locked' => true,
         ]);
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Diverifikasi',
-            'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Tim telah terkunci secara otomatis.",
+            'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi oleh admin. Kamu sekarang dapat menambahkan anggota tim.",
         ]);
 
         ActivityLog::create([
@@ -146,12 +145,13 @@ class AdminController extends Controller
         $pendaftaran->update([
             'team_locked' => false,
             'unlock_requested' => false,
+            'auto_lock_at' => now()->addMinutes(5),
         ]);
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Buka Kunci Tim Disetujui',
-            'pesan' => 'Permohonan buka kunci tim telah disetujui. Kamu sekarang dapat mengubah anggota tim. Jangan lupa kunci kembali setelah selesai.',
+            'pesan' => 'Permohonan buka kunci tim telah disetujui. Kamu memiliki waktu 5 menit untuk mengubah anggota tim sebelum sistem mengunci otomatis.',
         ]);
 
         ActivityLog::create([
