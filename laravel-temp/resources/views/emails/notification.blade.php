@@ -151,19 +151,6 @@
                 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:24px auto;">
                     <tr>
                         <td class="header" align="center">
-                            <table border="0" cellpadding="0" cellspacing="0" align="center" class="header-logos-table">
-                                <tr>
-                                    <td>
-                                        <img src="{{ $untadUrl }}" alt="UNTAD" width="46" height="48" style="width:46px;height:48px;display:block;border:0;outline:none;" />
-                                    </td>
-                                    <td>
-                                        <img src="{{ $hmtiUrl }}" alt="HMTI" width="48" height="48" style="width:48px;height:48px;display:block;border:0;outline:none;" />
-                                    </td>
-                                    <td>
-                                        <img src="{{ $ifestUrl }}" alt="I-FEST 2026" width="85" height="48" style="width:85px;height:48px;display:block;border:0;outline:none;" />
-                                    </td>
-                                </tr>
-                            </table>
                             <div class="header-title">Informatics Festival 2026</div>
                         </td>
                     </tr>
