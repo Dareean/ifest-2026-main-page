@@ -29,6 +29,13 @@ onMounted(() => {
     const userData = JSON.parse(decodeURIComponent(rawUser))
     auth.handleGoogleCallback(token, userData)
     statusMsg.value = 'Berhasil! Mengalihkan...'
+
+    // Connect mode: redirect back to profile
+    if (route.query.action === 'connect') {
+      router.push('/dashboard/profile?google=connected')
+      return
+    }
+
     const isAdmin = userData.role === 'admin' || userData.role === 'super_admin'
     router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
   } catch {

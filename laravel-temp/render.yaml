@@ -40,8 +40,6 @@ services:
         fromEnv: GOOGLE_CLIENT_SECRET
       - key: GOOGLE_REDIRECT_URL
         value: https://ifest-2026-api.onrender.com/api/auth/google/callback
-      - key: GOOGLE_CONNECT_REDIRECT_URL
-        value: https://ifest-2026-api.onrender.com/api/auth/google/callback/connect
       - key: MAIL_MAILER
         value: log
       - key: MAIL_FROM_ADDRESS

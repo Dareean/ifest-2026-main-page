@@ -165,6 +165,58 @@ class AuthController extends Controller
             return redirect($this->frontendUrl() . '/login?error=google_failed');
         }
 
+        // Detect connect mode via encrypted state
+        $state = $request->input('state');
+        $connectUserId = null;
+
+        if ($state) {
+            try {
+                $data = json_decode(Crypt::decryptString($state), true);
+                $connectUserId = $data['user_id'] ?? null;
+            } catch (\Exception $e) {
+                // Not a connect state, proceed as regular login
+            }
+        }
+
+        if ($connectUserId) {
+            // === CONNECT MODE: Link Google to existing account ===
+            $existing = User::where('google_id', $googleUser->getId())
+                ->where('id', '!=', $connectUserId)
+                ->first();
+            if ($existing) {
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=taken');
+            }
+
+            $user = User::find($connectUserId);
+            if (!$user) {
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=user_not_found');
+            }
+
+            $user->update([
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
+                'avatar' => $googleUser->getAvatar(),
+                'google_token' => $googleUser->token,
+                'google_refresh_token' => $googleUser->refreshToken,
+            ]);
+
+            $token = $user->createToken('auth-token')->plainTextToken;
+
+            $userData = urlencode(json_encode([
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'avatar' => $user->avatar,
+                'phone' => $user->phone,
+                'institution' => $user->institution,
+                'google_id' => $user->google_id,
+            ]));
+
+            return redirect($this->frontendUrl() . '/auth/callback?action=connect&token=' . $token . '&user=' . $userData);
+        }
+
+        // === LOGIN MODE: Normal Google login ===
         $user = User::where('google_id', $googleUser->getId())
             ->orWhere('email', $googleUser->getEmail())
             ->first();
@@ -182,7 +234,6 @@ class AuthController extends Controller
                 'google_refresh_token' => $googleUser->refreshToken,
             ]);
 
-            // Kirim notifikasi selamat datang hanya untuk user baru
             Notification::create([
                 'user_id' => $user->id,
                 'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
@@ -199,7 +250,6 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        // Redirect ke frontend dengan token dan data user di URL
         $userData = urlencode(json_encode([
             'id' => $user->id,
             'name' => $user->name,
@@ -220,56 +270,11 @@ class AuthController extends Controller
         $state = Crypt::encryptString(json_encode(['user_id' => $user->id]));
         $url = Socialite::driver('google')
             ->stateless()
-            ->redirectUrl(config('services.google.connect_redirect'))
             ->with(['state' => $state])
             ->redirect()
             ->getTargetUrl();
 
         return response()->json(['url' => $url]);
-    }
-
-    public function googleConnectCallback(Request $request)
-    {
-        $error = $request->input('error');
-        if ($error) {
-            return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=' . $error);
-        }
-
-        $state = $request->input('state');
-        if (!$state) {
-            return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=missing_state');
-        }
-
-        try {
-            $data = json_decode(Crypt::decryptString($state), true);
-            $userId = $data['user_id'] ?? null;
-        } catch (\Exception $e) {
-            return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=invalid_state');
-        }
-
-        $googleUser = Socialite::driver('google')->stateless()->user();
-
-        $existing = User::where('google_id', $googleUser->getId())
-            ->where('id', '!=', $userId)
-            ->first();
-        if ($existing) {
-            return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=taken');
-        }
-
-        $user = User::find($userId);
-        if (!$user) {
-            return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=user_not_found');
-        }
-
-        $user->update([
-            'name' => $googleUser->getName(),
-            'google_id' => $googleUser->getId(),
-            'avatar' => $googleUser->getAvatar(),
-            'google_token' => $googleUser->token,
-            'google_refresh_token' => $googleUser->refreshToken,
-        ]);
-
-        return redirect($this->frontendUrl() . '/dashboard/profile?google=connected');
     }
 
     public function googleDisconnect(Request $request): JsonResponse

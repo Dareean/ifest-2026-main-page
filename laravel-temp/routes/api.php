@@ -17,7 +17,6 @@ Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
-Route::get('/auth/google/callback/connect', [AuthController::class, 'googleConnectCallback']);
 
 Route::get('/lombas', [LombaController::class, 'index']);
 Route::get('/lombas/{lomba}', [LombaController::class, 'show']);
