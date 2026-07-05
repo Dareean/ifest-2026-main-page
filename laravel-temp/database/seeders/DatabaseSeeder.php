@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Super Admin I-FEST',
                 'password' => bcrypt('super123'),
                 'role' => 'super_admin',
+                'email_verified_at' => now(),
             ]
         );
         $lombas = [

@@ -169,7 +169,7 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        if (is_null($user->email_verified_at)) {
+        if (is_null($user->email_verified_at) && !in_array($user->role, ['admin', 'super_admin'])) {
             Auth::logout();
             return response()->json([
                 'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
