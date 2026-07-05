@@ -3,6 +3,7 @@ import { ref, defineAsyncComponent, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RisoLoader from './components/RisoLoader.vue'
 import ToastContainer from './components/ToastContainer.vue'
+import ConfirmContainer from './components/ConfirmContainer.vue'
 import { useAuthStore } from './stores/auth'
 import { Bot } from 'lucide-vue-next'
 
@@ -59,6 +60,7 @@ onMounted(() => {
 
     <!-- Global Toast Notifications -->
     <ToastContainer />
+    <ConfirmContainer />
   </div>
 
   <!-- Global AI Assistant Chat Widget -->

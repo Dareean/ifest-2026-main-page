@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useConfirm } from '../../composables/useConfirm'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
@@ -12,6 +13,7 @@ import {
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+const confirmModal = useConfirm()
 const pendaftarans = ref([])
 const loading = ref(true)
 const lombaList = ref([])
@@ -291,7 +293,7 @@ async function handleInvite() {
 }
 
 async function handleCancelInvite(invitationId) {
-  if (!confirm('Batalkan undangan ini?')) return
+  if (!await confirmModal.confirm('Batalkan undangan ini?', 'Batalkan Undangan?')) return
   try {
     await api.put(`/invitations/${invitationId}/reject`)
     fetchTeamInvitations()
@@ -307,7 +309,7 @@ async function handleAcceptInvite(invitationId) {
     await fetchInvitations()
     await fetchData()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menerima undangan')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal menerima undangan', 'Gagal')
   } finally {
     actionLoading.value = null
   }
@@ -319,7 +321,7 @@ async function handleDeclineInvite(invitationId) {
     await api.put(`/invitations/${invitationId}/reject`)
     await fetchInvitations()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menolak undangan')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal menolak undangan', 'Gagal')
   } finally {
     actionLoading.value = null
   }
@@ -328,7 +330,7 @@ async function handleDeclineInvite(invitationId) {
 async function handleRemoveMember(memberId) {
   if (!selectedLombaForDetail.value) return
   const reg = getRegistration(selectedLombaForDetail.value.id)
-  if (!confirm('Apakah Anda yakin ingin mengeluarkan anggota ini?')) return
+  if (!await confirmModal.confirm('Apakah Anda yakin ingin mengeluarkan anggota ini?', 'Keluarkan Anggota?')) return
   actionLoading.value = memberId
   try {
     await api.delete(`/pendaftarans/${reg.id}/members/${memberId}`)
@@ -336,7 +338,7 @@ async function handleRemoveMember(memberId) {
     const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
     if (updated) selectedLombaForDetail.value = updated
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal mengeluarkan anggota')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal mengeluarkan anggota', 'Gagal')
   } finally {
     actionLoading.value = null
   }
@@ -352,12 +354,12 @@ function goToTeamPage() {
 async function handleRequestChanges() {
   if (!selectedLombaForDetail.value) return
   const reg = getRegistration(selectedLombaForDetail.value.id)
-  if (!confirm('Ajukan permohonan buka kunci tim ke admin?')) return
+  if (!await confirmModal.confirm('Ajukan permohonan buka kunci tim ke admin?', 'Ajukan Buka Kunci?')) return
   try {
     await api.post(`/pendaftarans/${reg.id}/request-changes`)
     reg.unlock_requested = true
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal mengirim permohonan')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal mengirim permohonan', 'Gagal')
   }
 }
 

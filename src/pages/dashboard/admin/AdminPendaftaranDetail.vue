@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useConfirm } from '../../../composables/useConfirm'
 import api from '../../../utils/api'
 import {
   ArrowLeft, Clock, CheckCircle, AlertTriangle, Lock, Unlock,
@@ -9,6 +10,7 @@ import {
 
 const route = useRoute()
 const router = useRouter()
+const confirmModal = useConfirm()
 const loading = ref(true)
 const error = ref('')
 const data = ref(null)
@@ -31,13 +33,13 @@ async function fetchDetail() {
 }
 
 async function handleVerify() {
-  if (!confirm('Verifikasi pendaftaran ini?')) return
+  if (!await confirmModal.confirm('Verifikasi pendaftaran ini?', 'Verifikasi Pendaftaran?')) return
   actionLoading.value = true
   try {
     await api.put(`/admin/pendaftarans/${route.params.id}/verify`)
     await fetchDetail()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal verifikasi')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal verifikasi', 'Gagal')
   } finally {
     actionLoading.value = false
   }
@@ -51,7 +53,7 @@ async function handleReject() {
     showRejectForm.value = false
     rejectNotes.value = ''
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menolak')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal menolak', 'Gagal')
   } finally {
     actionLoading.value = false
   }
@@ -63,7 +65,7 @@ async function handleApproveUnlock() {
     await api.put(`/admin/pendaftarans/${route.params.id}/approve-unlock`)
     await fetchDetail()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal memproses')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal memproses', 'Gagal')
   } finally {
     actionLoading.value = false
   }
@@ -79,9 +81,9 @@ async function handleSendNotification() {
       pesan: msg,
       user_ids: [reg.value.user_id],
     })
-    alert('Notifikasi terkirim')
+    await confirmModal.alert('Notifikasi terkirim', 'Sukses')
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal', 'Gagal')
   } finally {
     actionLoading.value = false
   }

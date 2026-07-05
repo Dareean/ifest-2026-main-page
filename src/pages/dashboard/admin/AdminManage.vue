@@ -2,9 +2,11 @@
 import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
+import { useConfirm } from '../../../composables/useConfirm'
 import { Search, Shield, Crown, User, UserCog } from 'lucide-vue-next'
 
 const auth = useAuthStore()
+const confirmModal = useConfirm()
 const loading = ref(true)
 const updatingUserId = ref(null)
 const data = ref(null)
@@ -23,14 +25,14 @@ async function fetch() {
 
 async function changeRole(user, newRole) {
   if (auth.user?.id === user.id) {
-    alert('Anda tidak bisa mengubah role Anda sendiri!')
+    await confirmModal.alert('Anda tidak bisa mengubah role Anda sendiri!', 'Peringatan')
     fetch()
     return
   }
 
   const roleLabel = { user: 'User', admin: 'Admin', super_admin: 'Super Admin' }
   const confirmMsg = `Apakah Anda yakin ingin mengubah role ${user.name} menjadi ${roleLabel[newRole] || newRole}?`
-  if (!confirm(confirmMsg)) {
+  if (!await confirmModal.confirm(confirmMsg, 'Ubah Role?')) {
     fetch()
     return
   }
@@ -39,10 +41,10 @@ async function changeRole(user, newRole) {
   try {
     const res = await api.put(`/admin/users/${user.id}/role`, { role: newRole })
     user.role = newRole
-    alert(res.data.message || 'Role berhasil diubah')
+    await confirmModal.alert(res.data.message || 'Role berhasil diubah', 'Sukses')
   } catch (e) {
     const errorMsg = e.response?.data?.message || 'Gagal mengubah role'
-    alert(errorMsg)
+    await confirmModal.alert(errorMsg, 'Gagal')
     fetch()
   } finally {
     updatingUserId.value = null

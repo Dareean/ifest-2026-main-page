@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
 import { useToast } from '../../../composables/useToast'
+import { useConfirm } from '../../../composables/useConfirm'
 import { Search, Shield, User, Crown, Trash2 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 const toast = useToast()
+const confirmModal = useConfirm()
 const loading = ref(true)
 const updatingUserId = ref(null)
 const data = ref(null)
@@ -27,7 +29,7 @@ async function fetch() {
 }
 
 async function deleteUser(user) {
-  if (!confirm(`Yakin ingin menghapus akun "${user.name}" (${user.email})? Semua data terkait akan ikut terhapus.`)) return
+  if (!await confirmModal.confirm(`Yakin ingin menghapus akun "${user.name}" (${user.email})? Semua data terkait akan ikut terhapus.`, 'Hapus Pengguna?')) return
   try {
     const res = await api.delete(`/admin/users/${user.id}`)
     data.value.data = data.value.data.filter(u => u.id !== user.id)
@@ -44,7 +46,7 @@ async function changeRole(user, newRole) {
   }
 
   const confirmMsg = `Apakah Anda yakin ingin mengubah role ${user.name} menjadi ${newRole.toUpperCase()}?`
-  if (!confirm(confirmMsg)) {
+  if (!await confirmModal.confirm(confirmMsg, 'Ubah Role?')) {
     // Reset select to original value by re-fetching or forcing re-render
     fetch()
     return

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useConfirm } from '../composables/useConfirm'
 import api from '../utils/api'
 import { CheckCircle, Printer, ArrowLeft, Loader } from 'lucide-vue-next'
 
@@ -8,6 +9,7 @@ const route = useRoute()
 const router = useRouter()
 const pendaftaran = ref(null)
 const loading = ref(true)
+const confirmModal = useConfirm()
 
 async function fetchInvoice() {
   try {
@@ -16,12 +18,12 @@ async function fetchInvoice() {
     if (match) {
       pendaftaran.value = match
     } else {
-      alert('Pendaftaran tidak ditemukan')
+      await confirmModal.alert('Pendaftaran tidak ditemukan', 'Error')
       router.push('/dashboard/competitions')
     }
   } catch (e) {
     console.error(e)
-    alert('Gagal mengambil data kuitansi')
+    await confirmModal.alert('Gagal mengambil data kuitansi', 'Error')
   } finally {
     loading.value = false
   }

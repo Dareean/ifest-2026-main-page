@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useConfirm } from '../../composables/useConfirm'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
@@ -11,6 +12,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const confirmModal = useConfirm()
 
 const loading = ref(true)
 const error = ref('')
@@ -60,13 +62,13 @@ async function handleInvite() {
 }
 
 async function handleRemoveMember(invitationId) {
-  if (!confirm('Apakah Anda yakin ingin mengeluarkan anggota ini?')) return
+  if (!await confirmModal.confirm('Apakah Anda yakin ingin mengeluarkan anggota ini?', 'Keluarkan Anggota?')) return
   actionLoading.value = invitationId
   try {
     await api.delete(`/pendaftarans/${route.params.id}/members/${invitationId}`)
     await fetchTeam()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal mengeluarkan anggota')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal mengeluarkan anggota', 'Gagal')
   } finally {
     actionLoading.value = null
   }
@@ -87,7 +89,7 @@ async function handleRequestUnlock() {
     await api.post(`/pendaftarans/${route.params.id}/request-changes`)
     await fetchTeam()
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal mengajukan permohonan')
+    await confirmModal.alert(e.response?.data?.message || 'Gagal mengajukan permohonan', 'Gagal')
   }
 }
 
