@@ -1,3 +1,15 @@
+@php
+    $isLocal = config('app.env') === 'local' || \Illuminate\Support\Str::contains(config('app.url'), 'loca.lt');
+    $untadUrl = $isLocal 
+        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/logo_untad.webp' 
+        : asset('logo-untad.webp');
+    $hmtiUrl = $isLocal 
+        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/HMTI%20LOGO.webp' 
+        : asset('logo-hmti.webp');
+    $ifestUrl = $isLocal 
+        ? 'https://raw.githubusercontent.com/Dareean/ifest-2026-main-page/main/src/assets/logo_utama/Logo-IFEST-2026.webp' 
+        : asset('logo-ifest.webp');
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,17 +37,13 @@
             text-align: center;
             border-radius: 12px 12px 0 0;
         }
-        .header-logos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 28px;
-            margin-bottom: 16px;
+        .header-logos-table {
+            margin: 0 auto 16px auto;
+            border-collapse: collapse;
         }
-        .header-logos img {
-            height: 48px;
-            width: auto;
-            display: block;
+        .header-logos-table td {
+            padding: 0 12px;
+            vertical-align: middle;
         }
         .header-title {
             font-size: 13px;
@@ -115,18 +123,13 @@
             border-radius: 0 0 12px 12px;
             border-top: 1px solid #E2E8F0;
         }
-        .footer-logos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 12px;
+        .footer-logos-table {
+            margin: 0 auto 12px auto;
+            border-collapse: collapse;
         }
-        .footer-logos img {
-            height: 28px;
-            width: auto;
-            display: block;
-            opacity: 0.6;
+        .footer-logos-table td {
+            padding: 0 8px;
+            vertical-align: middle;
         }
         .footer p {
             margin: 0;
@@ -136,8 +139,6 @@
         }
         @@media only screen and (max-width: 480px) {
             .header { padding: 28px 20px 22px; }
-            .header-logos { gap: 16px; }
-            .header-logos img { height: 36px; }
             .body-content { padding: 28px 20px; }
             .footer { padding: 20px; }
         }
@@ -149,12 +150,20 @@
             <td align="center">
                 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:24px auto;">
                     <tr>
-                        <td class="header">
-                            <div class="header-logos">
-                                <img src="{{ asset('logo-untad.webp') }}" alt="UNTAD" />
-                                <img src="{{ asset('logo-hmti.webp') }}" alt="HMTI" />
-                                <img src="{{ asset('logo-ifest.webp') }}" alt="I-FEST 2026" />
-                            </div>
+                        <td class="header" align="center">
+                            <table border="0" cellpadding="0" cellspacing="0" align="center" class="header-logos-table">
+                                <tr>
+                                    <td>
+                                        <img src="{{ $untadUrl }}" alt="UNTAD" width="46" height="48" style="width:46px;height:48px;display:block;border:0;outline:none;" />
+                                    </td>
+                                    <td>
+                                        <img src="{{ $hmtiUrl }}" alt="HMTI" width="48" height="48" style="width:48px;height:48px;display:block;border:0;outline:none;" />
+                                    </td>
+                                    <td>
+                                        <img src="{{ $ifestUrl }}" alt="I-FEST 2026" width="85" height="48" style="width:85px;height:48px;display:block;border:0;outline:none;" />
+                                    </td>
+                                </tr>
+                            </table>
                             <div class="header-title">Informatics Festival 2026</div>
                         </td>
                     </tr>
@@ -186,12 +195,20 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="footer">
-                            <div class="footer-logos">
-                                <img src="{{ asset('logo-untad.webp') }}" alt="UNTAD" />
-                                <img src="{{ asset('logo-hmti.webp') }}" alt="HMTI" />
-                                <img src="{{ asset('logo-ifest.webp') }}" alt="I-FEST 2026" />
-                            </div>
+                        <td class="footer" align="center">
+                            <table border="0" cellpadding="0" cellspacing="0" align="center" class="footer-logos-table">
+                                <tr>
+                                    <td style="opacity:0.6;">
+                                        <img src="{{ $untadUrl }}" alt="UNTAD" width="27" height="28" style="width:27px;height:28px;display:block;border:0;outline:none;opacity:0.6;" />
+                                    </td>
+                                    <td style="opacity:0.6;">
+                                        <img src="{{ $hmtiUrl }}" alt="HMTI" width="28" height="28" style="width:28px;height:28px;display:block;border:0;outline:none;opacity:0.6;" />
+                                    </td>
+                                    <td style="opacity:0.6;">
+                                        <img src="{{ $ifestUrl }}" alt="I-FEST 2026" width="50" height="28" style="width:50px;height:28px;display:block;border:0;outline:none;opacity:0.6;" />
+                                    </td>
+                                </tr>
+                            </table>
                             <p>Email ini dikirim secara otomatis oleh sistem I-FEST 2026. Mohon tidak membalas email ini.</p>
                             <p style="margin-top:4px;">&copy; 2026 HMTI — Universitas Tadulako. All rights reserved.</p>
                         </td>
