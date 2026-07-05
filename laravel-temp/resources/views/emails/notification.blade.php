@@ -6,162 +6,199 @@
     <title>{{ $notification->judul }}</title>
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #F8FAFC;
-            color: #04000D;
             margin: 0;
             padding: 0;
+            background-color: #F0F2F5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
+        }
+        table {
+            border-collapse: collapse;
         }
         .container {
             max-width: 600px;
-            margin: 40px auto;
-            background-color: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            margin: 0 auto;
         }
         .header {
-            background-color: #04000D;
-            padding: 32px 24px;
+            background-color: #1E3A5F;
+            padding: 36px 32px 28px;
             text-align: center;
+            border-radius: 12px 12px 0 0;
         }
-        .header img {
-            height: 64px;
+        .header-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 28px;
+            margin-bottom: 16px;
+        }
+        .header-logos img {
+            height: 48px;
             width: auto;
             display: block;
-            margin: 0 auto 12px auto;
         }
         .header-title {
-            font-size: 14px;
-            font-weight: 800;
-            color: #DCEEB1;
-            letter-spacing: 0.25em;
+            font-size: 13px;
+            font-weight: 600;
+            color: #94A3B8;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
-        .content {
-            padding: 40px 32px;
-            font-family: 'Inter', -apple-system, sans-serif;
+        .body-content {
+            background-color: #FFFFFF;
+            padding: 40px 36px;
         }
-        .content h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #04000D;
-            margin-top: 0;
-            margin-bottom: 18px;
+        .salutation {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1E293B;
+            margin: 0 0 6px 0;
         }
-        .content p {
+        .body-text {
             font-size: 14px;
-            line-height: 1.625;
+            line-height: 1.7;
             color: #475569;
-            margin-bottom: 24px;
+            margin: 0 0 20px 0;
         }
         .info-box {
             background-color: #F8FAFC;
             border-left: 4px solid #FF3D8B;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.01);
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 6px;
         }
         .info-box h3 {
-            margin: 0 0 8px 0;
+            margin: 0 0 6px 0;
             font-size: 14px;
-            font-weight: 800;
-            color: #04000D;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: #1E3A5F;
         }
         .info-box p {
             margin: 0;
             font-size: 13.5px;
             line-height: 1.6;
-            color: #334155;
+            color: #475569;
         }
-        .button-container {
-            margin: 32px 0;
+        .button-wrap {
             text-align: center;
+            margin: 32px 0;
         }
         .button {
             display: inline-block;
-            background-color: #04000D;
-            color: #DCEEB1 !important;
+            background-color: #1E3A5F;
+            color: #FFFFFF !important;
             text-decoration: none;
-            padding: 14px 32px;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 0.1em;
-            border-radius: 12px;
-            border: 2px solid #DCEEB1;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(4, 0, 13, 0.15);
-            transition: all 0.2s ease;
+            padding: 13px 36px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            letter-spacing: 0.03em;
         }
         .signature {
             margin-top: 32px;
-            border-top: 1px solid #F1F5F9;
             padding-top: 24px;
+            border-top: 1px solid #E2E8F0;
         }
         .signature p {
             margin: 0;
             font-size: 13.5px;
-            line-height: 1.6;
+            line-height: 1.7;
             color: #475569;
+        }
+        .signature strong {
+            color: #1E3A5F;
         }
         .footer {
             background-color: #F8FAFC;
-            padding: 24px 32px;
+            padding: 28px 36px;
             text-align: center;
+            border-radius: 0 0 12px 12px;
             border-top: 1px solid #E2E8F0;
+        }
+        .footer-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+        .footer-logos img {
+            height: 28px;
+            width: auto;
+            display: block;
+            opacity: 0.6;
         }
         .footer p {
             margin: 0;
             font-size: 11px;
-            color: #64748B;
+            color: #94A3B8;
             line-height: 1.6;
+        }
+        @@media only screen and (max-width: 480px) {
+            .header { padding: 28px 20px 22px; }
+            .header-logos { gap: 16px; }
+            .header-logos img { height: 36px; }
+            .body-content { padding: 28px 20px; }
+            .footer { padding: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <img src="{{ asset('logo-ifest.webp') }}" alt="I-FEST 2026" width="64" style="display:block;margin:0 auto 12px auto" />
-            <div class="header-title">Informatics Festival 2026</div>
-        </div>
+    <table class="container" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+            <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:24px auto;">
+                    <tr>
+                        <td class="header">
+                            <div class="header-logos">
+                                <img src="{{ asset('logo-untad.webp') }}" alt="UNTAD" />
+                                <img src="{{ asset('logo-hmti.webp') }}" alt="HMTI" />
+                                <img src="{{ asset('logo-ifest.webp') }}" alt="I-FEST 2026" />
+                            </div>
+                            <div class="header-title">Informatics Festival 2026</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="body-content">
+                            <p class="salutation">Yth. {{ $notification->user->name }},</p>
+                            <p class="body-text">
+                                Kami informasikan bahwa terdapat pembaruan resmi terkait keikutsertaan Anda dalam kegiatan <strong>Informatics Festival (I-FEST) 2026</strong> yang diselenggarakan oleh Himpunan Mahasiswa Teknik Informatika (HMTI), Universitas Tadulako.
+                            </p>
 
-        <!-- Content -->
-        <div class="content">
-            <h2>Yth. Sdr/i. {{ $notification->user->name }},</h2>
-            <p>Kami menginformasikan bahwa terdapat pembaruan informasi resmi terkait keikutsertaan Anda dalam kegiatan <strong>Informatics Festival (I-FEST) 2026</strong> yang diselenggarakan oleh HMTI Universitas Tadulako.</p>
-            
-            <!-- Highlighted Info Box -->
-            <div class="info-box">
-                <h3>{{ $notification->judul }}</h3>
-                <p>{{ $notification->pesan }}</p>
-            </div>
+                            <div class="info-box">
+                                <h3>{{ $notification->judul }}</h3>
+                                <p>{{ $notification->pesan }}</p>
+                            </div>
 
-            <p>Untuk melihat rincian informasi selengkapnya atau melakukan tindakan lebih lanjut, silakan masuk ke dashboard akun Anda melalui tombol di bawah ini:</p>
+                            <p class="body-text">
+                                Silakan buka dashboard akun Anda untuk melihat rincian selengkapnya atau melakukan tindakan lebih lanjut.
+                            </p>
 
-            <!-- Button CTA -->
-            <div class="button-container">
-                <a href="{{ env('FRONTEND_URL', 'http://localhost:5173') }}/dashboard" class="button">Buka Dashboard</a>
-            </div>
+                            <div class="button-wrap">
+                                <a href="{{ env('FRONTEND_URL', 'http://localhost:5173') }}/dashboard" class="button">Buka Dashboard</a>
+                            </div>
 
-            <!-- Signature -->
-            <div class="signature">
-                <p>Hormat kami,</p>
-                <p style="margin-top: 6px;"><strong style="color: #04000D;">Panitia Pelaksana I-FEST 2026</strong></p>
-                <p style="font-size: 12px; color: #64748B; margin-top: 2px;">Himpunan Mahasiswa Teknik Informatika (HMTI) UNTAD</p>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>Email ini dikirimkan secara otomatis oleh sistem I-FEST 2026. Mohon untuk tidak membalas email ini secara langsung.</p>
-            <p style="margin-top: 6px;">&copy; 2026 HMTI — Universitas Tadulako (UNTAD). All rights reserved.</p>
-        </div>
-    </div>
+                            <div class="signature">
+                                <p>Hormat kami,</p>
+                                <p style="margin-top:4px;"><strong>Panitia Pelaksana I-FEST 2026</strong></p>
+                                <p style="font-size:12px;color:#64748B;margin-top:2px;">HMTI — Universitas Tadulako</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer">
+                            <div class="footer-logos">
+                                <img src="{{ asset('logo-untad.webp') }}" alt="UNTAD" />
+                                <img src="{{ asset('logo-hmti.webp') }}" alt="HMTI" />
+                                <img src="{{ asset('logo-ifest.webp') }}" alt="I-FEST 2026" />
+                            </div>
+                            <p>Email ini dikirim secara otomatis oleh sistem I-FEST 2026. Mohon tidak membalas email ini.</p>
+                            <p style="margin-top:4px;">&copy; 2026 HMTI — Universitas Tadulako. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
