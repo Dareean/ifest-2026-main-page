@@ -10,6 +10,7 @@ class Pendaftaran extends Model
         'user_id', 'lomba_id', 'team_name', 'team_members', 'status', 'gelombang', 'notes',
         'team_locked', 'unlock_requested', 'auto_lock_at',
         'payment_proof', 'payment_status', 'payment_verified_at', 'payment_notes',
+        'last_reminder_sent_at',
     ];
 
     protected $appends = ['max_members'];
@@ -22,6 +23,7 @@ class Pendaftaran extends Model
             'unlock_requested' => 'boolean',
             'auto_lock_at' => 'datetime',
             'payment_verified_at' => 'datetime',
+            'last_reminder_sent_at' => 'datetime',
         ];
     }
 

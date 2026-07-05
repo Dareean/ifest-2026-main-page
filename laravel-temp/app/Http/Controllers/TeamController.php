@@ -30,6 +30,7 @@ class TeamController extends Controller
     {
         if ($pendaftaran->team_locked) return;
 
+        $pendaftaran->load('lomba');
         $maxMembers = $pendaftaran->lomba->getMaxMembers();
         $acceptedCount = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
             ->where('status', 'accepted')
@@ -40,6 +41,20 @@ class TeamController extends Controller
                 'team_locked' => true,
                 'auto_lock_at' => null,
             ]);
+
+            // Notify admins that team is ready for verification
+            try {
+                $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
+                foreach ($admins as $admin) {
+                    Notification::create([
+                        'user_id' => $admin->id,
+                        'judul' => 'Tim Siap Diverifikasi',
+                        'pesan' => 'Tim "' . ($pendaftaran->team_name ?: 'Tim ' . $pendaftaran->user?->name) . '" telah mengisi semua kuota anggota dan siap untuk diverifikasi.',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // role column may not exist yet
+            }
         }
     }
 
@@ -51,8 +66,14 @@ class TeamController extends Controller
 
         $this->applyAutoLock($pendaftaran);
 
-        if ($pendaftaran->status !== 'verified') {
-            return response()->json(['message' => 'Pendaftaran belum diverifikasi'], 400);
+        $pendaftaran->load('lomba');
+
+        if ($pendaftaran->status === 'rejected') {
+            return response()->json(['message' => 'Pendaftaran telah ditolak'], 400);
+        }
+
+        if (!$pendaftaran->isFree() && $pendaftaran->payment_status !== 'verified') {
+            return response()->json(['message' => 'Pembayaran belum diverifikasi'], 400);
         }
 
         if ($pendaftaran->team_locked) {

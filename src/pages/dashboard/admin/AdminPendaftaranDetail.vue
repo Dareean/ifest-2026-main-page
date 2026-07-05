@@ -24,6 +24,29 @@ const rejectPaymentNotes = ref('')
 
 const reg = computed(() => data.value)
 
+const memberCount = computed(() => {
+  if (!reg.value) return { current: 0, max: 0 }
+  const accepted = reg.value.team_invitations?.filter(i => i.status === 'accepted')?.length || 0
+  const current = 1 + accepted
+
+  const req = reg.value.lomba?.team_requirements
+  let max = 3
+  if (req) {
+    if (req.toLowerCase().includes('individu')) max = 1
+    else {
+      const rangeMatch = req.match(/(\d+)\s*[-–]\s*(\d+)/)
+      if (rangeMatch) max = parseInt(rangeMatch[2], 10)
+      else {
+        const singleMatch = req.match(/(\d+)/)
+        if (singleMatch) max = parseInt(singleMatch[1], 10)
+      }
+    }
+  }
+  return { current, max }
+})
+
+const isTeamFull = computed(() => memberCount.value.current >= memberCount.value.max)
+
 async function fetchDetail() {
   loading.value = true
   try {
@@ -205,9 +228,14 @@ onMounted(fetchDetail)
 
         <!-- Team members -->
         <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6">
-          <h2 class="font-extrabold text-sm text-on-surface mb-4 flex items-center gap-2">
-            <Users class="w-4 h-4 text-accent-magenta" /> Anggota Tim
-          </h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
+              <Users class="w-4 h-4 text-accent-magenta" /> Anggota Tim
+            </h2>
+            <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-on-surface-variant">
+              {{ memberCount.current }} / {{ memberCount.max }} Slot
+            </span>
+          </div>
           <div class="space-y-2.5">
             <div class="flex items-center justify-between text-xs bg-slate-50 rounded-xl p-3 border border-slate-100">
               <div>
@@ -291,7 +319,12 @@ onMounted(fetchDetail)
         <!-- Quick actions -->
         <div v-if="reg?.status === 'pending'" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-5 space-y-3">
           <h3 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Aksi Tim</h3>
-          <button @click="handleVerify" :disabled="actionLoading || reg.payment_status !== 'verified'" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5" :title="reg.payment_status !== 'verified' && reg.lomba?.fee?.toLowerCase() !== 'gratis' ? 'Verifikasi pembayaran terlebih dahulu' : ''">
+          <p v-if="reg?.status === 'pending'" class="text-[10px] text-on-surface-variant/70 leading-relaxed">
+            Slot anggota: <strong class="text-on-surface">{{ memberCount.current }}/{{ memberCount.max }}</strong>
+            <span v-if="!isTeamFull" class="text-accent-magenta"> — belum penuh</span>
+            <span v-else class="text-green-600"> — penuh, siap verifikasi</span>
+          </p>
+          <button @click="handleVerify" :disabled="actionLoading || reg.payment_status !== 'verified' || !isTeamFull" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5" :title="!isTeamFull ? 'Tim harus mengisi semua slot anggota terlebih dahulu (' + memberCount.current + '/' + memberCount.max + ')' : reg.payment_status !== 'verified' && reg.lomba?.fee?.toLowerCase() !== 'gratis' ? 'Verifikasi pembayaran terlebih dahulu' : ''">
             <CheckCircle class="w-4 h-4" /> {{ actionLoading ? 'Memproses...' : 'Verifikasi Tim' }}
           </button>
           <button @click="showRejectForm = !showRejectForm" class="w-full bg-white hover:bg-slate-50 text-accent-magenta border border-slate-200 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">

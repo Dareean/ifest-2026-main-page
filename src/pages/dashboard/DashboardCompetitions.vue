@@ -86,23 +86,21 @@ let timerId = null
 
 const anggotaVisible = computed(() => {
   const reg = getRegistration(selectedLombaForDetail.value?.id)
-  return !!reg && reg.status === 'verified'
+  return !!reg && (reg.payment_status === 'verified' || reg.status === 'verified')
 })
 
 const availableTabs = computed(() => {
-  const tabs = ['info', 'timeline']
+  const tabs = ['info', 'timeline', 'team']
   if (selectedLombaForDetail.value) {
     const reg = getRegistration(selectedLombaForDetail.value.id)
-    if (!reg || reg.status === 'pending' || reg.status === 'rejected') {
-      tabs.push('team')
+    if (reg) {
+      if (reg.payment_status === 'verified' || reg.status === 'verified') {
+        tabs.push('anggota')
+      }
+      if (reg.status === 'verified') {
+        tabs.push('submit')
+      }
     }
-    if (reg?.status === 'verified') {
-      tabs.push('team')
-      tabs.push('anggota')
-      tabs.push('submit')
-    }
-  } else {
-    tabs.push('team')
   }
   return tabs
 })
@@ -448,8 +446,10 @@ onMounted(() => {
 watch(selectedLombaForDetail, (lomba) => {
   if (!lomba) return
   const reg = getRegistration(lomba.id)
-  if (reg?.status === 'verified') {
-    fetchTeamInvitations()
+  if (reg) {
+    if (reg.payment_status === 'verified' || reg.status === 'verified') {
+      fetchTeamInvitations()
+    }
     if (reg.auto_lock_at) {
       startAutoLockCountdown(reg.auto_lock_at)
     }
@@ -671,7 +671,7 @@ onUnmounted(() => {
 
               <!-- Pending + Payment Verified (waiting for team verification) -->
               <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified'">
-                <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Pembayaran terverifikasi! Tim kami akan segera memverifikasi pendaftaran tim Anda.</p>
+                <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Pembayaran terverifikasi! Silakan undang anggota tim Anda pada tab Anggota Tim.</p>
               </template>
 
               <!-- Free competition (auto payment verified) -->

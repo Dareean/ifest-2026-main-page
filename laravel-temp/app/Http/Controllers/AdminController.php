@@ -84,14 +84,24 @@ class AdminController extends Controller
             return response()->json(['message' => 'Pembayaran belum diverifikasi. Verifikasi pembayaran terlebih dahulu sebelum memverifikasi tim.'], 400);
         }
 
+        // Team must have filled all member slots
+        $maxMembers = $pendaftaran->lomba->getMaxMembers();
+        $acceptedCount = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('status', 'accepted')
+            ->count();
+        if (1 + $acceptedCount < $maxMembers) {
+            return response()->json(['message' => 'Tim belum mengisi semua kuota anggota. Isi slot terlebih dahulu sebelum verifikasi tim (' . (1 + $acceptedCount) . '/' . $maxMembers . ' terisi).'], 400);
+        }
+
         $pendaftaran->update([
             'status' => 'verified',
+            'team_locked' => true,
         ]);
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Diverifikasi',
-            'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi oleh admin. Kamu sekarang dapat menambahkan anggota tim.",
+            'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Selamat mengikuti lomba!",
         ]);
 
         ActivityLog::create([
@@ -152,12 +162,13 @@ class AdminController extends Controller
         $pendaftaran->update([
             'payment_status' => 'verified',
             'payment_verified_at' => now(),
+            'team_locked' => false,
         ]);
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pembayaran Diverifikasi',
-            'pesan' => "Pembayaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Tim kamu akan segera diverifikasi oleh admin.",
+            'pesan' => "Pembayaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Silakan undang anggota tim kamu untuk mengisi slot yang tersedia.",
         ]);
 
         ActivityLog::create([
