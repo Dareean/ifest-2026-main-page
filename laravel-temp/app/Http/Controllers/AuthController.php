@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmailVerification;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -18,6 +20,43 @@ class AuthController extends Controller
     private function frontendUrl(): string
     {
         return env('FRONTEND_URL', 'http://localhost:5173');
+    }
+
+    private function sendOtpEmail(string $email, string $name, string $otp, string $expiresAt): void
+    {
+        try {
+            $html = view('emails.otp', compact('name', 'otp', 'expiresAt'))->render();
+
+            Http::withHeaders([
+                'api-key' => env('BREVO_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.brevo.com/v3/smtp/email', [
+                'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
+                'to' => [['email' => $email]],
+                'subject' => 'Kode Verifikasi Email — I-FEST 2026',
+                'htmlContent' => $html,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Send OTP email failed: ' . $e->getMessage(), ['to' => $email]);
+        }
+    }
+
+    private function generateAndSendOtp(string $email, string $name): string
+    {
+        EmailVerification::where('email', $email)->delete();
+
+        $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $expiresAt = now()->addMinutes(10);
+
+        EmailVerification::create([
+            'email' => $email,
+            'otp' => $otp,
+            'expires_at' => $expiresAt,
+        ]);
+
+        $this->sendOtpEmail($email, $name, $otp, $expiresAt->format('H:i'));
+
+        return $otp;
     }
 
     public function register(Request $request): JsonResponse
@@ -40,22 +79,77 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
             'institution' => $request->institution,
+            'email_verified_at' => null,
+        ]);
+
+        $this->generateAndSendOtp($user->email, $user->name);
+
+        return response()->json([
+            'message' => 'Registrasi berhasil. Silakan verifikasi email Anda dengan kode OTP yang telah dikirim.',
+            'user'    => $user->only(['id', 'name', 'email']),
+            'needs_verification' => true,
+        ], 201);
+    }
+
+    public function sendOtp(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email sudah diverifikasi'], 400);
+        }
+
+        $this->generateAndSendOtp($user->email, $user->name);
+
+        return response()->json(['message' => 'Kode OTP telah dikirim ulang ke email Anda']);
+    }
+
+    public function verifyOtp(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|exists:users,email',
+            'otp' => 'required|string|size:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $record = EmailVerification::where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->valid()
+            ->first();
+
+        if (!$record) {
+            return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->update(['email_verified_at' => now()]);
+
+        $record->delete();
+
+        Notification::create([
+            'user_id' => $user->id,
+            'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
+            'pesan'   => "Halo, {$user->name}! Akun kamu berhasil diverifikasi. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan tim kamu sekarang!",
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        // Kirim notifikasi selamat datang ke inbox dashboard
-        Notification::create([
-            'user_id' => $user->id,
-            'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
-            'pesan'   => "Halo, {$user->name}! Akun kamu berhasil dibuat. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan tim kamu sekarang!",
-        ]);
-
         return response()->json([
-            'message' => 'Registrasi berhasil',
+            'message' => 'Email berhasil diverifikasi',
             'user'    => $user,
             'token'   => $token,
-        ], 201);
+        ]);
     }
 
     public function login(Request $request): JsonResponse
@@ -74,6 +168,16 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+
+        if (is_null($user->email_verified_at)) {
+            Auth::logout();
+            return response()->json([
+                'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
+                'needs_verification' => true,
+                'email' => $user->email,
+            ], 403);
+        }
+
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
@@ -194,6 +298,13 @@ class AuthController extends Controller
                 'avatar' => $googleUser->getAvatar(),
                 'google_token' => $googleUser->token,
                 'google_refresh_token' => $googleUser->refreshToken,
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ]);
+
+            Notification::create([
+                'user_id' => $user->id,
+                'judul' => 'Akun Google Terhubung',
+                'pesan' => "Akun Google {$googleUser->getEmail()} berhasil dihubungkan ke akun I-FEST 2026 kamu. Kamu sekarang bisa login menggunakan Google kapan saja.",
             ]);
 
             $token = $user->createToken('auth-token')->plainTextToken;
@@ -241,6 +352,7 @@ class AuthController extends Controller
                 'avatar' => $googleUser->getAvatar(),
                 'google_token' => $googleUser->token,
                 'google_refresh_token' => $googleUser->refreshToken ?? $user->google_refresh_token,
+                'email_verified_at' => $user->email_verified_at ?? now(),
             ]);
         }
 

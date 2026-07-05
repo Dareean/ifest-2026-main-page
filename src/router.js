@@ -61,6 +61,11 @@ const routes = [
     component: () => import('./pages/AuthCallbackPage.vue'),
   },
   {
+    path: '/verifikasi-email',
+    name: 'OtpVerification',
+    component: () => import('./pages/OtpVerificationPage.vue'),
+  },
+  {
     path: '/lupa-password',
     name: 'ForgotPassword',
     component: () => import('./pages/ForgotPasswordPage.vue'),

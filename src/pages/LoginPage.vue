@@ -20,6 +20,10 @@ async function handleLogin() {
   isSubmitting.value = true
   try {
     const res = await auth.login(form.value)
+    if (res?.needs_verification) {
+      router.push({ path: '/verifikasi-email', query: { email: res.email } })
+      return
+    }
     const isAdmin = res?.user?.role === 'admin' || res?.user?.role === 'super_admin'
     router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
   } catch (e) {

@@ -16,10 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       const res = await api.post('/auth/register', data)
-      token.value = res.data.token
-      user.value = res.data.user
-      localStorage.setItem('auth_token', res.data.token)
-      localStorage.setItem('auth_user', JSON.stringify(res.data.user))
       return res.data
     } finally {
       loading.value = false
@@ -86,9 +82,22 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('auth_user', JSON.stringify(userObj))
   }
 
+  async function sendOtp(email) {
+    return api.post('/auth/send-otp', { email })
+  }
+
+  async function verifyOtp(email, otp) {
+    const res = await api.post('/auth/verify-otp', { email, otp })
+    token.value = res.data.token
+    user.value = res.data.user
+    localStorage.setItem('auth_token', res.data.token)
+    localStorage.setItem('auth_user', JSON.stringify(res.data.user))
+    return res.data
+  }
+
   return {
     user, token, loading, isAuthenticated, isSuperAdmin, unreadNotifications,
     register, login, fetchUser, logout, googleLogin, connectGoogle,
-    disconnectGoogle, handleGoogleCallback,
+    disconnectGoogle, handleGoogleCallback, sendOtp, verifyOtp,
   }
 })

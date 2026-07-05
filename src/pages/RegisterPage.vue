@@ -19,8 +19,8 @@ async function handleRegister() {
   error.value = ''
   isSubmitting.value = true
   try {
-    await auth.register(form.value)
-    router.push('/dashboard')
+    const res = await auth.register(form.value)
+    router.push({ path: '/verifikasi-email', query: { email: res.user.email } })
   } catch (e) {
     error.value = e.response?.data?.errors
       ? Object.values(e.response.data.errors).flat().join(', ')
