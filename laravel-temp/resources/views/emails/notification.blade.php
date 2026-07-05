@@ -127,7 +127,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <img src="{{ $message->embed(public_path('logo-ifest.webp')) }}" alt="I-FEST 2026" />
+            <img src="{{ asset('logo-ifest.webp') }}" alt="I-FEST 2026" width="64" style="display:block;margin:0 auto 12px auto" />
             <div class="header-title">Informatics Festival 2026</div>
         </div>
 
