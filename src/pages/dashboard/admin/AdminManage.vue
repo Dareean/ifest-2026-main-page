@@ -2,20 +2,17 @@
 import { ref, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
-import { Search, Shield, User, Crown } from 'lucide-vue-next'
+import { Search, Shield, Crown, User, UserCog } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 const loading = ref(true)
 const updatingUserId = ref(null)
 const data = ref(null)
-const searchQuery = ref('')
 
 async function fetch() {
   loading.value = true
   try {
-    const params = { per_page: 50 }
-    if (searchQuery.value) params.search = searchQuery.value
-    const res = await api.get('/admin/users', { params })
+    const res = await api.get('/admin/super/admins')
     data.value = res.data
   } catch (e) {
     console.error(e)
@@ -27,12 +24,13 @@ async function fetch() {
 async function changeRole(user, newRole) {
   if (auth.user?.id === user.id) {
     alert('Anda tidak bisa mengubah role Anda sendiri!')
+    fetch()
     return
   }
 
-  const confirmMsg = `Apakah Anda yakin ingin mengubah role ${user.name} menjadi ${newRole.toUpperCase()}?`
+  const roleLabel = { user: 'User', admin: 'Admin', super_admin: 'Super Admin' }
+  const confirmMsg = `Apakah Anda yakin ingin mengubah role ${user.name} menjadi ${roleLabel[newRole] || newRole}?`
   if (!confirm(confirmMsg)) {
-    // Reset select to original value by re-fetching or forcing re-render
     fetch()
     return
   }
@@ -57,16 +55,12 @@ onMounted(fetch)
 <template>
   <div>
     <div class="mb-8">
-      <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-accent-magenta mb-1 block">Admin Panel</span>
-      <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Pengguna</h1>
+      <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-accent-magenta mb-1 block">Super Admin</span>
+      <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Manage Admin</h1>
     </div>
 
-    <!-- Search -->
     <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-5 mb-6">
-      <div class="relative flex-1 max-w-md">
-        <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-        <input v-model="searchQuery" @input="fetch" placeholder="Cari nama atau email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-      </div>
+      <p class="text-xs text-on-surface-variant/70">Kelola akun admin dan super admin. Super admin memiliki akses penuh ke seluruh sistem.</p>
     </div>
 
     <!-- Loading -->
@@ -83,7 +77,6 @@ onMounted(fetch)
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Nama</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Email</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Role</th>
-              <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Pendaftaran</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Bergabung</th>
             </tr>
           </thead>
@@ -92,7 +85,6 @@ onMounted(fetch)
               <td class="px-5 py-3.5 font-bold text-on-surface">{{ user.name }}</td>
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/70">{{ user.email }}</td>
               <td class="px-5 py-3.5">
-                <!-- Self is static to prevent lockout -->
                 <div v-if="auth.user?.id === user.id" class="inline-flex items-center gap-1">
                   <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
                     <Crown class="w-2.5 h-2.5" /> Super Admin (Anda)
@@ -101,34 +93,19 @@ onMounted(fetch)
                     <Shield class="w-2.5 h-2.5" /> Admin (Anda)
                   </span>
                 </div>
-
-                <!-- Super admin sees dropdown with 3 roles; admin biasa sees read-only badge -->
-                <div v-else-if="auth.isSuperAdmin" class="inline-block relative">
+                <div v-else class="inline-block relative">
                   <select
                     :value="user.role"
                     @change="changeRole(user, $event.target.value)"
                     :disabled="updatingUserId === user.id"
                     class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 focus:border-[#04000D]/40 rounded-lg py-1 pl-2 pr-6 text-[10px] font-mono font-bold uppercase text-on-surface focus:outline-none transition-all cursor-pointer appearance-none disabled:opacity-50"
                   >
-                    <option value="user">User</option>
                     <option value="admin">Admin</option>
                     <option value="super_admin">Super Admin</option>
                   </select>
                   <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
                 </div>
-                <div v-else class="inline-flex items-center gap-1">
-                  <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
-                    <Crown class="w-2.5 h-2.5" /> Super Admin
-                  </span>
-                  <span v-else-if="user.role === 'admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
-                    <Shield class="w-2.5 h-2.5" /> Admin
-                  </span>
-                  <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-on-surface-variant/50 bg-slate-100 px-2 py-0.5 rounded-full">
-                    <User class="w-2.5 h-2.5" /> User
-                  </span>
-                </div>
               </td>
-              <td class="px-5 py-3.5 font-semibold text-on-surface">{{ user.pendaftarans_count }}</td>
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/60">{{ new Date(user.created_at).toLocaleDateString('id-ID') }}</td>
             </tr>
           </tbody>
@@ -137,7 +114,8 @@ onMounted(fetch)
     </div>
 
     <div v-else class="bg-white border border-[#04000D]/5 rounded-2xl p-12 text-center">
-      <p class="text-sm text-on-surface-variant/60">Tidak ada pengguna</p>
+      <UserCog class="w-10 h-10 text-on-surface-variant/20 mx-auto mb-3" />
+      <p class="text-sm text-on-surface-variant/60">Belum ada admin</p>
     </div>
   </div>
 </template>

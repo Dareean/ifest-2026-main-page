@@ -29,7 +29,8 @@ onMounted(() => {
     const userData = JSON.parse(decodeURIComponent(rawUser))
     auth.handleGoogleCallback(token, userData)
     statusMsg.value = 'Berhasil! Mengalihkan...'
-    router.push(userData.role === 'admin' ? '/dashboard/admin' : '/dashboard')
+    const isAdmin = userData.role === 'admin' || userData.role === 'super_admin'
+    router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
   } catch {
     statusMsg.value = 'Terjadi kesalahan. Mengalihkan...'
     setTimeout(() => router.push('/login'), 1500)

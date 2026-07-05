@@ -56,16 +56,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/google/disconnect', [AuthController::class, 'googleDisconnect']);
 });
 
-// Admin routes
+// Admin routes (admin biasa + super admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
     Route::get('/pendaftarans', [AdminController::class, 'pendaftarans']);
+    Route::get('/pendaftarans/export', [AdminController::class, 'exportPendaftarans']);
     Route::get('/pendaftarans/{pendaftaran}', [AdminController::class, 'pendaftaranDetail']);
     Route::put('/pendaftarans/{pendaftaran}/verify', [AdminController::class, 'verify']);
     Route::put('/pendaftarans/{pendaftaran}/reject', [AdminController::class, 'reject']);
     Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
-    Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
+    Route::get('/activity-logs', [AdminController::class, 'activityLogs']);
     Route::post('/notifications', [AdminController::class, 'broadcastNotification']);
     Route::get('/notifications', [AdminController::class, 'notifications']);
+
+    // Super admin only
+    Route::middleware('super_admin')->group(function () {
+        Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
+        Route::get('/super/admins', [AdminController::class, 'admins']);
+    });
 });

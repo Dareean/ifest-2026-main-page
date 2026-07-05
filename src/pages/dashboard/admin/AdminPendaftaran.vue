@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../../../utils/api'
-import { Search, Filter, Clock, CheckCircle, AlertTriangle } from 'lucide-vue-next'
+import { Search, Filter, Clock, CheckCircle, AlertTriangle, Download } from 'lucide-vue-next'
 
 const router = useRouter()
 const loading = ref(true)
@@ -37,6 +37,29 @@ async function fetchLombas() {
 
 function goToDetail(id) {
   router.push(`/dashboard/admin/pendaftaran/${id}`)
+}
+
+function exportCsv() {
+  const token = localStorage.getItem('auth_token')
+  const params = new URLSearchParams()
+  if (statusFilter.value) params.set('status', statusFilter.value)
+  if (selectedLomba.value) params.set('lomba_id', selectedLomba.value)
+
+  fetch(`${import.meta.env.VITE_API_URL || ''}/api/admin/pendaftarans/export?${params}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  .then(res => res.blob())
+  .then(blob => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `daftar_peserta_${new Date().toISOString().slice(0,10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  })
+  .catch(console.error)
 }
 
 const statusConfig = {
@@ -75,6 +98,9 @@ onMounted(() => {
           <option value="">Semua Lomba</option>
           <option v-for="l in lombas" :key="l.id" :value="l.id">{{ l.kode }} - {{ l.title }}</option>
         </select>
+        <button @click="exportCsv" class="inline-flex items-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-sm flex-shrink-0 whitespace-nowrap">
+          <Download class="w-3.5 h-3.5" /> Export CSV
+        </button>
       </div>
     </div>
 

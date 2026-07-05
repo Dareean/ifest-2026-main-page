@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { useAdminStore } from '../../../stores/admin'
 import {
   LayoutDashboard, ClipboardList, Users, Bell, LogOut, Menu, X,
-  Home, ChevronRight, Shield, Mail
+  Home, ChevronRight, Shield, Mail, UserCog
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -14,12 +14,18 @@ const auth = useAuthStore()
 const admin = useAdminStore()
 const sidebarOpen = ref(false)
 
-const navItems = [
-  { path: '/dashboard/admin', name: 'Dashboard', icon: LayoutDashboard },
-  { path: '/dashboard/admin/pendaftaran', name: 'Pendaftaran', icon: ClipboardList },
-  { path: '/dashboard/admin/users', name: 'Pengguna', icon: Users },
-  { path: '/dashboard/admin/notifications', name: 'Notifikasi', icon: Bell },
-]
+const navItems = computed(() => {
+  const items = [
+    { path: '/dashboard/admin', name: 'Dashboard', icon: LayoutDashboard },
+    { path: '/dashboard/admin/pendaftaran', name: 'Pendaftaran', icon: ClipboardList },
+    { path: '/dashboard/admin/users', name: 'Pengguna', icon: Users },
+    { path: '/dashboard/admin/notifications', name: 'Notifikasi', icon: Bell },
+  ]
+  if (auth.isSuperAdmin) {
+    items.push({ path: '/dashboard/admin/manage', name: 'Manage Admin', icon: UserCog })
+  }
+  return items
+})
 
 async function handleLogout() {
   await auth.logout()

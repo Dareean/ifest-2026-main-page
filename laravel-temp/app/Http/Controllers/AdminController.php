@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Models\Pendaftaran;
 use App\Models\User;
@@ -86,6 +87,14 @@ class AdminController extends Controller
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Tim telah terkunci secara otomatis.",
         ]);
 
+        ActivityLog::create([
+            'admin_id' => request()->user()->id,
+            'action' => 'verify',
+            'target_type' => 'pendaftaran',
+            'target_id' => $pendaftaran->id,
+            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name],
+        ]);
+
         Cache::forget('admin_stats');
 
         return response()->json(['message' => 'Pendaftaran berhasil diverifikasi', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
@@ -112,6 +121,14 @@ class AdminController extends Controller
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
         ]);
 
+        ActivityLog::create([
+            'admin_id' => $request->user()->id,
+            'action' => 'reject',
+            'target_type' => 'pendaftaran',
+            'target_id' => $pendaftaran->id,
+            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name, 'notes' => $request->notes],
+        ]);
+
         Cache::forget('admin_stats');
 
         return response()->json(['message' => 'Pendaftaran ditolak', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
@@ -132,6 +149,14 @@ class AdminController extends Controller
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Buka Kunci Tim Disetujui',
             'pesan' => 'Permohonan buka kunci tim telah disetujui. Kamu sekarang dapat mengubah anggota tim. Jangan lupa kunci kembali setelah selesai.',
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => request()->user()->id,
+            'action' => 'approve_unlock',
+            'target_type' => 'pendaftaran',
+            'target_id' => $pendaftaran->id,
+            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name],
         ]);
 
         Cache::forget('admin_stats');
@@ -210,6 +235,13 @@ class AdminController extends Controller
             }
         }
 
+        ActivityLog::create([
+            'admin_id' => $request->user()->id,
+            'action' => 'broadcast_notification',
+            'target_type' => $request->filled('user_ids') ? 'users' : 'all',
+            'metadata' => ['judul' => $request->judul, 'recipient_count' => $users->count()],
+        ]);
+
         return response()->json(['message' => 'Notifikasi terkirim ke ' . $users->count() . ' pengguna']);
     }
 
@@ -228,7 +260,7 @@ class AdminController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'role' => 'required|string|in:user,admin',
+            'role' => 'required|string|in:user,admin,super_admin',
         ]);
 
         if ($validator->fails()) {
@@ -243,5 +275,66 @@ class AdminController extends Controller
             'message' => "Role user {$user->name} berhasil diubah menjadi {$request->role}",
             'data' => $user,
         ]);
+    }
+
+    public function activityLogs(): JsonResponse
+    {
+        $data = ActivityLog::with('admin:id,name')
+            ->latest()
+            ->paginate(20);
+
+        return response()->json($data);
+    }
+
+    public function exportPendaftarans(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $query = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title', 'submission:id,pendaftaran_id,link_drive');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('lomba_id')) {
+            $query->where('lomba_id', $request->lomba_id);
+        }
+
+        $pendaftarans = $query->latest()->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="daftar_peserta_' . now()->format('Y-m-d') . '.csv"',
+        ];
+
+        $callback = function () use ($pendaftarans) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($file, ['No', 'Nama Tim', 'Lomba', 'Ketua', 'Email Ketua', 'Status', 'Link Karya', 'Tanggal Daftar']);
+
+            foreach ($pendaftarans as $i => $p) {
+                fputcsv($file, [
+                    $i + 1,
+                    $p->team_name,
+                    $p->lomba->title,
+                    $p->user->name,
+                    $p->user->email,
+                    $p->status,
+                    $p->submission?->link_drive,
+                    $p->created_at->format('Y-m-d H:i'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function admins(): JsonResponse
+    {
+        $data = User::whereIn('role', ['admin', 'super_admin'])
+            ->withCount('pendaftarans')
+            ->latest()
+            ->paginate(50);
+
+        return response()->json($data);
     }
 }

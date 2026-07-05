@@ -1,14 +1,30 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import api from '../../../utils/api'
 import { useAdminStore } from '../../../stores/admin'
-import { Users, ClipboardList, Clock, CheckCircle, AlertTriangle, Shield } from 'lucide-vue-next'
+import { Users, ClipboardList, Clock, CheckCircle, AlertTriangle, Shield, Activity, Eye, XCircle, Lock, Send } from 'lucide-vue-next'
 
 const admin = useAdminStore()
 const loading = ref(true)
+const activities = ref([])
+const activitiesLoading = ref(true)
+
+const actionConfig = {
+  verify: { icon: CheckCircle, label: 'Verifikasi', class: 'bg-[#DCEEB1]/30 text-green-700 border-[#DCEEB1]' },
+  reject: { icon: XCircle, label: 'Tolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
+  approve_unlock: { icon: Lock, label: 'Buka Kunci', class: 'bg-amber-50 text-amber-600 border-amber-200' },
+  broadcast_notification: { icon: Send, label: 'Kirim Notif', class: 'bg-blue-50 text-blue-600 border-blue-200' },
+}
 
 onMounted(async () => {
   await admin.fetchStats()
   loading.value = false
+  try {
+    const res = await api.get('/admin/activity-logs', { params: { per_page: 10 } })
+    activities.value = res.data.data || []
+  } catch {} finally {
+    activitiesLoading.value = false
+  }
 })
 </script>
 
@@ -101,6 +117,30 @@ onMounted(async () => {
           </div>
         </div>
         <p v-else class="text-xs text-on-surface-variant/50 py-4 text-center">Belum ada pendaftaran</p>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6">
+        <h3 class="font-extrabold text-sm text-on-surface mb-4 flex items-center gap-2">
+          <Activity class="w-4 h-4 text-accent-magenta" /> Aktivitas Terbaru
+        </h3>
+        <div v-if="activitiesLoading" class="space-y-2">
+          <div v-for="i in 4" :key="i" class="h-10 bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+        </div>
+        <div v-else-if="activities.length" class="space-y-1.5">
+          <div v-for="log in activities" :key="log.id" class="flex items-center gap-3 text-xs border-b border-slate-50 last:border-0 py-2 last:pb-0">
+            <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border flex-shrink-0" :class="actionConfig[log.action]?.class || 'bg-slate-50 text-on-surface-variant'">
+              <component :is="actionConfig[log.action]?.icon" class="w-2.5 h-2.5" />
+              {{ actionConfig[log.action]?.label || log.action }}
+            </span>
+            <div class="min-w-0 flex-1 truncate">
+              <span class="font-semibold text-on-surface">{{ log.admin?.name }}</span>
+              <span v-if="log.metadata?.lomba" class="text-on-surface-variant/70"> &middot; {{ log.metadata.lomba }}</span>
+            </div>
+            <span class="font-mono text-[9px] text-on-surface-variant/50 whitespace-nowrap">{{ new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) }}</span>
+          </div>
+        </div>
+        <p v-else class="text-xs text-on-surface-variant/50 py-4 text-center">Belum ada aktivitas</p>
       </div>
 
       <!-- Per-lomba stats -->

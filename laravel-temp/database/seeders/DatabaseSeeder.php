@@ -18,6 +18,14 @@ class DatabaseSeeder extends Seeder
                 'role' => 'admin',
             ]
         );
+        User::updateOrCreate(
+            ['email' => 'superadmin@ifest.com'],
+            [
+                'name' => 'Super Admin I-FEST',
+                'password' => bcrypt('super123'),
+                'role' => 'super_admin',
+            ]
+        );
         $lombas = [
             [
                 'kode' => 'NAT-01',

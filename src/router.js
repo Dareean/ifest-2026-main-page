@@ -23,6 +23,7 @@ import AdminPendaftaran from './pages/dashboard/admin/AdminPendaftaran.vue'
 import AdminPendaftaranDetail from './pages/dashboard/admin/AdminPendaftaranDetail.vue'
 import AdminUsers from './pages/dashboard/admin/AdminUsers.vue'
 import AdminNotifications from './pages/dashboard/admin/AdminNotifications.vue'
+import AdminManage from './pages/dashboard/admin/AdminManage.vue'
 
 const routes = [
   {
@@ -148,6 +149,12 @@ const routes = [
         name: 'AdminNotifications',
         component: AdminNotifications,
       },
+      {
+        path: 'manage',
+        name: 'AdminManage',
+        component: AdminManage,
+        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
+      },
     ],
   },
 ]
@@ -171,7 +178,8 @@ router.afterEach(() => {
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('auth_token')
   const user = JSON.parse(localStorage.getItem('auth_user') || 'null')
-  const isAdmin = user && user.role === 'admin'
+  const isAdmin = user && (user.role === 'admin' || user.role === 'super_admin')
+const isSuperAdmin = user && user.role === 'super_admin'
 
   if (to.meta.requiresAuth) {
     if (!token) {
@@ -181,6 +189,10 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAdmin) {
       if (!isAdmin) {
         next({ name: 'Dashboard' })
+        return
+      }
+      if (to.meta.requiresSuperAdmin && !isSuperAdmin) {
+        next({ name: 'AdminDashboard' })
         return
       }
     } else {

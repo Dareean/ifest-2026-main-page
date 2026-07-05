@@ -8,7 +8,8 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
-  const isAdmin = computed(() => user.value?.role === 'admin')
+  const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'super_admin')
+  const isSuperAdmin = computed(() => user.value?.role === 'super_admin')
   const unreadNotifications = computed(() => user.value?.notifications?.length || 0)
 
   async function register(data) {
@@ -86,7 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
-    user, token, loading, isAuthenticated, unreadNotifications,
+    user, token, loading, isAuthenticated, isSuperAdmin, unreadNotifications,
     register, login, fetchUser, logout, googleLogin, connectGoogle,
     disconnectGoogle, handleGoogleCallback,
   }
