@@ -185,31 +185,27 @@ class AdminController extends Controller
         }
 
         $judul = $request->judul;
-        $pesan = $request->pesan;
-
         $apiKey = env('BREVO_API_KEY');
-        app()->terminating(function () use ($emails, $judul, $pesan, $apiKey) {
-            foreach ($emails as $item) {
-                $notif = Notification::find($item['notif_id']);
-                if (!$notif) continue;
-                try {
-                    $html = view('emails.notification', ['notification' => $notif])->render();
-                    if ($apiKey) {
-                        Http::withHeaders([
-                            'api-key' => $apiKey,
-                            'Content-Type' => 'application/json',
-                        ])->post('https://api.brevo.com/v3/smtp/email', [
-                            'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
-                            'to' => [['email' => $item['email']]],
-                            'subject' => $judul,
-                            'htmlContent' => $html,
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::error('Send email failed: ' . $e->getMessage(), $item);
+        foreach ($emails as $item) {
+            $notif = Notification::find($item['notif_id']);
+            if (!$notif) continue;
+            try {
+                $html = view('emails.notification', ['notification' => $notif])->render();
+                if ($apiKey) {
+                    Http::timeout(10)->withHeaders([
+                        'api-key' => $apiKey,
+                        'Content-Type' => 'application/json',
+                    ])->post('https://api.brevo.com/v3/smtp/email', [
+                        'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
+                        'to' => [['email' => $item['email']]],
+                        'subject' => $judul,
+                        'htmlContent' => $html,
+                    ]);
                 }
+            } catch (\Exception $e) {
+                Log::error('Send email failed: ' . $e->getMessage(), $item);
             }
-        });
+        }
 
         return response()->json(['message' => 'Notifikasi terkirim ke ' . $users->count() . ' pengguna']);
     }

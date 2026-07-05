@@ -10,30 +10,6 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
-// Debug
-Route::get('/debug/ip', function () {
-    $ip = @file_get_contents('https://api.ipify.org');
-    return ['render_outbound_ip' => $ip ?: 'failed to detect'];
-});
-
-Route::get('/debug/test-email', function () {
-    $apiKey = env('BREVO_API_KEY');
-    if (!$apiKey) return response()->json(['error' => 'BREVO_API_KEY not set'], 500);
-
-    $res = Http::withHeaders(['api-key' => $apiKey, 'Content-Type' => 'application/json'])
-        ->post('https://api.brevo.com/v3/smtp/email', [
-            'sender' => ['email' => 'noreply@ifest2026.com', 'name' => 'I-FEST 2026'],
-            'to' => [['email' => 'dmardin@gmail.com']],
-            'subject' => 'Test Brevo API',
-            'htmlContent' => '<p>Test from Render</p>',
-        ]);
-
-    return response()->json([
-        'status' => $res->status(),
-        'body' => $res->body(),
-    ]);
-});
-
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
