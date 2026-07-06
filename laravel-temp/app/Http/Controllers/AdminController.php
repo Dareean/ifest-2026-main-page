@@ -28,7 +28,6 @@ class AdminController extends Controller
         $byLomba = \App\Models\Lomba::withCount('pendaftarans')
             ->get()
             ->map(fn($l) => ['lomba' => $l->kode . ' - ' . $l->title, 'total' => $l->pendaftarans_count]);
-        $pendingUnlock = Pendaftaran::where('unlock_requested', true)->count();
         $recentRegistrations = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title')
             ->latest()->take(5)->get();
 
@@ -37,7 +36,7 @@ class AdminController extends Controller
             'total_pendaftarans' => $totalPendaftarans,
             'by_status' => $byStatus,
             'by_lomba' => $byLomba,
-            'pending_unlock_requests' => $pendingUnlock,
+            'pending_unlock_requests' => 
             'recent_registrations' => $recentRegistrations,
         ];
 
@@ -93,16 +92,14 @@ class AdminController extends Controller
             return response()->json(['message' => 'Tim belum mengisi semua kuota anggota. Isi slot terlebih dahulu sebelum verifikasi tim (' . (1 + $acceptedCount) . '/' . $maxMembers . ' terisi).'], 400);
         }
 
-        $pendaftaran->update([
-            'status' => 'verified',
-            'team_locked' => true,
-        ]);
+        $pendaftaran->update(['status' => 'verified']);
 
-        Notification::create([
+        $notif = Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Diverifikasi',
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Selamat mengikuti lomba!",
         ]);
+        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => request()->user()->id,
@@ -162,14 +159,14 @@ class AdminController extends Controller
         $pendaftaran->update([
             'payment_status' => 'verified',
             'payment_verified_at' => now(),
-            'team_locked' => false,
         ]);
 
-        Notification::create([
+        $notif = Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pembayaran Diverifikasi',
             'pesan' => "Pembayaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Silakan undang anggota tim kamu untuk mengisi slot yang tersedia.",
         ]);
+        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => request()->user()->id,
@@ -182,6 +179,119 @@ class AdminController extends Controller
         Cache::forget('admin_stats');
 
         return response()->json(['message' => 'Pembayaran berhasil diverifikasi', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
+    }
+
+    public function batchVerify(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:pendaftarans,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $results = ['success' => 0, 'skipped' => 0, 'errors' => []];
+        $pendaftarans = Pendaftaran::whereIn('id', $request->ids)->with('lomba', 'user')->get();
+
+        foreach ($pendaftarans as $p) {
+            try {
+                if ($p->status !== 'pending') {
+                    $results['skipped']++;
+                    continue;
+                }
+                if (!$p->isFree() && $p->payment_status !== 'verified') {
+                    $results['skipped']++;
+                    continue;
+                }
+
+                $p->update(['status' => 'verified']);
+
+                $notif = Notification::create([
+                    'user_id' => $p->user_id,
+                    'judul' => 'Pendaftaran Diverifikasi',
+                    'pesan' => "Pendaftaran untuk lomba {$p->lomba->title} telah diverifikasi. Selamat mengikuti lomba!",
+                ]);
+                $this->sendEmailBrevo($notif->fresh()->load('user'));
+
+                ActivityLog::create([
+                    'admin_id' => $request->user()->id,
+                    'action' => 'verify',
+                    'target_type' => 'pendaftaran',
+                    'target_id' => $p->id,
+                    'metadata' => ['lomba' => $p->lomba->title, 'user' => $p->user->name],
+                ]);
+
+                $results['success']++;
+            } catch (\Exception $e) {
+                $results['errors'][] = "ID {$p->id}: {$e->getMessage()}";
+            }
+        }
+
+        Cache::forget('admin_stats');
+
+        return response()->json([
+            'message' => "{$results['success']} pendaftaran berhasil diverifikasi, {$results['skipped']} dilewati",
+            'results' => $results,
+        ]);
+    }
+
+    public function batchReject(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:pendaftarans,id',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $results = ['success' => 0, 'skipped' => 0, 'errors' => []];
+        $pendaftarans = Pendaftaran::whereIn('id', $request->ids)->with('lomba', 'user')->get();
+
+        foreach ($pendaftarans as $p) {
+            try {
+                if ($p->status !== 'pending') {
+                    $results['skipped']++;
+                    continue;
+                }
+
+                $p->update([
+                    'status' => 'rejected',
+                    'notes' => $request->notes,
+                ]);
+
+                $notif = Notification::create([
+                    'user_id' => $p->user_id,
+                    'judul' => 'Pendaftaran Ditolak',
+                    'pesan' => "Pendaftaran untuk lomba {$p->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
+                ]);
+
+                $this->sendEmailBrevo($notif->fresh()->load('user'));
+
+                ActivityLog::create([
+                    'admin_id' => $request->user()->id,
+                    'action' => 'reject',
+                    'target_type' => 'pendaftaran',
+                    'target_id' => $p->id,
+                    'metadata' => ['lomba' => $p->lomba->title, 'user' => $p->user->name, 'notes' => $request->notes],
+                ]);
+
+                $results['success']++;
+            } catch (\Exception $e) {
+                $results['errors'][] = "ID {$p->id}: {$e->getMessage()}";
+            }
+        }
+
+        Cache::forget('admin_stats');
+
+        return response()->json([
+            'message' => "{$results['success']} pendaftaran ditolak, {$results['skipped']} dilewati",
+            'results' => $results,
+        ]);
     }
 
     public function rejectPayment(Request $request, Pendaftaran $pendaftaran): JsonResponse
@@ -245,37 +355,6 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             Log::error('Send Brevo email failed: ' . $e->getMessage(), ['to' => $notif->user->email]);
         }
-    }
-
-    public function approveUnlock(Pendaftaran $pendaftaran): JsonResponse
-    {
-        if (!$pendaftaran->unlock_requested) {
-            return response()->json(['message' => 'Tidak ada permohonan buka kunci untuk tim ini'], 400);
-        }
-
-        $pendaftaran->update([
-            'team_locked' => false,
-            'unlock_requested' => false,
-            'auto_lock_at' => now()->addMinutes(5),
-        ]);
-
-        Notification::create([
-            'user_id' => $pendaftaran->user_id,
-            'judul' => 'Buka Kunci Tim Disetujui',
-            'pesan' => 'Permohonan buka kunci tim telah disetujui. Kamu memiliki waktu 5 menit untuk mengubah anggota tim sebelum sistem mengunci otomatis.',
-        ]);
-
-        ActivityLog::create([
-            'admin_id' => request()->user()->id,
-            'action' => 'approve_unlock',
-            'target_type' => 'pendaftaran',
-            'target_id' => $pendaftaran->id,
-            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name],
-        ]);
-
-        Cache::forget('admin_stats');
-
-        return response()->json(['message' => 'Buka kunci tim disetujui', 'data' => $pendaftaran->fresh()]);
     }
 
     public function users(Request $request): JsonResponse
@@ -374,7 +453,7 @@ class AdminController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'role' => 'required|string|in:user,admin,super_admin',
+            'role' => 'required|string|in:user,admin',
         ]);
 
         if ($validator->fails()) {
@@ -473,7 +552,7 @@ class AdminController extends Controller
 
     public function admins(): JsonResponse
     {
-        $data = User::whereIn('role', ['admin', 'super_admin'])
+        $data = User::where('role', 'admin')
             ->withCount('pendaftarans')
             ->latest()
             ->paginate(50);

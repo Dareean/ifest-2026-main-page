@@ -107,6 +107,30 @@ onMounted(() => {
       </p>
     </div>
 
+    <!-- Status Summary -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+        <p class="font-mono text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Total</p>
+        <p class="text-2xl font-extrabold text-on-surface mt-1">{{ pendaftarans.length }}</p>
+        <p class="text-[10px] text-on-surface-variant/50 mt-0.5">Lomba diikuti</p>
+      </div>
+      <div class="bg-[#FFF9E6] border border-amber-200/30 rounded-2xl p-4 shadow-sm">
+        <p class="font-mono text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Pending</p>
+        <p class="text-2xl font-extrabold text-on-surface mt-1">{{ pendaftarans.filter(p => p.status === 'pending').length }}</p>
+        <p class="text-[10px] text-on-surface-variant/50 mt-0.5">Menunggu verifikasi</p>
+      </div>
+      <div class="bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 rounded-2xl p-4 shadow-sm">
+        <p class="font-mono text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Terverifikasi</p>
+        <p class="text-2xl font-extrabold text-on-surface mt-1">{{ pendaftarans.filter(p => p.status === 'verified').length }}</p>
+        <p class="text-[10px] text-on-surface-variant/50 mt-0.5">Tim terverifikasi</p>
+      </div>
+      <div class="bg-[#FF3D8B]/5 border border-accent-magenta/15 rounded-2xl p-4 shadow-sm">
+        <p class="font-mono text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Ditolak</p>
+        <p class="text-2xl font-extrabold text-accent-magenta mt-1">{{ pendaftarans.filter(p => p.status === 'rejected').length }}</p>
+        <p class="text-[10px] text-on-surface-variant/50 mt-0.5">Pendaftaran ditolak</p>
+      </div>
+    </div>
+
     <!-- Announcement Banner -->
     <div v-for="ann in announcements" :key="ann.id" class="mb-6 p-4 bg-[#FF3D8B]/5 border border-accent-magenta/15 rounded-2xl flex items-start gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.005)]">
       <div class="w-8 h-8 rounded-lg bg-[#FF3D8B]/10 flex items-center justify-center flex-shrink-0">

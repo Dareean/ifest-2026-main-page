@@ -7,10 +7,11 @@ import { useBack } from '../../composables/useBack'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import { useCompetitionNav } from '../../composables/useCompetitionNav'
+import ProgressStepper from '../../components/ProgressStepper.vue'
 import {
   Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
   Send, X, Users, BookOpen, Calendar, ArrowLeft,
-  ChevronRight, Award, FileText, Printer, Lock, Unlock, UserMinus, Mail, Check, Copy
+  ChevronRight, Award, FileText, Printer, UserMinus, Mail, Check, Copy
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
@@ -24,7 +25,7 @@ const loading = ref(true)
 const lombaList = ref([])
 
 // Forms state
-const daftarForm = ref({ team_name: '', team_members: [] })
+const daftarForm = ref({ team_name: '' })
 const submitForm = ref({ link_drive: '', catatan: '' })
 const submitting = ref(false)
 const submittingSubmit = ref(false)
@@ -54,10 +55,6 @@ const paymentLink = ref('')
 const uploadingPayment = ref(false)
 const paymentUploadError = ref('')
 const paymentUploadSuccess = ref('')
-
-const isTeamLocked = computed(() => {
-  return getRegistration(selectedLombaForDetail.value?.id)?.team_locked ?? true
-})
 
 const isFull = computed(() => {
   const max = getMaxMembers(selectedLombaForDetail?.team_requirements)
@@ -95,8 +92,7 @@ const now = ref(new Date())
 let timerId = null
 
 const anggotaVisible = computed(() => {
-  const reg = getRegistration(selectedLombaForDetail.value?.id)
-  return !!reg && (reg.payment_status === 'verified' || reg.status === 'verified')
+  return !!getRegistration(selectedLombaForDetail.value?.id)
 })
 
 // availableTabs is now provided by useCompetitionNav
@@ -225,11 +221,12 @@ function openDetail(lomba) {
       catatan: reg.submission?.catatan || ''
     }
   } else {
-    daftarForm.value = { team_name: '', team_members: [] }
+        daftarForm.value = { team_name: '' }
   }
 }
 
-function closeDetail() {
+function closeDetail()
+ {
   selectedLombaForDetail.value = null
   goBack('/dashboard')
 }
@@ -241,9 +238,8 @@ async function handleDaftar() {
   try {
     await api.post(`/lombas/${selectedLombaForDetail.value.id}/daftar`, {
       team_name: daftarForm.value.team_name || null,
-      team_members: daftarForm.value.team_members.length > 0 ? daftarForm.value.team_members : null,
     })
-    daftarForm.value = { team_name: '', team_members: [] }
+    daftarForm.value = { team_name: '' }
     await fetchData()
     // reload state
     const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
@@ -258,14 +254,6 @@ async function handleDaftar() {
   } finally {
     submitting.value = false
   }
-}
-
-function addMember() {
-  daftarForm.value.team_members.push({ name: '', email: '' })
-}
-
-function removeMember(i) {
-  daftarForm.value.team_members.splice(i, 1)
 }
 
 async function handleSubmitKarya() {
@@ -378,46 +366,8 @@ async function handleRemoveMember(memberId) {
   }
 }
 
-function goToTeamPage() {
-  const reg = getRegistration(selectedLombaForDetail.value?.id)
-  if (reg) {
-    router.push(`/dashboard/tim/${reg.id}`)
-  }
-}
 
-async function handleRequestChanges() {
-  if (!selectedLombaForDetail.value) return
-  const reg = getRegistration(selectedLombaForDetail.value.id)
-  if (!await confirmModal.confirm('Ajukan permohonan buka kunci tim ke admin?', 'Ajukan Buka Kunci?')) return
-  try {
-    await api.post(`/pendaftarans/${reg.id}/request-changes`)
-    reg.unlock_requested = true
-  } catch (e) {
-    showToast(e.response?.data?.message || 'Gagal mengirim permohonan', 'error')
-  }
-}
 
-const autoLockRemaining = ref(0)
-let autoLockTimer = null
-
-function startAutoLockCountdown(autoLockAt) {
-  if (autoLockTimer) clearInterval(autoLockTimer)
-  if (!autoLockAt) {
-    autoLockRemaining.value = 0
-    return
-  }
-  function tick() {
-    const diff = new Date(autoLockAt).getTime() - Date.now()
-    if (diff <= 0) {
-      autoLockRemaining.value = 0
-      clearInterval(autoLockTimer)
-      return
-    }
-    autoLockRemaining.value = Math.ceil(diff / 1000)
-  }
-  tick()
-  autoLockTimer = setInterval(tick, 1000)
-}
 
 onMounted(() => {
   // Load from Cache first for instant render
@@ -461,18 +411,12 @@ watch(selectedLombaForDetail, (lomba) => {
   if (!lomba) return
   const reg = getRegistration(lomba.id)
   if (reg) {
-    if (reg.payment_status === 'verified' || reg.status === 'verified') {
-      fetchTeamInvitations()
-    }
-    if (reg.auto_lock_at) {
-      startAutoLockCountdown(reg.auto_lock_at)
-    }
+    fetchTeamInvitations()
   }
 })
 
 onUnmounted(() => {
   if (timerId) clearInterval(timerId)
-  if (autoLockTimer) clearInterval(autoLockTimer)
 })
 </script>
 
@@ -613,124 +557,131 @@ onUnmounted(() => {
       <!-- Tab Content: Registrasi & Tim -->
       <div v-else-if="activeTab === 'team'" class="space-y-6">
         <!-- Status: Registered -->
-        <div v-if="sudahTerdaftar(selectedLombaForDetail?.id)">
-          <div
-            class="p-4 border rounded-2xl flex items-start gap-3 shadow-sm text-xs"
-            :class="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.class || ''"
-          >
-            <component :is="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.icon || Clock" class="w-5 h-5 mt-0.5 flex-shrink-0" />
-            <div class="flex-1 min-w-0">
-              <p class="font-bold">Status: {{ statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.label }}</p>
-              <div v-if="getRegistration(selectedLombaForDetail?.id)?.gelombang" class="flex items-center gap-1.5 mt-1.5">
-                <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="getRegistration(selectedLombaForDetail?.id)?.gelombang === '1' ? 'bg-pink-100 text-pink-700 border border-pink-200' : 'bg-blue-100 text-blue-700 border border-blue-200'">
-                  Gelombang {{ getRegistration(selectedLombaForDetail?.id)?.gelombang }}
-                </span>
-              </div>
-
-              <!-- Payment Accounts Info -->
-              <div v-if="selectedLombaForDetail?.payment_accounts?.length && getRegistration(selectedLombaForDetail?.id)?.payment_status !== 'verified'" class="mt-3 bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider block mb-2">Metode Pembayaran</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div v-for="(acct, i) in selectedLombaForDetail.payment_accounts" :key="i" class="bg-white rounded-xl p-3 border border-slate-100 flex items-center gap-3 shadow-sm">
-                    <div class="w-10 h-10 rounded-xl bg-[#DCEEB1]/20 border border-[#DCEEB1]/30 flex items-center justify-center text-[8px] font-black uppercase flex-shrink-0 text-on-surface">
-                      {{ acct.bank?.slice(0, 3) || acct.ewallet?.slice(0, 3) || 'BR' }}
-                    </div>
-                    <div class="min-w-0">
-                      <p class="font-bold text-xs text-on-surface leading-tight">{{ acct.bank || acct.ewallet }}</p>
-                      <p class="font-mono text-[10px] font-bold text-on-surface mt-0.5 select-all">{{ acct.nomor }}</p>
-                      <p class="text-[10px] text-on-surface-variant/60 truncate">a.n. {{ acct.nama }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Pending + Unpaid (not free) → show upload payment -->
-              <template v-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'unpaid'">
-                <div v-if="selectedLombaForDetail?.fee && selectedLombaForDetail.fee.toLowerCase() !== 'gratis'" class="mt-3">
-                  <p class="text-[11px] opacity-80 leading-relaxed">Silakan upload bukti pembayaran untuk melanjutkan proses verifikasi.</p>
-                  <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
-                    <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
-                    <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
-                    <div>
-                      <label class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider mb-1.5 block">Link Google Drive Bukti Bayar</label>
-                      <input v-model="paymentLink" placeholder="https://drive.google.com/file/d/..." class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                    </div>
-                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
-                      {{ uploadingPayment ? 'Mengirim...' : 'Kirim Bukti Bayar' }}
-                    </button>
-                  </div>
-                </div>
-              </template>
-
-              <!-- Pending + Payment Pending -->
-              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'pending'">
-                <div class="mt-3 space-y-3">
-                  <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran sedang diverifikasi oleh admin.</p>
-                  <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_proof" class="bg-white/60 rounded-xl p-3 border border-slate-200/60">
-                    <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Bukti Bayar</span>
-                    <a :href="getRegistration(selectedLombaForDetail?.id)?.payment_proof" target="_blank" class="flex items-center gap-2 mt-1.5 text-xs font-bold text-sky-600 hover:underline truncate">
-                      {{ getRegistration(selectedLombaForDetail?.id)?.payment_proof }}
-                    </a>
-                  </div>
-                </div>
-              </template>
-
-              <!-- Pending + Payment Rejected -->
-              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'rejected'">
-                <div class="mt-3">
-                  <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran ditolak.</p>
-                  <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_notes" class="mt-2 bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px]">
-                    <span class="font-bold text-accent-magenta">Alasan:</span>
-                    <span class="text-on-surface-variant/80 ml-1">{{ getRegistration(selectedLombaForDetail?.id)?.payment_notes }}</span>
-                  </div>
-                  <p class="text-[11px] mt-2">Silakan kirim ulang link bukti pembayaran yang valid.</p>
-                  <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
-                    <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
-                    <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
-                    <div>
-                      <label class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider mb-1.5 block">Link Google Drive Bukti Bayar</label>
-                      <input v-model="paymentLink" placeholder="https://drive.google.com/file/d/..." class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                    </div>
-                    <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
-                      {{ uploadingPayment ? 'Mengirim...' : 'Kirim Ulang Bukti Bayar' }}
-                    </button>
-                  </div>
-                </div>
-              </template>
-
-              <!-- Pending + Payment Verified (waiting for team verification) -->
-              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified'">
-                <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Pembayaran terverifikasi! Silakan undang anggota tim Anda pada tab Anggota Tim.</p>
-              </template>
-
-              <!-- Free competition (auto payment verified) -->
-              <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && selectedLombaForDetail?.fee && selectedLombaForDetail.fee.toLowerCase() === 'gratis'">
-                <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Lomba gratis — pendaftaran Anda sedang menunggu verifikasi admin.</p>
-              </template>
-
-              <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'verified'">
-                Tim Anda telah diverifikasi! Kelola anggota tim di tab <strong>Anggota Tim</strong>.
-              </p>
-              <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'rejected'">
-                Pendaftaran ditolak. Catatan: {{ getRegistration(selectedLombaForDetail?.id)?.notes || 'Tidak ada catatan.' }} Hubungi panitia untuk info lebih lanjut.
-              </p>
-            </div>
+        <div v-if="sudahTerdaftar(selectedLombaForDetail?.id)" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Progress Stepper (Left) -->
+          <div class="lg:col-span-5 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+            <h4 class="font-extrabold text-xs text-on-surface uppercase tracking-wider mb-2">Progress</h4>
+            <ProgressStepper
+              :reg="getRegistration(selectedLombaForDetail?.id)"
+              :lomba="selectedLombaForDetail"
+              :team-accepted-count="teamInvitations.filter(i => i.status === 'accepted').length"
+            />
           </div>
 
-          <div class="flex flex-wrap gap-3 pt-4">
-            <button
-              @click="goToTeamPage"
-              class="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-on-surface border border-slate-200 px-5 py-3 rounded-xl text-xs font-bold transition-all shadow-sm"
+          <!-- Status & Actions (Right) -->
+          <div class="lg:col-span-7 space-y-4">
+            <div
+              class="p-4 border rounded-2xl flex items-start gap-3 shadow-sm text-xs"
+              :class="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.class || ''"
             >
-              <Users class="w-4 h-4" /> Kelola Tim
-            </button>
-            <router-link
-              :to="'/invoice/' + getRegistration(selectedLombaForDetail?.id)?.id"
-              target="_blank"
-              class="inline-flex items-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] px-5 py-3 rounded-xl text-xs font-bold transition-all shadow-sm"
-            >
-              <Printer class="w-4 h-4" /> Cetak Bukti Pendaftaran
-            </router-link>
+              <component :is="statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.icon || Clock" class="w-5 h-5 mt-0.5 flex-shrink-0" />
+              <div class="flex-1 min-w-0">
+                <p class="font-bold">Status: {{ statusConfig[getRegistration(selectedLombaForDetail?.id)?.status]?.label }}</p>
+                <div v-if="getRegistration(selectedLombaForDetail?.id)?.gelombang" class="flex items-center gap-1.5 mt-1.5">
+                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="getRegistration(selectedLombaForDetail?.id)?.gelombang === '1' ? 'bg-pink-100 text-pink-700 border border-pink-200' : 'bg-blue-100 text-blue-700 border border-blue-200'">
+                    Gelombang {{ getRegistration(selectedLombaForDetail?.id)?.gelombang }}
+                  </span>
+                </div>
+
+                <!-- Payment Accounts Info -->
+                <div v-if="selectedLombaForDetail?.payment_accounts?.length && getRegistration(selectedLombaForDetail?.id)?.payment_status !== 'verified'" class="mt-3 bg-slate-50 rounded-xl p-4 border border-slate-100">
+                  <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider block mb-2">Metode Pembayaran</span>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div v-for="(acct, i) in selectedLombaForDetail.payment_accounts" :key="i" class="bg-white rounded-xl p-3 border border-slate-100 flex items-center gap-3 shadow-sm">
+                      <div class="w-10 h-10 rounded-xl bg-[#DCEEB1]/20 border border-[#DCEEB1]/30 flex items-center justify-center text-[8px] font-black uppercase flex-shrink-0 text-on-surface">
+                        {{ acct.bank?.slice(0, 3) || acct.ewallet?.slice(0, 3) || 'BR' }}
+                      </div>
+                      <div class="min-w-0">
+                        <p class="font-bold text-xs text-on-surface leading-tight">{{ acct.bank || acct.ewallet }}</p>
+                        <p class="font-mono text-[10px] font-bold text-on-surface mt-0.5 select-all">{{ acct.nomor }}</p>
+                        <p class="text-[10px] text-on-surface-variant/60 truncate">a.n. {{ acct.nama }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pending + Unpaid (not free) → show upload payment -->
+                <template v-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'unpaid'">
+                  <div v-if="selectedLombaForDetail?.fee && selectedLombaForDetail.fee.toLowerCase() !== 'gratis'" class="mt-3">
+                    <p class="text-[11px] opacity-80 leading-relaxed">Silakan upload bukti pembayaran untuk melanjutkan proses verifikasi.</p>
+                    <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
+                      <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
+                      <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
+                      <div>
+                        <label class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider mb-1.5 block">Link Google Drive Bukti Bayar</label>
+                        <input v-model="paymentLink" placeholder="https://drive.google.com/file/d/..." class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                      </div>
+                      <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+                        {{ uploadingPayment ? 'Mengirim...' : 'Kirim Bukti Bayar' }}
+                      </button>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Pending + Payment Pending -->
+                <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'pending'">
+                  <div class="mt-3 space-y-3">
+                    <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran sedang diverifikasi oleh admin.</p>
+                    <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_proof" class="bg-white/60 rounded-xl p-3 border border-slate-200/60">
+                      <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Bukti Bayar</span>
+                      <a :href="getRegistration(selectedLombaForDetail?.id)?.payment_proof" target="_blank" class="flex items-center gap-2 mt-1.5 text-xs font-bold text-sky-600 hover:underline truncate">
+                        {{ getRegistration(selectedLombaForDetail?.id)?.payment_proof }}
+                      </a>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Pending + Payment Rejected -->
+                <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'rejected'">
+                  <div class="mt-3">
+                    <p class="text-[11px] opacity-80 leading-relaxed">Bukti pembayaran ditolak.</p>
+                    <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_notes" class="mt-2 bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px]">
+                      <span class="font-bold text-accent-magenta">Alasan:</span>
+                      <span class="text-on-surface-variant/80 ml-1">{{ getRegistration(selectedLombaForDetail?.id)?.payment_notes }}</span>
+                    </div>
+                    <p class="text-[11px] mt-2">Silakan kirim ulang link bukti pembayaran yang valid.</p>
+                    <div class="mt-3 bg-white/60 rounded-xl p-3 border border-dashed border-slate-200/60 space-y-2.5">
+                      <div v-if="paymentUploadError" class="bg-accent-magenta/5 border border-accent-magenta/20 rounded-lg px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</div>
+                      <div v-if="paymentUploadSuccess" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-lg px-3 py-2 text-[11px] font-semibold text-on-surface">{{ paymentUploadSuccess }}</div>
+                      <div>
+                        <label class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider mb-1.5 block">Link Google Drive Bukti Bayar</label>
+                        <input v-model="paymentLink" placeholder="https://drive.google.com/file/d/..." class="w-full bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                      </div>
+                      <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+                        {{ uploadingPayment ? 'Mengirim...' : 'Kirim Ulang Bukti Bayar' }}
+                      </button>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Pending + Payment Verified (waiting for team verification) -->
+                <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified'">
+                  <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Pembayaran terverifikasi! Silakan undang anggota tim Anda pada tab Anggota Tim.</p>
+                </template>
+
+                <!-- Free competition (auto payment verified) -->
+                <template v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'pending' && selectedLombaForDetail?.fee && selectedLombaForDetail.fee.toLowerCase() === 'gratis'">
+                  <p class="text-[11px] opacity-80 mt-1 leading-relaxed">Lomba gratis — pendaftaran Anda sedang menunggu verifikasi admin.</p>
+                </template>
+
+                <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'verified'">
+                  Tim Anda telah diverifikasi! Kelola anggota tim di tab <strong>Anggota Tim</strong>.
+                </p>
+                <p class="text-[11px] opacity-80 mt-1 leading-relaxed" v-else-if="getRegistration(selectedLombaForDetail?.id)?.status === 'rejected'">
+                  Pendaftaran ditolak. Catatan: {{ getRegistration(selectedLombaForDetail?.id)?.notes || 'Tidak ada catatan.' }} Hubungi panitia untuk info lebih lanjut.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+              <router-link
+                :to="'/invoice/' + getRegistration(selectedLombaForDetail?.id)?.id"
+                target="_blank"
+                class="inline-flex items-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] px-5 py-3 rounded-xl text-xs font-bold transition-all shadow-sm"
+              >
+                <Printer class="w-4 h-4" /> Cetak Bukti Pendaftaran
+              </router-link>
+            </div>
           </div>
         </div>
 
@@ -895,7 +846,7 @@ onUnmounted(() => {
               </div>
               <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ invite.invitedUser?.email || invite.email }}</p>
             </div>
-            <button v-if="!isTeamLocked" @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
+            <button @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
               <UserMinus class="w-3.5 h-3.5" />
             </button>
           </div>
@@ -914,7 +865,7 @@ onUnmounted(() => {
               </p>
             </div>
             <div class="flex items-center gap-1">
-              <button v-if="!isTeamLocked" @click="handleCancelInvite(invite.id)" class="text-on-surface-variant/40 hover:text-accent-magenta transition-colors p-1" title="Batalkan undangan">
+              <button @click="handleCancelInvite(invite.id)" class="text-on-surface-variant/40 hover:text-accent-magenta transition-colors p-1" title="Batalkan undangan">
                 <X class="w-3.5 h-3.5" />
               </button>
             </div>
@@ -926,7 +877,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Add Member Form (when not locked) -->
-            <div v-if="!isTeamLocked && emptySlots > 0" class="border-t border-slate-200/60 pt-4">
+            <div v-if="emptySlots > 0" class="border-t border-slate-200/60 pt-4">
             <p class="text-xs font-bold text-on-surface mb-2">Undang Anggota Baru</p>
             <div v-if="inviteError && !inviteErrorFound" class="mb-2 bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ inviteError }}</div>
             <div v-if="inviteError && inviteErrorFound" class="mb-2 bg-[#FFF9E6] border border-amber-200/40 rounded-xl px-3 py-3 text-[11px]">
@@ -945,45 +896,13 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Lock Status & Actions -->
+          <!-- Slot status -->
           <div class="border-t border-slate-200/60 pt-4 mt-2">
-            <div v-if="isTeamLocked && isFull" class="flex items-center gap-2 text-xs">
-              <Lock class="w-4 h-4 text-on-surface-variant/40" />
-              <span class="text-on-surface-variant/70">Tim terkunci (semua slot terisi)</span>
-              <button v-if="!getRegistration(selectedLombaForDetail?.id)?.unlock_requested" @click="handleRequestChanges" class="ml-auto bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all shadow-sm">
-                Ajukan Buka Kunci
-              </button>
-              <span v-else class="ml-auto font-mono text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
-                Menunggu Persetujuan Admin
-              </span>
+            <div class="flex items-center gap-2 text-xs">
+              <Users class="w-4 h-4 text-on-surface-variant/40" />
+              <span v-if="emptySlots === 0" class="text-on-surface-variant/70">Semua slot terisi</span>
+              <span v-else class="text-on-surface-variant/70">{{ emptySlots }} slot tersedia</span>
             </div>
-            <div v-else-if="isTeamLocked && !isFull" class="flex items-center gap-2 text-xs">
-              <Lock class="w-4 h-4 text-on-surface-variant/40" />
-              <span class="text-on-surface-variant/70">Tim terkunci</span>
-              <button @click="handleRequestChanges" class="ml-auto bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all shadow-sm">
-                Ajukan Buka Kunci
-              </button>
-            </div>
-            <div v-else-if="!isTeamLocked && emptySlots === 0" class="flex items-center gap-2 text-xs">
-              <Unlock class="w-4 h-4 text-[#DCEEB1]" />
-              <span class="text-on-surface-variant/70">Tim terbuka — semua slot terisi, akan terkunci otomatis.</span>
-            </div>
-            <div v-else-if="autoLockRemaining > 0" class="flex items-center gap-2 text-xs">
-              <Unlock class="w-4 h-4 text-amber-500" />
-              <span class="text-on-surface-variant/70">Tim dibuka sementara — otomatis terkunci dalam </span>
-              <span class="font-mono font-bold text-accent-magenta">{{ Math.floor(autoLockRemaining / 60) }}:{{ String(autoLockRemaining % 60).padStart(2, '0') }}</span>
-            </div>
-            <div v-else class="flex items-center gap-2 text-xs">
-              <Unlock class="w-4 h-4 text-[#DCEEB1]" />
-              <span class="text-on-surface-variant/70">Tim terbuka — {{ emptySlots }} slot tersedia</span>
-            </div>
-          </div>
-
-          <!-- Kelola Tim (Link to full team management page) -->
-          <div class="border-t border-slate-200/60 pt-4 mt-2">
-            <button @click="goToTeamPage" class="w-full bg-white hover:bg-slate-50 text-on-surface border border-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
-              <Users class="w-4 h-4" /> Kelola Tim (Halaman Lengkap)
-            </button>
           </div>
         </div>
       </div>

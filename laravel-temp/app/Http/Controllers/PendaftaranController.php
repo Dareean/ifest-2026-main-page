@@ -25,22 +25,7 @@ class PendaftaranController extends Controller
             $q->where('invited_user_id', $user->id)->where('status', 'accepted');
         })->with('lomba', 'submission', 'user')->get();
 
-        $memberOfViaJson = Pendaftaran::where('status', 'verified')
-            ->whereNotNull('team_members')
-            ->with('lomba', 'submission', 'user')
-            ->get()
-            ->filter(function ($p) use ($user) {
-                $mList = $p->team_members ?: [];
-                foreach ($mList as $m) {
-                    if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'joined') {
-                        return true;
-                    }
-                }
-                return false;
-            })
-            ->values();
-
-        $all = $owned->merge($memberOfViaInvitation)->merge($memberOfViaJson)->unique('id')->sortByDesc('created_at')->values();
+        $all = $owned->merge($memberOfViaInvitation)->unique('id')->sortByDesc('created_at')->values();
 
         return response()->json(['data' => $all]);
     }
@@ -83,9 +68,6 @@ class PendaftaranController extends Controller
 
         $rules = [
             'team_name' => $isTeam ? 'required|string|max:255' : 'nullable|string|max:255',
-            'team_members' => 'nullable|array',
-            'team_members.*.name' => 'required_with:team_members|string|max:255',
-            'team_members.*.email' => 'required_with:team_members|email|max:255',
         ];
 
         $messages = $isTeam ? [
@@ -116,7 +98,6 @@ class PendaftaranController extends Controller
             'user_id' => $request->user()->id,
             'lomba_id' => $lomba->id,
             'team_name' => $teamName,
-            'team_members' => $request->team_members,
             'gelombang' => $gelombang,
             'payment_status' => strtolower(trim($lomba->fee)) === 'gratis' ? 'verified' : 'unpaid',
         ]);
@@ -142,21 +123,23 @@ class PendaftaranController extends Controller
             ->where('status', 'accepted')
             ->exists();
 
-        if (!$isMember) {
-            $mList = $pendaftaran->team_members ?: [];
-            foreach ($mList as $m) {
-                if (isset($m['email']) && strtolower($m['email']) === strtolower($user->email) && isset($m['status']) && $m['status'] === 'joined') {
-                    $isMember = true;
-                    break;
-                }
-            }
-        }
-
         if (!$isLeader && !$isMember) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json(['data' => $pendaftaran->load('lomba', 'submission', 'user')]);
+        $acceptedMembers = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('status', 'accepted')
+            ->with('invitedUser:id,name,email')
+            ->get()
+            ->map(fn ($inv) => [
+                'name' => $inv->invitedUser->name,
+                'email' => $inv->invitedUser->email,
+            ]);
+
+        return response()->json([
+            'data' => $pendaftaran->load('lomba', 'submission', 'user')
+                ->setAttribute('accepted_members', $acceptedMembers),
+        ]);
     }
 
     public function uploadPayment(Request $request, Pendaftaran $pendaftaran): JsonResponse
@@ -195,7 +178,7 @@ class PendaftaranController extends Controller
 
         // Notify admins
         try {
-            $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
+            $admins = User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
                 Notification::create([
                     'user_id' => $admin->id,

@@ -16,68 +16,16 @@ class TeamController extends Controller
         return $pendaftaran->user_id === $request->user()->id;
     }
 
-    private function applyAutoLock(Pendaftaran $pendaftaran): void
-    {
-        if (!$pendaftaran->team_locked && $pendaftaran->auto_lock_at && now()->greaterThanOrEqualTo($pendaftaran->auto_lock_at)) {
-            $pendaftaran->update([
-                'team_locked' => true,
-                'auto_lock_at' => null,
-            ]);
-        }
-    }
-
-    private function checkAndAutoLockIfFull(Pendaftaran $pendaftaran): void
-    {
-        if ($pendaftaran->team_locked) return;
-
-        $pendaftaran->load('lomba');
-        $maxMembers = $pendaftaran->lomba->getMaxMembers();
-        $acceptedCount = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
-            ->where('status', 'accepted')
-            ->count();
-
-        if (1 + $acceptedCount >= $maxMembers) {
-            $pendaftaran->update([
-                'team_locked' => true,
-                'auto_lock_at' => null,
-            ]);
-
-            // Notify admins that team is ready for verification
-            try {
-                $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
-                foreach ($admins as $admin) {
-                    Notification::create([
-                        'user_id' => $admin->id,
-                        'judul' => 'Tim Siap Diverifikasi',
-                        'pesan' => 'Tim "' . ($pendaftaran->team_name ?: 'Tim ' . $pendaftaran->user?->name) . '" telah mengisi semua kuota anggota dan siap untuk diverifikasi.',
-                    ]);
-                }
-            } catch (\Exception $e) {
-                // role column may not exist yet
-            }
-        }
-    }
-
     public function invite(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
         if (!$this->checkOwnership($request, $pendaftaran)) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $this->applyAutoLock($pendaftaran);
-
         $pendaftaran->load('lomba');
 
         if ($pendaftaran->status === 'rejected') {
             return response()->json(['message' => 'Pendaftaran telah ditolak'], 400);
-        }
-
-        if (!$pendaftaran->isFree() && $pendaftaran->payment_status !== 'verified') {
-            return response()->json(['message' => 'Pembayaran belum diverifikasi'], 400);
-        }
-
-        if ($pendaftaran->team_locked) {
-            return response()->json(['message' => 'Tim sedang terkunci. Ajukan permohonan perubahan terlebih dahulu'], 400);
         }
 
         $request->validate(['email' => 'required|email']);
@@ -202,8 +150,6 @@ class TeamController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $this->applyAutoLock($pendaftaran);
-
         $pendaftaran->load('lomba', 'user');
         $ketua = $pendaftaran->user;
         $accepted = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
@@ -236,9 +182,6 @@ class TeamController extends Controller
             ]),
             'max_members' => $maxMembers,
             'current_count' => 1 + $accepted->count(),
-            'team_locked' => $pendaftaran->team_locked,
-            'unlock_requested' => $pendaftaran->unlock_requested,
-            'auto_lock_at' => $pendaftaran->auto_lock_at,
             'status' => $pendaftaran->status,
         ]);
     }
@@ -269,9 +212,6 @@ class TeamController extends Controller
             'judul' => 'Undangan Diterima',
             'pesan' => $request->user()->name . ' telah menerima undangan bergabung ke tim.',
         ]);
-
-        // Auto-lock if team is now full
-        $this->checkAndAutoLockIfFull($invitation->pendaftaran);
 
         return response()->json(['message' => 'Berhasil bergabung ke tim', 'invitation' => $invitation]);
     }
@@ -327,39 +267,5 @@ class TeamController extends Controller
         return response()->json(['message' => $userName . ' berhasil dikeluarkan dari tim']);
     }
 
-    public function requestChanges(Request $request, Pendaftaran $pendaftaran): JsonResponse
-    {
-        if (!$this->checkOwnership($request, $pendaftaran)) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
 
-        if (!$pendaftaran->team_locked) {
-            return response()->json(['message' => 'Tim tidak dalam keadaan terkunci'], 400);
-        }
-
-        $pendaftaran->update(['unlock_requested' => true]);
-
-        // Notify requesting user
-        Notification::create([
-            'user_id' => $request->user()->id,
-            'judul' => 'Permohonan Buka Kunci Dikirim',
-            'pesan' => 'Permohonan buka kunci untuk tim "' . ($pendaftaran->team_name ?: 'Tim Anda') . '" telah dikirim ke admin. Kami akan mengirimkan notifikasi email setelah disetujui.',
-        ]);
-
-        // Notify admin users (skip if role column doesn't exist yet — admin panel pending)
-        try {
-            $admins = User::where('role', 'admin')->get();
-            foreach ($admins as $admin) {
-                Notification::create([
-                    'user_id' => $admin->id,
-                    'judul' => 'Permohonan Perubahan Tim',
-                    'pesan' => 'Tim "' . ($pendaftaran->team_name ?: $request->user()->name) . '" meminta untuk membuka perubahan anggota.',
-                ]);
-            }
-        } catch (\Exception $e) {
-            // admin role column not available yet
-        }
-
-        return response()->json(['message' => 'Permohonan perubahan dikirim ke admin']);
-    }
 }

@@ -4,7 +4,7 @@ import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
 import { useToast } from '../../../composables/useToast'
 import { useConfirm } from '../../../composables/useConfirm'
-import { Search, Shield, User, Crown, Trash2 } from 'lucide-vue-next'
+import { Search, Shield, User, Trash2 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 const toast = useToast()
@@ -99,7 +99,7 @@ onMounted(fetch)
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Role</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Pendaftaran</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Bergabung</th>
-              <th v-if="auth.isSuperAdmin" class="text-right font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Aksi</th>
+              <th class="text-right font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -108,15 +108,12 @@ onMounted(fetch)
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/70">{{ user.email }}</td>
               <td class="px-5 py-3.5">
                 <div v-if="auth.user?.id === user.id" class="inline-flex items-center gap-1">
-                  <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
-                    <Crown class="w-2.5 h-2.5" /> Super Admin (Anda)
-                  </span>
-                  <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
+                  <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
                     <Shield class="w-2.5 h-2.5" /> Admin (Anda)
                   </span>
                 </div>
 
-                <div v-else-if="auth.isSuperAdmin" class="inline-block relative">
+                <div v-else class="inline-block relative">
                   <select
                     :value="user.role"
                     @change="changeRole(user, $event.target.value)"
@@ -125,25 +122,13 @@ onMounted(fetch)
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
-                    <option value="super_admin">Super Admin</option>
                   </select>
                   <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
-                </div>
-                <div v-else class="inline-flex items-center gap-1">
-                  <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
-                    <Crown class="w-2.5 h-2.5" /> Super Admin
-                  </span>
-                  <span v-else-if="user.role === 'admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
-                    <Shield class="w-2.5 h-2.5" /> Admin
-                  </span>
-                  <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-on-surface-variant/50 bg-slate-100 px-2 py-0.5 rounded-full">
-                    <User class="w-2.5 h-2.5" /> User
-                  </span>
                 </div>
               </td>
               <td class="px-5 py-3.5 font-semibold text-on-surface">{{ user.pendaftarans_count }}</td>
               <td class="px-5 py-3.5 font-mono text-[10px] text-on-surface-variant/60">{{ new Date(user.created_at).toLocaleDateString('id-ID') }}</td>
-              <td v-if="auth.isSuperAdmin && auth.user?.id !== user.id" class="px-5 py-3.5 text-right">
+              <td v-if="auth.user?.id !== user.id" class="px-5 py-3.5 text-right">
                 <button @click="deleteUser(user)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors" title="Hapus akun">
                   <Trash2 class="w-3.5 h-3.5" />
                 </button>
@@ -159,14 +144,11 @@ onMounted(fetch)
           <div class="flex items-start justify-between gap-2 mb-2">
             <p class="font-bold text-sm text-on-surface leading-tight">{{ user.name }}</p>
             <div v-if="auth.user?.id === user.id">
-              <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
-                <Crown class="w-2.5 h-2.5" /> Anda
-              </span>
-              <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
                 <Shield class="w-2.5 h-2.5" /> Anda
               </span>
             </div>
-            <div v-else-if="auth.isSuperAdmin" class="flex items-center gap-1.5">
+            <div v-else class="flex items-center gap-1.5">
               <div class="inline-block relative">
                 <select
                   :value="user.role"
@@ -176,24 +158,12 @@ onMounted(fetch)
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
-                  <option value="super_admin">Super Admin</option>
                 </select>
                 <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>
               </div>
-              <button v-if="auth.user?.id !== user.id" @click="deleteUser(user)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Hapus akun">
+              <button @click="deleteUser(user)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Hapus akun">
                 <Trash2 class="w-3.5 h-3.5" />
               </button>
-            </div>
-            <div v-else>
-              <span v-if="user.role === 'super_admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-amber-200 px-2 py-0.5 rounded-full">
-                <Crown class="w-2.5 h-2.5" /> Super Admin
-              </span>
-              <span v-else-if="user.role === 'admin'" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded-full">
-                <Shield class="w-2.5 h-2.5" /> Admin
-              </span>
-              <span v-else class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase text-on-surface-variant/50 bg-slate-100 px-2 py-0.5 rounded-full">
-                <User class="w-2.5 h-2.5" /> User
-              </span>
             </div>
           </div>
           <div class="space-y-1 text-xs text-on-surface-variant/70">

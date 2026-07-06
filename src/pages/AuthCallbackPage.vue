@@ -36,7 +36,7 @@ onMounted(() => {
       return
     }
 
-    const isAdmin = userData.role === 'admin' || userData.role === 'super_admin'
+    const isAdmin = userData.role === 'admin'
     router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
   } catch {
     statusMsg.value = 'Terjadi kesalahan. Mengalihkan...'

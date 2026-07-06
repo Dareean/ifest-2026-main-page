@@ -17,17 +17,12 @@ const { goBack } = useBack()
 
 async function fetchInvoice() {
   try {
-    const res = await api.get('/pendaftarans')
-    const match = res.data.data.find(p => p.id === parseInt(route.params.id))
-    if (match) {
-      pendaftaran.value = match
-    } else {
-      showToast('Pendaftaran tidak ditemukan', 'error')
-      router.push('/dashboard/competitions')
-    }
+    const res = await api.get(`/pendaftarans/${route.params.id}`)
+    pendaftaran.value = res.data.data
   } catch (e) {
     console.error(e)
-    showToast('Gagal mengambil data kuitansi', 'error')
+    showToast('Pendaftaran tidak ditemukan', 'error')
+    router.push('/dashboard/competitions')
   } finally {
     loading.value = false
   }
@@ -102,11 +97,11 @@ onMounted(fetchInvoice)
           </div>
 
           <!-- Team Members -->
-          <div v-if="pendaftaran.team_members?.length" class="border-t border-slate-100 pt-4 print:border-slate-200">
+          <div v-if="pendaftaran.accepted_members?.length" class="border-t border-slate-100 pt-4 print:border-slate-200">
             <span class="text-[9px] font-bold uppercase text-slate-400 tracking-wider block mb-2">Anggota Tim</span>
             <div class="space-y-1">
               <div 
-                v-for="(member, idx) in pendaftaran.team_members" 
+                v-for="(member, idx) in pendaftaran.accepted_members" 
                 :key="idx" 
                 class="flex justify-between items-center bg-slate-50 border border-slate-100/50 rounded-lg px-3 py-1.5 text-[11px] print:bg-none print:border-none print:px-0 print:py-0.5"
               >

@@ -36,7 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pendaftarans/{pendaftaran}/team', [TeamController::class, 'myTeam']);
     Route::get('/pendaftarans/{pendaftaran}/invitations', [TeamController::class, 'byPendaftaran']);
     Route::delete('/pendaftarans/{pendaftaran}/members/{invitation}', [TeamController::class, 'removeMember']);
-    Route::post('/pendaftarans/{pendaftaran}/request-changes', [TeamController::class, 'requestChanges']);
 
     Route::post('/pendaftarans/{pendaftaran}/payment/upload', [PendaftaranController::class, 'uploadPayment']);
 
@@ -59,26 +58,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/google/disconnect', [AuthController::class, 'googleDisconnect']);
 });
 
-// Admin routes (admin biasa + super admin)
+// Admin routes
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
     Route::get('/pendaftarans', [AdminController::class, 'pendaftarans']);
     Route::get('/pendaftarans/export', [AdminController::class, 'exportPendaftarans']);
+    Route::put('/pendaftarans/batch/verify', [AdminController::class, 'batchVerify']);
+    Route::put('/pendaftarans/batch/reject', [AdminController::class, 'batchReject']);
     Route::get('/pendaftarans/{pendaftaran}', [AdminController::class, 'pendaftaranDetail']);
     Route::put('/pendaftarans/{pendaftaran}/verify', [AdminController::class, 'verify']);
     Route::put('/pendaftarans/{pendaftaran}/reject', [AdminController::class, 'reject']);
     Route::put('/pendaftarans/{pendaftaran}/verify-payment', [AdminController::class, 'verifyPayment']);
     Route::put('/pendaftarans/{pendaftaran}/reject-payment', [AdminController::class, 'rejectPayment']);
-    Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
     Route::get('/activity-logs', [AdminController::class, 'activityLogs']);
     Route::post('/notifications', [AdminController::class, 'broadcastNotification']);
     Route::get('/notifications', [AdminController::class, 'notifications']);
-
-    // Super admin only
-    Route::middleware('super_admin')->group(function () {
-        Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
-        Route::get('/super/admins', [AdminController::class, 'admins']);
-        Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
-    });
+    Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
+    Route::get('/super/admins', [AdminController::class, 'admins']);
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
 });

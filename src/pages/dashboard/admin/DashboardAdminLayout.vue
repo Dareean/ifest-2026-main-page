@@ -21,9 +21,7 @@ const navItems = computed(() => {
     { path: '/dashboard/admin/users', name: 'Pengguna', icon: Users },
     { path: '/dashboard/admin/notifications', name: 'Notifikasi', icon: Bell },
   ]
-  if (auth.isSuperAdmin) {
-    items.push({ path: '/dashboard/admin/manage', name: 'Manage Admin', icon: UserCog })
-  }
+  items.push({ path: '/dashboard/admin/manage', name: 'Manage Admin', icon: UserCog })
   return items
 })
 

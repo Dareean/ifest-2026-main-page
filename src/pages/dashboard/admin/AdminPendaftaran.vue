@@ -1,16 +1,74 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useConfirm } from '../../../composables/useConfirm'
+import { useToast } from '../../../composables/useToast'
 import api from '../../../utils/api'
-import { Search, Filter, Clock, CheckCircle, AlertTriangle, Download } from 'lucide-vue-next'
+import { Search, Filter, Clock, CheckCircle, AlertTriangle, Download, Check, X } from 'lucide-vue-next'
 
 const router = useRouter()
+const { showToast } = useToast()
+const confirmModal = useConfirm()
 const loading = ref(true)
 const data = ref(null)
 const statusFilter = ref('')
 const searchQuery = ref('')
 const lombas = ref([])
 const selectedLomba = ref('')
+
+// Bulk selection
+const selectedIds = ref([])
+const selectAll = ref(false)
+
+const allIds = computed(() => data.value?.data?.map(r => r.id) || [])
+
+function toggleSelectAll() {
+  if (selectedIds.value.length === allIds.value.length) {
+    selectedIds.value = []
+    selectAll.value = false
+  } else {
+    selectedIds.value = [...allIds.value]
+    selectAll.value = true
+  }
+}
+
+function toggleSelect(id) {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx > -1) {
+    selectedIds.value.splice(idx, 1)
+  } else {
+    selectedIds.value.push(id)
+  }
+  selectAll.value = selectedIds.value.length === allIds.value.length
+}
+
+async function batchVerify() {
+  if (!selectedIds.value.length) return
+  if (!await confirmModal.confirm(`Verifikasi ${selectedIds.value.length} pendaftaran?`, 'Verifikasi Massal')) return
+  try {
+    const res = await api.put('/admin/pendaftarans/batch/verify', { ids: selectedIds.value })
+    showToast(res.data.message, 'success')
+    selectedIds.value = []
+    selectAll.value = false
+    await fetch()
+  } catch (e) {
+    showToast(e.response?.data?.message || 'Gagal', 'error')
+  }
+}
+
+async function batchReject() {
+  if (!selectedIds.value.length) return
+  if (!await confirmModal.confirm(`Tolak ${selectedIds.value.length} pendaftaran?`, 'Tolak Massal')) return
+  try {
+    const res = await api.put('/admin/pendaftarans/batch/reject', { ids: selectedIds.value })
+    showToast(res.data.message, 'success')
+    selectedIds.value = []
+    selectAll.value = false
+    await fetch()
+  } catch (e) {
+    showToast(e.response?.data?.message || 'Gagal', 'error')
+  }
+}
 
 async function fetch() {
   loading.value = true
@@ -116,6 +174,19 @@ onMounted(() => {
       <div v-for="i in 5" :key="i" class="h-16 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
     </div>
 
+    <!-- Bulk Action Bar -->
+    <div v-if="selectedIds.length > 0" class="flex items-center gap-3 mb-4 bg-[#04000D] text-white rounded-2xl px-5 py-3 shadow-sm">
+      <span class="text-xs font-semibold">{{ selectedIds.length }} dipilih</span>
+      <div class="flex-1"></div>
+      <button @click="batchVerify" class="inline-flex items-center gap-1.5 bg-[#DCEEB1] hover:bg-[#DCEEB1]/80 text-on-surface px-4 py-2 rounded-xl text-xs font-bold transition-all">
+        <Check class="w-3.5 h-3.5" /> Verifikasi
+      </button>
+      <button @click="batchReject" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all">
+        <X class="w-3.5 h-3.5" /> Tolak
+      </button>
+      <button @click="selectedIds = []; selectAll = false" class="text-white/50 hover:text-white/80 transition-colors text-[10px] font-semibold">Batal</button>
+    </div>
+
     <!-- Empty -->
     <div v-else-if="!data?.data?.length" class="bg-white border border-[#04000D]/5 rounded-2xl p-12 text-center">
       <p class="text-sm text-on-surface-variant/60">Tidak ada pendaftaran</p>
@@ -127,6 +198,9 @@ onMounted(() => {
         <table class="w-full text-xs">
           <thead>
             <tr class="border-b border-slate-100 bg-slate-50/50">
+              <th class="w-10 px-4 py-3">
+                <input type="checkbox" :checked="selectAll" @change="toggleSelectAll" class="rounded border-slate-300 text-[#04000D] focus:ring-[#04000D]/30 cursor-pointer" />
+              </th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Tim</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Ketua</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Lomba</th>
@@ -138,6 +212,9 @@ onMounted(() => {
           </thead>
           <tbody>
             <tr v-for="reg in data.data" :key="reg.id" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors cursor-pointer" @click="goToDetail(reg.id)">
+              <td class="px-4 py-3.5" @click.stop>
+                <input type="checkbox" :checked="selectedIds.includes(reg.id)" @change="toggleSelect(reg.id)" class="rounded border-slate-300 text-[#04000D] focus:ring-[#04000D]/30 cursor-pointer" />
+              </td>
               <td class="px-5 py-3.5 font-bold text-on-surface">{{ reg.team_name || '-' }}</td>
               <td class="px-5 py-3.5">
                 <p class="font-semibold text-on-surface">{{ reg.user?.name }}</p>
@@ -170,8 +247,9 @@ onMounted(() => {
       <!-- Cards (mobile) -->
       <div class="md:hidden divide-y divide-slate-100">
         <div v-for="reg in data.data" :key="reg.id" @click="goToDetail(reg.id)" class="p-4 hover:bg-slate-50/50 transition-colors cursor-pointer active:bg-slate-100">
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <p class="font-bold text-sm text-on-surface leading-tight">{{ reg.team_name || '-' }}</p>
+          <div class="flex items-center gap-3 mb-2">
+            <input type="checkbox" :checked="selectedIds.includes(reg.id)" @change.stop="toggleSelect(reg.id)" class="rounded border-slate-300 text-[#04000D] focus:ring-[#04000D]/30 cursor-pointer flex-shrink-0" />
+            <p class="font-bold text-sm text-on-surface leading-tight flex-1 min-w-0">{{ reg.team_name || '-' }}</p>
             <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0" :class="statusConfig[reg.status]?.class || ''">
               <component :is="statusConfig[reg.status]?.icon" class="w-2.5 h-2.5" />
               {{ statusConfig[reg.status]?.label }}

@@ -9,7 +9,7 @@ const availableTabs = computed(() => {
   if (selectedLomba.value) {
     const reg = pendaftarans.value.find(p => p.lomba_id === selectedLomba.value.id)
     if (reg) {
-      if (reg.payment_status === 'verified' || reg.status === 'verified') {
+      if (reg) {
         tabs.push('anggota')
       }
       if (reg.status === 'verified') {

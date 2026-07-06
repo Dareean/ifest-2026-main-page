@@ -13,7 +13,6 @@ import DashboardOverview from './pages/dashboard/DashboardOverview.vue'
 import DashboardCompetitions from './pages/dashboard/DashboardCompetitions.vue'
 import DashboardNotifications from './pages/dashboard/DashboardNotifications.vue'
 import DashboardProfile from './pages/dashboard/DashboardProfile.vue'
-import DashboardTim from './pages/dashboard/DashboardTim.vue'
 import DashboardInvitations from './pages/dashboard/DashboardInvitations.vue'
 import DashboardHelp from './pages/dashboard/DashboardHelp.vue'
 
@@ -107,11 +106,6 @@ const routes = [
         component: DashboardProfile,
       },
       {
-        path: 'tim/:id',
-        name: 'DashboardTim',
-        component: DashboardTim,
-      },
-      {
         path: 'undangan',
         name: 'DashboardInvitations',
         component: DashboardInvitations,
@@ -158,7 +152,7 @@ const routes = [
         path: 'manage',
         name: 'AdminManage',
         component: AdminManage,
-        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true },
       },
     ],
   },
@@ -183,8 +177,7 @@ router.afterEach(() => {
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('auth_token')
   const user = JSON.parse(localStorage.getItem('auth_user') || 'null')
-  const isAdmin = user && (user.role === 'admin' || user.role === 'super_admin')
-const isSuperAdmin = user && user.role === 'super_admin'
+  const isAdmin = user && user.role === 'admin'
 
   if (to.meta.requiresAuth) {
     if (!token) {
@@ -194,10 +187,6 @@ const isSuperAdmin = user && user.role === 'super_admin'
     if (to.meta.requiresAdmin) {
       if (!isAdmin) {
         next({ name: 'Dashboard' })
-        return
-      }
-      if (to.meta.requiresSuperAdmin && !isSuperAdmin) {
-        next({ name: 'AdminDashboard' })
         return
       }
     } else {
