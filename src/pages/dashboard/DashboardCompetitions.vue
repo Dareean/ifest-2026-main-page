@@ -544,6 +544,29 @@ onUnmounted(() => {
             <BookOpen class="w-4 h-4" /> Download Petunjuk Teknis (Juknis)
           </a>
         </div>
+
+        <!-- CTA Daftar Sekarang -->
+        <div class="pt-5 border-t border-slate-100 mt-6">
+          <template v-if="!sudahTerdaftar(selectedLombaForDetail?.id)">
+            <button 
+              v-if="isLombaOpen(selectedLombaForDetail)" 
+              @click="activeTab = 'team'" 
+              class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-3.5 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+            >
+              <Plus class="w-4 h-4" /> Daftar Sekarang
+            </button>
+            <div v-else class="bg-slate-50 border border-slate-100 rounded-xl p-4 text-center">
+              <p class="text-xs font-semibold text-on-surface-variant/60">Pendaftaran belum dibuka</p>
+            </div>
+          </template>
+          <button 
+            v-else 
+            @click="activeTab = 'team'" 
+            class="w-full bg-[#DCEEB1] hover:bg-[#DCEEB1]/80 text-on-surface py-3 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+          >
+            <CheckCircle class="w-4 h-4" /> Lihat Status Pendaftaran
+          </button>
+        </div>
       </div>
 
       <!-- Tab Content: Timeline -->
@@ -581,6 +604,23 @@ onUnmounted(() => {
                 <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="getRegistration(selectedLombaForDetail?.id)?.gelombang === '1' ? 'bg-pink-100 text-pink-700 border border-pink-200' : 'bg-blue-100 text-blue-700 border border-blue-200'">
                   Gelombang {{ getRegistration(selectedLombaForDetail?.id)?.gelombang }}
                 </span>
+              </div>
+
+              <!-- Payment Accounts Info -->
+              <div v-if="selectedLombaForDetail?.payment_accounts?.length && getRegistration(selectedLombaForDetail?.id)?.payment_status !== 'verified'" class="mt-3 bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider block mb-2">Metode Pembayaran</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div v-for="(acct, i) in selectedLombaForDetail.payment_accounts" :key="i" class="bg-white rounded-xl p-3 border border-slate-100 flex items-center gap-3 shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-[#DCEEB1]/20 border border-[#DCEEB1]/30 flex items-center justify-center text-[8px] font-black uppercase flex-shrink-0 text-on-surface">
+                      {{ acct.bank?.slice(0, 3) || acct.ewallet?.slice(0, 3) || 'BR' }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-xs text-on-surface leading-tight">{{ acct.bank || acct.ewallet }}</p>
+                      <p class="font-mono text-[10px] font-bold text-on-surface mt-0.5 select-all">{{ acct.nomor }}</p>
+                      <p class="text-[10px] text-on-surface-variant/60 truncate">a.n. {{ acct.nama }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Pending + Unpaid (not free) → show upload payment -->
@@ -657,6 +697,12 @@ onUnmounted(() => {
           </div>
 
           <div class="flex flex-wrap gap-3 pt-4">
+            <button
+              @click="goToTeamPage"
+              class="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-on-surface border border-slate-200 px-5 py-3 rounded-xl text-xs font-bold transition-all shadow-sm"
+            >
+              <Users class="w-4 h-4" /> Kelola Tim
+            </button>
             <router-link
               :to="'/invoice/' + getRegistration(selectedLombaForDetail?.id)?.id"
               target="_blank"
@@ -899,6 +945,13 @@ onUnmounted(() => {
               <Unlock class="w-4 h-4 text-[#DCEEB1]" />
               <span class="text-on-surface-variant/70">Tim terbuka — {{ emptySlots }} slot tersedia</span>
             </div>
+          </div>
+
+          <!-- Kelola Tim (Link to full team management page) -->
+          <div class="border-t border-slate-200/60 pt-4 mt-2">
+            <button @click="goToTeamPage" class="w-full bg-white hover:bg-slate-50 text-on-surface border border-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+              <Users class="w-4 h-4" /> Kelola Tim (Halaman Lengkap)
+            </button>
           </div>
         </div>
       </div>

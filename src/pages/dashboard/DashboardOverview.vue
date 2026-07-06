@@ -227,6 +227,13 @@ onMounted(() => {
               <span class="text-[9px] font-bold uppercase text-on-surface-variant/40">Biaya</span>
               <span class="text-xs font-extrabold text-on-surface">{{ l.fee_gelombang_1 || l.fee }}</span>
             </div>
+            <button
+              v-if="!sudahTerdaftar(l.id)"
+              @click.stop="openCompetition(l)"
+              class="mt-3 w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2 rounded-lg text-[10px] font-bold transition-all shadow-sm"
+            >
+              Daftar Sekarang
+            </button>
           </div>
         </div>
       </div>

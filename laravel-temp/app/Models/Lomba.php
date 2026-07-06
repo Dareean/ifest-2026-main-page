@@ -13,6 +13,7 @@ class Lomba extends Model
         'guidebook_link', 'card_bg', 'accent_color', 'text_color', 'is_active',
         'gelombang_1_start', 'gelombang_1_end', 'gelombang_2_end',
         'fee_gelombang_1', 'fee_gelombang_2',
+        'payment_accounts',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class Lomba extends Model
             'gelombang_1_start' => 'date',
             'gelombang_1_end' => 'date',
             'gelombang_2_end' => 'date',
+            'payment_accounts' => 'array',
         ];
     }
 
