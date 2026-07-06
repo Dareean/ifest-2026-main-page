@@ -8,7 +8,7 @@ import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
   ArrowLeft, Users, Mail, UserMinus, Lock, Clock,
-  CheckCircle, AlertTriangle, X, ChevronRight
+  CheckCircle, AlertTriangle, X, ChevronRight, Copy
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -25,7 +25,18 @@ const inviteEmail = ref('')
 const inviting = ref(false)
 const inviteError = ref('')
 const inviteSuccess = ref('')
+const inviteErrorFound = ref(false)
+const inviteErrorEmail = ref('')
+const copied = ref(false)
 const actionLoading = ref(null)
+
+const registerLink = computed(() => `${window.location.origin}/register`)
+
+function copyRegisterLink() {
+  navigator.clipboard.writeText(registerLink.value)
+  copied.value = true
+  setTimeout(() => { copied.value = false }, 2000)
+}
 
 const pendaftaran = computed(() => team.value?.pendaftaran)
 const maxMembers = computed(() => team.value?.max_members || 1)
@@ -59,7 +70,15 @@ async function handleInvite() {
     inviteEmail.value = ''
     await fetchTeam()
   } catch (e) {
-    inviteError.value = e.response?.data?.message || 'Gagal mengirim undangan'
+    const data = e.response?.data
+    if (data && data.found === false) {
+      inviteError.value = data.message
+      inviteErrorFound.value = true
+      inviteErrorEmail.value = inviteEmail.value
+    } else {
+      inviteError.value = data?.message || 'Gagal mengirim undangan'
+      inviteErrorFound.value = false
+    }
   } finally {
     inviting.value = false
   }
@@ -257,6 +276,9 @@ onMounted(fetchTeam)
                 </div>
                 <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5 truncate" v-if="inv.name" :title="inv.email">{{ inv.email }} &middot; Menunggu konfirmasi</p>
                 <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5 truncate" v-else>Menunggu konfirmasi</p>
+                <p v-if="inv.expires_at" class="text-[10px] text-amber-600/70 mt-0.5">
+                  Berlaku sampai {{ new Date(inv.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) }}
+                </p>
               </div>
               <div class="flex items-center justify-between sm:justify-end gap-2 flex-shrink-0 border-t border-slate-200/30 sm:border-0 pt-2.5 sm:pt-0 mt-0.5 sm:mt-0 w-full sm:w-auto">
                 <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFF9E6] border border-amber-200 text-amber-600">Pending</span>
@@ -309,9 +331,18 @@ onMounted(fetchTeam)
                 {{ inviting ? 'Mengundang...' : 'Kirim' }}
               </button>
             </div>
-            <p v-if="inviteError" class="mt-3 text-[11px] font-semibold text-accent-magenta bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-2.5 flex items-center gap-2">
+            <div v-if="inviteError && !inviteErrorFound" class="mt-3 text-[11px] font-semibold text-accent-magenta bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-2.5 flex items-center gap-2">
               <AlertTriangle class="w-3.5 h-3.5 flex-shrink-0" /> {{ inviteError }}
-            </p>
+            </div>
+            <div v-if="inviteError && inviteErrorFound" class="mt-3 bg-[#FFF9E6] border border-amber-200/40 rounded-xl px-4 py-3 text-[11px]">
+              <p class="font-semibold text-amber-700 flex items-center gap-2">
+                <AlertTriangle class="w-3.5 h-3.5 flex-shrink-0" /> {{ inviteError }}
+              </p>
+              <p class="text-on-surface-variant/70 mt-1 leading-relaxed">Mintalah calon anggota untuk mendaftar akun terlebih dahulu, lalu undang kembali setelah mereka terdaftar.</p>
+              <button @click="copyRegisterLink" class="mt-2 inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all shadow-sm">
+                <Copy class="w-3 h-3" /> {{ copied ? 'Tersalin!' : 'Salin Link Pendaftaran' }}
+              </button>
+            </div>
             <p v-if="inviteSuccess" class="mt-3 text-[11px] font-semibold text-green-700 bg-[#DCEEB1]/10 border border-[#DCEEB1]/45 rounded-xl px-4 py-2.5 flex items-center gap-2">
               <CheckCircle class="w-3.5 h-3.5 flex-shrink-0" /> {{ inviteSuccess }}
             </p>

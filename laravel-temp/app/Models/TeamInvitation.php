@@ -12,7 +12,15 @@ class TeamInvitation extends Model
         'invited_by_user_id',
         'invited_user_id',
         'status',
+        'expires_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'expires_at' => 'datetime',
+        ];
+    }
 
     public function pendaftaran()
     {

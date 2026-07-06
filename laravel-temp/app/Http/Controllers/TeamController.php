@@ -107,8 +107,20 @@ class TeamController extends Controller
                 return response()->json(['message' => 'Anggota ini sudah bergabung'], 400);
             }
             // If rejected, allow re-invite by updating
-            $existing->update(['status' => 'pending', 'invited_user_id' => null]);
-            return $this->sendInviteResponse($existing, $pendaftaran, $request->user());
+            $invitedUser = User::where('email', $email)->first();
+            $existing->update(['status' => 'pending', 'invited_user_id' => $invitedUser?->id, 'expires_at' => now()->addDays(3)]);
+            if ($invitedUser) {
+                Notification::create([
+                    'user_id' => $invitedUser->id,
+                    'judul' => 'Undangan Tim',
+                    'pesan' => 'Kamu diundang bergabung ke tim "' . ($pendaftaran->team_name ?: 'Tim ' . $request->user()->name) . '" oleh ' . $request->user()->name . '. Klik untuk menerima atau menolak.',
+                ]);
+            }
+            return response()->json([
+                'message' => 'Undangan berhasil dikirim ke ' . $email,
+                'invitation' => $existing->load('invitedUser'),
+                'found' => true,
+            ], 201);
         }
 
         $invitedUser = User::where('email', $email)->first();
@@ -140,6 +152,7 @@ class TeamController extends Controller
             'invited_by_user_id' => $request->user()->id,
             'invited_user_id' => $invitedUser->id,
             'status' => 'pending',
+            'expires_at' => now()->addDays(3),
         ]);
 
         Notification::create([
@@ -159,6 +172,9 @@ class TeamController extends Controller
     {
         $invitations = TeamInvitation::where('email', $request->user()->email)
             ->where('status', 'pending')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
             ->with(['pendaftaran.lomba', 'invitedBy'])
             ->latest()
             ->get();
@@ -216,6 +232,7 @@ class TeamController extends Controller
                 'email' => $i->email,
                 'name' => $i->invitedUser?->name,
                 'created_at' => $i->created_at,
+                'expires_at' => $i->expires_at,
             ]),
             'max_members' => $maxMembers,
             'current_count' => 1 + $accepted->count(),
@@ -234,6 +251,11 @@ class TeamController extends Controller
 
         if ($invitation->status !== 'pending') {
             return response()->json(['message' => 'Undangan sudah tidak aktif'], 400);
+        }
+
+        if ($invitation->expires_at && now()->greaterThan($invitation->expires_at)) {
+            $invitation->update(['status' => 'rejected']);
+            return response()->json(['message' => 'Undangan sudah kedaluwarsa'], 400);
         }
 
         $invitation->update([
