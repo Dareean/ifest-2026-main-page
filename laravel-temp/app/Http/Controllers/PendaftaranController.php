@@ -40,6 +40,17 @@ class PendaftaranController extends Controller
             return response()->json(['message' => 'Kamu sudah terdaftar di lomba ini'], 409);
         }
 
+        // Check per kategori: 1 akun hanya boleh mendaftar 1 lomba per kategori
+        $kategori = explode('-', $lomba->kode)[0];
+        $existingKategori = Pendaftaran::where('user_id', $request->user()->id)
+            ->whereHas('lomba', function ($q) use ($kategori) {
+                $q->where('kode', 'like', $kategori . '-%');
+            })
+            ->exists();
+        if ($existingKategori) {
+            return response()->json(['message' => 'Kamu sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
+        }
+
         // Determine which gelombang we're in
         $now = now()->startOfDay();
         $gelombang = null;

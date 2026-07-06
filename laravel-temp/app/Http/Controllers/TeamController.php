@@ -85,13 +85,55 @@ class TeamController extends Controller
             return response()->json(['message' => 'Tidak bisa mengundang diri sendiri'], 400);
         }
 
-        // Check if user already has a pendaftaran for this lomba (already on another team)
-        $alreadyRegistered = Pendaftaran::where('user_id', $invitedUser->id)
+        // Check if user is already ketua of another team for this lomba
+        $alreadyKetua = Pendaftaran::where('user_id', $invitedUser->id)
             ->where('lomba_id', $pendaftaran->lomba_id)
-            ->where('status', 'verified')
             ->exists();
-        if ($alreadyRegistered) {
-            return response()->json(['message' => 'User sudah terdaftar di tim lain untuk lomba ini'], 400);
+        if ($alreadyKetua) {
+            return response()->json(['message' => 'User sudah mendaftar sebagai ketua tim lain untuk lomba ini'], 400);
+        }
+
+        // Check if user is already an accepted member of another team for this lomba
+        $alreadyMember = TeamInvitation::whereHas('pendaftaran', function ($q) use ($pendaftaran) {
+                $q->where('lomba_id', $pendaftaran->lomba_id);
+            })
+            ->where('invited_user_id', $invitedUser->id)
+            ->where('status', 'accepted')
+            ->exists();
+        if ($alreadyMember) {
+            return response()->json(['message' => 'User sudah menjadi anggota tim lain untuk lomba ini'], 400);
+        }
+
+        // Also block if user has a pending invitation for a different team in the same lomba
+        $alreadyInvited = TeamInvitation::whereHas('pendaftaran', function ($q) use ($pendaftaran) {
+                $q->where('lomba_id', $pendaftaran->lomba_id)->where('id', '!=', $pendaftaran->id);
+            })
+            ->where('invited_user_id', $invitedUser->id)
+            ->where('status', 'pending')
+            ->exists();
+        if ($alreadyInvited) {
+            return response()->json(['message' => 'User sudah memiliki undangan pending untuk tim lain di lomba ini'], 400);
+        }
+
+        // Check per kategori: user already in another competition of same category
+        $kategori = explode('-', $pendaftaran->lomba->kode)[0];
+        $sameKategori = Pendaftaran::where('user_id', $invitedUser->id)
+            ->whereHas('lomba', function ($q) use ($kategori, $pendaftaran) {
+                $q->where('kode', 'like', $kategori . '-%')->where('id', '!=', $pendaftaran->lomba_id);
+            })
+            ->exists();
+        if (!$sameKategori) {
+            $sameKategori = TeamInvitation::whereHas('pendaftaran', function ($q) use ($kategori, $pendaftaran) {
+                    $q->whereHas('lomba', function ($qq) use ($kategori) {
+                        $qq->where('kode', 'like', $kategori . '-%');
+                    })->where('id', '!=', $pendaftaran->id);
+                })
+                ->where('invited_user_id', $invitedUser->id)
+                ->where('status', 'accepted')
+                ->exists();
+        }
+        if ($sameKategori) {
+            return response()->json(['message' => 'User sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
         }
 
         $invitation = TeamInvitation::create([
@@ -199,6 +241,40 @@ class TeamController extends Controller
         if ($invitation->expires_at && now()->greaterThan($invitation->expires_at)) {
             $invitation->update(['status' => 'rejected']);
             return response()->json(['message' => 'Undangan sudah kedaluwarsa'], 400);
+        }
+
+        // Check if user already ketua of another team for this lomba
+        $user = $request->user();
+        $lombaId = $invitation->pendaftaran->lomba_id;
+        $alreadyKetua = Pendaftaran::where('user_id', $user->id)
+            ->where('lomba_id', $lombaId)
+            ->where('id', '!=', $invitation->pendaftaran_id)
+            ->exists();
+        if ($alreadyKetua) {
+            return response()->json(['message' => 'Kamu sudah mendaftar sebagai ketua tim lain untuk lomba ini'], 400);
+        }
+
+        // Check if user already accepted member of another team for this lomba
+        $alreadyMember = TeamInvitation::whereHas('pendaftaran', function ($q) use ($lombaId, $invitation) {
+                $q->where('lomba_id', $lombaId)->where('id', '!=', $invitation->pendaftaran_id);
+            })
+            ->where('invited_user_id', $user->id)
+            ->where('status', 'accepted')
+            ->exists();
+        if ($alreadyMember) {
+            return response()->json(['message' => 'Kamu sudah menjadi anggota tim lain untuk lomba ini'], 400);
+        }
+
+        // Check per kategori: user already in another competition of same category
+        $lomba = $invitation->pendaftaran->lomba;
+        $kategori = explode('-', $lomba->kode)[0];
+        $sameKategori = Pendaftaran::where('user_id', $user->id)
+            ->whereHas('lomba', function ($q) use ($kategori, $lombaId) {
+                $q->where('kode', 'like', $kategori . '-%')->where('id', '!=', $lombaId);
+            })
+            ->exists();
+        if ($sameKategori) {
+            return response()->json(['message' => 'Kamu sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
         }
 
         $invitation->update([
