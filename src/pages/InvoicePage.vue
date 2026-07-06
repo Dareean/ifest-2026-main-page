@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useConfirm } from '../composables/useConfirm'
 import { useToast } from '../composables/useToast'
+import { useBack } from '../composables/useBack'
 import api from '../utils/api'
 import { CheckCircle, Printer, ArrowLeft, Loader, Clock, AlertTriangle } from 'lucide-vue-next'
 
@@ -12,6 +13,7 @@ const pendaftaran = ref(null)
 const loading = ref(true)
 const confirmModal = useConfirm()
 const { showToast } = useToast()
+const { goBack } = useBack()
 
 async function fetchInvoice() {
   try {
@@ -51,7 +53,7 @@ onMounted(fetchInvoice)
       
       <!-- Back & Print Buttons (Hidden during print) -->
       <div class="flex items-center justify-between gap-4 mb-8 print:hidden">
-        <button @click="router.back()" class="inline-flex items-center gap-1.5 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors">
+        <button @click="goBack('/dashboard/competitions')" class="inline-flex items-center gap-1.5 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors">
           <ArrowLeft class="w-4 h-4" /> Kembali
         </button>
         <button @click="handlePrint" class="inline-flex items-center gap-1.5 bg-[#04000D] hover:bg-black text-[#DCEEB1] hover:text-[#DCEEB1]/90 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">

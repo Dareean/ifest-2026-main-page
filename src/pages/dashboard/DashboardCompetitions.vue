@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useConfirm } from '../../composables/useConfirm'
 import { useToast } from '../../composables/useToast'
+import { useBack } from '../../composables/useBack'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import { useCompetitionNav } from '../../composables/useCompetitionNav'
@@ -16,6 +17,7 @@ const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 const confirmModal = useConfirm()
+const { goBack } = useBack()
 const { showToast } = useToast()
 const { selectedLomba: selectedLombaForDetail, pendaftarans, activeTab, availableTabs } = useCompetitionNav()
 const loading = ref(true)
@@ -218,7 +220,7 @@ function openDetail(lomba) {
 
 function closeDetail() {
   selectedLombaForDetail.value = null
-  router.push('/dashboard')
+  goBack('/dashboard')
 }
 
 async function handleDaftar() {

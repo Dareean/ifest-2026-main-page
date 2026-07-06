@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useConfirm } from '../../composables/useConfirm'
 import { useToast } from '../../composables/useToast'
+import { useBack } from '../../composables/useBack'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
 import {
@@ -15,6 +16,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const confirmModal = useConfirm()
 const { showToast } = useToast()
+const { goBack } = useBack()
 
 const loading = ref(true)
 const error = ref('')
@@ -102,7 +104,7 @@ onMounted(fetchTeam)
   <div>
     <!-- Header -->
     <div class="flex items-start gap-3 mb-8">
-      <button @click="router.push('/dashboard/competitions')" class="mt-1 w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors flex items-center justify-center text-on-surface-variant shadow-sm flex-shrink-0">
+      <button @click="goBack('/dashboard/competitions')" class="mt-1 w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors flex items-center justify-center text-on-surface-variant shadow-sm flex-shrink-0">
         <ArrowLeft class="w-5 h-5" />
       </button>
       <div class="min-w-0 flex-1">
