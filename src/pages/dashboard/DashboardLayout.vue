@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
+import { useCompetitionNav } from '../../composables/useCompetitionNav'
 
 import {
   LayoutDashboard, Trophy, Bell, User, LogOut, Menu, X,
@@ -14,6 +15,7 @@ const apiBase = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || 'http://l
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
+const { selectedLomba, activeTab, availableTabs } = useCompetitionNav()
 const sidebarOpen = ref(false)
 const unreadNotifCount = ref(0)
 const unreadInvCount = ref(0)
@@ -106,22 +108,42 @@ onMounted(() => {
 
       <!-- Navigation -->
       <nav class="flex-1 px-3 pt-5 space-y-1">
-        <router-link
-          v-for="item in navItems"
-          :key="item.path"
-          :to="item.path"
-          @click="sidebarOpen = false"
-          class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-150"
-          :class="route.path === item.path
-            ? 'bg-[#04000D] text-[#DCEEB1] shadow-sm'
-            : 'text-on-surface-variant hover:bg-slate-50 hover:text-on-surface'"
-        >
-          <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
-          <span>{{ item.name }}</span>
-          <span v-if="item.name === 'Notifikasi' && unreadNotifCount > 0" class="ml-auto bg-accent-magenta text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadNotifCount }}</span>
-          <span v-if="item.name === 'Undangan' && unreadInvCount > 0" class="ml-auto bg-amber-500 text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadInvCount }}</span>
-          <ChevronRight v-if="route.path === item.path" class="w-3.5 h-3.5 ml-auto opacity-60" />
-        </router-link>
+        <div v-for="item in navItems" :key="item.path" class="space-y-1">
+          <router-link
+            :to="item.path"
+            @click="sidebarOpen = false"
+            class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-150"
+            :class="route.path === item.path
+              ? 'bg-[#04000D] text-[#DCEEB1] shadow-sm'
+              : 'text-on-surface-variant hover:bg-slate-50 hover:text-on-surface'"
+          >
+            <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
+            <span>{{ item.name }}</span>
+            <span v-if="item.name === 'Notifikasi' && unreadNotifCount > 0" class="ml-auto bg-accent-magenta text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadNotifCount }}</span>
+            <span v-if="item.name === 'Undangan' && unreadInvCount > 0" class="ml-auto bg-amber-500 text-white font-mono text-[9px] font-black px-1.5 py-0.5 rounded-full">{{ unreadInvCount }}</span>
+            <ChevronRight v-if="route.path === item.path" class="w-3.5 h-3.5 ml-auto opacity-60" />
+          </router-link>
+
+          <!-- Sub-navigation for Lomba when active & a competition is selected -->
+          <div v-if="item.name === 'Lomba' && route.path.startsWith('/dashboard/competitions') && selectedLomba" class="pl-7 pr-3 py-1.5 space-y-1 border-l border-slate-100 ml-6">
+            <button
+              v-for="tab in availableTabs"
+              :key="tab"
+              @click="activeTab = tab"
+              class="w-full text-left px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all"
+              :class="activeTab === tab
+                ? 'text-black bg-slate-100 font-extrabold'
+                : 'text-on-surface-variant/70 hover:text-on-surface hover:bg-slate-50/70'"
+            >
+              {{ 
+                tab === 'info' ? 'Detail & Juknis' :
+                tab === 'timeline' ? 'Timeline' :
+                tab === 'team' ? 'Pendaftaran' :
+                tab === 'anggota' ? 'Anggota Tim' : 'Pengumpulan Karya'
+              }}
+            </button>
+          </div>
+        </div>
       </nav>
 
       <!-- Bottom -->

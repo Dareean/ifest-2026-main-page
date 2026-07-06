@@ -5,6 +5,7 @@ import { useConfirm } from '../../composables/useConfirm'
 import { useToast } from '../../composables/useToast'
 import api from '../../utils/api'
 import { useAuthStore } from '../../stores/auth'
+import { useCompetitionNav } from '../../composables/useCompetitionNav'
 import {
   Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
   Send, X, Users, BookOpen, Calendar, ArrowLeft,
@@ -16,13 +17,9 @@ const router = useRouter()
 const route = useRoute()
 const confirmModal = useConfirm()
 const { showToast } = useToast()
-const pendaftarans = ref([])
+const { selectedLomba: selectedLombaForDetail, pendaftarans, activeTab, availableTabs } = useCompetitionNav()
 const loading = ref(true)
 const lombaList = ref([])
-
-// Tab navigation & detail view state
-const selectedLombaForDetail = ref(null)
-const activeTab = ref('info')
 
 // Forms state
 const daftarForm = ref({ team_name: '', team_members: [] })
@@ -89,21 +86,7 @@ const anggotaVisible = computed(() => {
   return !!reg && (reg.payment_status === 'verified' || reg.status === 'verified')
 })
 
-const availableTabs = computed(() => {
-  const tabs = ['info', 'timeline', 'team']
-  if (selectedLombaForDetail.value) {
-    const reg = getRegistration(selectedLombaForDetail.value.id)
-    if (reg) {
-      if (reg.payment_status === 'verified' || reg.status === 'verified') {
-        tabs.push('anggota')
-      }
-      if (reg.status === 'verified') {
-        tabs.push('submit')
-      }
-    }
-  }
-  return tabs
-})
+// availableTabs is now provided by useCompetitionNav
 
 const isLombaOpen = (lomba) => {
   if (!lomba) return false
@@ -431,17 +414,27 @@ onMounted(() => {
     loading.value = true
   }
 
-  fetchData().then(() => {
-    // Open competition from query param
-    if (route.query.id) {
-      const found = lombaList.value.find(l => l.id == route.query.id)
-      if (found) openDetail(found)
-    }
-  })
+  fetchData()
   timerId = setInterval(() => {
     now.value = new Date()
   }, 1000)
 })
+
+// Watch route.query.id and lombaList to open the competition automatically
+watch(
+  [() => route.query.id, lombaList],
+  ([newId, list]) => {
+    if (newId && list && list.length > 0) {
+      const found = list.find((l) => l.id == newId)
+      if (found) {
+        openDetail(found)
+        return
+      }
+    }
+    selectedLombaForDetail.value = null
+  },
+  { immediate: true }
+)
 
 watch(selectedLombaForDetail, (lomba) => {
   if (!lomba) return
@@ -500,32 +493,7 @@ onUnmounted(() => {
 
     <!-- View: Focused Detail View -->
     <div v-if="selectedLombaForDetail" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 md:p-8">
-      <!-- Tabs -->
-      <div class="flex border-b border-slate-100 overflow-x-auto gap-6 mb-8 scrollbar-none">
-        <button
-          v-for="tab in availableTabs"
-          :key="tab"
-          @click="activeTab = tab"
-          :disabled="tab === 'submit' && (!sudahTerdaftar(selectedLombaForDetail?.id) || getRegistration(selectedLombaForDetail?.id)?.status !== 'verified')"
-          class="py-3 px-1 border-b-2 font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap"
-          :class="[
-            activeTab === tab 
-              ? 'border-black text-on-surface' 
-              : 'border-transparent text-on-surface-variant/60 hover:text-on-surface',
-            tab === 'submit' && (!sudahTerdaftar(selectedLombaForDetail?.id) || getRegistration(selectedLombaForDetail?.id)?.status !== 'verified')
-              ? 'opacity-40 cursor-not-allowed'
-              : '',
-            tab === 'anggota' && !anggotaVisible ? 'hidden' : ''
-          ]"
-        >
-          {{ 
-            tab === 'info' ? 'Detail & Juknis' :
-            tab === 'timeline' ? 'Timeline' :
-            tab === 'team' ? 'Pendaftaran' :
-            tab === 'anggota' ? 'Anggota Tim' : 'Pengumpulan Karya'
-          }}
-        </button>
-      </div>
+      <!-- Tabs are now managed via the sidebar layout -->
 
       <!-- Tab Content: Info & Juknis -->
       <div v-if="activeTab === 'info'" class="space-y-6">

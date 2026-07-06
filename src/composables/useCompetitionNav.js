@@ -1,0 +1,30 @@
+import { ref, computed } from 'vue'
+
+const selectedLomba = ref(null)
+const pendaftarans = ref([])
+const activeTab = ref('info')
+
+const availableTabs = computed(() => {
+  const tabs = ['info', 'timeline', 'team']
+  if (selectedLomba.value) {
+    const reg = pendaftarans.value.find(p => p.lomba_id === selectedLomba.value.id)
+    if (reg) {
+      if (reg.payment_status === 'verified' || reg.status === 'verified') {
+        tabs.push('anggota')
+      }
+      if (reg.status === 'verified') {
+        tabs.push('submit')
+      }
+    }
+  }
+  return tabs
+})
+
+export function useCompetitionNav() {
+  return {
+    selectedLomba,
+    pendaftarans,
+    activeTab,
+    availableTabs
+  }
+}
