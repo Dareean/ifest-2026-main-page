@@ -68,6 +68,11 @@ const emptySlots = computed(() => {
   return Math.max(0, max - 1 - accepted)
 })
 
+const isLeader = computed(() => {
+  const reg = getRegistration(selectedLombaForDetail.value?.id)
+  return reg && reg.user_id === auth.user?.id
+})
+
 const getMaxMembers = (req) => {
   if (!req) return 3
   if (req.toLowerCase().includes('individu')) return 1
@@ -163,7 +168,8 @@ async function fetchTeamInvitations() {
     const res = await api.get(`/pendaftarans/${reg.id}/invitations`)
     teamInvitations.value = res.data.data
   } catch (e) {
-    console.error(e)
+    console.error('fetchTeamInvitations error:', e.response?.status, e.response?.data || e.message)
+    teamInvitations.value = []
   }
 }
 
@@ -411,6 +417,13 @@ watch(selectedLombaForDetail, (lomba) => {
   if (!lomba) return
   const reg = getRegistration(lomba.id)
   if (reg) {
+    fetchTeamInvitations()
+  }
+})
+
+// Re-fetch team invitations when switching to anggota tab
+watch(activeTab, (tab) => {
+  if (tab === 'anggota') {
     fetchTeamInvitations()
   }
 })
@@ -813,16 +826,18 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Tab Content: Anggota Tim (Only verified) -->
+      <!-- Tab Content: Anggota Tim -->
       <div v-if="activeTab === 'anggota'">
         <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 md:p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
             <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
               <Users class="w-4 h-4 text-accent-magenta" /> Anggota Tim
             </h4>
-            <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white border border-slate-200 text-on-surface-variant">
-              Max: {{ getMaxMembers(selectedLombaForDetail?.team_requirements) }} Orang
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="emptySlots === 0 ? 'bg-[#DCEEB1] text-on-surface border border-[#DCEEB1]' : 'bg-white border border-slate-200 text-on-surface-variant'">
+                {{ 1 + teamInvitations.filter(i => i.status === 'accepted').length }}/{{ getMaxMembers(selectedLombaForDetail?.team_requirements) }} Anggota
+              </span>
+            </div>
           </div>
 
           <!-- Ketua -->
@@ -846,7 +861,7 @@ onUnmounted(() => {
               </div>
               <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ invite.invitedUser?.email || invite.email }}</p>
             </div>
-            <button @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
+            <button v-if="isLeader" @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
               <UserMinus class="w-3.5 h-3.5" />
             </button>
           </div>
@@ -864,7 +879,7 @@ onUnmounted(() => {
                 Berlaku sampai {{ new Date(invite.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) }}
               </p>
             </div>
-            <div class="flex items-center gap-1">
+            <div v-if="isLeader" class="flex items-center gap-1">
               <button @click="handleCancelInvite(invite.id)" class="text-on-surface-variant/40 hover:text-accent-magenta transition-colors p-1" title="Batalkan undangan">
                 <X class="w-3.5 h-3.5" />
               </button>
@@ -873,11 +888,11 @@ onUnmounted(() => {
 
           <!-- Empty Slots -->
           <div v-for="slot in emptySlots" :key="'slot-' + slot" class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex items-center justify-center text-xs text-on-surface-variant/40">
-            <Users class="w-3.5 h-3.5 mr-2" /> Slot Anggota {{ slot }}
+            <Users class="w-3.5 h-3.5 mr-2" /> Slot {{ slot }} (kosong)
           </div>
 
-          <!-- Add Member Form (when not locked) -->
-            <div v-if="emptySlots > 0" class="border-t border-slate-200/60 pt-4">
+          <!-- Add Member Form (only for leader) -->
+            <div v-if="isLeader && emptySlots > 0" class="border-t border-slate-200/60 pt-4">
             <p class="text-xs font-bold text-on-surface mb-2">Undang Anggota Baru</p>
             <div v-if="inviteError && !inviteErrorFound" class="mb-2 bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ inviteError }}</div>
             <div v-if="inviteError && inviteErrorFound" class="mb-2 bg-[#FFF9E6] border border-amber-200/40 rounded-xl px-3 py-3 text-[11px]">

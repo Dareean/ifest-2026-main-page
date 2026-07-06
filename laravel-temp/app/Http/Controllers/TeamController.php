@@ -174,7 +174,14 @@ class TeamController extends Controller
 
     public function byPendaftaran(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
-        if (!$this->checkOwnership($request, $pendaftaran)) {
+        $user = $request->user();
+        $isKetua = $pendaftaran->user_id === $user->id;
+        $isMember = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+            ->where('invited_user_id', $user->id)
+            ->where('status', 'accepted')
+            ->exists();
+
+        if (!$isKetua && !$isMember) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
