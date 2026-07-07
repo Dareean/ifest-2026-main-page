@@ -36,7 +36,7 @@ class AdminController extends Controller
             'total_pendaftarans' => $totalPendaftarans,
             'by_status' => $byStatus,
             'by_lomba' => $byLomba,
-            'pending_unlock_requests' => 
+            'pending_unlock_requests' => 0,
             'recent_registrations' => $recentRegistrations,
         ];
 
