@@ -485,6 +485,12 @@ watch(() => route.query.id, (newId) => {
               <span class="bg-white border border-[#04000D] px-3 py-1">{{ activeCompetition.schedule }}</span>
             </div>
 
+            <!-- CONTACT PERSON -->
+            <div v-if="activeCompetition.contactPerson" class="mb-10 p-4 bg-[#04000D] text-white border-2 border-[#04000D] flex items-center gap-3 font-mono text-xs">
+              <span class="uppercase tracking-widest font-black text-[#FDE047]">CP:</span>
+              <span class="font-bold">{{ activeCompetition.contactPerson }}</span>
+            </div>
+
             <!-- CALL TO ACTIONS (DAFTAR SEKARANG) -->
             <div class="border-t-3 border-[#04000D] pt-8 flex flex-col sm:flex-row items-center gap-6 select-none">
               

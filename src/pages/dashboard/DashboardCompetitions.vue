@@ -523,6 +523,14 @@ onUnmounted(() => {
           </a>
         </div>
 
+        <!-- Contact Person -->
+        <div v-if="selectedLombaForDetail?.contact_person" class="pt-2">
+          <div class="inline-flex items-center gap-2 bg-[#04000D] text-white px-5 py-3 rounded-xl text-xs font-bold shadow-sm">
+            <span class="uppercase tracking-widest font-black text-[#FDE047]">CP:</span>
+            <span>{{ selectedLombaForDetail.contact_person }}</span>
+          </div>
+        </div>
+
         <!-- CTA Daftar Sekarang -->
         <div class="pt-5 border-t border-slate-100 mt-6">
           <template v-if="!sudahTerdaftar(selectedLombaForDetail?.id)">

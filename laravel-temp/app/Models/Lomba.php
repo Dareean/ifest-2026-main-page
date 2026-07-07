@@ -10,7 +10,7 @@ class Lomba extends Model
         'kode', 'title', 'scale', 'tagline', 'fee', 'target',
         'team_requirements', 'languages', 'babak', 'description',
         'long_description', 'rules', 'schedule', 'registration_link',
-        'guidebook_link', 'card_bg', 'accent_color', 'text_color', 'is_active',
+        'guidebook_link', 'contact_person', 'card_bg', 'accent_color', 'text_color', 'is_active',
         'gelombang_1_start', 'gelombang_1_end', 'gelombang_2_end',
         'fee_gelombang_1', 'fee_gelombang_2',
         'payment_accounts',
