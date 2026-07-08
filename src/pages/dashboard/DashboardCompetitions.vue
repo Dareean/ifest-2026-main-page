@@ -42,6 +42,7 @@ const inviteErrorFound = ref(false)
 const inviteErrorEmail = ref('')
 const copied = ref(false)
 const actionLoading = ref(null)
+const unlockRequesting = ref(false)
 
 const registerLink = computed(() => `${window.location.origin}/register`)
 
@@ -83,16 +84,6 @@ const getMaxMembers = (req) => {
   return 3
 }
 
-// Competition opening dates config
-const openDates = {
-  'NAT-01': new Date('2025-01-01T00:00:00'),
-  'NAT-02': new Date('2025-01-01T00:00:00'),
-  'NAT-03': new Date('2025-01-01T00:00:00'),
-  'REG-01': new Date('2025-01-01T00:00:00'),
-  'REG-02': new Date('2025-01-01T00:00:00'),
-  'REG-03': new Date('2025-01-01T00:00:00'),
-}
-
 const now = ref(new Date())
 let timerId = null
 
@@ -102,29 +93,30 @@ const anggotaVisible = computed(() => {
 
 // availableTabs is now provided by useCompetitionNav
 
-const isLombaOpen = (lomba) => {
-  if (!lomba) return false
-  const openDate = openDates[lomba.kode]
-  if (!openDate) return true
-  return now.value >= openDate
+const isLombaOpen = (l) => {
+  if (!l) return false
+  const now = new Date()
+  const g1s = l.gelombang_1_start ? new Date(l.gelombang_1_start) : null
+  const g1e = l.gelombang_1_end ? new Date(l.gelombang_1_end) : null
+  const g2s = l.gelombang_2_start ? new Date(l.gelombang_2_start) : null
+  const g2e = l.gelombang_2_end ? new Date(l.gelombang_2_end) : null
+  if (g1s && g1e && now >= g1s && now <= g1e) return true
+  if (g2s && g2e && now >= g2s && now <= g2e) return true
+  return false
 }
 
-const getLombaCountdownText = (lomba) => {
-  if (!lomba) return ''
-  const openDate = openDates[lomba.kode]
-  if (!openDate) return ''
-  const diff = openDate - now.value
-  if (diff <= 0) return ''
-  
+const getLombaCountdownText = (l) => {
+  if (!l) return ''
+  const now = new Date().getTime()
+  const g1s = l.gelombang_1_start ? new Date(l.gelombang_1_start).getTime() : null
+  const g2s = l.gelombang_2_start ? new Date(l.gelombang_2_start).getTime() : null
+  const target = g1s && now < g1s ? g1s : (g2s && now < g2s ? g2s : null)
+  if (!target) return ''
+  const diff = target - now
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  
-  if (days > 0) {
-    return `${days}d : ${hours}h`
-  }
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-  return `${hours}h : ${minutes}m : ${seconds}s`
+  if (days > 0) return `${days}h ${hours}j lagi`
+  return `${hours}j lagi`
 }
 
 const getRegistration = (lombaId) => {
@@ -227,7 +219,8 @@ function openDetail(lomba) {
       catatan: reg.submission?.catatan || ''
     }
   } else {
-        daftarForm.value = { team_name: '' }
+    daftarForm.value = { team_name: '' }
+    submitForm.value = { link_drive: '', catatan: '' }
   }
 }
 
@@ -268,7 +261,7 @@ async function handleSubmitKarya() {
   submitError.value = ''
   submittingSubmit.value = true
   try {
-    await api.post(`/lombas/${selectedLombaForDetail.value.id}/submit`, {
+    await api.post(`/pendaftarans/${reg.id}/submit`, {
       link_drive: submitForm.value.link_drive,
       catatan: submitForm.value.catatan || null,
     })
@@ -326,7 +319,22 @@ async function handleCancelInvite(invitationId) {
     await api.put(`/invitations/${invitationId}/reject`)
     fetchTeamInvitations()
   } catch (e) {
-    console.error(e)
+    showToast(e.response?.data?.message || 'Gagal membatalkan undangan', 'error')
+  }
+}
+
+async function handleRequestUnlock() {
+  const reg = getRegistration(selectedLombaForDetail.value?.id)
+  if (!reg) return
+  unlockRequesting.value = true
+  try {
+    await api.post(`/pendaftarans/${reg.id}/request-unlock`)
+    showToast('Permintaan buka kunci terkirim ke admin', 'success')
+    await fetchData()
+  } catch (e) {
+    showToast(e.response?.data?.message || 'Gagal mengirim permintaan', 'error')
+  } finally {
+    unlockRequesting.value = false
   }
 }
 
@@ -402,7 +410,7 @@ watch(
   [() => route.query.id, lombaList],
   ([newId, list]) => {
     if (newId && list && list.length > 0) {
-      const found = list.find((l) => l.id == newId)
+      const found = list.find((l) => l.id == newId || l.kode === newId)
       if (found) {
         openDetail(found)
         return
@@ -916,6 +924,29 @@ onUnmounted(() => {
               <button @click="handleInvite" :disabled="inviting || !inviteEmail" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1.5">
                 <Plus class="w-3.5 h-3.5" /> {{ inviting ? '...' : 'Undang' }}
               </button>
+            </div>
+          </div>
+
+          <!-- Lock status & unlock request -->
+          <div v-if="isLeader && getRegistration(selectedLombaForDetail?.id)?.team_locked" class="border-t border-slate-200/60 pt-4 mt-2">
+            <div class="bg-amber-50 border border-amber-200/50 rounded-xl p-4">
+              <div class="flex items-center justify-between gap-3">
+                <div class="min-w-0 text-xs">
+                  <p class="font-bold text-amber-800">Tim Terkunci</p>
+                  <p class="text-amber-700/80 mt-0.5 leading-relaxed">Tim Anda saat ini terkunci. Anda tidak dapat mengundang anggota baru atau mengubah komposisi tim.</p>
+                </div>
+                <button
+                  v-if="!getRegistration(selectedLombaForDetail?.id)?.unlock_requested"
+                  @click="handleRequestUnlock"
+                  :disabled="unlockRequesting"
+                  class="flex-shrink-0 bg-[#04000D] hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold transition-all shadow-sm disabled:opacity-40"
+                >
+                  {{ unlockRequesting ? 'Mengirim...' : 'Minta Buka Kunci' }}
+                </button>
+                <span v-else class="flex-shrink-0 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                  Permintaan Terkirim
+                </span>
+              </div>
             </div>
           </div>
 

@@ -54,6 +54,7 @@ onMounted(() => {
     router.push('/login')
   }
   if (!isAdminRoute.value) {
+    auth.fetchUser()
     fetchInvitationCount()
   }
 })

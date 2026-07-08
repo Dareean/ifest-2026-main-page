@@ -7,7 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
+        // Only PostgreSQL uses CHECK constraints — skip on MySQL/SQLite
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
+        }
 
         DB::table('users')
             ->where('role', 'super_admin')
@@ -16,6 +19,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('user', 'admin', 'super_admin'))");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('user', 'admin', 'super_admin'))");
+        }
     }
 };

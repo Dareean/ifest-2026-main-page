@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pendaftaran_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pendaftaran_id')->index()->constrained()->cascadeOnDelete();
             $table->string('link_drive')->nullable();
             $table->text('catatan')->nullable();
             $table->enum('status', ['draft', 'submitted', 'reviewed'])->default('draft');

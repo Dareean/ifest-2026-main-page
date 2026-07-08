@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import api from '../../utils/api'
-import { Trophy, CheckCircle, Clock, AlertTriangle, ChevronRight, Sparkles, Mail, Check, X, Users } from 'lucide-vue-next'
+import { Trophy, CheckCircle, Clock, AlertTriangle, ChevronRight, Sparkles, Mail, Check, X } from 'lucide-vue-next'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -12,23 +12,10 @@ const pendaftarans = ref([])
 const invitations = ref([])
 const loading = ref(true)
 const actionLoading = ref(null)
-const announcements = ref([])
-
 const statusConfig = {
   pending: { icon: Clock, label: 'Pending', class: 'bg-[#FFF9E6] text-on-surface border-amber-200' },
   verified: { icon: CheckCircle, label: 'Terverifikasi', class: 'bg-[#DCEEB1] text-on-surface border-[#DCEEB1]' },
   rejected: { icon: AlertTriangle, label: 'Ditolak', class: 'bg-[#FF3D8B]/10 text-accent-magenta border-accent-magenta/20' },
-}
-
-async function fetchAnnouncements() {
-  try {
-    const res = await fetch('/announcements.json')
-    if (res.ok) {
-      announcements.value = await res.json()
-    }
-  } catch (e) {
-    console.error('Gagal mengambil pengumuman:', e)
-  }
 }
 
 function getRegistration(lombaId) {
@@ -87,7 +74,6 @@ async function fetchData() {
 
 onMounted(() => {
   fetchData()
-  fetchAnnouncements()
 })
 </script>
 
@@ -128,17 +114,6 @@ onMounted(() => {
         <p class="font-mono text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Ditolak</p>
         <p class="text-2xl font-extrabold text-accent-magenta mt-1">{{ pendaftarans.filter(p => p.status === 'rejected').length }}</p>
         <p class="text-[10px] text-on-surface-variant/50 mt-0.5">Pendaftaran ditolak</p>
-      </div>
-    </div>
-
-    <!-- Announcement Banner -->
-    <div v-for="ann in announcements" :key="ann.id" class="mb-6 p-4 bg-[#FF3D8B]/5 border border-accent-magenta/15 rounded-2xl flex items-start gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.005)]">
-      <div class="w-8 h-8 rounded-lg bg-[#FF3D8B]/10 flex items-center justify-center flex-shrink-0">
-        <Sparkles class="w-4 h-4 text-accent-magenta animate-pulse" />
-      </div>
-      <div class="min-w-0 flex-1">
-        <span class="font-mono text-[9px] font-bold uppercase text-accent-magenta tracking-wider">Pengumuman Penting</span>
-        <p class="text-xs text-on-surface mt-0.5 leading-relaxed">{{ ann.text }}</p>
       </div>
     </div>
 

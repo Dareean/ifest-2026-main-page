@@ -2,16 +2,16 @@
 import { onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import api from '../utils/api'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 const statusMsg = ref('Memproses login Google...')
 
-onMounted(() => {
+onMounted(async () => {
   const token = route.query.token
   const error = route.query.error
-  const rawUser = route.query.user
 
   if (error) {
     statusMsg.value = 'Login Google gagal. Mengalihkan...'
@@ -19,25 +19,30 @@ onMounted(() => {
     return
   }
 
-  if (!token || !rawUser) {
+  if (!token) {
     statusMsg.value = 'Data tidak valid. Mengalihkan...'
     setTimeout(() => router.push('/login'), 1500)
     return
   }
 
   try {
-    const userData = JSON.parse(decodeURIComponent(rawUser))
-    auth.handleGoogleCallback(token, userData)
+    localStorage.setItem('auth_token', token)
+    auth.token = token
+
+    const res = await api.get('/auth/user')
+    const userData = res.data.user
+
+    auth.user = userData
+    localStorage.setItem('auth_user', JSON.stringify(userData))
+
     statusMsg.value = 'Berhasil! Mengalihkan...'
 
-    // Connect mode: redirect back to profile
     if (route.query.action === 'connect') {
       router.push('/dashboard/profile?google=connected')
       return
     }
 
-    const isAdmin = userData.role === 'admin'
-    router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
+    router.push(userData.role === 'admin' ? '/dashboard/admin' : '/dashboard')
   } catch {
     statusMsg.value = 'Terjadi kesalahan. Mengalihkan...'
     setTimeout(() => router.push('/login'), 1500)

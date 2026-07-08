@@ -7,7 +7,6 @@ export const useAdminStore = defineStore('admin', () => {
   const statsLoading = ref(false)
 
   async function fetchStats() {
-    if (stats.value) return stats.value
     statsLoading.value = true
     try {
       const res = await api.get('/admin/stats')

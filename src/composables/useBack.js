@@ -4,7 +4,7 @@ export function useBack() {
   const router = useRouter()
 
   function goBack(fallback = '/') {
-    if (window.history.length > 2) {
+    if (window.history.length > 1) {
       router.back()
     } else {
       router.push(fallback)

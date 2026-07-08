@@ -12,7 +12,7 @@ const props = defineProps({
   format: { type: Function, default: null }
 })
 
-const display = ref((0).toLocaleString() + props.suffix)
+const display = ref('')
 
 function easeOutQuad(t){ return t*(2-t) }
 

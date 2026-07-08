@@ -54,10 +54,11 @@ class ProfileController extends Controller
             Storage::delete($oldPath);
         }
 
-        // Simpan file baru ke storage/app/public/avatars
+        // Simpan file baru ke storage/app/public/avatars dengan nama hash
         $file = $request->file('avatar');
-        $path = $file->store('public/avatars');
-        $publicUrl = '/storage/' . str_replace('public/', '', $path);
+        $path = $file->hashName('public/avatars');
+        $file->storeAs('public/avatars', basename($path));
+        $publicUrl = '/storage/avatars/' . basename($path);
 
         $user->update(['avatar' => $publicUrl]);
 

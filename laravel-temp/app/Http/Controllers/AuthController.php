@@ -19,7 +19,7 @@ class AuthController extends Controller
 {
     private function frontendUrl(): string
     {
-        return env('FRONTEND_URL', 'http://localhost:5173');
+        return config('app.frontend_url', 'http://localhost:5173');
     }
 
     private function sendOtpEmail(string $email, string $name, string $otp, string $expiresAt): void
@@ -28,7 +28,7 @@ class AuthController extends Controller
             $html = view('emails.otp', compact('name', 'otp', 'expiresAt'))->render();
 
             Http::withHeaders([
-                'api-key' => env('BREVO_API_KEY'),
+                'api-key' => config('services.brevo.api_key'),
                 'Content-Type' => 'application/json',
             ])->post('https://api.brevo.com/v3/smtp/email', [
                 'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
@@ -94,7 +94,7 @@ class AuthController extends Controller
     public function sendOtp(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|exists:users,email',
+            'email' => 'required|string|email',
         ]);
 
         if ($validator->fails()) {
@@ -102,6 +102,9 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Jika email terdaftar, kode OTP telah dikirim']);
+        }
 
         if ($user->email_verified_at) {
             return response()->json(['message' => 'Email sudah diverifikasi'], 400);
@@ -208,7 +211,7 @@ class AuthController extends Controller
     public function forgotPassword(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|exists:users,email',
+            'email' => 'required|string|email',
         ]);
 
         if ($validator->fails()) {
@@ -220,10 +223,11 @@ class AuthController extends Controller
         );
 
         if ($status === Password::RESET_LINK_SENT) {
-            return response()->json(['message' => 'Link reset password telah dikirim ke email Anda']);
+            return response()->json(['message' => 'Link reset password telah dikirim ke email Anda jika email terdaftar']);
         }
 
-        return response()->json(['message' => 'Gagal mengirim link reset password'], 500);
+        // Always return same message to prevent user enumeration
+        return response()->json(['message' => 'Link reset password telah dikirim ke email Anda jika email terdaftar']);
     }
 
     public function resetPassword(Request $request): JsonResponse
@@ -269,13 +273,23 @@ class AuthController extends Controller
             return redirect($this->frontendUrl() . '/login?error=google_failed');
         }
 
-        // Detect connect mode via state parameter
+        // Detect connect mode via signed state parameter
         $state = $request->input('state');
         $connectUserId = null;
 
         if ($state) {
-            $data = json_decode(base64_decode($state), true);
-            $connectUserId = is_array($data) ? ($data['user_id'] ?? null) : null;
+            $signed = json_decode(base64_decode($state), true);
+            if (is_array($signed) && isset($signed['state'], $signed['hmac'])) {
+                $expectedHmac = hash_hmac('sha256', $signed['state'], config('app.key'));
+                if (hash_equals($expectedHmac, $signed['hmac'])) {
+                    $data = json_decode(base64_decode($signed['state']), true);
+                    if (is_array($data) && isset($data['user_id'], $data['exp'])) {
+                        if (now()->timestamp <= $data['exp']) {
+                            $connectUserId = $data['user_id'];
+                        }
+                    }
+                }
+            }
         }
 
         if ($connectUserId) {
@@ -309,18 +323,7 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth-token')->plainTextToken;
 
-            $userData = urlencode(json_encode([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'avatar' => $user->avatar,
-                'phone' => $user->phone,
-                'institution' => $user->institution,
-                'google_id' => $user->google_id,
-            ]));
-
-            return redirect($this->frontendUrl() . '/auth/callback?action=connect&token=' . $token . '&user=' . $userData);
+            return redirect($this->frontendUrl() . '/auth/callback?action=connect&token=' . $token);
         }
 
         // === LOGIN MODE: Normal Google login ===
@@ -358,18 +361,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        $userData = urlencode(json_encode([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role,
-            'avatar' => $user->avatar,
-            'phone' => $user->phone,
-            'institution' => $user->institution,
-            'google_id' => $user->google_id,
-        ]));
-
-        return redirect($this->frontendUrl() . '/auth/callback?token=' . $token . '&user=' . $userData);
+        return redirect($this->frontendUrl() . '/auth/callback?token=' . $token);
     }
 
     public function googleConnect(Request $request): JsonResponse
@@ -377,18 +369,24 @@ class AuthController extends Controller
         try {
             $user = $request->user();
 
-            $state = base64_encode(json_encode(['user_id' => $user->id]));
+            $payload = json_encode([
+                'user_id' => $user->id,
+                'exp' => now()->addMinutes(10)->timestamp,
+            ]);
+            $state = base64_encode($payload);
+            $hmac = hash_hmac('sha256', $payload, config('app.key'));
+            $signed = base64_encode(json_encode(['state' => $state, 'hmac' => $hmac]));
 
             $url = Socialite::driver('google')
                 ->stateless()
-                ->with(['state' => $state])
+                ->with(['state' => $signed])
                 ->redirect()
                 ->getTargetUrl();
 
             return response()->json(['url' => $url]);
         } catch (\Exception $e) {
             Log::error('googleConnect error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            return response()->json(['message' => 'Gagal menghubungkan Google: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal menghubungkan Google. Silakan coba lagi.'], 500);
         }
     }
 

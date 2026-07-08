@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('pendaftarans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('lomba_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->index()->constrained()->cascadeOnDelete();
+            $table->foreignId('lomba_id')->index()->constrained()->cascadeOnDelete();
             $table->string('team_name')->nullable();
             $table->json('team_members')->nullable();
             $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');

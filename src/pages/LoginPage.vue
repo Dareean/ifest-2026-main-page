@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-vue-next'
 import logoUntad from '../assets/logo_utama/logo_untad.webp'
@@ -8,6 +8,7 @@ import logoHmti from '../assets/logo_utama/HMTI LOGO.webp'
 import logoIfest from '../assets/logo_utama/Logo-IFEST-2026.webp'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
 
 const form = ref({ email: '', password: '' })
@@ -24,8 +25,11 @@ async function handleLogin() {
       router.push({ path: '/verifikasi-email', query: { email: res.email } })
       return
     }
-    const isAdmin = res?.user?.role === 'admin'
-    router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
+    let redirect = route.query.redirect
+    if (typeof redirect !== 'string' || !/^\/(?!\/)/.test(redirect)) {
+      redirect = res?.user?.role === 'admin' ? '/dashboard/admin' : '/dashboard'
+    }
+    router.push(redirect)
   } catch (e) {
     error.value = e.response?.data?.message || 'Email atau password salah'
   } finally {

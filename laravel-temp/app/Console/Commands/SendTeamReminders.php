@@ -74,7 +74,7 @@ class SendTeamReminders extends Command
 
     private function sendEmailReminder(Pendaftaran $pendaftaran, Lomba $lomba, int $remainingSlots, string $hariLabel): void
     {
-        $apiKey = env('BREVO_API_KEY');
+        $apiKey = config('services.brevo.api_key');
         if (!$apiKey) return;
 
         $user = $pendaftaran->user;

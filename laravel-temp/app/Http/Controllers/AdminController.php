@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -25,9 +26,20 @@ class AdminController extends Controller
         $byStatus = Pendaftaran::selectRaw("status, count(*) as total")
             ->groupBy('status')
             ->pluck('total', 'status');
-        $byLomba = \App\Models\Lomba::withCount('pendaftarans')
+        $byStatusCounts = Pendaftaran::selectRaw("lomba_id, status, count(*) as total")
+            ->groupBy('lomba_id', 'status')
             ->get()
-            ->map(fn($l) => ['lomba' => $l->kode . ' - ' . $l->title, 'total' => $l->pendaftarans_count]);
+            ->groupBy('lomba_id');
+        $byLomba = \App\Models\Lomba::withCount('pendaftarans')->get()->map(function ($l) use ($byStatusCounts) {
+            $stats = ($byStatusCounts[$l->id] ?? collect())->pluck('total', 'status');
+            return [
+                'lomba' => $l->kode . ' - ' . $l->title,
+                'total' => $l->pendaftarans_count,
+                'pending' => $stats['pending'] ?? 0,
+                'verified' => $stats['verified'] ?? 0,
+                'rejected' => $stats['rejected'] ?? 0,
+            ];
+        });
         $recentRegistrations = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title')
             ->latest()->take(5)->get();
 
@@ -36,32 +48,9 @@ class AdminController extends Controller
             'total_pendaftarans' => $totalPendaftarans,
             'by_status' => $byStatus,
             'by_lomba' => $byLomba,
-            'pending_unlock_requests' => 0,
+            'pending_unlock_requests' => Pendaftaran::where('unlock_requested', true)->count(),
             'recent_registrations' => $recentRegistrations,
         ];
-
-        return response()->json($data);
-    }
-
-    public function pendaftarans(Request $request): JsonResponse
-    {
-        $query = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title', 'submission:id,pendaftaran_id,link_drive');
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-        if ($request->filled('lomba_id')) {
-            $query->where('lomba_id', $request->lomba_id);
-        }
-        if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function ($q) use ($s) {
-                $q->where('team_name', 'ilike', "%$s%")
-                  ->orWhereHas('user', fn($u) => $u->where('name', 'ilike', "%$s%")->orWhere('email', 'ilike', "%$s%"));
-            });
-        }
-
-        $data = $query->latest()->paginate($request->per_page ?? 20);
 
         return response()->json($data);
     }
@@ -92,14 +81,16 @@ class AdminController extends Controller
             return response()->json(['message' => 'Tim belum mengisi semua kuota anggota. Isi slot terlebih dahulu sebelum verifikasi tim (' . (1 + $acceptedCount) . '/' . $maxMembers . ' terisi).'], 400);
         }
 
-        $pendaftaran->update(['status' => 'verified']);
+        $pendaftaran->update([
+            'status' => 'verified',
+            'team_locked' => true,
+        ]);
 
-        $notif = Notification::create([
+        Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Diverifikasi',
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Selamat mengikuti lomba!",
         ]);
-        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => request()->user()->id,
@@ -129,13 +120,11 @@ class AdminController extends Controller
             'notes' => $request->notes,
         ]);
 
-        $notif = Notification::create([
+        Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Ditolak',
             'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
         ]);
-
-        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => $request->user()->id,
@@ -161,12 +150,11 @@ class AdminController extends Controller
             'payment_verified_at' => now(),
         ]);
 
-        $notif = Notification::create([
+        Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pembayaran Diverifikasi',
             'pesan' => "Pembayaran untuk lomba {$pendaftaran->lomba->title} telah diverifikasi. Silakan undang anggota tim kamu untuk mengisi slot yang tersedia.",
         ]);
-        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => request()->user()->id,
@@ -206,14 +194,26 @@ class AdminController extends Controller
                     continue;
                 }
 
-                $p->update(['status' => 'verified']);
+                // Team must have filled all member slots
+                $maxMembers = $p->lomba->getMaxMembers();
+                $acceptedCount = TeamInvitation::where('pendaftaran_id', $p->id)
+                    ->where('status', 'accepted')
+                    ->count();
+                if (1 + $acceptedCount < $maxMembers) {
+                    $results['skipped']++;
+                    continue;
+                }
 
-                $notif = Notification::create([
+                $p->update([
+                    'status' => 'verified',
+                    'team_locked' => true,
+                ]);
+
+                Notification::create([
                     'user_id' => $p->user_id,
                     'judul' => 'Pendaftaran Diverifikasi',
                     'pesan' => "Pendaftaran untuk lomba {$p->lomba->title} telah diverifikasi. Selamat mengikuti lomba!",
                 ]);
-                $this->sendEmailBrevo($notif->fresh()->load('user'));
 
                 ActivityLog::create([
                     'admin_id' => $request->user()->id,
@@ -294,6 +294,66 @@ class AdminController extends Controller
         ]);
     }
 
+    public function approveUnlock(Pendaftaran $pendaftaran): JsonResponse
+    {
+        if (!$pendaftaran->unlock_requested) {
+            return response()->json(['message' => 'Tidak ada permintaan buka kunci'], 400);
+        }
+
+        $pendaftaran->update([
+            'team_locked' => false,
+            'unlock_requested' => false,
+        ]);
+
+        Notification::create([
+            'user_id' => $pendaftaran->user_id,
+            'judul' => 'Tim Dibuka Kembali',
+            'pesan' => "Tim untuk lomba {$pendaftaran->lomba->title} telah dibuka kembali oleh admin. Silakan kelola anggota tim Anda.",
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => request()->user()->id,
+            'action' => 'approve_unlock',
+            'target_type' => 'pendaftaran',
+            'target_id' => $pendaftaran->id,
+            'metadata' => ['lomba' => $pendaftaran->lomba->title, 'user' => $pendaftaran->user->name],
+        ]);
+
+        Cache::forget('admin_stats');
+
+        return response()->json(['message' => 'Tim berhasil dibuka kembali', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
+    }
+
+    public function pendaftarans(Request $request): JsonResponse
+    {
+        $query = Pendaftaran::with('user:id,name,email', 'lomba:id,kode,title', 'submission:id,pendaftaran_id,link_drive');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('lomba_id')) {
+            $query->where('lomba_id', $request->lomba_id);
+        }
+        if ($request->filled('gelombang')) {
+            $query->where('gelombang', $request->gelombang);
+        }
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('team_name', 'ilike', "%$s%")
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'ilike', "%$s%")->orWhere('email', 'ilike', "%$s%"));
+            });
+        }
+
+        $perPage = min((int)($request->per_page ?? 20), 100);
+        $data = $query->latest()->paginate($perPage);
+
+        return response()->json($data);
+    }
+
     public function rejectPayment(Request $request, Pendaftaran $pendaftaran): JsonResponse
     {
         if ($pendaftaran->payment_status !== 'pending') {
@@ -313,13 +373,11 @@ class AdminController extends Controller
             'payment_notes' => $request->payment_notes,
         ]);
 
-        $notif = Notification::create([
+        Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Bukti Pembayaran Ditolak',
             'pesan' => "Bukti pembayaran untuk lomba {$pendaftaran->lomba->title} ditolak. Alasan: {$request->payment_notes}. Silakan upload ulang bukti pembayaran yang valid.",
         ]);
-
-        $this->sendEmailBrevo($notif->fresh()->load('user'));
 
         ActivityLog::create([
             'admin_id' => $request->user()->id,
@@ -334,29 +392,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Bukti pembayaran ditolak', 'data' => $pendaftaran->fresh()->load('lomba', 'user')]);
     }
 
-    private function sendEmailBrevo(Notification $notif): void
-    {
-        if (!filter_var($notif->user->email, FILTER_VALIDATE_EMAIL)) return;
-
-        $apiKey = env('BREVO_API_KEY');
-        if (!$apiKey) return;
-
-        try {
-            $html = view('emails.notification', ['notification' => $notif])->render();
-            Http::timeout(10)->withHeaders([
-                'api-key' => $apiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.brevo.com/v3/smtp/email', [
-                'sender' => ['email' => config('mail.from.address', 'noreply@ifest2026.com'), 'name' => 'I-FEST 2026'],
-                'to' => [['email' => $notif->user->email]],
-                'subject' => 'I-FEST 2026: ' . $notif->judul,
-                'htmlContent' => $html,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Send Brevo email failed: ' . $e->getMessage(), ['to' => $notif->user->email]);
-        }
-    }
-
     public function users(Request $request): JsonResponse
     {
         $query = User::query();
@@ -369,7 +404,8 @@ class AdminController extends Controller
             });
         }
 
-        $data = $query->withCount('pendaftarans')->latest()->paginate($request->per_page ?? 20);
+        $perPage = min((int)($request->per_page ?? 20), 100);
+        $data = $query->withCount('pendaftarans')->latest()->paginate($perPage);
         return response()->json($data);
     }
 
@@ -403,7 +439,7 @@ class AdminController extends Controller
         }
 
         $judul = $request->judul;
-        $apiKey = env('BREVO_API_KEY');
+        $apiKey = config('services.brevo.api_key');
         foreach ($emails as $item) {
             $notif = Notification::find($item['notif_id']);
             if (!$notif) continue;
@@ -486,6 +522,12 @@ class AdminController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        if ($request->filled('gelombang')) {
+            $query->where('gelombang', $request->gelombang);
+        }
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
         if ($request->filled('lomba_id')) {
             $query->where('lomba_id', $request->lomba_id);
         }
@@ -500,7 +542,7 @@ class AdminController extends Controller
         $callback = function () use ($pendaftarans) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
-            fputcsv($file, ['No', 'Nama Tim', 'Lomba', 'Ketua', 'Email Ketua', 'Status', 'Link Karya', 'Tanggal Daftar']);
+            fputcsv($file, ['No', 'Nama Tim', 'Lomba', 'Ketua', 'Email Ketua', 'Gelombang', 'Status', 'Pembayaran', 'Link Karya', 'Tanggal Daftar']);
 
             foreach ($pendaftarans as $i => $p) {
                 fputcsv($file, [
@@ -509,7 +551,9 @@ class AdminController extends Controller
                     $p->lomba->title,
                     $p->user->name,
                     $p->user->email,
+                    $p->gelombang,
                     $p->status,
+                    $p->payment_status,
                     $p->submission?->link_drive,
                     $p->created_at->format('Y-m-d H:i'),
                 ]);
@@ -529,13 +573,15 @@ class AdminController extends Controller
 
         $userName = $user->name;
 
-        // Delete related data
-        Pendaftaran::where('user_id', $user->id)->delete();
-        TeamInvitation::where('invited_by_user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
-        Notification::where('user_id', $user->id)->delete();
-        EmailVerification::where('email', $user->email)->delete();
-        Submission::whereHas('pendaftaran', fn($q) => $q->where('user_id', $user->id))->delete();
-        ActivityLog::where('admin_id', $user->id)->delete();
+        DB::transaction(function () use ($user) {
+            Pendaftaran::where('user_id', $user->id)->delete();
+            TeamInvitation::where('invited_by_user_id', $user->id)->orWhere('invited_user_id', $user->id)->delete();
+            Notification::where('user_id', $user->id)->delete();
+            EmailVerification::where('email', $user->email)->delete();
+            Submission::whereHas('pendaftaran', fn($q) => $q->where('user_id', $user->id))->delete();
+            ActivityLog::where('admin_id', $user->id)->delete();
+            $user->delete();
+        });
 
         ActivityLog::create([
             'admin_id' => $request->user()->id,
@@ -544,8 +590,6 @@ class AdminController extends Controller
             'target_id' => $user->id,
             'metadata' => ['name' => $userName, 'email' => $user->email],
         ]);
-
-        $user->delete();
 
         return response()->json(['message' => "Akun {$userName} berhasil dihapus"]);
     }

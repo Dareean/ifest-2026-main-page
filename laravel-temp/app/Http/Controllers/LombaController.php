@@ -16,6 +16,9 @@ class LombaController extends Controller
 
     public function show(Lomba $lomba): JsonResponse
     {
+        if (!$lomba->is_active) {
+            return response()->json(['message' => 'Lomba tidak ditemukan'], 404);
+        }
         return response()->json(['data' => $lomba]);
     }
 }

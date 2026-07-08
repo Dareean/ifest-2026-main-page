@@ -8,6 +8,7 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TeamController extends Controller
 {
@@ -20,6 +21,10 @@ class TeamController extends Controller
     {
         if (!$this->checkOwnership($request, $pendaftaran)) {
             return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($pendaftaran->team_locked) {
+            return response()->json(['message' => 'Tim sedang terkunci. Ajukan permintaan buka kunci melalui dashboard untuk mengundang anggota baru.'], 403);
         }
 
         $pendaftaran->load('lomba');
@@ -75,9 +80,9 @@ class TeamController extends Controller
 
         if (!$invitedUser) {
             return response()->json([
-                'message' => 'Email ' . $email . ' belum terdaftar di sistem',
+                'message' => 'Undangan berhasil dikirim ke ' . $email,
                 'found' => false,
-            ], 404);
+            ], 201);
         }
 
         // Check if invited user is the ketua themselves
@@ -165,7 +170,7 @@ class TeamController extends Controller
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
-            ->with(['pendaftaran.lomba', 'invitedBy'])
+            ->with(['pendaftaran.lomba', 'pendaftaran.user', 'invitedBy'])
             ->latest()
             ->get();
 
@@ -237,71 +242,92 @@ class TeamController extends Controller
 
     public function accept(Request $request, TeamInvitation $invitation): JsonResponse
     {
-        if ($invitation->email !== $request->user()->email) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+        return DB::transaction(function () use ($request, $invitation) {
+            if ($invitation->email !== $request->user()->email) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
 
-        if ($invitation->status !== 'pending') {
-            return response()->json(['message' => 'Undangan sudah tidak aktif'], 400);
-        }
+            if ($invitation->status !== 'pending') {
+                return response()->json(['message' => 'Undangan sudah tidak aktif'], 400);
+            }
 
-        if ($invitation->expires_at && now()->greaterThan($invitation->expires_at)) {
-            $invitation->update(['status' => 'rejected']);
-            return response()->json(['message' => 'Undangan sudah kedaluwarsa'], 400);
-        }
+            if ($invitation->expires_at && now()->greaterThan($invitation->expires_at)) {
+                $invitation->update(['status' => 'rejected']);
+                return response()->json(['message' => 'Undangan sudah kedaluwarsa'], 400);
+            }
 
-        // Check if user already ketua of another team for this lomba
-        $user = $request->user();
-        $lombaId = $invitation->pendaftaran->lomba_id;
-        $alreadyKetua = Pendaftaran::where('user_id', $user->id)
-            ->where('lomba_id', $lombaId)
-            ->where('id', '!=', $invitation->pendaftaran_id)
-            ->exists();
-        if ($alreadyKetua) {
-            return response()->json(['message' => 'Kamu sudah mendaftar sebagai ketua tim lain untuk lomba ini'], 400);
-        }
+            // Lock the pendaftaran row to prevent race conditions
+            $pendaftaran = Pendaftaran::lockForUpdate()->find($invitation->pendaftaran_id);
+            if (!$pendaftaran) {
+                return response()->json(['message' => 'Pendaftaran tidak ditemukan'], 404);
+            }
 
-        // Check if user already accepted member of another team for this lomba
-        $alreadyMember = TeamInvitation::whereHas('pendaftaran', function ($q) use ($lombaId, $invitation) {
-                $q->where('lomba_id', $lombaId)->where('id', '!=', $invitation->pendaftaran_id);
-            })
-            ->where('invited_user_id', $user->id)
-            ->where('status', 'accepted')
-            ->exists();
-        if ($alreadyMember) {
-            return response()->json(['message' => 'Kamu sudah menjadi anggota tim lain untuk lomba ini'], 400);
-        }
+            // Check team capacity within the lock
+            $maxMembers = $pendaftaran->lomba->getMaxMembers();
+            $acceptedCount = TeamInvitation::where('pendaftaran_id', $pendaftaran->id)
+                ->where('status', 'accepted')
+                ->count();
+            if (1 + $acceptedCount >= $maxMembers) {
+                return response()->json(['message' => 'Tim sudah penuh (maksimal ' . $maxMembers . ' anggota)'], 400);
+            }
 
-        // Check per kategori: user already in another competition of same category
-        $lomba = $invitation->pendaftaran->lomba;
-        $kategori = explode('-', $lomba->kode)[0];
-        $sameKategori = Pendaftaran::where('user_id', $user->id)
-            ->whereHas('lomba', function ($q) use ($kategori, $lombaId) {
-                $q->where('kode', 'like', $kategori . '-%')->where('id', '!=', $lombaId);
-            })
-            ->exists();
-        if ($sameKategori) {
-            return response()->json(['message' => 'Kamu sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
-        }
+            // Check if user already ketua of another team for this lomba
+            $user = $request->user();
+            $lombaId = $pendaftaran->lomba_id;
+            $alreadyKetua = Pendaftaran::where('user_id', $user->id)
+                ->where('lomba_id', $lombaId)
+                ->where('id', '!=', $pendaftaran->id)
+                ->exists();
+            if ($alreadyKetua) {
+                return response()->json(['message' => 'Kamu sudah mendaftar sebagai ketua tim lain untuk lomba ini'], 400);
+            }
 
-        $invitation->update([
-            'status' => 'accepted',
-            'invited_user_id' => $request->user()->id,
-        ]);
+            // Check if user already accepted member of another team for this lomba
+            $alreadyMember = TeamInvitation::whereHas('pendaftaran', function ($q) use ($lombaId, $pendaftaran) {
+                    $q->where('lomba_id', $lombaId)->where('id', '!=', $pendaftaran->id);
+                })
+                ->where('invited_user_id', $user->id)
+                ->where('status', 'accepted')
+                ->exists();
+            if ($alreadyMember) {
+                return response()->json(['message' => 'Kamu sudah menjadi anggota tim lain untuk lomba ini'], 400);
+            }
 
-        // Notify ketua
-        Notification::create([
-            'user_id' => $invitation->invited_by_user_id,
-            'judul' => 'Undangan Diterima',
-            'pesan' => $request->user()->name . ' telah menerima undangan bergabung ke tim.',
-        ]);
+            // Check per kategori: user already in another competition of same category
+            $lomba = $pendaftaran->lomba;
+            $kategori = explode('-', $lomba->kode)[0];
+            $sameKategori = Pendaftaran::where('user_id', $user->id)
+                ->whereHas('lomba', function ($q) use ($kategori, $lombaId) {
+                    $q->where('kode', 'like', $kategori . '-%')->where('id', '!=', $lombaId);
+                })
+                ->exists();
+            if ($sameKategori) {
+                return response()->json(['message' => 'Kamu sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
+            }
 
-        return response()->json(['message' => 'Berhasil bergabung ke tim', 'invitation' => $invitation]);
+            $invitation->update([
+                'status' => 'accepted',
+                'invited_user_id' => $user->id,
+            ]);
+
+            // Notify ketua
+            Notification::create([
+                'user_id' => $invitation->invited_by_user_id,
+                'judul' => 'Undangan Diterima',
+                'pesan' => $user->name . ' telah menerima undangan bergabung ke tim.',
+            ]);
+
+            return response()->json(['message' => 'Berhasil bergabung ke tim', 'invitation' => $invitation]);
+        });
     }
 
     public function reject(Request $request, TeamInvitation $invitation): JsonResponse
     {
-        if ($invitation->email !== $request->user()->email) {
+        $user = $request->user();
+        $isInvitee = $invitation->email === $user->email;
+        $isInviter = $invitation->invited_by_user_id === $user->id;
+
+        if (!$isInvitee && !$isInviter) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -311,12 +337,19 @@ class TeamController extends Controller
 
         $invitation->update(['status' => 'rejected']);
 
-        // Notify ketua
-        Notification::create([
-            'user_id' => $invitation->invited_by_user_id,
-            'judul' => 'Undangan Ditolak',
-            'pesan' => $request->user()->name . ' menolak undangan bergabung ke tim.',
-        ]);
+        if ($isInvitee) {
+            Notification::create([
+                'user_id' => $invitation->invited_by_user_id,
+                'judul' => 'Undangan Ditolak',
+                'pesan' => $user->name . ' menolak undangan bergabung ke tim.',
+            ]);
+        } else {
+            Notification::create([
+                'user_id' => $invitation->invited_user_id,
+                'judul' => 'Undangan Dibatalkan',
+                'pesan' => 'Undangan untuk bergabung ke tim telah dibatalkan oleh ketua tim.',
+            ]);
+        }
 
         return response()->json(['message' => 'Undangan ditolak']);
     }
@@ -325,6 +358,10 @@ class TeamController extends Controller
     {
         if (!$this->checkOwnership($request, $pendaftaran)) {
             return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($pendaftaran->team_locked) {
+            return response()->json(['message' => 'Tim sedang terkunci. Ajukan permintaan buka kunci melalui dashboard untuk mengeluarkan anggota.'], 403);
         }
 
         if ($invitation->pendaftaran_id !== $pendaftaran->id) {

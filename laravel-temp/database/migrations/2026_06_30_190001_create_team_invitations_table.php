@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('team_invitations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pendaftaran_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pendaftaran_id')->index()->constrained()->cascadeOnDelete();
             $table->string('email');
-            $table->foreignId('invited_by_user_id')->constrained('users');
-            $table->foreignId('invited_user_id')->nullable()->constrained('users');
+            $table->foreignId('invited_by_user_id')->index()->constrained('users');
+            $table->foreignId('invited_user_id')->nullable()->index()->constrained('users');
             $table->string('status')->default('pending');
             $table->timestamps();
 

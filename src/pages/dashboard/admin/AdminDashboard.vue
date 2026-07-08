@@ -145,11 +145,26 @@ onMounted(async () => {
 
       <!-- Per-lomba stats -->
       <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6">
-        <h3 class="font-extrabold text-sm text-on-surface mb-4">Per Lomba</h3>
+        <h3 class="font-extrabold text-sm text-on-surface mb-4 flex items-center gap-2">
+          <ClipboardList class="w-4 h-4 text-accent-magenta" /> Per Lomba
+        </h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <div v-for="item in admin.stats.by_lomba" :key="item.lomba" class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 text-xs">
-            <p class="font-bold text-on-surface truncate">{{ item.lomba }}</p>
-            <p class="font-mono text-[10px] text-on-surface-variant/60 mt-1">{{ item.total }} pendaftaran</p>
+            <div class="flex items-center justify-between mb-2">
+              <p class="font-bold text-on-surface truncate">{{ item.lomba }}</p>
+              <span class="font-mono text-[10px] font-bold text-on-surface-variant/60">{{ item.total }}</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FFF9E6] text-amber-600">
+                <Clock class="w-2.5 h-2.5" /> {{ item.pending || 0 }}
+              </span>
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#DCEEB1]/30 text-green-700">
+                <CheckCircle class="w-2.5 h-2.5" /> {{ item.verified || 0 }}
+              </span>
+              <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FF3D8B]/10 text-accent-magenta">
+                <AlertTriangle class="w-2.5 h-2.5" /> {{ item.rejected || 0 }}
+              </span>
+            </div>
           </div>
         </div>
       </div>

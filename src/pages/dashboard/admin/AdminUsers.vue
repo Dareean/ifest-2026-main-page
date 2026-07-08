@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import api from '../../../utils/api'
 import { useAuthStore } from '../../../stores/auth'
 import { useToast } from '../../../composables/useToast'
@@ -22,7 +22,7 @@ async function fetch() {
     const res = await api.get('/admin/users', { params })
     data.value = res.data
   } catch (e) {
-    console.error(e)
+    console.error('Gagal memuat pengguna:', e)
   } finally {
     loading.value = false
   }
@@ -65,6 +65,12 @@ async function changeRole(user, newRole) {
   }
 }
 
+let searchTimeout = null
+watch(searchQuery, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => fetch(), 400)
+})
+
 onMounted(fetch)
 </script>
 
@@ -79,7 +85,7 @@ onMounted(fetch)
     <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-5 mb-6">
       <div class="relative flex-1 max-w-md">
         <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-        <input v-model="searchQuery" @input="fetch" placeholder="Cari nama atau email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+        <input v-model="searchQuery" placeholder="Cari nama atau email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
       </div>
     </div>
 

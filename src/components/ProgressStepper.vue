@@ -15,7 +15,16 @@ const steps = computed(() => {
 
   if (!reg || !lomba) return s
 
-  const isTeam = (lomba.getMaxMembers?.() ?? 1) > 1
+  const getMaxMembers = (req) => {
+    if (!req) return 3
+    if (req.toLowerCase().includes('individu')) return 1
+    const matches = req.match(/(\d+)\s*-\s*(\d+)/)
+    if (matches) return parseInt(matches[2], 10)
+    const matchesSingle = req.match(/(\d+)/)
+    if (matchesSingle) return parseInt(matchesSingle[1], 10)
+    return 3
+  }
+  const isTeam = (getMaxMembers(lomba.team_requirements) ?? 1) > 1
   const isFree = lomba.fee && lomba.fee.toLowerCase() === 'gratis'
   const hasSubmission = !!reg.submission
   const paymentVerified = reg.payment_status === 'verified'
@@ -60,7 +69,7 @@ const steps = computed(() => {
 
   // 4. Anggota Tim (only for team)
   if (isTeam) {
-    const maxMembers = lomba.getMaxMembers?.() ?? 1
+    const maxMembers = getMaxMembers(lomba.team_requirements)
     const teamFull = 1 + props.teamAcceptedCount >= maxMembers
     let memberState = 'pending'
     if (teamFull) {

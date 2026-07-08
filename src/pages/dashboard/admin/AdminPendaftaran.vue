@@ -12,9 +12,12 @@ const confirmModal = useConfirm()
 const loading = ref(true)
 const data = ref(null)
 const statusFilter = ref('')
+const paymentFilter = ref('')
+const gelombangFilter = ref('')
 const searchQuery = ref('')
 const lombas = ref([])
 const selectedLomba = ref('')
+const currentPage = ref(1)
 
 // Bulk selection
 const selectedIds = ref([])
@@ -73,14 +76,17 @@ async function batchReject() {
 async function fetch() {
   loading.value = true
   try {
-    const params = { per_page: 50 }
+    const params = { per_page: 25, page: currentPage.value }
     if (statusFilter.value) params.status = statusFilter.value
+    if (paymentFilter.value) params.payment_status = paymentFilter.value
+    if (gelombangFilter.value) params.gelombang = gelombangFilter.value
     if (selectedLomba.value) params.lomba_id = selectedLomba.value
     if (searchQuery.value) params.search = searchQuery.value
     const res = await api.get('/admin/pendaftarans', { params })
     data.value = res.data
   } catch (e) {
-    console.error(e)
+    console.error('Gagal memuat daftar pendaftaran:', e)
+    showToast('Gagal memuat data pendaftaran', 'error')
   } finally {
     loading.value = false
   }
@@ -97,17 +103,21 @@ function goToDetail(id) {
   router.push(`/dashboard/admin/pendaftaran/${id}`)
 }
 
-function exportCsv() {
-  const token = localStorage.getItem('auth_token')
-  const params = new URLSearchParams()
-  if (statusFilter.value) params.set('status', statusFilter.value)
-  if (selectedLomba.value) params.set('lomba_id', selectedLomba.value)
+async function exportCsv() {
+  try {
+    const params = new URLSearchParams()
+    if (statusFilter.value) params.set('status', statusFilter.value)
+    if (paymentFilter.value) params.set('payment_status', paymentFilter.value)
+    if (gelombangFilter.value) params.set('gelombang', gelombangFilter.value)
+    if (selectedLomba.value) params.set('lomba_id', selectedLomba.value)
 
-  fetch(`${import.meta.env.VITE_API_URL || ''}/api/admin/pendaftarans/export?${params}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  .then(res => res.blob())
-  .then(blob => {
+    showToast('Mengunduh CSV...', 'info')
+
+    const res = await api.get(`/admin/pendaftarans/export?${params}`, {
+      responseType: 'blob'
+    })
+
+    const blob = res.data
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -116,9 +126,48 @@ function exportCsv() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  })
-  .catch(console.error)
+  } catch (e) {
+    showToast('Gagal mengunduh CSV', 'error')
+    console.error('Export CSV error:', e)
+  }
 }
+
+const lastPage = computed(() => data.value?.last_page || 1)
+
+const visiblePages = computed(() => {
+  const maxVisible = 5
+  const last = lastPage.value
+  let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+  let end = Math.min(last, start + maxVisible - 1)
+  if (end - start + 1 < maxVisible) {
+    start = Math.max(1, end - maxVisible + 1)
+  }
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+})
+
+function goToPage(page) {
+  currentPage.value = page
+  fetch()
+}
+
+let searchTimeout = null
+watch([statusFilter, paymentFilter, gelombangFilter, selectedLomba], () => {
+  currentPage.value = 1
+  fetch()
+})
+
+watch(searchQuery, () => {
+  currentPage.value = 1
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => fetch(), 400)
+})
+
+const gelombangConfig = {
+  1: { label: 'Gel. 1', class: 'bg-blue-50 text-blue-700 border-blue-200' },
+  2: { label: 'Gel. 2', class: 'bg-purple-50 text-purple-700 border-purple-200' },
+}
+
+const submissionExists = (reg) => reg.submission?.link_drive
 
 const statusConfig = {
   pending: { icon: Clock, label: 'Pending', class: 'bg-[#FFF9E6] text-amber-600 border-amber-200' },
@@ -148,15 +197,27 @@ onMounted(() => {
 
     <!-- Filters -->
     <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-4 sm:p-5 mb-6">
-      <div class="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-3">
-        <div class="relative col-span-2 sm:flex-1">
+      <div class="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-3 flex-wrap">
+        <div class="relative col-span-2 sm:flex-1 min-w-[200px]">
           <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-          <input v-model="searchQuery" @input="fetch" placeholder="Cari nama tim, peserta, email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+          <input v-model="searchQuery" placeholder="Cari nama tim, peserta, email..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
         </div>
+        <select v-model="gelombangFilter" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 sm:px-4 text-xs font-semibold text-on-surface focus:outline-none">
+          <option value="">Semua Gelombang</option>
+          <option value="1">Gelombang 1</option>
+          <option value="2">Gelombang 2</option>
+        </select>
         <select v-model="statusFilter" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 sm:px-4 text-xs font-semibold text-on-surface focus:outline-none">
           <option value="">Semua Status</option>
           <option value="pending">Pending</option>
           <option value="verified">Terverifikasi</option>
+          <option value="rejected">Ditolak</option>
+        </select>
+        <select v-model="paymentFilter" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 sm:px-4 text-xs font-semibold text-on-surface focus:outline-none">
+          <option value="">Semua Pembayaran</option>
+          <option value="unpaid">Belum Bayar</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Lunas</option>
           <option value="rejected">Ditolak</option>
         </select>
         <select v-model="selectedLomba" @change="fetch" class="bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 sm:px-4 text-xs font-semibold text-on-surface focus:outline-none">
@@ -204,6 +265,8 @@ onMounted(() => {
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Tim</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Ketua</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Lomba</th>
+              <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Gel.</th>
+              <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Karya</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Pembayaran</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Status</th>
               <th class="text-left font-mono text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 px-5 py-3">Tanggal</th>
@@ -222,6 +285,17 @@ onMounted(() => {
               </td>
               <td class="px-5 py-3.5">
                 <span class="font-mono text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">{{ reg.lomba?.kode }}</span>
+              </td>
+              <td class="px-5 py-3.5">
+                <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" :class="gelombangConfig[reg.gelombang]?.class || ''">
+                  {{ gelombangConfig[reg.gelombang]?.label || reg.gelombang }}
+                </span>
+              </td>
+              <td class="px-5 py-3.5">
+                <span v-if="submissionExists(reg)" class="inline-flex items-center gap-1 font-mono text-[9px] font-bold text-green-600">
+                  <Check class="w-2.5 h-2.5" /> Ada
+                </span>
+                <span v-else class="font-mono text-[9px] text-slate-400">-</span>
               </td>
               <td class="px-5 py-3.5">
                 <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" :class="paymentStatusConfig[reg.payment_status]?.class || ''">
@@ -268,6 +342,20 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="data && lastPage > 1" class="flex items-center justify-between mt-6">
+      <span class="text-xs text-on-surface-variant/60">Hal. {{ data.current_page }} dari {{ lastPage }} ({{ data.total }} total)</span>
+      <div class="flex items-center gap-1">
+        <button @click="goToPage(1)" :disabled="currentPage === 1" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100" :class="currentPage === 1 ? 'text-slate-300' : 'text-on-surface'">&laquo;</button>
+        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100" :class="currentPage === 1 ? 'text-slate-300' : 'text-on-surface'">&lsaquo;</button>
+        <template v-for="p in visiblePages" :key="p">
+          <button @click="goToPage(p)" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all" :class="currentPage === p ? 'bg-[#04000D] text-white' : 'text-on-surface hover:bg-slate-100'">{{ p }}</button>
+        </template>
+        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === lastPage" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100" :class="currentPage === lastPage ? 'text-slate-300' : 'text-on-surface'">&rsaquo;</button>
+        <button @click="goToPage(lastPage)" :disabled="currentPage === lastPage" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100" :class="currentPage === lastPage ? 'text-slate-300' : 'text-on-surface'">&raquo;</button>
       </div>
     </div>
   </div>

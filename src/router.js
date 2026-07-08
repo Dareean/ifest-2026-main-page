@@ -176,12 +176,15 @@ router.afterEach(() => {
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('auth_token')
-  const user = JSON.parse(localStorage.getItem('auth_user') || 'null')
+  let user = null
+  try {
+    user = JSON.parse(localStorage.getItem('auth_user') || 'null')
+  } catch { user = null }
   const isAdmin = user && user.role === 'admin'
 
   if (to.meta.requiresAuth) {
     if (!token) {
-      next({ name: 'Login' })
+      next({ name: 'Login', query: { redirect: to.fullPath } })
       return
     }
     if (to.meta.requiresAdmin) {

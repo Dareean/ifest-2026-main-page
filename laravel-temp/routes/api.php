@@ -10,18 +10,21 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/send-otp', [AuthController::class, 'sendOtp']);
-Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
-Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+// Public routes with rate limiting
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,10');
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+Route::post('/auth/send-otp', [AuthController::class, 'sendOtp'])->middleware('throttle:3,10');
+Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp'])->middleware('throttle:10,1');
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,10');
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,10');
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 
 Route::get('/lombas', [LombaController::class, 'index']);
 Route::get('/lombas/{lomba}', [LombaController::class, 'show']);
+
+// AI chat proxy (protected to prevent abuse)
+Route::middleware('auth:sanctum')->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -36,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pendaftarans/{pendaftaran}/team', [TeamController::class, 'myTeam']);
     Route::get('/pendaftarans/{pendaftaran}/invitations', [TeamController::class, 'byPendaftaran']);
     Route::delete('/pendaftarans/{pendaftaran}/members/{invitation}', [TeamController::class, 'removeMember']);
+    Route::post('/pendaftarans/{pendaftaran}/request-unlock', [PendaftaranController::class, 'requestUnlock']);
 
     Route::post('/pendaftarans/{pendaftaran}/payment/upload', [PendaftaranController::class, 'uploadPayment']);
 
@@ -70,6 +74,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::put('/pendaftarans/{pendaftaran}/reject', [AdminController::class, 'reject']);
     Route::put('/pendaftarans/{pendaftaran}/verify-payment', [AdminController::class, 'verifyPayment']);
     Route::put('/pendaftarans/{pendaftaran}/reject-payment', [AdminController::class, 'rejectPayment']);
+    Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
     Route::get('/activity-logs', [AdminController::class, 'activityLogs']);
     Route::post('/notifications', [AdminController::class, 'broadcastNotification']);

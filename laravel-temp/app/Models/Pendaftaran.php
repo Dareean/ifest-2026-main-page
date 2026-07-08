@@ -9,7 +9,7 @@ class Pendaftaran extends Model
     protected $fillable = [
         'user_id', 'lomba_id', 'team_name', 'status', 'gelombang', 'notes',
         'payment_proof', 'payment_status', 'payment_verified_at', 'payment_notes',
-        'last_reminder_sent_at',
+        'last_reminder_sent_at', 'team_locked', 'unlock_requested',
     ];
 
     protected $appends = ['max_members'];
@@ -25,7 +25,9 @@ class Pendaftaran extends Model
     public function isFree(): bool
     {
         $fee = $this->lomba?->fee;
-        return $fee && strtolower(trim($fee)) === 'gratis';
+        if (!$fee) return false;
+        $normalized = strtolower(trim($fee));
+        return in_array($normalized, ['gratis', 'free', '0', 'rp 0', 'gratis (free)', 'no fee', 'n/a']);
     }
 
     public function getMaxMembersAttribute(): int

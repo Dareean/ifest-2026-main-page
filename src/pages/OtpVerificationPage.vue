@@ -28,8 +28,9 @@ async function handleVerify() {
   error.value = ''
   isSubmitting.value = true
   try {
-    await auth.verifyOtp(email.value, otp.value)
-    router.push('/dashboard')
+    const res = await auth.verifyOtp(email.value, otp.value)
+    const isAdmin = res.user?.role === 'admin'
+    router.push(isAdmin ? '/dashboard/admin' : '/dashboard')
   } catch (e) {
     error.value = e.response?.data?.message || 'Kode OTP salah'
   } finally {

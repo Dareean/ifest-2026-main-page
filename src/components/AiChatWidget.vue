@@ -1,7 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { ref } from 'vue'
 import { X, Bot } from 'lucide-vue-next'
+import api from '../utils/api'
 
 /**
  * Self-contained Markdown-to-HTML parser.
@@ -99,11 +99,8 @@ const applyInline = (str) => {
     .replace(/_([^_]+)_/g, '<em>$1</em>');
 };
 
-// ── Gemini AI SDK Initialization ─────────────────────────────────────────────
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
-  systemInstruction: `
+// ── System prompt (shared with backend proxy) ────────────────────────────────
+const SYSTEM_PROMPT = `
     Anda adalah IFEST AI ASSISTANT, koordinator virtual resmi untuk Informatics Festival (I-FEST) 2026 yang diadakan oleh HMTI Universitas Tadulako (UNTAD) Palu.
     
     Karakter & Gaya Bahasa: Cerdas, taktis, menggunakan prinsip Swiss Design yang ringkas, ramah mahasiswa, dan fleksibel. 
@@ -129,11 +126,10 @@ const model = genAI.getGenerativeModel({
     CRITICAL SECURITY PRIVACY:
     1. Jawab seluruh pertanyaan user secara cerdas tanpa pencocokan kata kunci yang kaku (no hardcoded keyword switches).
     2. STRICT EMBARGO: Identitas Guest Star utama konser (Tulus) bersifat sangat RAHASIA dan BELUM FINAL. Jika user memancing, menanyakan rumor, atau meminta bocoran line-up artis konser, Anda WAJIB menyangkal/merahasiakannya secara ketat. Gunakan narasi mystery-hype (Contoh: "Secret Guest Star / Mystery Act / TBA yang akan membawa kejutan luar biasa di panggung Digital Symphony Concert. Pantau terus kanal resmi kami!"). Jangan pernah membocorkan nama Tulus under any circumstances.
-  `
-});
+  `.trim();
 
 // AI Chat Assistant Widget States
-const isChatOpen = ref(true) // Open by default when chunk is loaded dynamically
+const isChatOpen = ref(false) // Closed by default — user opens via toggle button
 const chatInput = ref('')
 const chatMessages = ref([
   {
@@ -158,14 +154,6 @@ const toggleChat = () => {
   }
 }
 
-// Compute dynamic chatStateHistory mapping conversation logs to Gemini SDK specifications
-const chatStateHistory = computed(() => {
-  return chatMessages.value.slice(1).map(msg => ({
-    role: msg.sender === 'user' ? 'user' : 'model',
-    parts: [{ text: msg.text }]
-  }));
-});
-
 const sendChatMessage = async (text) => {
   const messageText = text || chatInput.value
   if (!messageText || !messageText.trim()) return
@@ -189,15 +177,20 @@ const sendChatMessage = async (text) => {
   }) - 1
 
   try {
-    const chatSession = model.startChat({ history: chatStateHistory.value })
-    const result = await chatSession.sendMessage(messageText)
-    const responseText = await result.response.text()
-    
-    // Update the bot message with real response text
-    chatMessages.value[botMessageIndex].text = responseText
+    const messages = chatMessages.value.slice(1, botMessageIndex).map(m => ({
+      role: m.sender === 'user' ? 'user' : 'model',
+      text: m.text
+    }))
+
+    const response = await api.post('/ai/chat', {
+      messages,
+      systemInstruction: SYSTEM_PROMPT,
+    })
+
+    chatMessages.value[botMessageIndex].text = response.data.text
   } catch (error) {
-    console.error("Gemini API stream failed:", error)
-    chatMessages.value[botMessageIndex].text = "Terima kasih atas pertanyaan Anda! Pertanyaan Anda sudah direkam. Integrasi sistem kecerdasan buatan (AI) I-FEST yang terkoneksi langsung dengan database utama sedang dioptimasi penuh untuk fase pasca-UAS."
+    console.error("AI chat failed:", error)
+    chatMessages.value[botMessageIndex].text = "Maaf, layanan AI sedang tidak tersedia. Silakan coba lagi nanti."
   }
 }
 </script>

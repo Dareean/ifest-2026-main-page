@@ -12,10 +12,18 @@ const getAsset = (assetModules, folder, fileName) => {
 
 const route = useRoute()
 const router = useRouter()
+const isLoggedIn = !!localStorage.getItem('auth_token')
+
+function handleDaftar() {
+  if (isLoggedIn) {
+    router.push(`/dashboard/competitions?id=${activeCompetition.value.id}`)
+  } else {
+    router.push(`/login?redirect=${encodeURIComponent('/dashboard/competitions?id=' + activeCompetition.value.id)}`)
+  }
+}
 
 const activeCompetition = ref(competitionsData[0])
 const isScrolled = ref(false)
-const returnSection = ref('')
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
@@ -49,7 +57,6 @@ const getShortName = (id) => {
 onMounted(() => {
   window.scrollTo(0, 0)
   window.addEventListener('scroll', handleScroll)
-  returnSection.value = window.history.state?.fromSection || ''
   
   // Initialize countdown
   calculateTimeLeft()
@@ -65,7 +72,7 @@ onMounted(() => {
 })
 
 // Countdown Lomba 11 Juli 2026
-const announcementTarget = new Date('2025-01-01T00:00:00+07:00').getTime()
+const announcementTarget = new Date('2026-07-09T00:00:00+08:00').getTime()
 const countdown = ref({
   days: 0,
   hours: 0,
@@ -139,7 +146,7 @@ watch(() => route.query.id, (newId) => {
           >
             <!-- Back button with Brutalist hover mechanics -->
             <router-link
-              :to="{ path: '/', state: { scrollToSection: returnSection } }"
+              :to="{ path: '/', state: { scrollToSection: '' } }"
               :class="[
                 'flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-[#04000D] transition-all duration-300 cursor-pointer',
                 isScrolled 
@@ -495,13 +502,13 @@ watch(() => route.query.id, (newId) => {
             <div class="border-t-3 border-[#04000D] pt-8 flex flex-col sm:flex-row items-center gap-6 select-none">
               
               <!-- DAFTAR SEKARANG Button -->
-              <a 
-                :href="activeCompetition.registrationLink"
-                class="riso-btn-plate flex-1 w-full bg-[#04000D] text-white py-4 rounded-full font-button text-xs text-center font-black select-none tracking-widest transition-transform hover:-translate-y-1 active:translate-y-0"
+              <button
+                @click="handleDaftar"
+                class="riso-btn-plate flex-1 w-full bg-[#04000D] text-white py-4 rounded-full font-button text-xs text-center font-black select-none tracking-widest transition-transform hover:-translate-y-1 active:translate-y-0 cursor-pointer"
                 :style="{ '--plate-color': activeCompetition.id === 'REG-03' ? '#FDE047' : activeCompetition.cardBg }"
               >
-                DAFTAR SEKARANG
-              </a>
+                {{ isLoggedIn ? 'DAFTAR via DASHBOARD' : 'DAFTAR SEKARANG' }}
+              </button>
               
               <!-- UNDUH JUKNIS Button -->
               <a 
