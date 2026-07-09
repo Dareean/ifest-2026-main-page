@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ifest-hmti-untad.vercel.app/sitemap.xml
