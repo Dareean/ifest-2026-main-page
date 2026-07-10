@@ -93,31 +93,10 @@ const anggotaVisible = computed(() => {
 
 // availableTabs is now provided by useCompetitionNav
 
-const isLombaOpen = (l) => {
-  if (!l) return false
-  const now = new Date()
-  const g1s = l.gelombang_1_start ? new Date(l.gelombang_1_start) : null
-  const g1e = l.gelombang_1_end ? new Date(l.gelombang_1_end) : null
-  const g2s = l.gelombang_2_start ? new Date(l.gelombang_2_start) : null
-  const g2e = l.gelombang_2_end ? new Date(l.gelombang_2_end) : null
-  if (g1s && g1e && now >= g1s && now <= g1e) return true
-  if (g2s && g2e && now >= g2s && now <= g2e) return true
-  return false
-}
+// SIMULASI: semua lomba terbuka
+const isLombaOpen = () => true
 
-const getLombaCountdownText = (l) => {
-  if (!l) return ''
-  const now = new Date().getTime()
-  const g1s = l.gelombang_1_start ? new Date(l.gelombang_1_start).getTime() : null
-  const g2s = l.gelombang_2_start ? new Date(l.gelombang_2_start).getTime() : null
-  const target = g1s && now < g1s ? g1s : (g2s && now < g2s ? g2s : null)
-  if (!target) return ''
-  const diff = target - now
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  if (days > 0) return `${days}h ${hours}j lagi`
-  return `${hours}j lagi`
-}
+const getLombaCountdownText = () => ''
 
 const getRegistration = (lombaId) => {
   if (!lombaId) return null

@@ -67,29 +67,8 @@ class PendaftaranController extends Controller
                 return response()->json(['message' => 'Kamu sudah menjadi anggota tim lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
             }
 
-            // Determine which gelombang we're in
-            $now = now()->startOfDay();
-            $gelombang = null;
-
-            if ($lomba->gelombang_1_start && $lomba->gelombang_1_end) {
-                $g1Start = $lomba->gelombang_1_start->startOfDay();
-                $g1End = $lomba->gelombang_1_end->startOfDay();
-
-                if ($now->greaterThanOrEqualTo($g1Start) && $now->lessThanOrEqualTo($g1End)) {
-                    $gelombang = '1';
-                } elseif ($lomba->gelombang_2_end) {
-                    $g2Start = $g1End->copy()->addDay();
-                    $g2End = $lomba->gelombang_2_end->startOfDay();
-
-                    if ($now->greaterThanOrEqualTo($g2Start) && $now->lessThanOrEqualTo($g2End)) {
-                        $gelombang = '2';
-                    }
-                }
-            }
-
-            if (!$gelombang) {
-                return response()->json(['message' => 'Pendaftaran untuk lomba ini belum dibuka atau sudah ditutup.'], 403);
-            }
+            // SIMULASI: bypass gelombang — semua lomba terbuka
+            $gelombang = '1';
 
             $isTeam = $lomba->getMaxMembers() > 1;
 
