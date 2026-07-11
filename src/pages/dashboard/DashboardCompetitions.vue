@@ -148,10 +148,17 @@ async function handleUploadPayment() {
   paymentUploadError.value = ''
   paymentUploadSuccess.value = ''
   try {
-    await api.post(`/pendaftarans/${reg.id}/payment/upload`, { payment_proof: paymentLink.value })
+    const res = await api.post(`/pendaftarans/${reg.id}/payment/upload`, { payment_proof: paymentLink.value })
     paymentUploadSuccess.value = 'Bukti pembayaran berhasil dikirim!'
     paymentLink.value = ''
-    await fetchData()
+    if (res.data.data) {
+      const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
+      if (idx !== -1) {
+        pendaftarans.value[idx] = res.data.data
+        localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
+      }
+    }
+    fetchData()
   } catch (e) {
     paymentUploadError.value = e.response?.data?.message || e.response?.data?.errors?.payment_proof?.[0] || 'Gagal mengirim link bukti bayar'
   } finally {
@@ -168,9 +175,13 @@ async function handleUploadSocial(type, invitationId = null) {
     if (!field.value[invitationId]) return
     memberSocialUploading.value[invitationId] = true
     try {
-      await api.post(`/invitations/${invitationId}/social-proof`, { type, proof_url: field.value[invitationId] })
+      const res = await api.post(`/invitations/${invitationId}/social-proof`, { type, proof_url: field.value[invitationId] })
       field.value[invitationId] = ''
-      await fetchTeamInvitations()
+      if (res.data.data) {
+        const idx = teamInvitations.value.findIndex(i => i.id === invitationId)
+        if (idx !== -1) teamInvitations.value[idx] = res.data.data
+      }
+      fetchTeamInvitations()
     } catch (e) {
       showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
     } finally {
@@ -181,9 +192,16 @@ async function handleUploadSocial(type, invitationId = null) {
     if (!field.value) return
     socialUploading.value = true
     try {
-      await api.post(`/pendaftarans/${reg.id}/social-proof`, { type, proof_url: field.value })
+      const res = await api.post(`/pendaftarans/${reg.id}/social-proof`, { type, proof_url: field.value })
       field.value = ''
-      await fetchData()
+      if (res.data.data) {
+        const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
+        if (idx !== -1) {
+          pendaftarans.value[idx] = res.data.data
+          localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
+        }
+      }
+      fetchData()
     } catch (e) {
       showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
     } finally {
@@ -270,13 +288,24 @@ async function handleSubmitKarya() {
   submitError.value = ''
   submittingSubmit.value = true
   try {
-    await api.post(`/pendaftarans/${reg.id}/submit`, {
+    const res = await api.post(`/pendaftarans/${reg.id}/submit`, {
       link_drive: submitForm.value.link_drive,
       catatan: submitForm.value.catatan || null,
     })
-    await fetchData()
-    // refresh detail state
-    openDetail(selectedLombaForDetail.value)
+    // Optimistic update: patch submission into local pendaftaran
+    if (res.data.data) {
+      const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
+      if (idx !== -1) {
+        pendaftarans.value[idx] = { ...pendaftarans.value[idx], submission: res.data.data }
+        localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
+      }
+    }
+    // Refresh local detail state
+    if (selectedLombaForDetail.value) {
+      const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
+      if (updated) openDetail(updated)
+    }
+    fetchData()
   } catch (e) {
     submitError.value = e.response?.data?.message || 'Gagal mengumpulkan karya'
   } finally {
@@ -295,18 +324,13 @@ async function handleInvite() {
     inviteSuccess.value = 'Undangan berhasil dikirim!'
     inviteEmail.value = ''
 
-    // Optimistic update — patch local state directly from API response, no full reload
-    const updatedPendaftaran = res.data.data
-    if (updatedPendaftaran) {
-      const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
-      if (idx !== -1) {
-        pendaftarans.value[idx] = updatedPendaftaran
-        localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
-      }
+    // Optimistic update: push new invitation to local state
+    if (res.data.invitation) {
+      teamInvitations.value.unshift(res.data.invitation)
     }
-    // Background refresh to ensure server truth without blocking UI
-    fetchData()
+    // Background refresh (non-blocking)
     fetchTeamInvitations()
+    fetchData()
   } catch (e) {
     inviteError.value = e.response?.data?.message || 'Gagal mengirim undangan'
   } finally {
@@ -432,13 +456,18 @@ watch(selectedLombaForDetail, (lomba) => {
 })
 
 // Re-fetch data when switching to relevant tabs
+// Re-fetch data when switching to relevant tabs (debounced)
+let tabSwitchTimeout = null
 watch(activeTab, (tab) => {
-  if (tab === 'anggota' || tab === 'validasi') {
-    fetchTeamInvitations()
-  }
-  if (tab === 'anggota') {
-    fetchData()
-  }
+  if (tabSwitchTimeout) clearTimeout(tabSwitchTimeout)
+  tabSwitchTimeout = setTimeout(() => {
+    if (tab === 'anggota' || tab === 'validasi') {
+      fetchTeamInvitations()
+    }
+    if (tab === 'anggota') {
+      fetchData()
+    }
+  }, 300)
 })
 
 onUnmounted(() => {

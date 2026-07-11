@@ -62,14 +62,14 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
 // Sensitive endpoints with stricter rate limits
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/pendaftarans/{pendaftaran}/invite', [TeamController::class, 'invite'])->middleware('throttle:10,1');
+    Route::post('/pendaftarans/{pendaftaran}/invite', [TeamController::class, 'invite'])->middleware('throttle:30,10');
     Route::post('/pendaftarans/{pendaftaran}/submit', [SubmissionController::class, 'store'])->middleware('throttle:5,1');
     Route::put('/password', [ProfileController::class, 'updatePassword'])->middleware('throttle:5,10');
     Route::post('/avatar', [ProfileController::class, 'uploadAvatar'])->middleware('throttle:5,10');
 });
 
 // Admin routes
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin', 'throttle:120,1'])->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
     Route::get('/pendaftarans', [AdminController::class, 'pendaftarans']);
     Route::get('/pendaftarans/export', [AdminController::class, 'exportPendaftarans']);

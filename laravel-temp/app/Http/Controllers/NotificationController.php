@@ -10,9 +10,10 @@ class NotificationController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $notifications = $request->user()->notifications()->latest()->get();
+        $perPage = min((int) $request->query('per_page', 50), 50);
+        $notifications = $request->user()->notifications()->latest()->paginate($perPage);
 
-        return response()->json(['data' => $notifications]);
+        return response()->json($notifications);
     }
 
     public function markAsRead(Request $request, Notification $notification): JsonResponse

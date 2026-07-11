@@ -33,39 +33,56 @@ const onLoaded = () => {
 const auth = useAuthStore()
 const toast = useToast()
 let pollInterval = null
+let authRefreshInterval = null
 
 function startNotificationPolling() {
   if (pollInterval) return
-  let lastUnreadCount = auth.user?.unread_notifications_count || 0
-  
+
+  // Store last seen highest notification ID to detect new ones
+  let lastMaxId = parseInt(localStorage.getItem('last_notif_id') || '0', 10)
+
   pollInterval = setInterval(async () => {
-    if (!auth.isAuthenticated) {
-      stopNotificationPolling()
+    if (!auth.isAuthenticated || document.hidden) {
+      if (!auth.isAuthenticated) stopNotificationPolling()
       return
     }
-    
+
     try {
-      const res = await api.get('/auth/user')
-      const newUser = res.data.user
-      const newCount = newUser.unread_notifications_count || 0
-      
-      if (newCount > lastUnreadCount) {
-        // Fetch new unread notification text
-        const notifRes = await api.get('/notifications')
-        const unreadNotifs = notifRes.data.data.filter(n => !n.is_read)
-        if (unreadNotifs.length > 0) {
-          const latestNotif = unreadNotifs[0]
-          toast.showToast(`${latestNotif.judul}: ${latestNotif.pesan}`, 'info')
+      // Lightweight: fetch only recent unread notifications, skip full /auth/user
+      const res = await api.get('/notifications?per_page=5')
+      const unread = res.data.data.filter(n => !n.is_read)
+
+      if (unread.length > 0) {
+        const maxId = Math.max(...unread.map(n => n.id))
+        if (maxId > lastMaxId) {
+          const latest = unread[0]
+          toast.showToast(`${latest.judul}: ${latest.pesan}`, 'info')
+          lastMaxId = maxId
+          localStorage.setItem('last_notif_id', String(maxId))
         }
       }
-      
-      auth.user = newUser
-      localStorage.setItem('auth_user', JSON.stringify(newUser))
-      lastUnreadCount = newCount
     } catch (e) {
-      console.error('Polling error:', e)
+      // Silent fail — polling errors should not flood console
     }
-  }, 8000) // Poll every 8 seconds
+  }, 30000) // Poll every 30 seconds instead of 8
+
+  // Refresh auth user every 5 minutes (background, fire-and-forget)
+  authRefreshInterval = setInterval(() => {
+    if (auth.isAuthenticated) {
+      auth.fetchUser().catch(() => {})
+    }
+  }, 300000)
+}
+
+function stopNotificationPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+  if (authRefreshInterval) {
+    clearInterval(authRefreshInterval)
+    authRefreshInterval = null
+  }
 }
 
 function stopNotificationPolling() {
