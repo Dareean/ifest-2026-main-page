@@ -9,10 +9,13 @@ const auth = useAuthStore()
 const statusMsg = ref('Memproses login Google...')
 
 onMounted(() => {
-  const token = route.query.token
+  // Read from hash fragment to avoid token exposure in server logs / browser history
+  const hash = route.hash.replace(/^#/, '')
+  const hashParams = new URLSearchParams(hash)
+  const token = hashParams.get('token') || route.query.token
   const error = route.query.error
-  const role = route.query.role || ''
-  const action = route.query.action || ''
+  const role = hashParams.get('role') || route.query.role || ''
+  const action = hashParams.get('action') || route.query.action || ''
 
   if (error) {
     statusMsg.value = 'Login Google gagal. Mengalihkan...'

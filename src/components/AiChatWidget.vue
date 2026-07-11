@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { X, Bot } from 'lucide-vue-next'
+import DOMPurify from 'dompurify'
 import api from '../utils/api'
 
 /**
@@ -240,7 +241,7 @@ const sendChatMessage = async (text) => {
               :class="msg.sender === 'user' 
                 ? 'bg-[#04000D] text-white border border-[#04000D] shadow-[2px_2px_0px_0px_rgba(255,61,139,0.85)]' 
                 : 'bg-[#DCEEB1]/70 border border-[#04000D] text-[#04000D]'"
-              v-html="parseMarkdown(msg.text)"
+              v-html="DOMPurify.sanitize(parseMarkdown(msg.text))"
             >
             </div>
             

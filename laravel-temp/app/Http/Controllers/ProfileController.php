@@ -56,8 +56,16 @@ class ProfileController extends Controller
             Storage::delete($oldPath);
         }
 
-        // Simpan file baru ke storage/app/public/avatars dengan nama hash
+        // Verify actual file MIME type (defense-in-depth beyond extension check)
         $file = $request->file('avatar');
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file->getRealPath());
+        finfo_close($finfo);
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp'])) {
+            return response()->json(['message' => 'File tidak valid. Hanya JPEG, PNG, dan WEBP yang diizinkan.'], 422);
+        }
+
+        // Simpan file baru ke storage/app/public/avatars dengan nama hash
         $path = $file->hashName('public/avatars');
         $file->storeAs('public/avatars', basename($path));
         $publicUrl = '/storage/avatars/' . basename($path);

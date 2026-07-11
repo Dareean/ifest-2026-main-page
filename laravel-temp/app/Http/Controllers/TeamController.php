@@ -61,6 +61,9 @@ class TeamController extends Controller
             }
             // If rejected, allow re-invite by updating
             $invitedUser = User::where('email', $email)->first();
+            if ($invitedUser && !$invitedUser->hasVerifiedEmail()) {
+                return response()->json(['message' => 'Calon anggota belum memverifikasi emailnya. Silakan minta mereka verifikasi email terlebih dahulu.'], 400);
+            }
             $existing->update(['status' => 'pending', 'invited_user_id' => $invitedUser?->id, 'expires_at' => now()->addDays(3)]);
             if ($invitedUser) {
                 Notification::create([
@@ -83,6 +86,11 @@ class TeamController extends Controller
                 'message' => 'Undangan berhasil dikirim ke ' . $email,
                 'found' => false,
             ], 201);
+        }
+
+        // Check if invited user has verified their email
+        if (!$invitedUser->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Calon anggota belum memverifikasi emailnya. Silakan minta mereka verifikasi email terlebih dahulu.'], 400);
         }
 
         // Check if invited user is the ketua themselves

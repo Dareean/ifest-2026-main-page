@@ -126,10 +126,11 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $record = EmailVerification::where('email', $request->email)
-            ->where('otp', $request->otp)
+        $records = EmailVerification::where('email', $request->email)
             ->valid()
-            ->first();
+            ->get();
+
+        $record = $records->first(fn($r) => $r->verify($request->otp));
 
         if (!$record) {
             return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
@@ -323,7 +324,7 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth-token')->plainTextToken;
 
-            return redirect($this->frontendUrl() . '/auth/callback?action=connect&token=' . $token . '&role=' . $user->role);
+            return redirect($this->frontendUrl() . '/auth/callback#action=connect&token=' . $token . '&role=' . $user->role);
         }
 
         // === LOGIN MODE: Normal Google login ===
@@ -361,7 +362,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        return redirect($this->frontendUrl() . '/auth/callback?token=' . $token . '&role=' . $user->role);
+        return redirect($this->frontendUrl() . '/auth/callback#token=' . $token . '&role=' . $user->role);
     }
 
     public function googleConnect(Request $request): JsonResponse

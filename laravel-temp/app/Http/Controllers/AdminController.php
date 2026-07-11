@@ -270,8 +270,6 @@ class AdminController extends Controller
                     'pesan' => "Pendaftaran untuk lomba {$p->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
                 ]);
 
-                $this->sendEmailBrevo($notif->fresh()->load('user'));
-
                 ActivityLog::create([
                     'admin_id' => $request->user()->id,
                     'action' => 'reject',
