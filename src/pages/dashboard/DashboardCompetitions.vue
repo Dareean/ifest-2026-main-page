@@ -57,6 +57,10 @@ const uploadingPayment = ref(false)
 const paymentUploadError = ref('')
 const paymentUploadSuccess = ref('')
 
+const formIgFollow = ref('')
+const formIgTwibbon = ref('')
+const socialUploading = ref(false)
+
 const isFull = computed(() => {
   const max = getMaxMembers(selectedLombaForDetail?.team_requirements)
   const accepted = teamInvitations.value.filter(i => i.status === 'accepted').length
@@ -159,6 +163,23 @@ async function handleUploadPayment() {
     paymentUploadError.value = e.response?.data?.message || e.response?.data?.errors?.payment_proof?.[0] || 'Gagal mengirim link bukti bayar'
   } finally {
     uploadingPayment.value = false
+  }
+}
+
+async function handleUploadSocial(type) {
+  const reg = getRegistration(selectedLombaForDetail.value?.id)
+  if (!reg) return
+  const field = type === 'follow' ? formIgFollow : formIgTwibbon
+  if (!field.value) return
+  socialUploading.value = true
+  try {
+    await api.post(`/pendaftarans/${reg.id}/social-proof`, { type, proof_url: field.value })
+    field.value = ''
+    await fetchData()
+  } catch (e) {
+    showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
+  } finally {
+    socialUploading.value = false
   }
 }
 
@@ -408,10 +429,13 @@ watch(selectedLombaForDetail, (lomba) => {
   }
 })
 
-// Re-fetch team invitations when switching to anggota tab
+// Re-fetch data when switching to relevant tabs
 watch(activeTab, (tab) => {
   if (tab === 'anggota') {
     fetchTeamInvitations()
+  }
+  if (tab === 'validasi' || tab === 'anggota') {
+    fetchData()
   }
 })
 
@@ -822,47 +846,88 @@ onUnmounted(() => {
       </div>
 
       <!-- Tab Content: Anggota Tim -->
-      <div v-if="activeTab === 'anggota'">
-        <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 md:p-6 space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
+      <div v-if="activeTab === 'anggota'" class="space-y-6">
+        <!-- Data Ketua -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
+          <div class="flex items-center justify-between border-b border-slate-200/60 pb-3 mb-4">
             <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
-              <Users class="w-4 h-4 text-accent-magenta" /> Anggota Tim
+              <Users class="w-4 h-4 text-accent-magenta" /> Data Ketua Tim
             </h4>
-            <div class="flex items-center gap-2">
-              <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="emptySlots === 0 ? 'bg-[#DCEEB1] text-on-surface border border-[#DCEEB1]' : 'bg-white border border-slate-200 text-on-surface-variant'">
-                {{ 1 + teamInvitations.filter(i => i.status === 'accepted').length }}/{{ getMaxMembers(selectedLombaForDetail?.team_requirements) }} Anggota
-              </span>
+            <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Nama Lengkap</label>
+              <p class="text-sm font-bold">{{ auth.user?.name || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Usia</label>
+              <p class="text-sm">{{ auth.user?.age || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Asal Sekolah/Univ/Instansi</label>
+              <p class="text-sm">{{ auth.user?.institution || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Nomor WhatsApp</label>
+              <p class="text-sm">{{ auth.user?.phone || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Username Instagram</label>
+              <p class="text-sm">{{ auth.user?.instagram_username ? '@' + auth.user?.instagram_username : '-' }}</p>
             </div>
           </div>
+          <button @click="router.push('/dashboard/profile')" class="mt-4 inline-flex items-center gap-1.5 text-[10px] font-bold text-accent-magenta hover:underline">
+            Edit Profil
+          </button>
+        </div>
 
-          <!-- Ketua -->
-          <div class="bg-white border border-slate-100 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-on-surface">{{ getRegistration(selectedLombaForDetail?.id)?.user?.name || auth.user?.name }}</span>
-                <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
-              </div>
-              <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ getRegistration(selectedLombaForDetail?.id)?.user?.email || auth.user?.email }}</p>
-            </div>
-            <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 text-on-surface">Joined</span>
+        <!-- Data Anggota -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
+          <div class="flex items-center justify-between border-b border-slate-200/60 pb-3 mb-4">
+            <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
+              <Users class="w-4 h-4 text-accent-magenta" /> Data Anggota Tim
+            </h4>
+            <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="emptySlots === 0 ? 'bg-[#DCEEB1] text-on-surface' : 'bg-white border border-slate-200 text-on-surface-variant'">
+              {{ 1 + teamInvitations.filter(i => i.status === 'accepted').length }}/{{ getMaxMembers(selectedLombaForDetail?.team_requirements) }}
+            </span>
           </div>
 
           <!-- Accepted Members -->
-          <div v-for="invite in teamInvitations.filter(i => i.status === 'accepted')" :key="invite.id" class="bg-white border border-slate-100 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-on-surface">{{ invite.invitedUser?.name || invite.email }}</span>
-                <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
+          <div v-for="invite in teamInvitations.filter(i => i.status === 'accepted')" :key="invite.id" class="mb-4 last:mb-0">
+            <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-on-surface">{{ invite.invitedUser?.name || invite.email }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
+                </div>
+                <button v-if="isLeader" @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
+                  <UserMinus class="w-3.5 h-3.5" />
+                </button>
               </div>
-              <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ invite.invitedUser?.email || invite.email }}</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/50">Asal Instansi</span>
+                  <p class="mt-0.5 font-semibold">{{ invite.invitedUser?.institution || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/50">WhatsApp</span>
+                  <p class="mt-0.5 font-semibold">{{ invite.invitedUser?.phone || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/50">Usia</span>
+                  <p class="mt-0.5 font-semibold">{{ invite.invitedUser?.age || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/50">Instagram</span>
+                  <p class="mt-0.5 font-semibold">{{ invite.invitedUser?.instagram_username ? '@' + invite.invitedUser?.instagram_username : '-' }}</p>
+                </div>
+              </div>
             </div>
-            <button v-if="isLeader" @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
-              <UserMinus class="w-3.5 h-3.5" />
-            </button>
           </div>
 
           <!-- Pending Invitations -->
-          <div v-for="invite in teamInvitations.filter(i => i.status === 'pending')" :key="invite.id" class="bg-[#FFF9E6] border border-amber-200/40 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm">
+          <div v-for="invite in teamInvitations.filter(i => i.status === 'pending')" :key="invite.id" class="bg-[#FFF9E6] border border-amber-200/40 rounded-xl p-3 flex items-center justify-between text-xs shadow-sm mb-2">
             <div class="min-w-0">
               <div class="flex items-center gap-2">
                 <Mail class="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
@@ -870,9 +935,6 @@ onUnmounted(() => {
                 <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">Pending</span>
               </div>
               <p class="font-mono text-[10px] text-on-surface-variant/60 mt-0.5">{{ invite.email }}</p>
-              <p v-if="invite.expires_at" class="text-[10px] text-amber-600/70 mt-0.5">
-                Berlaku sampai {{ new Date(invite.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) }}
-              </p>
             </div>
             <div v-if="isLeader" class="flex items-center gap-1">
               <button @click="handleCancelInvite(invite.id)" class="text-on-surface-variant/40 hover:text-accent-magenta transition-colors p-1" title="Batalkan undangan">
@@ -882,12 +944,12 @@ onUnmounted(() => {
           </div>
 
           <!-- Empty Slots -->
-          <div v-for="slot in emptySlots" :key="'slot-' + slot" class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex items-center justify-center text-xs text-on-surface-variant/40">
+          <div v-for="slot in emptySlots" :key="'slot-' + slot" class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex items-center justify-center text-xs text-on-surface-variant/40 mb-2">
             <Users class="w-3.5 h-3.5 mr-2" /> Slot {{ slot }} (kosong)
           </div>
 
-          <!-- Add Member Form (only for leader) -->
-            <div v-if="isLeader && emptySlots > 0" class="border-t border-slate-200/60 pt-4">
+          <!-- Add Member Form -->
+          <div v-if="isLeader && emptySlots > 0" class="mt-4 border-t border-slate-200/60 pt-4">
             <p class="text-xs font-bold text-on-surface mb-2">Undang Anggota Baru</p>
             <div v-if="inviteError && !inviteErrorFound" class="mb-2 bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ inviteError }}</div>
             <div v-if="inviteError && inviteErrorFound" class="mb-2 bg-[#FFF9E6] border border-amber-200/40 rounded-xl px-3 py-3 text-[11px]">
@@ -905,36 +967,140 @@ onUnmounted(() => {
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- Lock status & unlock request -->
-          <div v-if="isLeader && getRegistration(selectedLombaForDetail?.id)?.team_locked" class="border-t border-slate-200/60 pt-4 mt-2">
-            <div class="bg-amber-50 border border-amber-200/50 rounded-xl p-4">
-              <div class="flex items-center justify-between gap-3">
-                <div class="min-w-0 text-xs">
-                  <p class="font-bold text-amber-800">Tim Terkunci</p>
-                  <p class="text-amber-700/80 mt-0.5 leading-relaxed">Tim Anda saat ini terkunci. Anda tidak dapat mengundang anggota baru atau mengubah komposisi tim.</p>
-                </div>
-                <button
-                  v-if="!getRegistration(selectedLombaForDetail?.id)?.unlock_requested"
-                  @click="handleRequestUnlock"
-                  :disabled="unlockRequesting"
-                  class="flex-shrink-0 bg-[#04000D] hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold transition-all shadow-sm disabled:opacity-40"
-                >
-                  {{ unlockRequesting ? 'Mengirim...' : 'Minta Buka Kunci' }}
-                </button>
-                <span v-else class="flex-shrink-0 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
-                  Permintaan Terkirim
-                </span>
-              </div>
+        <!-- Pembayaran -->
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
+          <div class="flex items-center justify-between border-b border-slate-200/60 pb-3 mb-4">
+            <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
+              <Award class="w-4 h-4 text-accent-magenta" /> Pembayaran
+            </h4>
+            <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified' ? 'bg-[#DCEEB1] text-on-surface' : 'bg-amber-100 text-amber-700'">
+              {{ getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified' ? 'Lunas' : 'Belum Bayar' }}
+            </span>
+          </div>
+
+          <div class="bg-sky-50 border border-sky-200/60 rounded-xl p-4 mb-4">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-sky-700 mb-1">Informasi Pembayaran</p>
+            <p class="text-xs font-semibold text-sky-800">Rp85.000 (Batch II / Gelombang 2)</p>
+            <p class="text-xs text-sky-700 mt-1">BRI a.n <strong>LARA FAUZIA</strong> — <strong class="text-sm tracking-wider">5199 0100 5106 502</strong></p>
+          </div>
+
+          <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified'" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-xl p-4 flex items-center gap-3">
+            <CheckCircle class="w-5 h-5 text-on-surface flex-shrink-0" />
+            <div class="text-xs">
+              <p class="font-bold">Pembayaran Terverifikasi</p>
+              <p class="text-on-surface-variant/70 mt-0.5">Terima kasih, pembayaran Anda telah dikonfirmasi oleh admin.</p>
             </div>
           </div>
 
-          <!-- Slot status -->
-          <div class="border-t border-slate-200/60 pt-4 mt-2">
-            <div class="flex items-center gap-2 text-xs">
-              <Users class="w-4 h-4 text-on-surface-variant/40" />
-              <span v-if="emptySlots === 0" class="text-on-surface-variant/70">Semua slot terisi</span>
-              <span v-else class="text-on-surface-variant/70">{{ emptySlots }} slot tersedia</span>
+          <div v-else-if="getRegistration(selectedLombaForDetail?.id)?.payment_status === 'pending'" class="bg-[#FFF9E6] border border-amber-200/40 rounded-xl p-4 flex items-center gap-3">
+            <Clock class="w-5 h-5 text-amber-600 flex-shrink-0 animate-pulse" />
+            <div class="text-xs">
+              <p class="font-bold text-amber-800">Menunggu Verifikasi</p>
+              <p class="text-amber-700/80 mt-0.5">Bukti pembayaran sedang diverifikasi oleh admin. Silakan tunggu konfirmasi.</p>
+            </div>
+          </div>
+
+          <div v-else class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Google Drive Bukti Transfer</label>
+              <input v-model="paymentLink" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+              <p class="text-[10px] text-on-surface-variant/50 mt-1">Upload screenshot bukti transfer ke Google Drive, lalu tempel link-nya di sini.</p>
+            </div>
+            <button @click="handleUploadPayment" :disabled="uploadingPayment || !paymentLink" class="w-full bg-[#04000D] hover:bg-black text-[#DCEEB1] py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm disabled:opacity-40 flex items-center justify-center gap-1.5">
+              <Send class="w-3.5 h-3.5" /> {{ uploadingPayment ? 'Mengirim...' : 'Kirim Bukti Bayar' }}
+            </button>
+            <p v-if="paymentUploadError" class="text-[11px] font-semibold text-accent-magenta">{{ paymentUploadError }}</p>
+            <p v-if="paymentUploadSuccess" class="text-[11px] font-semibold text-[#DCEEB1]">{{ paymentUploadSuccess }}</p>
+          </div>
+        </div>
+
+        <!-- Lock status & unlock request -->
+        <div v-if="isLeader && getRegistration(selectedLombaForDetail?.id)?.team_locked" class="bg-amber-50 border border-amber-200/50 rounded-xl p-4">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0 text-xs">
+              <p class="font-bold text-amber-800">Tim Terkunci</p>
+              <p class="text-amber-700/80 mt-0.5 leading-relaxed">Tim Anda saat ini terkunci. Anda tidak dapat mengundang anggota baru atau mengubah komposisi tim.</p>
+            </div>
+            <button
+              v-if="!getRegistration(selectedLombaForDetail?.id)?.unlock_requested"
+              @click="handleRequestUnlock"
+              :disabled="unlockRequesting"
+              class="flex-shrink-0 bg-[#04000D] hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold transition-all shadow-sm disabled:opacity-40"
+            >
+              {{ unlockRequesting ? 'Mengirim...' : 'Minta Buka Kunci' }}
+            </button>
+            <span v-else class="flex-shrink-0 font-mono text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+              Permintaan Terkirim
+            </span>
+          </div>
+        </div>
+
+        <div class="text-xs text-on-surface-variant/50 text-center">
+          <Users class="w-3.5 h-3.5 inline mr-1" />
+          <span v-if="emptySlots === 0">Semua slot terisi</span>
+          <span v-else>{{ emptySlots }} slot tersedia</span>
+        </div>
+      </div>
+
+      <!-- Tab Content: Validasi Sosial Media -->
+      <div v-if="activeTab === 'validasi'" class="space-y-6">
+        <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
+          <div class="border-b border-slate-200/60 pb-3 mb-4">
+            <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
+              <CheckCircle class="w-4 h-4 text-accent-magenta" /> Validasi Sosial Media
+            </h4>
+            <p class="text-[11px] text-on-surface-variant/70 mt-1">Syarat wajib: Follow Instagram I-FEST dan upload twibbon dengan tag akun resmi I-FEST.</p>
+          </div>
+
+          <div class="space-y-5">
+            <!-- Follow Instagram -->
+            <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h5 class="font-bold text-xs text-on-surface">1. Follow Instagram @ifest_official</h5>
+                  <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Screenshot bukti follow akun Instagram I-FEST</p>
+                </div>
+                <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Terkirim</span>
+              </div>
+              <div class="flex gap-2">
+                <input v-model="formIgFollow" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                <button @click="handleUploadSocial('follow')" :disabled="socialUploading || !formIgFollow" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-4 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1.5">
+                  <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
+                </button>
+              </div>
+              <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" target="_blank" class="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
+                Lihat bukti <ExternalLink class="w-3 h-3" />
+              </a>
+            </div>
+
+            <!-- Upload Twibbon -->
+            <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h5 class="font-bold text-xs text-on-surface">2. Upload Twibbon + Tag @ifest_official</h5>
+                  <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Screenshot twibbon yang sudah di-posting di Instagram dan menandai akun I-FEST</p>
+                </div>
+                <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Terkirim</span>
+              </div>
+              <div class="flex gap-2">
+                <input v-model="formIgTwibbon" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                <button @click="handleUploadSocial('twibbon')" :disabled="socialUploading || !formIgTwibbon" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-4 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1.5">
+                  <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
+                </button>
+              </div>
+              <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" target="_blank" class="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
+                Lihat bukti <ExternalLink class="w-3 h-3" />
+              </a>
+            </div>
+
+            <div v-if="getRegistration(selectedLombaForDetail?.id)?.social_validated" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-xl p-4 flex items-center gap-3">
+              <CheckCircle class="w-5 h-5 text-on-surface flex-shrink-0" />
+              <div class="text-xs">
+                <p class="font-bold">Validasi Sosial Media Selesai</p>
+                <p class="text-on-surface-variant/70 mt-0.5">Kedua bukti sudah terkirim. Terima kasih!</p>
+              </div>
             </div>
           </div>
         </div>

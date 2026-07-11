@@ -248,4 +248,34 @@ class PendaftaranController extends Controller
             'data' => $pendaftaran->fresh()->load('lomba'),
         ]);
     }
+
+    public function uploadSocialProof(Request $request, Pendaftaran $pendaftaran): JsonResponse
+    {
+        if ($pendaftaran->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|string|in:follow,twibbon',
+            'proof_url' => 'required|url|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $column = $request->type === 'follow' ? 'ig_follow_proof' : 'ig_twibbon_proof';
+
+        $pendaftaran->update([$column => $request->proof_url]);
+
+        $bothFilled = $pendaftaran->fresh()->ig_follow_proof && $pendaftaran->fresh()->ig_twibbon_proof;
+        if ($bothFilled) {
+            $pendaftaran->update(['social_validated' => true]);
+        }
+
+        return response()->json([
+            'message' => 'Bukti ' . ($request->type === 'follow' ? 'follow' : 'twibbon') . ' berhasil disimpan',
+            'data' => $pendaftaran->fresh()->load('lomba'),
+        ]);
+    }
 }

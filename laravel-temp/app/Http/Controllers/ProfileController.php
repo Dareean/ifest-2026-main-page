@@ -15,16 +15,18 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'name'        => 'sometimes|string|max:255',
-            'phone'       => 'nullable|string|max:20',
-            'institution' => 'nullable|string|max:255',
+            'name'               => 'sometimes|string|max:255',
+            'phone'              => 'nullable|string|max:20',
+            'institution'        => 'nullable|string|max:255',
+            'age'                => 'nullable|integer|min:1|max:150',
+            'instagram_username' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user->update($request->only(['name', 'phone', 'institution']));
+        $user->update($request->only(['name', 'phone', 'institution', 'age', 'instagram_username']));
 
         return response()->json([
             'message' => 'Profil berhasil diperbarui',

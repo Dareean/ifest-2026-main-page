@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pendaftarans/{pendaftaran}/invitations', [TeamController::class, 'byPendaftaran']);
     Route::delete('/pendaftarans/{pendaftaran}/members/{invitation}', [TeamController::class, 'removeMember']);
     Route::post('/pendaftarans/{pendaftaran}/request-unlock', [PendaftaranController::class, 'requestUnlock']);
+    Route::post('/pendaftarans/{pendaftaran}/social-proof', [PendaftaranController::class, 'uploadSocialProof']);
 
     Route::post('/pendaftarans/{pendaftaran}/payment/upload', [PendaftaranController::class, 'uploadPayment']);
 
