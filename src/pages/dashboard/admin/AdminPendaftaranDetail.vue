@@ -179,9 +179,66 @@ onMounted(fetchDetail)
       </div>
     </div>
 
-    <div v-if="loading" class="space-y-4">
-      <div class="h-40 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
-      <div class="h-40 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main skeleton -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+          <div class="flex items-center justify-between mb-4">
+            <div class="h-5 w-44 bg-slate-100/80 rounded-lg"></div>
+            <div class="h-6 w-24 bg-slate-100/80 rounded-full"></div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+              <div class="h-4 w-36 bg-slate-100/80 rounded"></div>
+            </div>
+            <div class="space-y-1">
+              <div class="h-3 w-16 bg-slate-100/80 rounded"></div>
+              <div class="h-4 w-52 bg-slate-100/80 rounded"></div>
+            </div>
+            <div class="space-y-1">
+              <div class="h-3 w-16 bg-slate-100/80 rounded"></div>
+              <div class="h-4 w-32 bg-slate-100/80 rounded"></div>
+            </div>
+            <div class="space-y-1">
+              <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+              <div class="h-4 w-36 bg-slate-100/80 rounded"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+          <div class="flex items-center justify-between mb-4">
+            <div class="h-5 w-32 bg-slate-100/80 rounded-lg"></div>
+            <div class="h-5 w-20 bg-slate-100/80 rounded-full"></div>
+          </div>
+          <div class="space-y-2">
+            <div class="h-10 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+            <div v-for="i in 2" :key="i" class="h-10 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+          </div>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+          <div class="h-5 w-28 bg-slate-100/80 rounded-lg mb-4"></div>
+          <div class="h-16 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+        </div>
+      </div>
+      <!-- Sidebar skeleton -->
+      <div class="space-y-4">
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 animate-pulse">
+          <div class="h-4 w-20 bg-slate-100/80 rounded mb-3"></div>
+          <div class="h-10 bg-slate-100/80 rounded-xl mb-2"></div>
+          <div class="h-10 bg-slate-100/80 rounded-xl"></div>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 animate-pulse">
+          <div class="h-4 w-28 bg-slate-100/80 rounded mb-3"></div>
+          <div class="h-10 bg-slate-100/80 rounded-xl"></div>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 animate-pulse space-y-3">
+          <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+          <div class="h-4 w-16 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-16 bg-slate-100/80 rounded mt-3"></div>
+          <div class="h-4 w-10 bg-slate-100/80 rounded"></div>
+        </div>
+      </div>
     </div>
 
     <div v-else-if="error" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-2xl p-6 text-center">

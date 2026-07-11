@@ -207,7 +207,15 @@ onMounted(fetchHistory)
         </div>
 
         <div v-if="historyLoading" class="space-y-3">
-          <div v-for="i in 3" :key="i" class="h-20 bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+          <div v-for="i in 3" :key="i" class="bg-slate-50 border border-slate-100 rounded-xl p-4 animate-pulse">
+            <div class="flex items-start justify-between gap-4 mb-2">
+              <div class="h-4 w-2/3 bg-slate-100/80 rounded"></div>
+              <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+            </div>
+            <div class="h-3 w-full bg-slate-100/80 rounded mb-1"></div>
+            <div class="h-3 w-4/5 bg-slate-100/80 rounded"></div>
+            <div class="h-5 w-28 bg-slate-100/80 rounded mt-2"></div>
+          </div>
         </div>
 
         <div v-else-if="notifications.length === 0" class="py-12 text-center border border-dashed border-[#04000D]/10 rounded-2xl bg-slate-50/50">

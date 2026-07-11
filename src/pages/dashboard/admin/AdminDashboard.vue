@@ -35,8 +35,32 @@ onMounted(async () => {
       <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Dashboard</h1>
     </div>
 
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-      <div v-for="i in 4" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <div v-if="loading" class="space-y-8">
+      <!-- Stat cards skeleton -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div v-for="i in 4" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+      </div>
+      <!-- Recent registrations skeleton -->
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+        <div class="h-5 w-48 bg-slate-100/80 rounded-lg mb-4"></div>
+        <div class="space-y-3">
+          <div v-for="i in 3" :key="i" class="h-10 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+        </div>
+      </div>
+      <!-- Activity skeleton -->
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+        <div class="h-5 w-40 bg-slate-100/80 rounded-lg mb-4"></div>
+        <div class="space-y-2">
+          <div v-for="i in 4" :key="i" class="h-10 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+        </div>
+      </div>
+      <!-- Per-lomba skeleton -->
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+        <div class="h-5 w-32 bg-slate-100/80 rounded-lg mb-4"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div v-for="i in 3" :key="i" class="h-20 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+        </div>
+      </div>
     </div>
 
     <div v-else-if="admin.stats" class="space-y-8">

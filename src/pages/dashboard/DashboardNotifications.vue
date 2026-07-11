@@ -66,9 +66,21 @@ onMounted(() => {
       </button>
     </div>
 
-    <!-- Loading -->
+    <!-- Loading skeleton -->
     <div v-if="loading" class="space-y-3">
-      <div v-for="i in 4" :key="i" class="h-20 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+      <div v-for="i in 4" :key="i" class="bg-slate-50 border border-slate-100 rounded-2xl p-5 animate-pulse">
+        <div class="flex items-start gap-4">
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-100/80 mt-1 flex-shrink-0"></div>
+          <div class="flex-1 min-w-0 space-y-2">
+            <div class="flex items-start justify-between gap-4">
+              <div class="h-4 w-2/3 bg-slate-100/80 rounded"></div>
+              <div class="h-3 w-16 bg-slate-100/80 rounded flex-shrink-0"></div>
+            </div>
+            <div class="h-3 w-full bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-4/5 bg-slate-100/80 rounded"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Empty -->

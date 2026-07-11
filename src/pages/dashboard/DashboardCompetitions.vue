@@ -463,9 +463,15 @@ onUnmounted(() => {
       </template>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="space-y-4">
-      <div v-for="i in 3" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="space-y-6">
+      <!-- Header skeleton -->
+      <div class="mb-8 space-y-3">
+        <div class="h-4 w-32 bg-slate-50 border border-slate-100 rounded-lg animate-pulse"></div>
+        <div class="h-9 w-52 bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+      </div>
+      <!-- Card skeletons -->
+      <div v-for="i in 3" :key="i" class="h-32 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
     </div>
 
     <!-- Fallback: No competition selected -->

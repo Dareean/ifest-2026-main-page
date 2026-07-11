@@ -230,9 +230,66 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="space-y-3">
-      <div v-for="i in 5" :key="i" class="h-16 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="space-y-4">
+      <!-- Filter bar skeleton -->
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 animate-pulse">
+        <div class="flex gap-3 flex-wrap">
+          <div class="h-10 w-56 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+          <div class="h-10 w-28 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+          <div class="h-10 w-28 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+          <div class="h-10 w-28 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+          <div class="h-10 w-28 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+          <div class="h-10 w-28 bg-slate-100/80 border border-slate-200/60 rounded-xl"></div>
+        </div>
+      </div>
+      <!-- Table skeleton -->
+      <div class="bg-slate-50 border border-slate-100 rounded-2xl overflow-hidden animate-pulse">
+        <div class="hidden md:block">
+          <div class="border-b border-slate-100 bg-slate-100/30 px-4 py-3 flex items-center gap-4">
+            <div class="w-10"><div class="h-4 w-4 bg-slate-100/80 rounded"></div></div>
+            <div class="h-3 w-16 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-12 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-10 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-10 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-16 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-14 bg-slate-100/80 rounded"></div>
+            <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+            <div class="flex-1"></div>
+          </div>
+          <div v-for="i in 5" :key="i" class="border-b border-slate-100 px-4 py-3.5 flex items-center gap-4">
+            <div class="w-10"><div class="h-4 w-4 bg-slate-100/80 rounded"></div></div>
+            <div class="h-4 w-24 bg-slate-100/80 rounded"></div>
+            <div class="flex flex-col gap-1">
+              <div class="h-3 w-28 bg-slate-100/80 rounded"></div>
+              <div class="h-2 w-36 bg-slate-100/60 rounded"></div>
+            </div>
+            <div class="h-5 w-12 bg-slate-100/80 rounded"></div>
+            <div class="h-5 w-10 bg-slate-100/80 rounded-full"></div>
+            <div class="h-5 w-10 bg-slate-100/80 rounded"></div>
+            <div class="h-5 w-16 bg-slate-100/80 rounded-full"></div>
+            <div class="h-5 w-14 bg-slate-100/80 rounded-full"></div>
+            <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+          </div>
+        </div>
+        <!-- Mobile skeleton -->
+        <div class="md:hidden divide-y divide-slate-100">
+          <div v-for="i in 3" :key="i" class="p-4 space-y-2">
+            <div class="flex items-center gap-3">
+              <div class="h-4 w-4 bg-slate-100/80 rounded"></div>
+              <div class="h-5 w-36 bg-slate-100/80 rounded flex-1"></div>
+              <div class="h-5 w-16 bg-slate-100/80 rounded-full"></div>
+            </div>
+            <div class="h-3 w-40 bg-slate-100/80 rounded ml-7"></div>
+            <div class="flex items-center gap-2 ml-7">
+              <div class="h-5 w-12 bg-slate-100/80 rounded"></div>
+              <div class="h-5 w-14 bg-slate-100/80 rounded-full"></div>
+              <div class="h-3 w-20 bg-slate-100/60 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Bulk Action Bar -->

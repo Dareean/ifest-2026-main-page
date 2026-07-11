@@ -117,9 +117,23 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="space-y-4">
-      <div v-for="i in 4" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="space-y-6">
+      <!-- Greeting skeleton -->
+      <div class="mb-8 space-y-3">
+        <div class="h-4 w-44 bg-slate-50 border border-slate-100 rounded-lg animate-pulse"></div>
+        <div class="h-9 w-64 bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+        <div class="h-4 w-80 bg-slate-50 border border-slate-100 rounded-lg animate-pulse"></div>
+      </div>
+      <!-- Stat cards skeleton -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div v-for="i in 4" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+      </div>
+      <!-- Lomba cards skeleton -->
+      <div class="space-y-4">
+        <div class="h-5 w-44 bg-slate-50 border border-slate-100 rounded-lg animate-pulse mb-4"></div>
+        <div v-for="i in 3" :key="i" class="h-32 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+      </div>
     </div>
 
     <template v-else>

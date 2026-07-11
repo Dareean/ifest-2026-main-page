@@ -55,9 +55,25 @@ onMounted(fetchInvitations)
       <h1 class="font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">Undangan Tim</h1>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="space-y-3">
-      <div v-for="i in 2" :key="i" class="h-28 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="space-y-4">
+      <div class="h-4 w-32 bg-slate-50 border border-slate-100 rounded-lg animate-pulse mb-4"></div>
+      <div v-for="i in 2" :key="i" class="bg-slate-50 border border-slate-100 rounded-2xl p-6 animate-pulse">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-slate-100/80 border border-slate-200/60 flex-shrink-0"></div>
+          <div class="flex-1 space-y-3">
+            <div class="flex items-center gap-2">
+              <div class="h-5 w-16 bg-slate-100/80 rounded"></div>
+              <div class="h-5 w-36 bg-slate-100/80 rounded"></div>
+            </div>
+            <div class="h-3 w-full bg-slate-100/80 rounded"></div>
+            <div class="flex gap-3 pt-2">
+              <div class="h-9 flex-1 bg-slate-100/80 rounded-xl"></div>
+              <div class="h-9 flex-1 bg-slate-100/80 rounded-xl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Empty -->

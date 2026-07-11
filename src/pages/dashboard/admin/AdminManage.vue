@@ -67,9 +67,31 @@ onMounted(fetch)
       <p class="text-xs text-on-surface-variant/70">Kelola akun admin. Admin memiliki akses penuh ke seluruh sistem.</p>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="space-y-3">
-      <div v-for="i in 5" :key="i" class="h-16 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="bg-slate-50 border border-slate-100 rounded-2xl overflow-hidden animate-pulse">
+      <!-- Table header skeleton -->
+      <div class="hidden md:block">
+        <div class="border-b border-slate-100 bg-slate-100/30 px-5 py-3 flex items-center gap-8">
+          <div class="h-3 w-16 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-12 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-20 bg-slate-100/80 rounded"></div>
+        </div>
+        <div v-for="i in 5" :key="i" class="border-b border-slate-100 px-5 py-3.5 flex items-center gap-8">
+          <div class="h-4 w-28 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-36 bg-slate-100/80 rounded"></div>
+          <div class="h-6 w-20 bg-slate-100/80 rounded-lg"></div>
+          <div class="h-3 w-24 bg-slate-100/80 rounded"></div>
+        </div>
+      </div>
+      <!-- Mobile skeleton -->
+      <div class="md:hidden divide-y divide-slate-100">
+        <div v-for="i in 3" :key="i" class="p-4 space-y-2">
+          <div class="h-5 w-36 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-48 bg-slate-100/80 rounded"></div>
+          <div class="h-3 w-24 bg-slate-100/80 rounded"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Table (desktop) + Cards (mobile) -->
