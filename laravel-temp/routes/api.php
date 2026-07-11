@@ -46,6 +46,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::get('/invitations/pending', [TeamController::class, 'pendingInvitations']);
     Route::put('/invitations/{invitation}/accept', [TeamController::class, 'accept']);
     Route::put('/invitations/{invitation}/reject', [TeamController::class, 'reject']);
+    Route::post('/invitations/{invitation}/social-proof', [TeamController::class, 'uploadSocialProof']);
 
     Route::get('/submissions', [SubmissionController::class, 'index']);
 

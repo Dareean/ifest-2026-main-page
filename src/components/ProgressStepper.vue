@@ -28,38 +28,46 @@ const steps = computed(() => {
   const isFree = lomba.fee && lomba.fee.toLowerCase() === 'gratis'
   const hasSubmission = !!reg.submission
   const paymentVerified = reg.payment_status === 'verified'
+  const statusVerified = reg.status === 'verified'
+  const maxMembers = getMaxMembers(lomba.team_requirements)
+  const teamFull = 1 + props.teamAcceptedCount >= maxMembers
 
-  function state(conditionMet) {
-    if (conditionMet) return 'completed'
-    return 'pending'
-  }
+  // Flag-based gate conditions
+  const anggotaDone = !isTeam || teamFull
+  const bayarDone = isFree || paymentVerified
+  const verifDone = statusVerified
 
   // 1. Pendaftaran
-  s.push({
-    key: 'daftar',
-    label: 'Pendaftaran',
-    desc: 'Registrasi lomba berhasil',
-    state: 'completed',
-  })
+  s.push({ key: 'daftar', label: 'Pendaftaran', desc: 'Registrasi lomba berhasil', state: 'completed' })
 
-  // 2. Pembayaran (skip if free)
-  if (!isFree) {
-    let payState = 'pending'
-    if (paymentVerified) {
-      payState = 'completed'
-    } else if (reg.payment_status === 'pending' || reg.payment_status === 'rejected') {
-      payState = 'current'
-    }
+  // 2. Anggota Tim (only for team)
+  if (isTeam) {
     s.push({
-      key: 'bayar',
-      label: 'Pembayaran',
-      desc: 'Upload & verifikasi bukti bayar',
-      state: payState,
+      key: 'anggota',
+      label: 'Anggota Tim',
+      desc: `${1 + props.teamAcceptedCount}/${maxMembers} anggota`,
+      state: anggotaDone ? 'completed' : 'current',
     })
   }
 
-  // 3. Verifikasi Tim (for team competitions) or Verifikasi Pendaftaran (individual)
-  const verifState = state(reg.status === 'verified')
+  // 3. Pembayaran (skip if free)
+  if (!isFree) {
+    let payState = 'pending'
+    if (bayarDone) {
+      payState = 'completed'
+    } else if (anggotaDone) {
+      payState = 'current'
+    }
+    s.push({ key: 'bayar', label: 'Pembayaran', desc: 'Upload & verifikasi bukti bayar', state: payState })
+  }
+
+  // 4. Verifikasi
+  let verifState = 'pending'
+  if (verifDone) {
+    verifState = 'completed'
+  } else if (bayarDone) {
+    verifState = 'current'
+  }
   s.push({
     key: 'verif',
     label: isTeam ? 'Verifikasi Tim' : 'Verifikasi',
@@ -67,31 +75,14 @@ const steps = computed(() => {
     state: verifState,
   })
 
-  // 4. Anggota Tim (only for team)
-  if (isTeam) {
-    const maxMembers = getMaxMembers(lomba.team_requirements)
-    const teamFull = 1 + props.teamAcceptedCount >= maxMembers
-    let memberState = 'pending'
-    if (teamFull) {
-      memberState = 'completed'
-    } else if (reg.status === 'verified') {
-      memberState = 'current'
-    }
-    s.push({
-      key: 'anggota',
-      label: 'Anggota Tim',
-      desc: `${1 + props.teamAcceptedCount}/${maxMembers} anggota`,
-      state: memberState,
-    })
-  }
-
   // 5. Kumpul Karya
-  s.push({
-    key: 'karya',
-    label: 'Pengumpulan Karya',
-    desc: hasSubmission ? 'Karya sudah dikumpulkan' : 'Kumpulkan link karya',
-    state: state(hasSubmission),
-  })
+  let karyaState = 'pending'
+  if (hasSubmission) {
+    karyaState = 'completed'
+  } else if (verifDone) {
+    karyaState = 'current'
+  }
+  s.push({ key: 'karya', label: 'Pengumpulan Karya', desc: hasSubmission ? 'Karya sudah dikumpulkan' : 'Kumpulkan link karya', state: karyaState })
 
   return s
 })

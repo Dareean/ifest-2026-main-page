@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TeamController extends Controller
 {
@@ -61,9 +62,6 @@ class TeamController extends Controller
             }
             // If rejected, allow re-invite by updating
             $invitedUser = User::where('email', $email)->first();
-            if ($invitedUser && !$invitedUser->hasVerifiedEmail()) {
-                return response()->json(['message' => 'Calon anggota belum memverifikasi emailnya. Silakan minta mereka verifikasi email terlebih dahulu.'], 400);
-            }
             $existing->update(['status' => 'pending', 'invited_user_id' => $invitedUser?->id, 'expires_at' => now()->addDays(3)]);
             if ($invitedUser) {
                 Notification::create([
@@ -75,99 +73,92 @@ class TeamController extends Controller
             return response()->json([
                 'message' => 'Undangan berhasil dikirim ke ' . $email,
                 'invitation' => $existing->load('invitedUser'),
-                'found' => true,
+                'found' => (bool) $invitedUser,
             ], 201);
         }
 
         $invitedUser = User::where('email', $email)->first();
 
-        if (!$invitedUser) {
-            return response()->json([
-                'message' => 'Undangan berhasil dikirim ke ' . $email,
-                'found' => false,
-            ], 201);
-        }
+        // Only run user-specific conflict checks if the user exists (registered)
+        if ($invitedUser) {
+            // Check if invited user is the ketua themselves
+            if ($invitedUser->id === $request->user()->id) {
+                return response()->json(['message' => 'Tidak bisa mengundang diri sendiri'], 400);
+            }
 
-        // Check if invited user has verified their email
-        if (!$invitedUser->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Calon anggota belum memverifikasi emailnya. Silakan minta mereka verifikasi email terlebih dahulu.'], 400);
-        }
+            // Check if user is already ketua of another team for this lomba
+            $alreadyKetua = Pendaftaran::where('user_id', $invitedUser->id)
+                ->where('lomba_id', $pendaftaran->lomba_id)
+                ->exists();
+            if ($alreadyKetua) {
+                return response()->json(['message' => 'User sudah mendaftar sebagai ketua tim lain untuk lomba ini'], 400);
+            }
 
-        // Check if invited user is the ketua themselves
-        if ($invitedUser->id === $request->user()->id) {
-            return response()->json(['message' => 'Tidak bisa mengundang diri sendiri'], 400);
-        }
-
-        // Check if user is already ketua of another team for this lomba
-        $alreadyKetua = Pendaftaran::where('user_id', $invitedUser->id)
-            ->where('lomba_id', $pendaftaran->lomba_id)
-            ->exists();
-        if ($alreadyKetua) {
-            return response()->json(['message' => 'User sudah mendaftar sebagai ketua tim lain untuk lomba ini'], 400);
-        }
-
-        // Check if user is already an accepted member of another team for this lomba
-        $alreadyMember = TeamInvitation::whereHas('pendaftaran', function ($q) use ($pendaftaran) {
-                $q->where('lomba_id', $pendaftaran->lomba_id);
-            })
-            ->where('invited_user_id', $invitedUser->id)
-            ->where('status', 'accepted')
-            ->exists();
-        if ($alreadyMember) {
-            return response()->json(['message' => 'User sudah menjadi anggota tim lain untuk lomba ini'], 400);
-        }
-
-        // Also block if user has a pending invitation for a different team in the same lomba
-        $alreadyInvited = TeamInvitation::whereHas('pendaftaran', function ($q) use ($pendaftaran) {
-                $q->where('lomba_id', $pendaftaran->lomba_id)->where('id', '!=', $pendaftaran->id);
-            })
-            ->where('invited_user_id', $invitedUser->id)
-            ->where('status', 'pending')
-            ->exists();
-        if ($alreadyInvited) {
-            return response()->json(['message' => 'User sudah memiliki undangan pending untuk tim lain di lomba ini'], 400);
-        }
-
-        // Check per kategori: user already in another competition of same category
-        $kategori = explode('-', $pendaftaran->lomba->kode)[0];
-        $sameKategori = Pendaftaran::where('user_id', $invitedUser->id)
-            ->whereHas('lomba', function ($q) use ($kategori, $pendaftaran) {
-                $q->where('kode', 'like', $kategori . '-%')->where('id', '!=', $pendaftaran->lomba_id);
-            })
-            ->exists();
-        if (!$sameKategori) {
-            $sameKategori = TeamInvitation::whereHas('pendaftaran', function ($q) use ($kategori, $pendaftaran) {
-                    $q->whereHas('lomba', function ($qq) use ($kategori) {
-                        $qq->where('kode', 'like', $kategori . '-%');
-                    })->where('id', '!=', $pendaftaran->id);
+            // Check if user is already an accepted member of another team for this lomba
+            $alreadyMember = TeamInvitation::whereHas('pendaftaran', function ($q) use ($pendaftaran) {
+                    $q->where('lomba_id', $pendaftaran->lomba_id);
                 })
                 ->where('invited_user_id', $invitedUser->id)
                 ->where('status', 'accepted')
                 ->exists();
-        }
-        if ($sameKategori) {
-            return response()->json(['message' => 'User sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
+            if ($alreadyMember) {
+                return response()->json(['message' => 'User sudah menjadi anggota tim lain untuk lomba ini'], 400);
+            }
+
+            // Also block if user has a pending invitation for a different team in the same lomba
+            $alreadyInvited = TeamInvitation::whereHas('pendaftaran', function ($q) use ($pendaftaran) {
+                    $q->where('lomba_id', $pendaftaran->lomba_id)->where('id', '!=', $pendaftaran->id);
+                })
+                ->where('invited_user_id', $invitedUser->id)
+                ->where('status', 'pending')
+                ->exists();
+            if ($alreadyInvited) {
+                return response()->json(['message' => 'User sudah memiliki undangan pending untuk tim lain di lomba ini'], 400);
+            }
+
+            // Check per kategori: user already in another competition of same category
+            $kategori = explode('-', $pendaftaran->lomba->kode)[0];
+            $sameKategori = Pendaftaran::where('user_id', $invitedUser->id)
+                ->whereHas('lomba', function ($q) use ($kategori, $pendaftaran) {
+                    $q->where('kode', 'like', $kategori . '-%')->where('id', '!=', $pendaftaran->lomba_id);
+                })
+                ->exists();
+            if (!$sameKategori) {
+                $sameKategori = TeamInvitation::whereHas('pendaftaran', function ($q) use ($kategori, $pendaftaran) {
+                        $q->whereHas('lomba', function ($qq) use ($kategori) {
+                            $qq->where('kode', 'like', $kategori . '-%');
+                        })->where('id', '!=', $pendaftaran->id);
+                    })
+                    ->where('invited_user_id', $invitedUser->id)
+                    ->where('status', 'accepted')
+                    ->exists();
+            }
+            if ($sameKategori) {
+                return response()->json(['message' => 'User sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
+            }
         }
 
         $invitation = TeamInvitation::create([
             'pendaftaran_id' => $pendaftaran->id,
             'email' => $email,
             'invited_by_user_id' => $request->user()->id,
-            'invited_user_id' => $invitedUser->id,
+            'invited_user_id' => $invitedUser?->id,
             'status' => 'pending',
             'expires_at' => now()->addDays(3),
         ]);
 
-        Notification::create([
-            'user_id' => $invitedUser->id,
-            'judul' => 'Undangan Tim',
-            'pesan' => 'Kamu diundang bergabung ke tim "' . ($pendaftaran->team_name ?: 'Tim ' . $request->user()->name) . '" oleh ' . $request->user()->name . '. Klik untuk menerima atau menolak.',
-        ]);
+        if ($invitedUser) {
+            Notification::create([
+                'user_id' => $invitedUser->id,
+                'judul' => 'Undangan Tim',
+                'pesan' => 'Kamu diundang bergabung ke tim "' . ($pendaftaran->team_name ?: 'Tim ' . $request->user()->name) . '" oleh ' . $request->user()->name . '. Klik untuk menerima atau menolak.',
+            ]);
+        }
 
         return response()->json([
             'message' => 'Undangan berhasil dikirim ke ' . $email,
             'invitation' => $invitation->load('invitedUser'),
-            'found' => true,
+            'found' => (bool) $invitedUser,
         ], 201);
     }
 
@@ -395,5 +386,39 @@ class TeamController extends Controller
         return response()->json(['message' => $userName . ' berhasil dikeluarkan dari tim']);
     }
 
+    public function uploadSocialProof(Request $request, TeamInvitation $invitation): JsonResponse
+    {
+        $user = $request->user();
 
+        // Only the invitation owner (invited user) can upload their social proof
+        if ($invitation->invited_user_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($invitation->status !== 'accepted') {
+            return response()->json(['message' => 'Undangan belum diterima'], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|string|in:follow,twibbon',
+            'proof_url' => 'required|url|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $column = $request->type === 'follow' ? 'ig_follow_proof' : 'ig_twibbon_proof';
+        $invitation->update([$column => $request->proof_url]);
+
+        $fresh = $invitation->fresh();
+        if ($fresh->ig_follow_proof && $fresh->ig_twibbon_proof) {
+            $invitation->update(['social_validated' => true]);
+        }
+
+        return response()->json([
+            'message' => 'Bukti ' . ($request->type === 'follow' ? 'follow' : 'twibbon') . ' berhasil disimpan',
+            'data' => $fresh->load('invitedUser'),
+        ]);
+    }
 }

@@ -7,7 +7,7 @@ import { useBack } from '../../../composables/useBack'
 import api from '../../../utils/api'
 import {
   ArrowLeft, Clock, CheckCircle, AlertTriangle, Lock, Unlock,
-  Users, Mail, Send, Shield, X
+  Users, Mail, Send, Shield, X, ExternalLink
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -296,18 +296,42 @@ onMounted(fetchDetail)
             </span>
           </div>
           <div class="space-y-2.5">
-            <div class="flex items-center justify-between text-xs bg-slate-50 rounded-xl p-3 border border-slate-100">
-              <div>
-                <span class="font-bold text-on-surface">{{ reg?.user?.name }}</span>
-                <span class="font-mono text-[9px] font-bold uppercase ml-2 px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
+            <div class="text-xs bg-slate-50 rounded-xl p-3 border border-slate-100">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-on-surface">{{ reg?.user?.name }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase ml-2 px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
+                </div>
+                <span v-if="reg?.ig_follow_proof && reg?.ig_twibbon_proof" class="font-mono text-[9px] uppercase px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 text-green-700 font-bold">Sosmed Valid</span>
+              </div>
+              <div v-if="reg?.ig_follow_proof || reg?.ig_twibbon_proof" class="flex flex-wrap gap-3 mt-2 pt-2 border-t border-slate-200/60">
+                <a v-if="reg?.ig_follow_proof" :href="reg.ig_follow_proof" target="_blank" class="text-[10px] font-bold text-sky-600 hover:underline flex items-center gap-1">
+                  <CheckCircle class="w-3 h-3" /> Follow @ifest_untad
+                </a>
+                <a v-if="reg?.ig_twibbon_proof" :href="reg.ig_twibbon_proof" target="_blank" class="text-[10px] font-bold text-sky-600 hover:underline flex items-center gap-1">
+                  <CheckCircle class="w-3 h-3" /> Twibbon @ifest_untad
+                </a>
               </div>
             </div>
-            <div v-for="inv in reg?.team_invitations?.filter(i => i.status === 'accepted')" :key="inv.id" class="flex items-center justify-between text-xs bg-white rounded-xl p-3 border border-slate-100">
-              <div>
-                <span class="font-bold text-on-surface">{{ inv.invited_user?.name }}</span>
-                <span class="font-mono text-[9px] font-bold uppercase ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
+            <div v-for="inv in reg?.team_invitations?.filter(i => i.status === 'accepted')" :key="inv.id" class="text-xs bg-white rounded-xl p-3 border border-slate-100">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-on-surface">{{ inv.invited_user?.name }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span v-if="inv.ig_follow_proof && inv.ig_twibbon_proof" class="font-mono text-[9px] uppercase px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 text-green-700 font-bold">Sosmed Valid</span>
+                  <span class="font-mono text-[9px] uppercase px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 text-green-700 font-bold">Joined</span>
+                </div>
               </div>
-              <span class="font-mono text-[9px] uppercase px-2 py-0.5 rounded-full bg-[#DCEEB1]/30 text-green-700 font-bold">Joined</span>
+              <div v-if="inv.ig_follow_proof || inv.ig_twibbon_proof" class="flex flex-wrap gap-3 mt-2 pt-2 border-t border-slate-200/60">
+                <a v-if="inv.ig_follow_proof" :href="inv.ig_follow_proof" target="_blank" class="text-[10px] font-bold text-sky-600 hover:underline flex items-center gap-1">
+                  <CheckCircle class="w-3 h-3" /> Follow @ifest_untad
+                </a>
+                <a v-if="inv.ig_twibbon_proof" :href="inv.ig_twibbon_proof" target="_blank" class="text-[10px] font-bold text-sky-600 hover:underline flex items-center gap-1">
+                  <CheckCircle class="w-3 h-3" /> Twibbon @ifest_untad
+                </a>
+              </div>
             </div>
             <div v-for="inv in reg?.team_invitations?.filter(i => i.status === 'pending')" :key="inv.id" class="flex items-center justify-between text-xs bg-white rounded-xl p-3 border border-dashed border-slate-200">
               <div>

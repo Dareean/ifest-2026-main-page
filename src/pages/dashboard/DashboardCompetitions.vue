@@ -11,7 +11,7 @@ import ProgressStepper from '../../components/ProgressStepper.vue'
 import {
   Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
   Send, X, Users, BookOpen, Calendar, ArrowLeft,
-  ChevronRight, Award, FileText, Printer, UserMinus, Mail, Check, Copy
+  ChevronRight, Award, FileText, Printer, UserMinus, Mail, Check
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
@@ -38,19 +38,9 @@ const inviteEmail = ref('')
 const inviting = ref(false)
 const inviteError = ref('')
 const inviteSuccess = ref('')
-const inviteErrorFound = ref(false)
-const inviteErrorEmail = ref('')
-const copied = ref(false)
+
 const actionLoading = ref(null)
 const unlockRequesting = ref(false)
-
-const registerLink = computed(() => `${window.location.origin}/register`)
-
-function copyRegisterLink() {
-  navigator.clipboard.writeText(registerLink.value)
-  copied.value = true
-  setTimeout(() => { copied.value = false }, 2000)
-}
 
 const paymentLink = ref('')
 const uploadingPayment = ref(false)
@@ -59,7 +49,10 @@ const paymentUploadSuccess = ref('')
 
 const formIgFollow = ref('')
 const formIgTwibbon = ref('')
+const memberIgFollow = ref({})
+const memberIgTwibbon = ref({})
 const socialUploading = ref(false)
+const memberSocialUploading = ref({})
 
 const isFull = computed(() => {
   const max = getMaxMembers(selectedLombaForDetail?.team_requirements)
@@ -166,20 +159,36 @@ async function handleUploadPayment() {
   }
 }
 
-async function handleUploadSocial(type) {
+async function handleUploadSocial(type, invitationId = null) {
   const reg = getRegistration(selectedLombaForDetail.value?.id)
   if (!reg) return
-  const field = type === 'follow' ? formIgFollow : formIgTwibbon
-  if (!field.value) return
-  socialUploading.value = true
-  try {
-    await api.post(`/pendaftarans/${reg.id}/social-proof`, { type, proof_url: field.value })
-    field.value = ''
-    await fetchData()
-  } catch (e) {
-    showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
-  } finally {
-    socialUploading.value = false
+
+  if (invitationId) {
+    const field = type === 'follow' ? memberIgFollow : memberIgTwibbon
+    if (!field.value[invitationId]) return
+    memberSocialUploading.value[invitationId] = true
+    try {
+      await api.post(`/invitations/${invitationId}/social-proof`, { type, proof_url: field.value[invitationId] })
+      field.value[invitationId] = ''
+      await fetchTeamInvitations()
+    } catch (e) {
+      showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
+    } finally {
+      memberSocialUploading.value[invitationId] = false
+    }
+  } else {
+    const field = type === 'follow' ? formIgFollow : formIgTwibbon
+    if (!field.value) return
+    socialUploading.value = true
+    try {
+      await api.post(`/pendaftarans/${reg.id}/social-proof`, { type, proof_url: field.value })
+      field.value = ''
+      await fetchData()
+    } catch (e) {
+      showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
+    } finally {
+      socialUploading.value = false
+    }
   }
 }
 
@@ -299,15 +308,7 @@ async function handleInvite() {
     fetchData()
     fetchTeamInvitations()
   } catch (e) {
-    const data = e.response?.data
-    if (data && data.found === false) {
-      inviteError.value = data.message
-      inviteErrorFound.value = true
-      inviteErrorEmail.value = inviteEmail.value
-    } else {
-      inviteError.value = data?.message || 'Gagal mengirim undangan'
-      inviteErrorFound.value = false
-    }
+    inviteError.value = e.response?.data?.message || 'Gagal mengirim undangan'
   } finally {
     inviting.value = false
   }
@@ -432,10 +433,10 @@ watch(selectedLombaForDetail, (lomba) => {
 
 // Re-fetch data when switching to relevant tabs
 watch(activeTab, (tab) => {
-  if (tab === 'anggota') {
+  if (tab === 'anggota' || tab === 'validasi') {
     fetchTeamInvitations()
   }
-  if (tab === 'validasi' || tab === 'anggota') {
+  if (tab === 'anggota') {
     fetchData()
   }
 })
@@ -926,14 +927,7 @@ onUnmounted(() => {
           <!-- Add Member Form -->
           <div v-if="isLeader && emptySlots > 0" class="mt-4 border-t border-slate-200/60 pt-4">
             <p class="text-xs font-bold text-on-surface mb-2">Undang Anggota Baru</p>
-            <div v-if="inviteError && !inviteErrorFound" class="mb-2 bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ inviteError }}</div>
-            <div v-if="inviteError && inviteErrorFound" class="mb-2 bg-[#FFF9E6] border border-amber-200/40 rounded-xl px-3 py-3 text-[11px]">
-              <p class="font-semibold text-amber-700">{{ inviteError }}</p>
-              <p class="text-on-surface-variant/70 mt-1 leading-relaxed">Mintalah calon anggota untuk mendaftar akun terlebih dahulu, lalu undang kembali setelah mereka terdaftar.</p>
-              <button @click="copyRegisterLink" class="mt-2 inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all shadow-sm">
-                <Copy class="w-3 h-3" /> {{ copied ? 'Tersalin!' : 'Salin Link Pendaftaran' }}
-              </button>
-            </div>
+            <div v-if="inviteError" class="mb-2 bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-3 py-2 text-[11px] font-semibold text-accent-magenta">{{ inviteError }}</div>
             <div v-if="inviteSuccess" class="mb-2 bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-xl px-3 py-2 text-[11px] font-semibold text-on-surface">{{ inviteSuccess }}</div>
             <div class="flex gap-2">
               <input v-model="inviteEmail" @keyup.enter="handleInvite" placeholder="email anggota@example.com" class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
@@ -972,62 +966,114 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Tab Content: Validasi Sosial Media -->
+      <!-- Tab Content: Validasi Sosial Media (per-member) -->
       <div v-if="activeTab === 'validasi'" class="space-y-6">
         <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
           <div class="border-b border-slate-200/60 pb-3 mb-4">
             <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
               <CheckCircle class="w-4 h-4 text-accent-magenta" /> Validasi Sosial Media
             </h4>
-            <p class="text-[11px] text-on-surface-variant/70 mt-1">Syarat wajib: Follow Instagram I-FEST dan upload twibbon dengan tag akun resmi I-FEST.</p>
+            <p class="text-[11px] text-on-surface-variant/70 mt-1">Syarat wajib setiap anggota tim: Follow Instagram <strong>@ifest_untad</strong> dan upload twibbon dengan tag akun resmi I-FEST.</p>
           </div>
 
-          <div class="space-y-5">
-            <!-- Follow Instagram -->
+          <div class="space-y-6">
+            <!-- Ketua Section -->
             <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
               <div class="flex items-center justify-between mb-3">
-                <div>
-                  <h5 class="font-bold text-xs text-on-surface">1. Follow Instagram @ifest_untad</h5>
-                  <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Screenshot bukti follow akun Instagram I-FEST</p>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-xs text-on-surface">{{ auth.user?.name || 'Ketua Tim' }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
+                  <span v-if="auth.user?.instagram_username" class="text-[10px] text-on-surface-variant/60">@{{ auth.user.instagram_username }}</span>
                 </div>
-                <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Terkirim</span>
+                <div class="flex gap-2">
+                  <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof && getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Valid</span>
+                </div>
               </div>
-              <div class="flex gap-2">
-                <input v-model="formIgFollow" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                <button @click="handleUploadSocial('follow')" :disabled="socialUploading || !formIgFollow" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-4 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1.5">
-                  <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
-                </button>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-[10px] font-bold text-on-surface-variant/70">Follow @ifest_untad</p>
+                    <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
+                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
+                  </div>
+                  <div v-if="isLeader" class="flex gap-2">
+                    <input v-model="formIgFollow" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                    <button @click="handleUploadSocial('follow')" :disabled="socialUploading || !formIgFollow" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
+                      <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
+                    </button>
+                  </div>
+                  <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
+                    Lihat bukti <ExternalLink class="w-3 h-3" />
+                  </a>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-[10px] font-bold text-on-surface-variant/70">Twibbon + Tag @ifest_untad</p>
+                    <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
+                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
+                  </div>
+                  <div v-if="isLeader" class="flex gap-2">
+                    <input v-model="formIgTwibbon" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                    <button @click="handleUploadSocial('twibbon')" :disabled="socialUploading || !formIgTwibbon" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
+                      <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
+                    </button>
+                  </div>
+                  <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
+                    Lihat bukti <ExternalLink class="w-3 h-3" />
+                  </a>
+                </div>
               </div>
-              <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" target="_blank" class="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
-                Lihat bukti <ExternalLink class="w-3 h-3" />
-              </a>
             </div>
 
-            <!-- Upload Twibbon -->
-            <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
+            <!-- Member Sections (accepted invitations) -->
+            <div v-for="invite in teamInvitations.filter(i => i.status === 'accepted')" :key="invite.id" class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
               <div class="flex items-center justify-between mb-3">
-                <div>
-                  <h5 class="font-bold text-xs text-on-surface">2. Upload Twibbon + Tag @ifest_untad</h5>
-                  <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Screenshot twibbon yang sudah di-posting di Instagram dan menandai akun I-FEST</p>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-xs text-on-surface">{{ invite.invitedUser?.name || invite.email }}</span>
+                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
+                  <span v-if="invite.invitedUser?.instagram_username" class="text-[10px] text-on-surface-variant/60">@{{ invite.invitedUser.instagram_username }}</span>
                 </div>
-                <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Terkirim</span>
+                <div class="flex gap-2">
+                  <span v-if="invite.ig_follow_proof && invite.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Valid</span>
+                </div>
               </div>
-              <div class="flex gap-2">
-                <input v-model="formIgTwibbon" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                <button @click="handleUploadSocial('twibbon')" :disabled="socialUploading || !formIgTwibbon" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-4 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1.5">
-                  <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
-                </button>
-              </div>
-              <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" target="_blank" class="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
-                Lihat bukti <ExternalLink class="w-3 h-3" />
-              </a>
-            </div>
 
-            <div v-if="getRegistration(selectedLombaForDetail?.id)?.social_validated" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-xl p-4 flex items-center gap-3">
-              <CheckCircle class="w-5 h-5 text-on-surface flex-shrink-0" />
-              <div class="text-xs">
-                <p class="font-bold">Validasi Sosial Media Selesai</p>
-                <p class="text-on-surface-variant/70 mt-0.5">Kedua bukti sudah terkirim. Terima kasih!</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-[10px] font-bold text-on-surface-variant/70">Follow @ifest_untad</p>
+                    <span v-if="invite.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
+                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
+                  </div>
+                  <div v-if="auth.user?.id === invite.invited_user_id" class="flex gap-2">
+                    <input v-model="memberIgFollow[invite.id]" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                    <button @click="handleUploadSocial('follow', invite.id)" :disabled="memberSocialUploading[invite.id] || !memberIgFollow[invite.id]" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
+                      <Send class="w-3 h-3" /> {{ memberSocialUploading[invite.id] ? '...' : 'Kirim' }}
+                    </button>
+                  </div>
+                  <a v-if="invite.ig_follow_proof" :href="invite.ig_follow_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
+                    Lihat bukti <ExternalLink class="w-3 h-3" />
+                  </a>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-[10px] font-bold text-on-surface-variant/70">Twibbon + Tag @ifest_untad</p>
+                    <span v-if="invite.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
+                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
+                  </div>
+                  <div v-if="auth.user?.id === invite.invited_user_id" class="flex gap-2">
+                    <input v-model="memberIgTwibbon[invite.id]" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
+                    <button @click="handleUploadSocial('twibbon', invite.id)" :disabled="memberSocialUploading[invite.id] || !memberIgTwibbon[invite.id]" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
+                      <Send class="w-3 h-3" /> {{ memberSocialUploading[invite.id] ? '...' : 'Kirim' }}
+                    </button>
+                  </div>
+                  <a v-if="invite.ig_twibbon_proof" :href="invite.ig_twibbon_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
+                    Lihat bukti <ExternalLink class="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
