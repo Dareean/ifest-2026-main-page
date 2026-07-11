@@ -414,10 +414,10 @@ class AdminController extends Controller
         $query = User::query();
 
         if ($request->filled('search')) {
-            $s = $request->search;
+            $s = strtolower($request->search);
             $query->where(function ($q) use ($s) {
-                $q->where('name', 'ilike', "%$s%")
-                  ->orWhere('email', 'ilike', "%$s%");
+                $q->whereRaw('LOWER(name) LIKE ?', ["%$s%"])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ["%$s%"]);
             });
         }
 
