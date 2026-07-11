@@ -152,9 +152,12 @@ const routes = [
         path: 'manage',
         name: 'AdminManage',
         component: AdminManage,
-        meta: { requiresAuth: true, requiresAdmin: true },
       },
     ],
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ]
 
@@ -168,10 +171,6 @@ const router = createRouter({
       return { top: 0, left: 0 }
     }
   },
-})
-
-router.afterEach(() => {
-  window.scrollTo(0, 0)
 })
 
 router.beforeEach((to, from, next) => {

@@ -9,8 +9,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
-  const unreadNotifications = computed(() => user.value?.unread_notifications_count || 0)
-
   async function register(data) {
     loading.value = true
     try {
@@ -58,13 +56,21 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function googleLogin() {
-    const res = await api.get('/auth/google/redirect')
-    window.location.href = res.data.url
+    try {
+      const res = await api.get('/auth/google/redirect')
+      window.location.href = res.data.url
+    } catch (e) {
+      throw new Error(e.response?.data?.message || 'Gagal membuka Google login')
+    }
   }
 
   async function connectGoogle() {
-    const res = await api.get('/auth/google/connect')
-    window.location.href = res.data.url
+    try {
+      const res = await api.get('/auth/google/connect')
+      window.location.href = res.data.url
+    } catch (e) {
+      throw new Error(e.response?.data?.message || 'Gagal menghubungkan Google')
+    }
   }
 
   async function disconnectGoogle() {
@@ -95,7 +101,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
-    user, token, loading, isAuthenticated, unreadNotifications,
+    user, token, loading, isAuthenticated,
     register, login, fetchUser, logout, googleLogin, connectGoogle,
     disconnectGoogle, handleGoogleCallback, sendOtp, verifyOtp,
   }

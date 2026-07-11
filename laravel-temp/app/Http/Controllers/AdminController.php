@@ -63,6 +63,7 @@ class AdminController extends Controller
 
     public function verify(Pendaftaran $pendaftaran): JsonResponse
     {
+        // Guard: already verified?
         if ($pendaftaran->status !== 'pending') {
             return response()->json(['message' => 'Pendaftaran sudah diverifikasi sebelumnya'], 400);
         }
@@ -81,10 +82,16 @@ class AdminController extends Controller
             return response()->json(['message' => 'Tim belum mengisi semua kuota anggota. Isi slot terlebih dahulu sebelum verifikasi tim (' . (1 + $acceptedCount) . '/' . $maxMembers . ' terisi).'], 400);
         }
 
-        $pendaftaran->update([
-            'status' => 'verified',
-            'team_locked' => true,
-        ]);
+        // Atomic update: only affect rows that are still pending — prevents TOCTOU race
+        $updated = Pendaftaran::where('id', $pendaftaran->id)
+            ->where('status', 'pending')
+            ->update(['status' => 'verified', 'team_locked' => true]);
+
+        if ($updated === 0) {
+            return response()->json(['message' => 'Pendaftaran sudah diverifikasi sebelumnya'], 400);
+        }
+
+        $pendaftaran->refresh();
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
@@ -141,14 +148,16 @@ class AdminController extends Controller
 
     public function verifyPayment(Pendaftaran $pendaftaran): JsonResponse
     {
-        if ($pendaftaran->payment_status !== 'pending') {
+        // Atomic guard: only update if still pending — prevents TOCTOU race
+        $updated = Pendaftaran::where('id', $pendaftaran->id)
+            ->where('payment_status', 'pending')
+            ->update(['payment_status' => 'verified', 'payment_verified_at' => now()]);
+
+        if ($updated === 0) {
             return response()->json(['message' => 'Tidak ada bukti pembayaran yang perlu diverifikasi'], 400);
         }
 
-        $pendaftaran->update([
-            'payment_status' => 'verified',
-            'payment_verified_at' => now(),
-        ]);
+        $pendaftaran->refresh();
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
@@ -204,10 +213,15 @@ class AdminController extends Controller
                     continue;
                 }
 
-                $p->update([
-                    'status' => 'verified',
-                    'team_locked' => true,
-                ]);
+                // Atomic guard: only update if still pending — prevents TOCTOU race
+                $updated = Pendaftaran::where('id', $p->id)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'verified', 'team_locked' => true]);
+
+                if ($updated === 0) {
+                    $results['skipped']++;
+                    continue;
+                }
 
                 Notification::create([
                     'user_id' => $p->user_id,
@@ -259,10 +273,15 @@ class AdminController extends Controller
                     continue;
                 }
 
-                $p->update([
-                    'status' => 'rejected',
-                    'notes' => $request->notes,
-                ]);
+                // Atomic guard: only update if still pending — prevents TOCTOU race
+                $updated = Pendaftaran::where('id', $p->id)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'rejected', 'notes' => $request->notes]);
+
+                if ($updated === 0) {
+                    $results['skipped']++;
+                    continue;
+                }
 
                 $notif = Notification::create([
                     'user_id' => $p->user_id,
@@ -339,10 +358,10 @@ class AdminController extends Controller
             $query->where('payment_status', $request->payment_status);
         }
         if ($request->filled('search')) {
-            $s = $request->search;
+            $s = strtolower($request->search);
             $query->where(function ($q) use ($s) {
-                $q->where('team_name', 'ilike', "%$s%")
-                  ->orWhereHas('user', fn($u) => $u->where('name', 'ilike', "%$s%")->orWhere('email', 'ilike', "%$s%"));
+                $q->whereRaw('LOWER(team_name) LIKE ?', ["%$s%"])
+                  ->orWhereHas('user', fn($u) => $u->whereRaw('LOWER(name) LIKE ?', ["%$s%"])->orWhereRaw('LOWER(email) LIKE ?', ["%$s%"]));
             });
         }
 
@@ -530,32 +549,34 @@ class AdminController extends Controller
             $query->where('lomba_id', $request->lomba_id);
         }
 
-        $pendaftarans = $query->latest()->get();
-
         $headers = [
             'Content-Type' => 'text/csv; charset=utf-8',
             'Content-Disposition' => 'attachment; filename="daftar_peserta_' . now()->format('Y-m-d') . '.csv"',
         ];
 
-        $callback = function () use ($pendaftarans) {
+        $callback = function () use ($query) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
             fputcsv($file, ['No', 'Nama Tim', 'Lomba', 'Ketua', 'Email Ketua', 'Gelombang', 'Status', 'Pembayaran', 'Link Karya', 'Tanggal Daftar']);
 
-            foreach ($pendaftarans as $i => $p) {
-                fputcsv($file, [
-                    $i + 1,
-                    $p->team_name,
-                    $p->lomba->title,
-                    $p->user->name,
-                    $p->user->email,
-                    $p->gelombang,
-                    $p->status,
-                    $p->payment_status,
-                    $p->submission?->link_drive,
-                    $p->created_at->format('Y-m-d H:i'),
-                ]);
-            }
+            $i = 0;
+            $query->latest()->chunk(200, function ($pendaftarans) use ($file, &$i) {
+                foreach ($pendaftarans as $p) {
+                    $i++;
+                    fputcsv($file, [
+                        $i,
+                        $p->team_name,
+                        $p->lomba->title,
+                        $p->user->name,
+                        $p->user->email,
+                        $p->gelombang,
+                        $p->status,
+                        $p->payment_status,
+                        $p->submission?->link_drive,
+                        $p->created_at->format('Y-m-d H:i'),
+                    ]);
+                }
+            });
 
             fclose($file);
         };

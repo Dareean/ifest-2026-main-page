@@ -37,6 +37,10 @@ let authRefreshInterval = null
 
 function startNotificationPolling() {
   if (pollInterval) return
+  if (authRefreshInterval) {
+    clearInterval(authRefreshInterval)
+    authRefreshInterval = null
+  }
 
   // Store last seen highest notification ID to detect new ones
   let lastMaxId = parseInt(localStorage.getItem('last_notif_id') || '0', 10)
@@ -82,13 +86,6 @@ function stopNotificationPolling() {
   if (authRefreshInterval) {
     clearInterval(authRefreshInterval)
     authRefreshInterval = null
-  }
-}
-
-function stopNotificationPolling() {
-  if (pollInterval) {
-    clearInterval(pollInterval)
-    pollInterval = null
   }
 }
 

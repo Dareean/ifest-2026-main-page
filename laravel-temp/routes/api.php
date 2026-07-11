@@ -17,8 +17,8 @@ Route::post('/auth/send-otp', [AuthController::class, 'sendOtp'])->middleware('t
 Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp'])->middleware('throttle:10,1');
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,10');
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,10');
-Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect']);
-Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
+Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])->middleware('throttle:10,1');
+Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])->middleware('throttle:10,1');
 
 Route::get('/lombas', [LombaController::class, 'index']);
 Route::get('/lombas/{lomba}', [LombaController::class, 'show']);

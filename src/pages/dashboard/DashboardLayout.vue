@@ -141,7 +141,6 @@ onMounted(() => {
                 tab === 'timeline' ? 'Timeline' :
                 tab === 'team' ? 'Pendaftaran' :
                 tab === 'anggota' ? 'Anggota Tim' :
-                tab === 'validasi' ? 'Validasi Sosial Media' :
                 tab === 'submit' ? 'Pengumpulan Karya' : tab
               }}
             </button>

@@ -10,8 +10,8 @@ import { useCompetitionNav } from '../../composables/useCompetitionNav'
 import ProgressStepper from '../../components/ProgressStepper.vue'
 import {
   Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
-  Send, X, Users, BookOpen, Calendar, ArrowLeft,
-  ChevronRight, Award, FileText, Printer, UserMinus, Mail, Check
+  Send, X, Users, BookOpen, ArrowLeft,
+  Award, FileText, Printer, UserMinus, Mail
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
@@ -47,13 +47,6 @@ const uploadingPayment = ref(false)
 const paymentUploadError = ref('')
 const paymentUploadSuccess = ref('')
 
-const formIgFollow = ref('')
-const formIgTwibbon = ref('')
-const memberIgFollow = ref({})
-const memberIgTwibbon = ref({})
-const socialUploading = ref(false)
-const memberSocialUploading = ref({})
-
 const isFull = computed(() => {
   const max = getMaxMembers(selectedLombaForDetail?.team_requirements)
   const accepted = teamInvitations.value.filter(i => i.status === 'accepted').length
@@ -67,8 +60,9 @@ const emptySlots = computed(() => {
 })
 
 const isLeader = computed(() => {
+  if (!auth.user) return false
   const reg = getRegistration(selectedLombaForDetail.value?.id)
-  return reg && reg.user_id === auth.user?.id
+  return reg && reg.user_id === auth.user.id
 })
 
 const getMaxMembers = (req) => {
@@ -81,7 +75,6 @@ const getMaxMembers = (req) => {
   return 3
 }
 
-const now = ref(new Date())
 let timerId = null
 
 const anggotaVisible = computed(() => {
@@ -93,6 +86,7 @@ const anggotaVisible = computed(() => {
 // SIMULASI: semua lomba terbuka
 const isLombaOpen = () => true
 
+// SIMULASI: semua lomba terbuka — implementasikan dengan tanggal pendaftaran nanti
 const getLombaCountdownText = () => ''
 
 const getRegistration = (lombaId) => {
@@ -158,55 +152,11 @@ async function handleUploadPayment() {
         localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
       }
     }
-    fetchData()
+    await fetchData()
   } catch (e) {
     paymentUploadError.value = e.response?.data?.message || e.response?.data?.errors?.payment_proof?.[0] || 'Gagal mengirim link bukti bayar'
   } finally {
     uploadingPayment.value = false
-  }
-}
-
-async function handleUploadSocial(type, invitationId = null) {
-  const reg = getRegistration(selectedLombaForDetail.value?.id)
-  if (!reg) return
-
-  if (invitationId) {
-    const field = type === 'follow' ? memberIgFollow : memberIgTwibbon
-    if (!field.value[invitationId]) return
-    memberSocialUploading.value[invitationId] = true
-    try {
-      const res = await api.post(`/invitations/${invitationId}/social-proof`, { type, proof_url: field.value[invitationId] })
-      field.value[invitationId] = ''
-      if (res.data.data) {
-        const idx = teamInvitations.value.findIndex(i => i.id === invitationId)
-        if (idx !== -1) teamInvitations.value[idx] = res.data.data
-      }
-      fetchTeamInvitations()
-    } catch (e) {
-      showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
-    } finally {
-      memberSocialUploading.value[invitationId] = false
-    }
-  } else {
-    const field = type === 'follow' ? formIgFollow : formIgTwibbon
-    if (!field.value) return
-    socialUploading.value = true
-    try {
-      const res = await api.post(`/pendaftarans/${reg.id}/social-proof`, { type, proof_url: field.value })
-      field.value = ''
-      if (res.data.data) {
-        const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
-        if (idx !== -1) {
-          pendaftarans.value[idx] = res.data.data
-          localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
-        }
-      }
-      fetchData()
-    } catch (e) {
-      showToast(e.response?.data?.message || 'Gagal mengirim bukti sosial media', 'error')
-    } finally {
-      socialUploading.value = false
-    }
   }
 }
 
@@ -305,7 +255,7 @@ async function handleSubmitKarya() {
       const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
       if (updated) openDetail(updated)
     }
-    fetchData()
+    await fetchData()
   } catch (e) {
     submitError.value = e.response?.data?.message || 'Gagal mengumpulkan karya'
   } finally {
@@ -328,9 +278,8 @@ async function handleInvite() {
     if (res.data.invitation) {
       teamInvitations.value.unshift(res.data.invitation)
     }
-    // Background refresh (non-blocking)
-    fetchTeamInvitations()
-    fetchData()
+    // Background refresh
+    await Promise.all([fetchTeamInvitations(), fetchData()])
   } catch (e) {
     inviteError.value = e.response?.data?.message || 'Gagal mengirim undangan'
   } finally {
@@ -342,7 +291,7 @@ async function handleCancelInvite(invitationId) {
   if (!await confirmModal.confirm('Batalkan undangan ini?', 'Batalkan Undangan?')) return
   try {
     await api.put(`/invitations/${invitationId}/reject`)
-    fetchTeamInvitations()
+    await fetchTeamInvitations()
   } catch (e) {
     showToast(e.response?.data?.message || 'Gagal membatalkan undangan', 'error')
   }
@@ -367,7 +316,6 @@ async function handleAcceptInvite(invitationId) {
   actionLoading.value = invitationId
   try {
     await api.put(`/invitations/${invitationId}/accept`)
-    await fetchInvitations()
     await fetchData()
   } catch (e) {
     showToast(e.response?.data?.message || 'Gagal menerima undangan', 'error')
@@ -425,9 +373,7 @@ onMounted(() => {
   }
 
   fetchData()
-  timerId = setInterval(() => {
-    now.value = new Date()
-  }, 1000)
+  // Timer placeholder for future countdown
 })
 
 // Watch route.query.id and lombaList to open the competition automatically
@@ -447,24 +393,21 @@ watch(
   { immediate: true }
 )
 
-watch(selectedLombaForDetail, (lomba) => {
+watch(selectedLombaForDetail, (lomba, oldLomba) => {
   if (!lomba) return
+  if (oldLomba && lomba.id === oldLomba.id) return
   const reg = getRegistration(lomba.id)
   if (reg) {
     fetchTeamInvitations()
   }
 })
 
-// Re-fetch data when switching to relevant tabs
-// Re-fetch data when switching to relevant tabs (debounced)
 let tabSwitchTimeout = null
 watch(activeTab, (tab) => {
   if (tabSwitchTimeout) clearTimeout(tabSwitchTimeout)
   tabSwitchTimeout = setTimeout(() => {
-    if (tab === 'anggota' || tab === 'validasi') {
-      fetchTeamInvitations()
-    }
     if (tab === 'anggota') {
+      fetchTeamInvitations()
       fetchData()
     }
   }, 300)
@@ -472,6 +415,7 @@ watch(activeTab, (tab) => {
 
 onUnmounted(() => {
   if (timerId) clearInterval(timerId)
+  // Cleanup was for now ref — kept for future use
 })
 </script>
 
@@ -518,8 +462,8 @@ onUnmounted(() => {
     </div>
 
     <!-- View: Focused Detail View -->
-    <div v-if="selectedLombaForDetail" class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 md:p-8">
-      <!-- Tabs are now managed via the sidebar layout -->
+    <div v-else class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 md:p-8">
+      <!-- Tab navigation in sidebar, content panels below -->
 
       <!-- Tab Content: Info & Juknis -->
       <div v-if="activeTab === 'info'" class="space-y-6">
@@ -723,17 +667,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Status: Not Registered Yet -->
-        <div v-else>
-          <div v-if="!isLombaOpen(selectedLombaForDetail)" class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50 flex flex-col items-center justify-center text-center max-w-xl mx-auto">
-            <Clock class="w-8 h-8 text-accent-magenta animate-pulse mb-3" />
-            <h4 class="font-extrabold text-sm text-on-surface">Pendaftaran Belum Dibuka</h4>
-            <p class="text-xs text-on-surface-variant/80 mt-1 max-w-xs">Lomba ini baru akan dibuka pendaftarannya dalam:</p>
-            <div class="mt-4 bg-black text-[#DCEEB1] font-mono text-xs font-bold px-4 py-2 rounded-xl tracking-widest shadow-sm">
-              {{ getLombaCountdownText(selectedLombaForDetail) }}
-            </div>
-          </div>
-
-          <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div class="lg:col-span-7 space-y-5">
               <div v-if="error" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-3 text-xs font-semibold text-accent-magenta">{{ error }}</div>
               <div>
@@ -773,7 +707,6 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-      </div>
 
       <!-- Tab Content: Submit (Only verified) -->
       <div v-else-if="activeTab === 'submit'">
@@ -851,7 +784,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Tab Content: Anggota Tim -->
-      <div v-if="activeTab === 'anggota'" class="space-y-6">
+      <div v-else-if="activeTab === 'anggota'" class="space-y-6">
         <!-- Data Ketua -->
         <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
           <div class="flex items-center justify-between border-b border-slate-200/60 pb-3 mb-4">
@@ -906,7 +839,7 @@ onUnmounted(() => {
                   <span class="font-bold text-sm text-on-surface">{{ invite.invitedUser?.name || invite.email }}</span>
                   <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
                 </div>
-                <button v-if="isLeader" @click="handleRemoveMember(invite.id)" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1" title="Keluarkan anggota">
+                <button v-if="isLeader" @click="handleRemoveMember(invite.id)" :disabled="actionLoading !== null" class="text-accent-magenta/50 hover:text-accent-magenta transition-colors p-1 disabled:opacity-30" title="Keluarkan anggota">
                   <UserMinus class="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -995,119 +928,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Tab Content: Validasi Sosial Media (per-member) -->
-      <div v-if="activeTab === 'validasi'" class="space-y-6">
-        <div class="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6">
-          <div class="border-b border-slate-200/60 pb-3 mb-4">
-            <h4 class="font-extrabold text-sm text-on-surface flex items-center gap-2">
-              <CheckCircle class="w-4 h-4 text-accent-magenta" /> Validasi Sosial Media
-            </h4>
-            <p class="text-[11px] text-on-surface-variant/70 mt-1">Syarat wajib setiap anggota tim: Follow Instagram <strong>@ifest_untad</strong> dan upload twibbon dengan tag akun resmi I-FEST.</p>
-          </div>
-
-          <div class="space-y-6">
-            <!-- Ketua Section -->
-            <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-xs text-on-surface">{{ auth.user?.name || 'Ketua Tim' }}</span>
-                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black text-[#DCEEB1]">Ketua</span>
-                  <span v-if="auth.user?.instagram_username" class="text-[10px] text-on-surface-variant/60">@{{ auth.user.instagram_username }}</span>
-                </div>
-                <div class="flex gap-2">
-                  <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof && getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Valid</span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <div class="flex items-center justify-between mb-2">
-                    <p class="text-[10px] font-bold text-on-surface-variant/70">Follow @ifest_untad</p>
-                    <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
-                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
-                  </div>
-                  <div v-if="isLeader" class="flex gap-2">
-                    <input v-model="formIgFollow" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                    <button @click="handleUploadSocial('follow')" :disabled="socialUploading || !formIgFollow" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
-                      <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
-                    </button>
-                  </div>
-                  <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
-                    Lihat bukti <ExternalLink class="w-3 h-3" />
-                  </a>
-                </div>
-
-                <div>
-                  <div class="flex items-center justify-between mb-2">
-                    <p class="text-[10px] font-bold text-on-surface-variant/70">Twibbon + Tag @ifest_untad</p>
-                    <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
-                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
-                  </div>
-                  <div v-if="isLeader" class="flex gap-2">
-                    <input v-model="formIgTwibbon" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                    <button @click="handleUploadSocial('twibbon')" :disabled="socialUploading || !formIgTwibbon" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
-                      <Send class="w-3 h-3" /> {{ socialUploading ? '...' : 'Kirim' }}
-                    </button>
-                  </div>
-                  <a v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" :href="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
-                    Lihat bukti <ExternalLink class="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Member Sections (accepted invitations) -->
-            <div v-for="invite in teamInvitations.filter(i => i.status === 'accepted')" :key="invite.id" class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-xs text-on-surface">{{ invite.invitedUser?.name || invite.email }}</span>
-                  <span class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-on-surface-variant">Anggota</span>
-                  <span v-if="invite.invitedUser?.instagram_username" class="text-[10px] text-on-surface-variant/60">@{{ invite.invitedUser.instagram_username }}</span>
-                </div>
-                <div class="flex gap-2">
-                  <span v-if="invite.ig_follow_proof && invite.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Valid</span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <div class="flex items-center justify-between mb-2">
-                    <p class="text-[10px] font-bold text-on-surface-variant/70">Follow @ifest_untad</p>
-                    <span v-if="invite.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
-                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
-                  </div>
-                  <div v-if="auth.user?.id === invite.invited_user_id" class="flex gap-2">
-                    <input v-model="memberIgFollow[invite.id]" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                    <button @click="handleUploadSocial('follow', invite.id)" :disabled="memberSocialUploading[invite.id] || !memberIgFollow[invite.id]" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
-                      <Send class="w-3 h-3" /> {{ memberSocialUploading[invite.id] ? '...' : 'Kirim' }}
-                    </button>
-                  </div>
-                  <a v-if="invite.ig_follow_proof" :href="invite.ig_follow_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
-                    Lihat bukti <ExternalLink class="w-3 h-3" />
-                  </a>
-                </div>
-
-                <div>
-                  <div class="flex items-center justify-between mb-2">
-                    <p class="text-[10px] font-bold text-on-surface-variant/70">Twibbon + Tag @ifest_untad</p>
-                    <span v-if="invite.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#DCEEB1]/70 text-on-surface">Terkirim</span>
-                    <span v-else class="font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-slate-200 text-on-surface-variant/50">Belum</span>
-                  </div>
-                  <div v-if="auth.user?.id === invite.invited_user_id" class="flex gap-2">
-                    <input v-model="memberIgTwibbon[invite.id]" placeholder="https://drive.google.com/..." class="flex-1 bg-white border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2 px-3 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none transition-all" />
-                    <button @click="handleUploadSocial('twibbon', invite.id)" :disabled="memberSocialUploading[invite.id] || !memberIgTwibbon[invite.id]" class="bg-[#04000D] hover:bg-black text-[#DCEEB1] px-3 py-2 rounded-xl text-[10px] font-bold transition-all disabled:opacity-40 shadow-sm flex items-center gap-1">
-                      <Send class="w-3 h-3" /> {{ memberSocialUploading[invite.id] ? '...' : 'Kirim' }}
-                    </button>
-                  </div>
-                  <a v-if="invite.ig_twibbon_proof" :href="invite.ig_twibbon_proof" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 hover:underline">
-                    Lihat bukti <ExternalLink class="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>

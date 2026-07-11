@@ -5,7 +5,7 @@ import { useAuthStore } from '../../../stores/auth'
 import { useAdminStore } from '../../../stores/admin'
 import {
   LayoutDashboard, ClipboardList, Users, Bell, LogOut, Menu, X,
-  Home, ChevronRight, Shield, Mail, UserCog
+  ChevronRight, Shield, UserCog
 } from 'lucide-vue-next'
 
 const router = useRouter()

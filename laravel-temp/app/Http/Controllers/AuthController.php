@@ -102,17 +102,13 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        if (!$user) {
+        if (!$user || $user->email_verified_at) {
             return response()->json(['message' => 'Jika email terdaftar, kode OTP telah dikirim']);
-        }
-
-        if ($user->email_verified_at) {
-            return response()->json(['message' => 'Email sudah diverifikasi'], 400);
         }
 
         $this->generateAndSendOtp($user->email, $user->name);
 
-        return response()->json(['message' => 'Kode OTP telah dikirim ulang ke email Anda']);
+        return response()->json(['message' => 'Jika email terdaftar, kode OTP telah dikirim']);
     }
 
     public function verifyOtp(Request $request): JsonResponse
@@ -151,7 +147,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Email berhasil diverifikasi',
-            'user'    => $user,
+            'user'    => $user->only(['id', 'name', 'email', 'role']),
             'token'   => $token,
         ]);
     }

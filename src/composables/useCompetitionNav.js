@@ -11,7 +11,6 @@ const availableTabs = computed(() => {
     const reg = pendaftarans.value.find(p => p.lomba_id === selectedLomba.value.id)
     if (reg) {
       tabs.push('anggota')
-      tabs.push('validasi')
       if (reg.status === 'verified') {
         tabs.push('submit')
       }

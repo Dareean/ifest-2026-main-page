@@ -65,9 +65,8 @@ class ProfileController extends Controller
             return response()->json(['message' => 'File tidak valid. Hanya JPEG, PNG, dan WEBP yang diizinkan.'], 422);
         }
 
-        // Simpan file baru ke storage/app/public/avatars dengan nama hash
-        $path = $file->hashName('public/avatars');
-        $file->storeAs('public/avatars', basename($path));
+        // Simpan file baru ke storage/app/public/avatars
+        $path = $file->store('public/avatars');
         $publicUrl = '/storage/avatars/' . basename($path);
 
         $user->update(['avatar' => $publicUrl]);

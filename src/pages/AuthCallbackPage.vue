@@ -41,9 +41,8 @@ onMounted(() => {
     } catch {}
   }
 
-  // Set minimal user for router guard, then fetch full data in background
+  // Store role in localStorage for router guard, fetch full data in background
   if (userRole) {
-    auth.user = { role: userRole }
     localStorage.setItem('auth_user', JSON.stringify({ role: userRole }))
   }
 

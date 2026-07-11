@@ -85,21 +85,19 @@ async function uploadAvatar() {
   }
 }
 
-watch(() => auth.user, (u) => {
-  if (u) {
-    form.value.name = u.name || ''
-    form.value.phone = u.phone || ''
-    form.value.institution = u.institution || ''
-  }
-}, { immediate: true })
+function initForm() {
+  form.value.name = auth.user?.name || ''
+  form.value.phone = auth.user?.phone || ''
+  form.value.institution = auth.user?.institution || ''
+}
 
 onMounted(async () => {
-  // Ambil data user terbaru dari backend saat masuk ke halaman profil
   try {
     await auth.fetchUser()
   } catch (e) {
     console.error('Gagal mengambil data profil terbaru:', e)
   }
+  initForm()
 
   if (route.query.google === 'connected') {
     googleMsg.value = 'Akun Google berhasil dihubungkan!'

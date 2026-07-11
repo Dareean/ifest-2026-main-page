@@ -52,6 +52,7 @@ class PendaftaranController extends Controller
                 ->whereHas('lomba', function ($q) use ($kategori) {
                     $q->where('kode', 'like', $kategori . '-%');
                 })
+                ->lockForUpdate()
                 ->exists();
             if ($existingKategori) {
                 return response()->json(['message' => 'Kamu sudah terdaftar di lomba lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
@@ -62,6 +63,7 @@ class PendaftaranController extends Controller
                 ->whereHas('pendaftaran.lomba', function ($q) use ($kategori) {
                     $q->where('kode', 'like', $kategori . '-%');
                 })
+                ->lockForUpdate()
                 ->exists();
             if ($existingMember) {
                 return response()->json(['message' => 'Kamu sudah menjadi anggota tim lain di kategori ini. 1 akun hanya bisa mendaftar 1 lomba per kategori.'], 400);
@@ -86,7 +88,7 @@ class PendaftaranController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $teamName = $request->has('team_name') ? trim($request->team_name) : null;
+            $teamName = $request->has('team_name') ? trim(preg_replace('/[^a-zA-Z0-9\s\-_.]+/u', '', $request->team_name)) : null;
 
             if ($teamName && $isTeam) {
                 $duplicate = Pendaftaran::where('lomba_id', $lomba->id)
@@ -115,7 +117,8 @@ class PendaftaranController extends Controller
                         'errors' => ['team_name' => ["Nama tim '$teamName' sudah digunakan. Silakan pilih nama lain."]]
                     ], 422);
                 }
-                throw $e;
+                Log::error('Registration failed: ' . $e->getMessage());
+                return response()->json(['message' => 'Terjadi kesalahan. Silakan coba lagi.'], 500);
             }
 
             Notification::create([
@@ -165,10 +168,6 @@ class PendaftaranController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        if ($pendaftaran->payment_status === 'verified') {
-            return response()->json(['message' => 'Pembayaran sudah diverifikasi'], 400);
-        }
-
         if ($pendaftaran->isFree()) {
             return response()->json(['message' => 'Lomba ini gratis, tidak perlu upload bukti bayar'], 400);
         }
@@ -181,11 +180,20 @@ class PendaftaranController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $pendaftaran->update([
-            'payment_proof' => $request->payment_proof,
-            'payment_status' => 'pending',
-            'payment_notes' => null,
-        ]);
+        // Atomic guard: only update if not already verified — prevents race with admin verify
+        $updated = Pendaftaran::where('id', $pendaftaran->id)
+            ->where('payment_status', '!=', 'verified')
+            ->update([
+                'payment_proof' => $request->payment_proof,
+                'payment_status' => 'pending',
+                'payment_notes' => null,
+            ]);
+
+        if ($updated === 0) {
+            return response()->json(['message' => 'Pembayaran sudah diverifikasi'], 400);
+        }
+
+        $pendaftaran->refresh();
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
