@@ -68,6 +68,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/avatar', [ProfileController::class, 'uploadAvatar'])->middleware('throttle:5,10');
 });
 
+// E2E testing helpers (local environment only — never in production)
+if (app()->environment('local')) {
+    Route::post('/e2e/verify-user', function (\Illuminate\Http\Request $request) {
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $user->update(['email_verified_at' => now()]);
+        return response()->json([
+            'message' => 'User verified',
+            'user'    => $user,
+        ]);
+    });
+}
+
 // Admin routes
 Route::middleware(['auth:sanctum', 'admin', 'throttle:120,1'])->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
