@@ -412,6 +412,7 @@ watch(
     if (newId && list && list.length > 0) {
       const found = list.find((l) => l.id == newId || l.kode === newId)
       if (found) {
+        if (selectedLombaForDetail.value?.id === found.id) return
         openDetail(found)
         return
       }
