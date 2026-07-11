@@ -1066,7 +1066,7 @@ onUnmounted(() => {
             <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
               <div class="flex items-center justify-between mb-3">
                 <div>
-                  <h5 class="font-bold text-xs text-on-surface">1. Follow Instagram @ifest_official</h5>
+                  <h5 class="font-bold text-xs text-on-surface">1. Follow Instagram @ifest_untad</h5>
                   <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Screenshot bukti follow akun Instagram I-FEST</p>
                 </div>
                 <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_follow_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Terkirim</span>
@@ -1086,7 +1086,7 @@ onUnmounted(() => {
             <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4">
               <div class="flex items-center justify-between mb-3">
                 <div>
-                  <h5 class="font-bold text-xs text-on-surface">2. Upload Twibbon + Tag @ifest_official</h5>
+                  <h5 class="font-bold text-xs text-on-surface">2. Upload Twibbon + Tag @ifest_untad</h5>
                   <p class="text-[10px] text-on-surface-variant/60 mt-0.5">Screenshot twibbon yang sudah di-posting di Instagram dan menandai akun I-FEST</p>
                 </div>
                 <span v-if="getRegistration(selectedLombaForDetail?.id)?.ig_twibbon_proof" class="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#DCEEB1] text-on-surface">Terkirim</span>
