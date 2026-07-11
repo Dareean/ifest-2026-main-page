@@ -2,16 +2,17 @@
 import { onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import api from '../utils/api'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 const statusMsg = ref('Memproses login Google...')
 
-onMounted(async () => {
+onMounted(() => {
   const token = route.query.token
   const error = route.query.error
+  const role = route.query.role || ''
+  const action = route.query.action || ''
 
   if (error) {
     statusMsg.value = 'Login Google gagal. Mengalihkan...'
@@ -25,28 +26,34 @@ onMounted(async () => {
     return
   }
 
-  try {
-    localStorage.setItem('auth_token', token)
-    auth.token = token
+  localStorage.setItem('auth_token', token)
+  auth.token = token
 
-    const res = await api.get('/auth/user')
-    const userData = res.data.user
-
-    auth.user = userData
-    localStorage.setItem('auth_user', JSON.stringify(userData))
-
-    statusMsg.value = 'Berhasil! Mengalihkan...'
-
-    if (route.query.action === 'connect') {
-      router.push('/dashboard/profile?google=connected')
-      return
-    }
-
-    router.push(userData.role === 'admin' ? '/dashboard/admin' : '/dashboard')
-  } catch {
-    statusMsg.value = 'Terjadi kesalahan. Mengalihkan...'
-    setTimeout(() => router.push('/login'), 1500)
+  // Determine role: from URL param, fallback to existing localStorage
+  let userRole = role
+  if (!userRole) {
+    try {
+      const existing = JSON.parse(localStorage.getItem('auth_user') || 'null')
+      if (existing?.role) userRole = existing.role
+    } catch {}
   }
+
+  // Set minimal user for router guard, then fetch full data in background
+  if (userRole) {
+    auth.user = { role: userRole }
+    localStorage.setItem('auth_user', JSON.stringify({ role: userRole }))
+  }
+
+  statusMsg.value = 'Berhasil! Mengalihkan...'
+
+  if (action === 'connect') {
+    router.push('/dashboard/profile?google=connected')
+  } else {
+    router.push(userRole === 'admin' ? '/dashboard/admin' : '/dashboard')
+  }
+
+  // Fetch full user data asynchronously — doesn't block navigation
+  auth.fetchUser()
 })
 </script>
 

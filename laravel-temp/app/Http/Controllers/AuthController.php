@@ -323,7 +323,7 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth-token')->plainTextToken;
 
-            return redirect($this->frontendUrl() . '/auth/callback?action=connect&token=' . $token);
+            return redirect($this->frontendUrl() . '/auth/callback?action=connect&token=' . $token . '&role=' . $user->role);
         }
 
         // === LOGIN MODE: Normal Google login ===
@@ -361,7 +361,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        return redirect($this->frontendUrl() . '/auth/callback?token=' . $token);
+        return redirect($this->frontendUrl() . '/auth/callback?token=' . $token . '&role=' . $user->role);
     }
 
     public function googleConnect(Request $request): JsonResponse
