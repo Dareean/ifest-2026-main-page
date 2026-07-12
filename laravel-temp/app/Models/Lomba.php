@@ -11,6 +11,7 @@ class Lomba extends Model
         'team_requirements', 'languages', 'babak', 'description',
         'long_description', 'rules', 'schedule', 'registration_link',
         'guidebook_link', 'contact_person', 'card_bg', 'accent_color', 'text_color', 'is_active',
+        'is_submission_open',
         'gelombang_1_start', 'gelombang_1_end', 'gelombang_2_end',
         'fee_gelombang_1', 'fee_gelombang_2',
         'payment_accounts',
@@ -21,6 +22,7 @@ class Lomba extends Model
         return [
             'rules' => 'array',
             'is_active' => 'boolean',
+            'is_submission_open' => 'boolean',
             'gelombang_1_start' => 'date',
             'gelombang_1_end' => 'date',
             'gelombang_2_end' => 'date',

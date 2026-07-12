@@ -41,3 +41,11 @@ export async function getResetTokenViaApi(email) {
   if (!res.ok()) throw new Error(`Get reset token failed: ${JSON.stringify(body)}`)
   return body
 }
+
+export async function setAdminViaApi(email) {
+  const ctx = await getRequest()
+  const res = await ctx.post(`${API_BASE}/e2e/set-admin`, { data: { email } })
+  const body = await res.json()
+  if (!res.ok()) throw new Error(`Set admin failed: ${JSON.stringify(body)}`)
+  return body
+}

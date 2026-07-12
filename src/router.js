@@ -23,6 +23,7 @@ import AdminPendaftaranDetail from './pages/dashboard/admin/AdminPendaftaranDeta
 import AdminUsers from './pages/dashboard/admin/AdminUsers.vue'
 import AdminNotifications from './pages/dashboard/admin/AdminNotifications.vue'
 import AdminManage from './pages/dashboard/admin/AdminManage.vue'
+import AdminLombas from './pages/dashboard/admin/AdminLombas.vue'
 
 const routes = [
   {
@@ -152,6 +153,11 @@ const routes = [
         path: 'manage',
         name: 'AdminManage',
         component: AdminManage,
+      },
+      {
+        path: 'lombas',
+        name: 'AdminLombas',
+        component: AdminLombas,
       },
     ],
   },

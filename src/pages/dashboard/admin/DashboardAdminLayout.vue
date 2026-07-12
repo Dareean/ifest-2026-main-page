@@ -5,7 +5,7 @@ import { useAuthStore } from '../../../stores/auth'
 import { useAdminStore } from '../../../stores/admin'
 import {
   LayoutDashboard, ClipboardList, Users, Bell, LogOut, Menu, X,
-  ChevronRight, Shield, UserCog
+  ChevronRight, Shield, UserCog, Trophy
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -18,6 +18,7 @@ const navItems = computed(() => {
   const items = [
     { path: '/dashboard/admin', name: 'Dashboard', icon: LayoutDashboard },
     { path: '/dashboard/admin/pendaftaran', name: 'Pendaftaran', icon: ClipboardList },
+    { path: '/dashboard/admin/lombas', name: 'Lomba', icon: Trophy },
     { path: '/dashboard/admin/users', name: 'Pengguna', icon: Users },
     { path: '/dashboard/admin/notifications', name: 'Notifikasi', icon: Bell },
   ]

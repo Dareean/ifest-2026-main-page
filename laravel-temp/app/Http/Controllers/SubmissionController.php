@@ -30,6 +30,10 @@ class SubmissionController extends Controller
             return response()->json(['message' => 'Pendaftaran belum diverifikasi'], 400);
         }
 
+        if (!$pendaftaran->lomba->is_submission_open) {
+            return response()->json(['message' => 'Pengumpulan karya untuk lomba ini sudah ditutup'], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'link_drive' => 'required|url|max:500',
             'catatan' => 'nullable|string|max:1000',

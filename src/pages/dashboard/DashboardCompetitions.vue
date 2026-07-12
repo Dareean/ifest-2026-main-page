@@ -710,6 +710,16 @@ onUnmounted(() => {
 
       <!-- Tab Content: Submit (Only verified) -->
       <div v-else-if="activeTab === 'submit'">
+
+        <!-- Submission closed banner -->
+        <div v-if="selectedLombaForDetail && !selectedLombaForDetail.is_submission_open" class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-6 md:p-8 text-center mb-8">
+          <Lock class="w-10 h-10 text-rose-400 mx-auto mb-3" />
+          <h3 class="font-extrabold text-sm text-rose-700 uppercase tracking-wider">Pengumpulan Ditutup</h3>
+          <p class="text-xs text-rose-600/80 mt-2 max-w-md mx-auto leading-relaxed">
+            Pengumpulan karya untuk lomba <strong>{{ selectedLombaForDetail.title }}</strong> telah ditutup oleh admin. Jika ada pertanyaan, silakan hubungi panitia.
+          </p>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <!-- Form Block (Left) -->
@@ -718,7 +728,8 @@ onUnmounted(() => {
               <CheckCircle class="w-5 h-5 text-on-surface-variant mt-0.5 flex-shrink-0" />
               <div class="min-w-0 flex-1 text-xs">
                 <h4 class="font-bold">Karya Berhasil Dikumpulkan</h4>
-                <p class="text-[11px] opacity-80 mt-1">Anda telah mengumpulkan link karya Anda. Anda tetap dapat memperbarui/mengirim ulang link karya tersebut sebelum batas waktu pendaftaran berakhir.</p>
+                <p class="text-[11px] opacity-80 mt-1" v-if="selectedLombaForDetail?.is_submission_open !== false">Anda telah mengumpulkan link karya Anda. Anda tetap dapat memperbarui/mengirim ulang link karya tersebut sebelum batas waktu pengumpulan resmi ditutup.</p>
+                <p class="text-[11px] opacity-80 mt-1" v-else>Karya Anda telah terkunci karena pengumpulan sudah ditutup.</p>
                 <div class="mt-4 pt-4 border-t border-[#DCEEB1]/45 space-y-2.5">
                   <div>
                     <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Karya (Google Drive)</span>
@@ -735,35 +746,37 @@ onUnmounted(() => {
             </div>
 
             <!-- Submit/Re-submit Form -->
-            <div class="space-y-5">
-              <h4 class="font-extrabold text-sm text-on-surface">
-                {{ getRegistration(selectedLombaForDetail?.id)?.submission ? 'Perbarui Karya Kamu' : 'Kumpulkan Karya Baru' }}
-              </h4>
-              
-              <div v-if="submitError" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-3 text-xs font-semibold text-accent-magenta">{{ submitError }}</div>
+            <template v-if="selectedLombaForDetail?.is_submission_open !== false">
+              <div class="space-y-5">
+                <h4 class="font-extrabold text-sm text-on-surface">
+                  {{ getRegistration(selectedLombaForDetail?.id)?.submission ? 'Perbarui Karya Kamu' : 'Kumpulkan Karya Baru' }}
+                </h4>
+                
+                <div v-if="submitError" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-3 text-xs font-semibold text-accent-magenta">{{ submitError }}</div>
 
-              <div>
-                <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Google Drive Karya <span class="text-accent-magenta">*</span></label>
-                <div class="relative">
-                  <FileText class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-                  <input v-model="submitForm.link_drive" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+                <div>
+                  <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Google Drive Karya <span class="text-accent-magenta">*</span></label>
+                  <div class="relative">
+                    <FileText class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
+                    <input v-model="submitForm.link_drive" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+                  </div>
+                  <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan status akses link Google Drive Anda telah disetel menjadi **Public (Siapa saja yang memiliki link dapat melihat)** agar juri dapat menilai karya Anda.</p>
                 </div>
-                <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan status akses link Google Drive Anda telah disetel menjadi **Public (Siapa saja yang memiliki link dapat melihat)** agar juri dapat menilai karya Anda.</p>
-              </div>
 
-              <div>
-                <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Catatan untuk Juri <span class="text-on-surface-variant/50">(opsional)</span></label>
-                <textarea v-model="submitForm.catatan" rows="4" placeholder="Tuliskan catatan tambahan mengenai berkas/karya Anda di sini jika ada..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all resize-none"></textarea>
-              </div>
+                <div>
+                  <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Catatan untuk Juri <span class="text-on-surface-variant/50">(opsional)</span></label>
+                  <textarea v-model="submitForm.catatan" rows="4" placeholder="Tuliskan catatan tambahan mengenai berkas/karya Anda di sini jika ada..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all resize-none"></textarea>
+                </div>
 
-              <button @click="handleSubmitKarya" :disabled="submittingSubmit || !submitForm.link_drive" class="w-full bg-[#04000D] text-white hover:bg-black py-3 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm mt-2 flex items-center justify-center gap-1.5">
-                <Send class="w-3.5 h-3.5" /> {{ submittingSubmit ? 'Mengirim...' : 'Kirim Karya' }}
-              </button>
-            </div>
+                <button @click="handleSubmitKarya" :disabled="submittingSubmit || !submitForm.link_drive" class="w-full bg-[#04000D] text-white hover:bg-black py-3 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm mt-2 flex items-center justify-center gap-1.5">
+                  <Send class="w-3.5 h-3.5" /> {{ submittingSubmit ? 'Mengirim...' : 'Kirim Karya' }}
+                </button>
+              </div>
+            </template>
           </div>
 
           <!-- Guide Sidebar (Right) -->
-          <div class="lg:col-span-5 bg-slate-50/70 border border-slate-100 rounded-2xl p-5 space-y-4">
+          <div v-if="selectedLombaForDetail?.is_submission_open !== false" class="lg:col-span-5 bg-slate-50/70 border border-slate-100 rounded-2xl p-5 space-y-4">
             <h4 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Petunjuk Pengumpulan</h4>
             <div class="space-y-3.5 text-xs text-on-surface-variant/80 leading-relaxed">
               <p>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminLombaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LombaController;
 use App\Http\Controllers\NotificationController;
@@ -91,6 +92,18 @@ if (app()->environment('local')) {
         $token = \Illuminate\Support\Facades\Password::createToken($user);
         return response()->json(['token' => $token, 'email' => $user->email]);
     });
+
+    Route::post('/e2e/set-admin', function (\Illuminate\Http\Request $request) {
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $user->update(['role' => 'admin']);
+        return response()->json([
+            'message' => 'User promoted to admin',
+            'user'    => $user->fresh(),
+        ]);
+    });
 }
 
 // Admin routes
@@ -113,4 +126,8 @@ Route::middleware(['auth:sanctum', 'admin', 'throttle:120,1'])->prefix('admin')-
     Route::put('/users/{user}/role', [AdminController::class, 'updateRole']);
     Route::get('/super/admins', [AdminController::class, 'admins']);
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
+
+    Route::get('/lombas', [AdminLombaController::class, 'index']);
+    Route::put('/lombas/{lomba}/toggle-submission', [AdminLombaController::class, 'toggleSubmission']);
+    Route::put('/lombas/{lomba}', [AdminLombaController::class, 'update']);
 });
