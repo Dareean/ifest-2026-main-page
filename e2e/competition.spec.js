@@ -10,9 +10,9 @@ test.describe('Fase 5: Competition Landing Page', () => {
     await expect(page.getByText('DIGITAL COMPETITIONS.')).toBeVisible()
   })
 
-  test('sidebar shows 6 competition navigation buttons', async ({ page }) => {
+  test('sidebar shows 5 competition navigation buttons', async ({ page }) => {
     const navButtons = page.locator('nav button')
-    await expect(navButtons).toHaveCount(6)
+    await expect(navButtons).toHaveCount(5)
   })
 
   test('first competition (Competitive Programming) is pre-selected by default', async ({ page }) => {

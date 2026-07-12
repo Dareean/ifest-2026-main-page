@@ -29,6 +29,20 @@ class AdminLombaController extends Controller
         ]);
     }
 
+    public function toggleActive(Lomba $lomba): JsonResponse
+    {
+        $lomba->update([
+            'is_active' => !$lomba->is_active,
+        ]);
+
+        $status = $lomba->fresh()->is_active ? 'ditampilkan' : 'disembunyikan';
+
+        return response()->json([
+            'message' => "Lomba {$lomba->title} berhasil {$status}",
+            'data' => $lomba->fresh(),
+        ]);
+    }
+
     public function update(Request $request, Lomba $lomba): JsonResponse
     {
         $validator = Validator::make($request->all(), [

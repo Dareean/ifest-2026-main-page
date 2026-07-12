@@ -3,10 +3,12 @@ import { ref, computed, onBeforeUnmount, onMounted, defineAsyncComponent } from 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { competitionsData } from '../data/competitionsData'
+import api from '../utils/api'
 import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock, Plus, Download, ExternalLink } from 'lucide-vue-next'
 
 const isLoggedIn = computed(() => !!localStorage.getItem('auth_token'))
 
+const activeKodes = ref([])
 const showContent = ref(true)
 const isLoading = ref(false)
 const isMenuOpen = ref(false)
@@ -972,11 +974,19 @@ const partnershipSchemes = [
   }
 ]
 
-onMounted(() => {
+onMounted(async () => {
   updateViewport()
   window.addEventListener('resize', updateViewport)
   window.addEventListener('scroll', handleScroll)
-  
+
+  // Fetch active lomba codes from API
+  try {
+    const res = await api.get('/lombas')
+    activeKodes.value = res.data.data.map(l => l.kode)
+  } catch {
+    activeKodes.value = competitionsData.map(c => c.id)
+  }
+
   // Initialize countdown
   calculateTimeLeft()
   countdownInterval = setInterval(calculateTimeLeft, 1000)
@@ -1627,7 +1637,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- TIER 3: EXPO INOVASI DIGITAL -->
-        <div>
+        <div v-if="activeKodes.includes('REG-03')">
           <div class="flex items-center gap-3 mb-8 select-none">
             <span class="font-mono text-xs font-bold uppercase tracking-widest bg-[#04000D] text-white px-2.5 py-0.5">TIER 03</span>
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#04000D]/60">{{ countdown.expired ? 'SULTENG INNOVATION ENGINE' : 'KATEGORI KHUSUS' }}</span>

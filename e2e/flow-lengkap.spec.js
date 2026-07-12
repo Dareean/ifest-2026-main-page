@@ -78,7 +78,7 @@ test.describe('Full End-to-End: Register → Verify → Login → Profile → Br
     // ===== STEP 6: BROWSE COMPETITIONS ON LANDING PAGE =====
     await test.step('Browse competitions on landing page', async () => {
       await page.goto('/kompetisi')
-      await expect(page.getByText('Kompetisi').first()).toBeVisible()
+      await page.waitForSelector('nav button', { timeout: 15000 })
 
       const cards = page.locator('nav button')
       expect(await cards.count()).toBeGreaterThanOrEqual(1)

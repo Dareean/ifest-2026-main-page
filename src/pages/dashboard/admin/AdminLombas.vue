@@ -4,7 +4,8 @@ import { useToast } from '../../../composables/useToast'
 import { useConfirm } from '../../../composables/useConfirm'
 import api from '../../../utils/api'
 import {
-  Trophy, ToggleLeft, ToggleRight, Calendar, ExternalLink, Lock, Unlock, ChevronDown, ChevronUp, Save, X
+  Trophy, ToggleLeft, ToggleRight, Calendar, ExternalLink, Lock, Unlock, ChevronDown, ChevronUp, Save, X,
+  Eye, EyeOff
 } from 'lucide-vue-next'
 
 const { showToast } = useToast()
@@ -43,6 +44,25 @@ async function fetchLombas() {
     showToast('Gagal memuat data lomba', 'error')
   } finally {
     loading.value = false
+  }
+}
+
+async function handleToggleActive(lomba) {
+  const action = lomba.is_active ? 'menyembunyikan' : 'menampilkan'
+  if (!await confirmModal.confirm(
+    `Yakin ingin ${action} lomba "${lomba.title}" dari landing page?`,
+    'Konfirmasi'
+  )) return
+
+  saving.value = lomba.id
+  try {
+    const res = await api.put(`/admin/lombas/${lomba.id}/toggle-active`)
+    showToast(res.data.message, 'success')
+    await fetchLombas()
+  } catch (e) {
+    showToast(e.response?.data?.message || 'Gagal mengubah status', 'error')
+  } finally {
+    saving.value = null
   }
 }
 
@@ -115,7 +135,7 @@ onMounted(fetchLombas)
         <!-- Main row -->
         <div class="p-4 md:p-5 flex items-center gap-4">
           <div class="flex-1 min-w-0 grid grid-cols-12 gap-2 md:gap-4 items-center text-xs">
-            <div class="col-span-12 md:col-span-3 flex items-center gap-3">
+            <div class="col-span-12 md:col-span-2 flex items-center gap-2">
               <span class="font-mono text-[10px] font-bold bg-slate-100 text-on-surface-variant/60 px-2 py-0.5 rounded">{{ lomba.kode }}</span>
               <span class="font-bold text-on-surface truncate">{{ lomba.title }}</span>
             </div>
@@ -123,11 +143,24 @@ onMounted(fetchLombas)
               <span class="md:hidden font-semibold text-[9px] uppercase tracking-wider block">Gel. 1</span>
               {{ formatDate(lomba.gelombang_1_start) }} - {{ formatDate(lomba.gelombang_1_end) }}
             </div>
-            <div class="col-span-6 md:col-span-2 text-on-surface-variant/70">
-              <span class="md:hidden font-semibold text-[9px] uppercase tracking-wider block">Gel. 2</span>
-              {{ formatDate(lomba.gelombang_2_end) || '-' }}
+            <div class="col-span-6 md:col-span-2">
+              <span class="md:hidden font-semibold text-[9px] uppercase tracking-wider block mb-1">Tampil</span>
+              <span
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                :class="lomba.is_active
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                  : 'bg-slate-100 text-slate-500 border border-slate-200'"
+              >
+                <template v-if="lomba.is_active">
+                  <Eye class="w-3 h-3" /> Tampil
+                </template>
+                <template v-else>
+                  <EyeOff class="w-3 h-3" /> Sembunyi
+                </template>
+              </span>
             </div>
             <div class="col-span-6 md:col-span-2">
+              <span class="md:hidden font-semibold text-[9px] uppercase tracking-wider block mb-1">Karya</span>
               <span
                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
                 :class="lomba.is_submission_open
@@ -142,11 +175,31 @@ onMounted(fetchLombas)
                 </template>
               </span>
             </div>
-            <div class="col-span-6 md:col-span-3 flex items-center gap-2 justify-end">
+            <div class="col-span-6 md:col-span-4 flex items-center gap-1.5 justify-end">
+              <button
+                @click="handleToggleActive(lomba)"
+                :disabled="saving === lomba.id"
+                class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all"
+                :class="lomba.is_active
+                  ? 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                  : 'bg-sky-50 text-sky-600 hover:bg-sky-100 border border-sky-200'"
+              >
+                <template v-if="saving === lomba.id">
+                  <span class="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full"></span>
+                </template>
+                <template v-else>
+                  <template v-if="lomba.is_active">
+                    <EyeOff class="w-3.5 h-3.5" /> Sembunyi
+                  </template>
+                  <template v-else>
+                    <Eye class="w-3.5 h-3.5" /> Tampil
+                  </template>
+                </template>
+              </button>
               <button
                 @click="handleToggle(lomba)"
                 :disabled="saving === lomba.id"
-                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all"
+                class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all"
                 :class="lomba.is_submission_open
                   ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'
                   : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'"

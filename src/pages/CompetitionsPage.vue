@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { competitionsData } from '../data/competitionsData'
 import { Lock } from 'lucide-vue-next'
+import api from '../utils/api'
 
 const dokumenAssetModules = import.meta.glob('../assets/dokumen/**/*', { eager: true })
 const getAsset = (assetModules, folder, fileName) => {
@@ -15,6 +16,7 @@ const router = useRouter()
 const isLoggedIn = !!localStorage.getItem('auth_token')
 
 function handleDaftar() {
+  if (!activeCompetition.value) return
   if (isLoggedIn) {
     router.push(`/dashboard/competitions?id=${activeCompetition.value.id}`)
   } else {
@@ -22,7 +24,11 @@ function handleDaftar() {
   }
 }
 
-const activeCompetition = ref(competitionsData[0])
+const activeKodes = ref([])
+const visibleCompetitions = computed(() =>
+  competitionsData.filter(c => activeKodes.value.includes(c.id))
+)
+const activeCompetition = ref(null)
 const isScrolled = ref(false)
 
 const handleScroll = () => {
@@ -54,20 +60,31 @@ const getShortName = (id) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.scrollTo(0, 0)
   window.addEventListener('scroll', handleScroll)
-  
+
+  // Fetch active lomba codes from API
+  try {
+    const res = await api.get('/lombas')
+    activeKodes.value = res.data.data.map(l => l.kode)
+  } catch {
+    activeKodes.value = competitionsData.map(c => c.id)
+  }
+
   // Initialize countdown
   calculateTimeLeft()
   countdownInterval = setInterval(calculateTimeLeft, 1000)
   
   const compId = route.query.id
   if (compId) {
-    const found = competitionsData.find(c => c.id === compId)
+    const found = visibleCompetitions.value.find(c => c.id === compId)
     if (found) {
       activeCompetition.value = found
     }
+  }
+  if (!activeCompetition.value && visibleCompetitions.value.length > 0) {
+    activeCompetition.value = visibleCompetitions.value[0]
   }
 })
 
@@ -111,7 +128,7 @@ onUnmounted(() => {
 
 watch(() => route.query.id, (newId) => {
   if (newId) {
-    const found = competitionsData.find(c => c.id === newId)
+    const found = visibleCompetitions.value.find(c => c.id === newId)
     if (found) {
       activeCompetition.value = found
     }
@@ -197,11 +214,11 @@ watch(() => route.query.id, (newId) => {
         <div class="max-w-container-max mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar font-mono text-[10px] uppercase font-bold text-[#04000D]">
           <span class="text-[#04000D]/50 mr-2 flex-shrink-0">Jump To:</span>
           <button 
-            v-for="comp in competitionsData" 
+            v-for="comp in visibleCompetitions" 
             :key="comp.id"
             @click="selectCompetitionAndScroll(comp)"
             class="px-2.5 py-1 border border-[#04000D] transition-all duration-150 flex-shrink-0 hover:bg-[#04000D] hover:text-white"
-            :class="activeCompetition.id === comp.id ? 'bg-[#04000D] text-white' : 'bg-white text-[#04000D]'"
+            :class="activeCompetition?.id === comp.id ? 'bg-[#04000D] text-white' : 'bg-white text-[#04000D]'"
           >
             {{ getShortName(comp.id) }}
           </button>
@@ -288,30 +305,30 @@ watch(() => route.query.id, (newId) => {
           <!-- Vertical list on desktop, Horizontal scrolling strip on mobile -->
           <nav class="flex lg:flex-col gap-4 overflow-x-auto pb-4 lg:pb-0 lg:overflow-x-visible no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0">
             <button 
-              v-for="comp in competitionsData" 
+              v-for="comp in visibleCompetitions" 
               :key="comp.id"
               @click="selectCompetitionAndScroll(comp)"
               class="flex-shrink-0 lg:flex-shrink text-left font-mono font-bold text-xs uppercase border-2 md:border-3 border-[#04000D] p-4 flex flex-col justify-between transition-all duration-150 cursor-pointer min-w-[200px] lg:w-full select-none"
               :style="{ 
-                backgroundColor: activeCompetition.id === comp.id ? comp.cardBg : '#F5F5F5',
-                transform: activeCompetition.id === comp.id ? 'translate(0px, 0px)' : 'translate(-3px, -3px)',
-                boxShadow: activeCompetition.id === comp.id ? '0px 0px 0px 0px #04000D' : '4px 4px 0px 0px #04000D',
-                color: activeCompetition.id === comp.id ? comp.textColor : '#04000D'
+                backgroundColor: activeCompetition?.id === comp.id ? comp.cardBg : '#F5F5F5',
+                transform: activeCompetition?.id === comp.id ? 'translate(0px, 0px)' : 'translate(-3px, -3px)',
+                boxShadow: activeCompetition?.id === comp.id ? '0px 0px 0px 0px #04000D' : '4px 4px 0px 0px #04000D',
+                color: activeCompetition?.id === comp.id ? comp.textColor : '#04000D'
               }"
             >
               <div class="flex justify-between items-start mb-4 w-full">
                 <span 
                   class="text-[8px] px-1.5 py-0.5 rounded-none font-mono tracking-widest"
                   :style="{ 
-                    backgroundColor: activeCompetition.id === comp.id && comp.textColor === '#FFFFFF' ? '#FFFFFF' : '#04000D',
-                    color: activeCompetition.id === comp.id && comp.textColor === '#FFFFFF' ? '#04000D' : '#FFFFFF'
+                    backgroundColor: activeCompetition?.id === comp.id && comp.textColor === '#FFFFFF' ? '#FFFFFF' : '#04000D',
+                    color: activeCompetition?.id === comp.id && comp.textColor === '#FFFFFF' ? '#04000D' : '#FFFFFF'
                   }"
                 >
                   {{ comp.id }}
                 </span>
                 <span 
                   class="text-[9px] tracking-wider opacity-60"
-                  :style="{ color: activeCompetition.id === comp.id ? comp.textColor : '#04000D' }"
+                  :style="{ color: activeCompetition?.id === comp.id ? comp.textColor : '#04000D' }"
                 >
                   {{ comp.scale }}
                 </span>
@@ -319,7 +336,7 @@ watch(() => route.query.id, (newId) => {
               
               <span 
                 class="text-sm font-black leading-none uppercase select-none"
-                :style="{ color: activeCompetition.id === comp.id ? comp.textColor : '#04000D' }"
+                :style="{ color: activeCompetition?.id === comp.id ? comp.textColor : '#04000D' }"
               >
                 {{ comp.title }}
               </span>
@@ -392,7 +409,7 @@ watch(() => route.query.id, (newId) => {
         <!-- CONTENT AREA (THE DEEP CONTEXT) -->
         <main class="w-full">
           <!-- Dynamic details page for the active selection -->
-          <article id="competition-details" class="bg-white border-3 md:border-4 border-[#04000D] p-6 sm:p-8 md:p-12 relative" :style="{ boxShadow: '10px 10px 0px 0px #04000D' }">
+          <article v-if="activeCompetition" id="competition-details" class="bg-white border-3 md:border-4 border-[#04000D] p-6 sm:p-8 md:p-12 relative" :style="{ boxShadow: '10px 10px 0px 0px #04000D' }">
             
             <!-- Category Banner Accent -->
             <div class="absolute -top-0.5 right-6 bg-[#04000D] text-white px-4 py-1.5 font-mono text-[9px] sm:text-xs font-bold uppercase tracking-widest">

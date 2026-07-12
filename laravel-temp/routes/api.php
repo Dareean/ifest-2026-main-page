@@ -129,5 +129,6 @@ Route::middleware(['auth:sanctum', 'admin', 'throttle:120,1'])->prefix('admin')-
 
     Route::get('/lombas', [AdminLombaController::class, 'index']);
     Route::put('/lombas/{lomba}/toggle-submission', [AdminLombaController::class, 'toggleSubmission']);
+    Route::put('/lombas/{lomba}/toggle-active', [AdminLombaController::class, 'toggleActive']);
     Route::put('/lombas/{lomba}', [AdminLombaController::class, 'update']);
 });

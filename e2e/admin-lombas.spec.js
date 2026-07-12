@@ -81,6 +81,46 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     expect(toggleData2.data.is_submission_open).toBe(initial)
   })
 
+  test('API: toggle-active changes is_active and public list reflects it', async ({ page }) => {
+    const { request } = await import('@playwright/test')
+    const ctx = await request.newContext()
+
+    // Get all lombas (admin endpoint includes inactive)
+    const adminLombasRes = await ctx.get(`${API_BASE}/admin/lombas`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    })
+    const adminLombas = await adminLombasRes.json()
+    const sdih = adminLombas.data.find(l => l.kode === 'REG-03')
+    expect(sdih).toBeDefined()
+    // S-DIH should start inactive after migration
+    expect(sdih.is_active).toBe(false)
+
+    // Public endpoint should NOT include S-DIH
+    const publicRes = await ctx.get(`${API_BASE}/lombas`)
+    const publicData = await publicRes.json()
+    const publicKodes = publicData.data.map(l => l.kode)
+    expect(publicKodes).not.toContain('REG-03')
+
+    // Toggle active ON
+    const toggleOn = await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    })
+    expect(toggleOn.ok()).toBe(true)
+    const toggleOnData = await toggleOn.json()
+    expect(toggleOnData.data.is_active).toBe(true)
+
+    // Now public endpoint SHOULD include S-DIH
+    const publicRes2 = await ctx.get(`${API_BASE}/lombas`)
+    const publicData2 = await publicRes2.json()
+    const publicKodes2 = publicData2.data.map(l => l.kode)
+    expect(publicKodes2).toContain('REG-03')
+
+    // Toggle active OFF (cleanup)
+    await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    })
+  })
+
   test('API: admin can update lomba deadlines', async ({ page }) => {
     const { request } = await import('@playwright/test')
     const ctx = await request.newContext()
