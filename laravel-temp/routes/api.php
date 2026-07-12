@@ -10,15 +10,16 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes with rate limiting
-Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,10');
-Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
-Route::post('/auth/send-otp', [AuthController::class, 'sendOtp'])->middleware('throttle:3,10');
-Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp'])->middleware('throttle:10,1');
-Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,10');
-Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,10');
-Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])->middleware('throttle:10,1');
-Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])->middleware('throttle:10,1');
+// Public routes — skip throttle in local for E2E testing
+$authThrottle = fn($limit) => env('APP_ENV') === 'local' ? [] : ["throttle:$limit"];
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware(...$authThrottle('5,10'));
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware(...$authThrottle('10,1'));
+Route::post('/auth/send-otp', [AuthController::class, 'sendOtp'])->middleware(...$authThrottle('3,10'));
+Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp'])->middleware(...$authThrottle('10,1'));
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware(...$authThrottle('3,10'));
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware(...$authThrottle('5,10'));
+Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])->middleware(...$authThrottle('10,1'));
+Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])->middleware(...$authThrottle('10,1'));
 
 Route::get('/lombas', [LombaController::class, 'index']);
 Route::get('/lombas/{lomba}', [LombaController::class, 'show']);
@@ -78,7 +79,7 @@ if (app()->environment('local')) {
         $user->update(['email_verified_at' => now()]);
         return response()->json([
             'message' => 'User verified',
-            'user'    => $user,
+            'user'    => $user->fresh(),
         ]);
     });
 }

@@ -24,6 +24,11 @@ class AuthController extends Controller
 
     private function sendOtpEmail(string $email, string $name, string $otp, string $expiresAt): void
     {
+        if (app()->environment('local')) {
+            Log::info('OTP for ' . $email . ': ' . $otp . ' (expires at ' . $expiresAt . ')');
+            return;
+        }
+
         try {
             $html = view('emails.otp', compact('name', 'otp', 'expiresAt'))->render();
 

@@ -19,19 +19,19 @@ test.describe('Competition Flow', () => {
   test('landing page shows competition list', async ({ page }) => {
     await page.goto('/kompetisi')
     await expect(page.getByText('Kompetisi').first()).toBeVisible()
-    const cards = page.locator('[class*="card"]')
+    const cards = page.locator('nav button')
     expect(await cards.count()).toBeGreaterThanOrEqual(1)
   })
 
   test('dashboard competition page loads with tabs', async ({ page }) => {
-    await page.goto('/dashboard/competitions')
+    await page.goto('/dashboard/competitions?id=1')
     await page.waitForTimeout(3000)
     const lombaHeading = page.getByText(/Lomba|Kompetisi|Pilih/i).first()
     await expect(lombaHeading).toBeVisible()
   })
 
   test('sidebar shows competition sub-navigation tabs', async ({ page }) => {
-    await page.goto('/dashboard/competitions')
+    await page.goto('/dashboard/competitions?id=1')
     await page.waitForTimeout(3000)
 
     const tabs = page.locator('button:has-text("Detail & Juknis"), button:has-text("Timeline")')

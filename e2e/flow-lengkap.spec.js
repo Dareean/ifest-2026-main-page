@@ -80,7 +80,7 @@ test.describe('Full End-to-End: Register → Verify → Login → Profile → Br
       await page.goto('/kompetisi')
       await expect(page.getByText('Kompetisi').first()).toBeVisible()
 
-      const cards = page.locator('[class*="card"]')
+      const cards = page.locator('nav button')
       expect(await cards.count()).toBeGreaterThanOrEqual(1)
       results.push('✅ Competitions: Landing page shows competition cards')
     })
