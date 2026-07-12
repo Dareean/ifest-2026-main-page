@@ -33,3 +33,11 @@ export async function loginViaApi(email, password) {
   if (!res.ok()) throw new Error(`Login failed: ${JSON.stringify(body)}`)
   return body
 }
+
+export async function getResetTokenViaApi(email) {
+  const ctx = await getRequest()
+  const res = await ctx.post(`${API_BASE}/e2e/reset-token`, { data: { email } })
+  const body = await res.json()
+  if (!res.ok()) throw new Error(`Get reset token failed: ${JSON.stringify(body)}`)
+  return body
+}

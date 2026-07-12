@@ -82,6 +82,15 @@ if (app()->environment('local')) {
             'user'    => $user->fresh(),
         ]);
     });
+
+    Route::post('/e2e/reset-token', function (\Illuminate\Http\Request $request) {
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $token = \Illuminate\Support\Facades\Password::createToken($user);
+        return response()->json(['token' => $token, 'email' => $user->email]);
+    });
 }
 
 // Admin routes

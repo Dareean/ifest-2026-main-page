@@ -142,7 +142,7 @@ class DatabaseSeeder extends Seeder
                 'gelombang_2_end' => '2026-08-09',
                 'registration_link' => 'https://forms.gle/2AaDqvh8ZKPa8etJA',
                 'guidebook_link' => 'https://drive.google.com/drive/folders/1XNmBvEaB4mRfVv3_pZKwiUsKLXLlUJCk?usp=sharing',
-                'contact_person' => 'Nailah (+62 838-4711-4963)',
+                'contact_person' => 'Naila (+62 838-4711-4963)',
                 'card_bg' => '#FFF9E6',
                 'accent_color' => '#8839FF',
                 'text_color' => '#04000D',

@@ -133,7 +133,7 @@ export const competitionsData = [
     schedule: "Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 12 Agustus 2026 | Pengumpulan Video: 28 Agustus 2026 | Pengumuman Top 5: 4 September 2026 | Pengumuman Pemenang: Hari H I-Fest",
     registrationLink: "https://forms.gle/2AaDqvh8ZKPa8etJA",
     guidebookLink: "https://drive.google.com/drive/folders/1XNmBvEaB4mRfVv3_pZKwiUsKLXLlUJCk?usp=sharing",
-    contactPerson: "Nailah (+62 838-4711-4963)"
+    contactPerson: "Naila (+62 838-4711-4963)"
   },
   {
     id: "REG-02",
