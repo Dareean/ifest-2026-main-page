@@ -11,7 +11,8 @@ import ProgressStepper from '../../components/ProgressStepper.vue'
 import {
   Trophy, Plus, ExternalLink, CheckCircle, Clock, AlertTriangle,
   Send, X, Users, BookOpen, ArrowLeft,
-  Award, FileText, Printer, UserMinus, Mail
+  Award, FileText, Printer, UserMinus, Mail,
+  Lock, PenTool, Download
 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
@@ -26,7 +27,7 @@ const lombaList = ref([])
 
 // Forms state
 const daftarForm = ref({ team_name: '' })
-const submitForm = ref({ link_drive: '', catatan: '' })
+const submitForm = ref({ link_drive: '', link_figma: '', originality_statement: '', catatan: '' })
 const submitting = ref(false)
 const submittingSubmit = ref(false)
 const error = ref('')
@@ -193,11 +194,13 @@ function openDetail(lomba) {
   if (reg) {
     submitForm.value = {
       link_drive: reg.submission?.link_drive || '',
+      link_figma: reg.submission?.link_figma || '',
+      originality_statement: reg.submission?.originality_statement || '',
       catatan: reg.submission?.catatan || ''
     }
   } else {
     daftarForm.value = { team_name: '' }
-    submitForm.value = { link_drive: '', catatan: '' }
+    submitForm.value = { link_drive: '', link_figma: '', originality_statement: '', catatan: '' }
   }
 }
 
@@ -240,6 +243,8 @@ async function handleSubmitKarya() {
   try {
     const res = await api.post(`/pendaftarans/${reg.id}/submit`, {
       link_drive: submitForm.value.link_drive,
+      link_figma: submitForm.value.link_figma || null,
+      originality_statement: submitForm.value.originality_statement,
       catatan: submitForm.value.catatan || null,
     })
     // Optimistic update: patch submission into local pendaftaran
@@ -261,6 +266,16 @@ async function handleSubmitKarya() {
   } finally {
     submittingSubmit.value = false
   }
+}
+
+function originalityTemplateLink(kode) {
+  const links = {
+    'NAT-02': 'https://docs.google.com/document/d/1ui-E7Symhsn2M15EAgjQnc1LZgYZ033_/edit',
+    'REG-02': 'https://docs.google.com/document/d/1GvLE8dYQI7CSvuVjLB4_IJs4ysIjqDCo2Uiwp7Y_sN0/edit',
+    'REG-01': 'https://docs.google.com/document/d/1v4R8d-lPNegQb6ysRsMqkZBJHmyxx6aYamci-tKgu0w/edit',
+    'NAT-03': 'https://docs.google.com/document/d/1nnZbDPE8ZGt5vNKZlgruAGoAq1NmehsbrDAWV_hhe1c/edit',
+  }
+  return links[kode] || null
 }
 
 async function handleInvite() {
@@ -737,6 +752,18 @@ onUnmounted(() => {
                       {{ getRegistration(selectedLombaForDetail?.id)?.submission?.link_drive }} <ExternalLink class="w-3 h-3 flex-shrink-0" />
                     </a>
                   </div>
+                  <div v-if="selectedLombaForDetail?.kode === 'NAT-02' && getRegistration(selectedLombaForDetail?.id)?.submission?.link_figma">
+                    <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Figma</span>
+                    <a :href="getRegistration(selectedLombaForDetail?.id)?.submission?.link_figma" target="_blank" class="text-xs font-bold text-on-surface hover:underline flex items-center gap-1 mt-0.5 truncate text-sky-600">
+                      {{ getRegistration(selectedLombaForDetail?.id)?.submission?.link_figma }} <ExternalLink class="w-3 h-3 flex-shrink-0" />
+                    </a>
+                  </div>
+                  <div v-if="getRegistration(selectedLombaForDetail?.id)?.submission?.originality_statement">
+                    <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Surat Pernyataan Orisinalitas</span>
+                    <a :href="getRegistration(selectedLombaForDetail?.id)?.submission?.originality_statement" target="_blank" class="text-xs font-bold text-on-surface hover:underline flex items-center gap-1 mt-0.5 truncate text-sky-600">
+                      {{ getRegistration(selectedLombaForDetail?.id)?.submission?.originality_statement }} <ExternalLink class="w-3 h-3 flex-shrink-0" />
+                    </a>
+                  </div>
                   <div v-if="getRegistration(selectedLombaForDetail?.id)?.submission?.catatan">
                     <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Catatan</span>
                     <p class="text-xs text-on-surface mt-0.5 leading-relaxed bg-white/50 border border-slate-100 rounded-xl p-3">{{ getRegistration(selectedLombaForDetail?.id)?.submission?.catatan }}</p>
@@ -763,12 +790,35 @@ onUnmounted(() => {
                   <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan status akses link Google Drive Anda telah disetel menjadi **Public (Siapa saja yang memiliki link dapat melihat)** agar juri dapat menilai karya Anda.</p>
                 </div>
 
+                <!-- Link Figma (UI/UX only) -->
+                <div v-if="selectedLombaForDetail?.kode === 'NAT-02'">
+                  <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Figma <span class="text-accent-magenta">*</span></label>
+                  <div class="relative">
+                    <PenTool class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
+                    <input v-model="submitForm.link_figma" placeholder="https://www.figma.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+                  </div>
+                  <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan akses Figma diatur ke <strong>"Anyone with the link"</strong> agar juri dapat melihat prototipe Anda.</p>
+                </div>
+
+                <!-- Surat Pernyataan Orisinalitas -->
+                <div>
+                  <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Surat Pernyataan Orisinalitas <span class="text-accent-magenta">*</span></label>
+                  <div class="relative">
+                    <FileText class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
+                    <input v-model="submitForm.originality_statement" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+                  </div>
+                  <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Unduh template surat pernyataan orisinalitas, isi dan tanda tangani, lalu unggah ke Google Drive dengan akses <strong>Public</strong>.</p>
+                  <a v-if="originalityTemplateLink(selectedLombaForDetail?.kode)" :href="originalityTemplateLink(selectedLombaForDetail?.kode)" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-accent-magenta hover:underline mt-1">
+                    <Download class="w-3 h-3" /> Download Template Surat Pernyataan
+                  </a>
+                </div>
+
                 <div>
                   <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Catatan untuk Juri <span class="text-on-surface-variant/50">(opsional)</span></label>
                   <textarea v-model="submitForm.catatan" rows="4" placeholder="Tuliskan catatan tambahan mengenai berkas/karya Anda di sini jika ada..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all resize-none"></textarea>
                 </div>
 
-                <button @click="handleSubmitKarya" :disabled="submittingSubmit || !submitForm.link_drive" class="w-full bg-[#04000D] text-white hover:bg-black py-3 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm mt-2 flex items-center justify-center gap-1.5">
+                <button @click="handleSubmitKarya" :disabled="submittingSubmit || !submitForm.link_drive || !submitForm.originality_statement" class="w-full bg-[#04000D] text-white hover:bg-black py-3 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm mt-2 flex items-center justify-center gap-1.5">
                   <Send class="w-3.5 h-3.5" /> {{ submittingSubmit ? 'Mengirim...' : 'Kirim Karya' }}
                 </button>
               </div>
@@ -780,16 +830,19 @@ onUnmounted(() => {
             <h4 class="font-extrabold text-xs text-on-surface uppercase tracking-wider">Petunjuk Pengumpulan</h4>
             <div class="space-y-3.5 text-xs text-on-surface-variant/80 leading-relaxed">
               <p>
-                <strong>1. Persiapkan Link Google Drive:</strong> Pastikan folder atau berkas karya Anda sudah diunggah secara lengkap ke Google Drive.
+                <strong>1. Persiapkan Google Drive:</strong> Pastikan folder atau berkas karya Anda sudah diunggah secara lengkap ke Google Drive. Aksesnya harus <strong>Public</strong>.
               </p>
               <p>
-                <strong>2. Atur Akses Link:</strong> Klik kanan folder di Google Drive $\rightarrow$ <em>Share</em> $\rightarrow$ Ubah akses umum menjadi <strong>"Anyone with the link / Siapa saja yang memiliki link"</strong> dengan peran <strong>Viewer</strong>.
+                <strong>2. Surat Pernyataan Orisinalitas:</strong> Download template surat pernyataan, isi dan tanda tangani, lalu unggah kembali ke Google Drive dengan akses <strong>Public</strong>. Tempelkan tautannya di kolom yang tersedia.
+              </p>
+              <p v-if="selectedLombaForDetail?.kode === 'NAT-02'">
+                <strong>3. Link Figma (UI/UX):</strong> Publikasikan prototipe Figma Anda dan atur akses menjadi <strong>"Anyone with the link"</strong>. Salin tautan dan tempelkan pada kolom yang tersedia.
               </p>
               <p>
-                <strong>3. Tempel Tautan:</strong> Salin tautan Google Drive tersebut dan tempelkan pada kolom input yang tersedia di samping kiri.
+                <strong>{{ selectedLombaForDetail?.kode === 'NAT-02' ? '4' : '3' }}. Tempel Tautan Karya:</strong> Salin tautan Google Drive Anda dan tempelkan pada kolom input yang tersedia di samping kiri.
               </p>
               <p>
-                <strong>4. Batas Waktu:</strong> Anda dapat memperbarui kiriman tautan berkas karya Anda berulang kali hingga batas waktu pengumpulan resmi ditutup.
+                <strong>{{ selectedLombaForDetail?.kode === 'NAT-02' ? '5' : '4' }}. Batas Waktu:</strong> Anda dapat memperbarui kiriman tautan berkas karya Anda berulang kali hingga batas waktu pengumpulan resmi ditutup.
               </p>
             </div>
           </div>

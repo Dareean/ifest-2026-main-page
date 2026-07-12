@@ -14,6 +14,8 @@ export const PROFILE_UPDATE = {
 }
 
 export const DRIVE_LINK = 'https://drive.google.com/file/d/1e2e-test-submission'
+export const FIGMA_LINK = 'https://www.figma.com/file/1e2e-test-figma'
+export const ORIGINALITY_LINK = 'https://drive.google.com/file/d/1e2e-test-originality'
 
 export function uniqueEmail(prefix = 'e2e') {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@test.ifest.com`

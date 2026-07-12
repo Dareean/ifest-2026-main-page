@@ -34,10 +34,18 @@ class SubmissionController extends Controller
             return response()->json(['message' => 'Pengumpulan karya untuk lomba ini sudah ditutup'], 403);
         }
 
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'link_drive' => 'required|url|max:500',
+            'link_figma' => 'nullable|url|max:500',
+            'originality_statement' => 'required|url|max:500',
             'catatan' => 'nullable|string|max:1000',
-        ]);
+        ];
+
+        if ($pendaftaran->lomba->kode === 'NAT-02') {
+            $rules['link_figma'] = 'required|url|max:500';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -47,6 +55,8 @@ class SubmissionController extends Controller
             ['pendaftaran_id' => $pendaftaran->id],
             [
                 'link_drive' => $request->link_drive,
+                'link_figma' => $request->link_figma,
+                'originality_statement' => $request->originality_statement,
                 'catatan' => $request->catatan,
                 'status' => 'submitted',
             ]

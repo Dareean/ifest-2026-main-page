@@ -390,8 +390,19 @@ onMounted(fetchDetail)
           <h2 class="font-extrabold text-sm text-on-surface mb-4 flex items-center gap-2">
             <Send class="w-4 h-4 text-accent-magenta" /> Karya
           </h2>
-          <div class="text-xs">
-            <a :href="reg.submission.link_drive" target="_blank" class="font-bold text-sky-600 hover:underline break-all">{{ reg.submission.link_drive }}</a>
+          <div class="text-xs space-y-2.5">
+            <div>
+              <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Karya (Google Drive)</span>
+              <a :href="reg.submission.link_drive" target="_blank" class="font-bold text-sky-600 hover:underline break-all mt-0.5 block">{{ reg.submission.link_drive }}</a>
+            </div>
+            <div v-if="reg.submission.link_figma">
+              <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Link Figma</span>
+              <a :href="reg.submission.link_figma" target="_blank" class="font-bold text-sky-600 hover:underline break-all mt-0.5 block">{{ reg.submission.link_figma }}</a>
+            </div>
+            <div v-if="reg.submission.originality_statement">
+              <span class="text-[9px] font-bold uppercase text-on-surface-variant/40 tracking-wider">Surat Pernyataan Orisinalitas</span>
+              <a :href="reg.submission.originality_statement" target="_blank" class="font-bold text-sky-600 hover:underline break-all mt-0.5 block">{{ reg.submission.originality_statement }}</a>
+            </div>
             <p v-if="reg.submission.catatan" class="text-on-surface-variant/80 mt-2 bg-slate-50 rounded-xl p-3">{{ reg.submission.catatan }}</p>
           </div>
         </div>

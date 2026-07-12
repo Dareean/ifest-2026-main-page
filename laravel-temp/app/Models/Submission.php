@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Submission extends Model
 {
     protected $fillable = [
-        'pendaftaran_id', 'link_drive', 'catatan', 'status',
+        'pendaftaran_id', 'link_drive', 'link_figma', 'originality_statement', 'catatan', 'status',
     ];
 
     public function pendaftaran()
