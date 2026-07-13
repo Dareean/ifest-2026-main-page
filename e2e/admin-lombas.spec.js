@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { TEST_USER, uniqueEmail, DRIVE_LINK, API_BASE } from './fixtures/data.js'
+import { TEST_USER, uniqueEmail, DRIVE_LINK, FIGMA_LINK, ORIGINALITY_LINK, API_BASE } from './fixtures/data.js'
 import { registerUserViaApi, verifyUserViaApi, loginViaApi, setAdminViaApi } from './helpers/seed.js'
 
 test.describe('Fase 6: Admin Lomba Management', () => {
@@ -121,6 +121,48 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     })
   })
 
+  test('UI: toggle S-DIH active changes landing page competition count', async ({ page }) => {
+    // Toggle S-DIH ON via API
+    const { request } = await import('@playwright/test')
+    const ctx = await request.newContext()
+
+    const adminLombasRes = await ctx.get(`${API_BASE}/admin/lombas`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    })
+    const adminLombas = await adminLombasRes.json()
+    const sdih = adminLombas.data.find(l => l.kode === 'REG-03')
+    expect(sdih).toBeDefined()
+
+    // Ensure S-DIH is currently OFF
+    if (sdih.is_active) {
+      await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      })
+    }
+
+    // Navigate to landing page and verify 5 competitions
+    await page.goto('/kompetisi')
+    await page.waitForSelector('nav button', { timeout: 15000 })
+    let count = await page.locator('nav button').count()
+    expect(count).toBe(5)
+
+    // Toggle S-DIH ON
+    await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    })
+
+    // Navigate to landing page and verify 6 competitions
+    await page.goto('/kompetisi')
+    await page.waitForSelector('nav button', { timeout: 15000 })
+    count = await page.locator('nav button').count()
+    expect(count).toBe(6)
+
+    // Toggle back OFF (cleanup)
+    await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    })
+  })
+
   test('API: admin can update lomba deadlines', async ({ page }) => {
     const { request } = await import('@playwright/test')
     const ctx = await request.newContext()
@@ -144,5 +186,76 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     expect(updateRes.ok()).toBe(true)
     const updateData = await updateRes.json()
     expect(updateData.data.contact_person).toContain('E2E Test CP')
+  })
+})
+
+test.describe('Admin Detail — Submission Fields', () => {
+  let adminToken
+
+  test.beforeAll(async () => {
+    const adminEmail = uniqueEmail('e2e-detail-admin')
+    await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
+    await verifyUserViaApi(adminEmail)
+    await setAdminViaApi(adminEmail)
+    const login = await loginViaApi(adminEmail, TEST_USER.password)
+    adminToken = login.data?.token || login.token
+  })
+
+  test('admin detail shows figma and originality statement for submitted karya', async ({ page }) => {
+    const { request } = await import('@playwright/test')
+    const ctx = await request.newContext()
+
+    // Create a user, register for first comp, verify, submit with figma + originality
+    const userEmail = uniqueEmail('e2e-detail-user')
+    await registerUserViaApi({ ...TEST_USER, email: userEmail, password_confirmation: TEST_USER.password })
+    await verifyUserViaApi(userEmail)
+    const userLogin = await loginViaApi(userEmail, TEST_USER.password)
+    const userToken = userLogin.data?.token || userLogin.token
+
+    const lombasRes = await ctx.get(`${API_BASE}/lombas`)
+    const lombas = await lombasRes.json()
+    const first = lombas.data?.[0]
+    if (!first) return
+
+    const daftarRes = await ctx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
+      headers: { Authorization: `Bearer ${userToken}`, Accept: 'application/json' },
+    })
+    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
+    if (!pendaftaranId) return
+
+    // Verify
+    await ctx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
+      headers: { Authorization: `Bearer ${adminToken}`, Accept: 'application/json' },
+    })
+
+    // Submit with all fields
+    await ctx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
+      headers: { Authorization: `Bearer ${userToken}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      data: {
+        link_drive: DRIVE_LINK,
+        link_figma: first.kode === 'NAT-02' ? FIGMA_LINK : null,
+        originality_statement: ORIGINALITY_LINK,
+      },
+    })
+
+    // Admin login via UI and check detail page
+    await page.goto('/login')
+    await page.waitForSelector('input[type="email"]', { timeout: 10000 })
+    await page.fill('input[type="email"]', adminEmail)
+    await page.fill('input[type="password"]', TEST_USER.password)
+    await page.click('button[type="submit"]')
+    await page.waitForURL(/\/dashboard/, { timeout: 20000 })
+
+    await page.goto(`/dashboard/admin/pendaftarans/${pendaftaranId}`)
+    await page.waitForTimeout(2000)
+
+    // Verify the new fields are displayed
+    await expect(page.getByText('Surat Pernyataan Orisinalitas')).toBeVisible()
+    await expect(page.getByText(ORIGINALITY_LINK)).toBeVisible()
+
+    if (first.kode === 'NAT-02') {
+      await expect(page.getByText('Link Figma')).toBeVisible()
+      await expect(page.getByText(FIGMA_LINK)).toBeVisible()
+    }
   })
 })

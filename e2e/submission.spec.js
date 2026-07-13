@@ -97,3 +97,134 @@ test.describe('Submission Flow', () => {
     expect(submitData.data.originality_statement).toBe(ORIGINALITY_LINK)
   })
 })
+
+test.describe('Submission Flow — Validation Errors', () => {
+  let userEmail
+  let token
+  let adminToken
+
+  test.beforeAll(async () => {
+    userEmail = uniqueEmail('e2e-val')
+    await registerUserViaApi({ ...TEST_USER, email: userEmail, password_confirmation: TEST_USER.password })
+    await verifyUserViaApi(userEmail)
+    const loginRes = await loginViaApi(userEmail, TEST_USER.password)
+    token = loginRes.data?.token || loginRes.token
+
+    const adminEmail = uniqueEmail('e2e-val-admin')
+    await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
+    await verifyUserViaApi(adminEmail)
+    await setAdminViaApi(adminEmail)
+    const adminLogin = await loginViaApi(adminEmail, TEST_USER.password)
+    adminToken = adminLogin.data?.token || adminLogin.token
+  })
+
+  test('API: submit without originality_statement returns 422', async ({ request }) => {
+    const lombasRes = await request.get(`${API_BASE}/lombas`)
+    const lombas = await lombasRes.json()
+    const first = lombas.data?.[0]
+    if (!first) return
+
+    const daftarRes = await request.post(`${API_BASE}/lombas/${first.id}/daftar`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+    })
+    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
+    if (!pendaftaranId) return
+
+    await request.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
+      headers: { Authorization: `Bearer ${adminToken}`, Accept: 'application/json' },
+    })
+
+    const submitRes = await request.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      data: { link_drive: DRIVE_LINK },
+    })
+    expect(submitRes.status()).toBe(422)
+  })
+
+  test('API: submit UI/UX without link_figma returns 422', async ({ request }) => {
+    const daftarRes = await request.post(`${API_BASE}/lombas/2/daftar`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+    })
+    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
+    if (!pendaftaranId) return
+
+    await request.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
+      headers: { Authorization: `Bearer ${adminToken}`, Accept: 'application/json' },
+    })
+
+    const submitRes = await request.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      data: { link_drive: DRIVE_LINK, originality_statement: ORIGINALITY_LINK },
+    })
+    expect(submitRes.status()).toBe(422)
+  })
+})
+
+test.describe('Submission Flow — UI Submit', () => {
+  let userEmail
+  let token
+  let adminToken
+
+  test.beforeAll(async () => {
+    userEmail = uniqueEmail('e2e-ui-submit')
+    await registerUserViaApi({ ...TEST_USER, email: userEmail, password_confirmation: TEST_USER.password })
+    await verifyUserViaApi(userEmail)
+    const loginRes = await loginViaApi(userEmail, TEST_USER.password)
+    token = loginRes.data?.token || loginRes.token
+
+    const adminEmail = uniqueEmail('e2e-ui-admin')
+    await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
+    await verifyUserViaApi(adminEmail)
+    await setAdminViaApi(adminEmail)
+    const adminLogin = await loginViaApi(adminEmail, TEST_USER.password)
+    adminToken = adminLogin.data?.token || adminLogin.token
+  })
+
+  test('UI: submit karya via form shows success and displays new fields', async ({ page }) => {
+    // Setup: register for first competition and verify via API
+    const lombasRes = await page.request.get(`${API_BASE}/lombas`)
+    const lombas = await lombasRes.json()
+    const first = lombas.data?.[0]
+    if (!first) return
+
+    const daftarRes = await page.request.post(`${API_BASE}/lombas/${first.id}/daftar`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+    })
+    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
+    if (!pendaftaranId) return
+
+    await page.request.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
+      headers: { Authorization: `Bearer ${adminToken}`, Accept: 'application/json' },
+    })
+
+    // Now do the UI flow
+    await loginViaUI(page, userEmail, TEST_USER.password)
+    await page.goto('/dashboard/competitions')
+    await page.waitForTimeout(3000)
+
+    const submitBtn = page.locator('button:has-text("Pengumpulan Karya")')
+    await expect(submitBtn.first()).toBeVisible({ timeout: 10000 })
+    await submitBtn.first().click()
+    await page.waitForTimeout(1000)
+
+    // Fill the form
+    const inputs = page.locator('input')
+    const count = await inputs.count()
+
+    // First input is link_drive
+    await inputs.nth(0).fill(DRIVE_LINK)
+
+    // Last input before textarea is originality_statement
+    await inputs.nth(count - 1).fill(ORIGINALITY_LINK)
+
+    // Submit
+    await page.click('button:has-text("Kirim Karya")')
+
+    // Wait for success banner
+    await expect(page.getByText('Karya Berhasil Dikumpulkan')).toBeVisible({ timeout: 15000 })
+
+    // Verify links are displayed in the submission banner
+    await expect(page.getByText(DRIVE_LINK)).toBeVisible()
+    await expect(page.getByText(ORIGINALITY_LINK)).toBeVisible()
+  })
+})
