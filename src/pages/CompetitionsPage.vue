@@ -504,7 +504,7 @@ watch(() => route.query.id, (newId) => {
             </div>
 
             <!-- TIMELINE BLOCK -->
-            <div class="mb-10 p-5 bg-[#DCEEB1]/20 border border-[#04000D] font-mono text-xs font-bold text-[#04000D] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div v-if="activeCompetition.schedule" class="mb-10 p-5 bg-[#DCEEB1]/20 border border-[#04000D] font-mono text-xs font-bold text-[#04000D] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <span class="text-accent-magenta">★ JADWAL PENTING:</span>
               <span class="bg-white border border-[#04000D] px-3 py-1">{{ activeCompetition.schedule }}</span>
             </div>

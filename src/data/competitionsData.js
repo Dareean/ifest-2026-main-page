@@ -4,9 +4,9 @@ export const competitionsData = [
     title: "Competitive Programming",
     scale: "Nasional",
     tagline: "ALGORITMA & PROBLEM SOLVING",
-    fee: "Rp 50.000 / Tim",
-    feeGelombang1: "Rp 40.000 / Tim",
-    feeGelombang2: "Rp 50.000 / Tim",
+    fee: "Rp 85.000 / Tim",
+    feeGelombang1: "Rp 65.000 / Tim",
+    feeGelombang2: "Rp 85.000 / Tim",
     target: "Terbuka untuk Umum (Usia 16-25 Tahun)",
     teamRequirements: "Tim (2-3 Orang)",
     languages: "Semua Bahasa Pemrograman (Platform HackerRank)",
@@ -26,8 +26,7 @@ export const competitionsData = [
       "Di babak penyisihan, setiap tim memiliki hak untuk menggunakan maksimal 3 komputer/laptop dengan webcam menyala (open camera & share screen).",
       "Dilarang keras menggunakan bantuan AI, melakukan kecurangan seperti plagiarisme kode, atau bertukar jawaban antar tim."
     ],
-    schedule: "Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 15 Agustus 2026 | Warm Up: 17 Agustus 2026 | Babak Penyisihan: 28 Agustus 2026 | Pengumuman Top 5: 4 September 2026 | Final: 5 September 2026",
-    registrationLink: "https://forms.gle/PiRWMLUo9NyKS6Kc8",
+    registrationLink: "https://forms.gle/PiRWMLUo9NyKS6cK8",
     guidebookLink: "https://drive.google.com/drive/folders/1WqwaGvTRvwXyBxFZsK5266hjBLUI7RI7?usp=sharing",
     contactPerson: "Alma (+62 822-1488-2845)"
   },
@@ -36,9 +35,9 @@ export const competitionsData = [
     title: "UI/UX Design",
     scale: "Nasional",
     tagline: "DESAIN DIGITAL BERDAMPAK",
-    fee: "Rp 50.000 / Tim",
-    feeGelombang1: "Rp 40.000 / Tim",
-    feeGelombang2: "Rp 50.000 / Tim",
+    fee: "Rp 85.000 / Tim",
+    feeGelombang1: "Rp 65.000 / Tim",
+    feeGelombang2: "Rp 85.000 / Tim",
     target: "Terbuka untuk Umum (Usia 17-25 Tahun)",
     teamRequirements: "Tim (3 Orang)",
     languages: "Figma, Adobe XD, atau sejenisnya",
@@ -61,7 +60,6 @@ export const competitionsData = [
       "Desain harus orisinal, belum pernah menjuarai kompetisi lain, dan tidak menggunakan UI Kit instan secara utuh.",
       "Babak final diikuti oleh 5 tim terbaik yang akan mempresentasikan karya mereka secara online di hadapan juri."
     ],
-    schedule: "Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 10 Agustus 2026 | Pengumpulan Proposal Karya: 28 Agustus 2026 | Penilaian Awal: 29 Agustus - 3 September 2026 | Pengumuman Top 5: 4 September 2026 | Pengumpulan Link Figma: 8 September 2026 | Presentasi Karya: 12 September 2026 | Pengumuman Pemenang: Hari H I-Fest",
     registrationLink: "https://forms.gle/aud4FoHggF3qow1G8",
     guidebookLink: "https://drive.google.com/drive/folders/10qgvLbmJIKpdVZpM_oV9Ak8wyg4dH7T1?usp=sharing",
     contactPerson: "Cut (+62 813-3237-0684)"
@@ -72,7 +70,7 @@ export const competitionsData = [
     scale: "Nasional",
     tagline: "IDE BISNIS INOVATIF",
     fee: "Rp 85.000 / Tim",
-    feeGelombang1: "Rp 70.000 / Tim",
+    feeGelombang1: "Rp 65.000 / Tim",
     feeGelombang2: "Rp 85.000 / Tim",
     target: "Terbuka untuk Umum",
     teamRequirements: "Tim (Maks. 3 orang)",
@@ -95,7 +93,6 @@ export const competitionsData = [
       "Wajib menyertakan rancangan model monetisasi dan analisis SWOT yang komprehensif.",
       "Di babak final, peserta diwajibkan memaparkan Pitch Deck di hadapan investor dan juri profesional dalam durasi 10 menit presentasi + tanya jawab."
     ],
-    schedule: "Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 11 Agustus 2026 | Pengumpulan Proposal Bisnis: 28 Agustus 2026 | Pengumuman Top 5: 4 September 2026 | Final: 11 September 2026 | Pengumuman Pemenang: Hari H I-Fest",
     registrationLink: "/#detail-kegiatan",
     guidebookLink: "https://drive.google.com/drive/folders/1EFmunjQoGOKC-hcQjCHFYYX0rb54xJ6g?usp=sharing",
     contactPerson: "Saiful (+62 819-4356-2655)"
@@ -130,7 +127,6 @@ export const competitionsData = [
       "Karya diunggah sebagai Reels ke Instagram ketua tim dengan menandai akun @ifest_untad, akun tidak privat, dan menggunakan caption resmi.",
       "Wajib menggunakan template logo panitia sebagai opening dan logo sponsor sebagai closing."
     ],
-    schedule: "Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 12 Agustus 2026 | Pengumpulan Video: 28 Agustus 2026 | Pengumuman Top 5: 4 September 2026 | Pengumuman Pemenang: Hari H I-Fest",
     registrationLink: "https://forms.gle/2AaDqvh8ZKPa8etJA",
     guidebookLink: "https://drive.google.com/drive/folders/1XNmBvEaB4mRfVv3_pZKwiUsKLXLlUJCk?usp=sharing",
     contactPerson: "Naila (+62 838-4711-4963)"
@@ -165,7 +161,6 @@ export const competitionsData = [
       "Wajib menyertakan template logo resmi yang disediakan oleh panitia pada karya poster.",
       "Karya harus orisinal, belum pernah memenangkan kompetisi lain, dan tidak mengandung SARA."
     ],
-    schedule: "Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 14 Agustus 2026 | Pengumpulan Karya: 28 Agustus 2026 | Pengumuman Top 5: 4 September 2026 | Pengumuman Pemenang: Hari H I-Fest",
     registrationLink: "https://forms.gle/n6YQRPEqUJX9PrHJ6",
     guidebookLink: "https://drive.google.com/drive/folders/1N_JYDUUHaqHZLSjN-YFhJzQ270yVq46c?usp=sharing",
     contactPerson: "Kisya (+62 821-9597-3499)"
@@ -200,7 +195,6 @@ export const competitionsData = [
       "Wajib melakukan commit kode ke repositori GitHub yang dipantau mentor berkala.",
       "Hasil akhir wajib dipamerkan secara interaktif di Paviliun S-DIH pada Expo Utama Hari-H."
     ],
-    schedule: "Registrasi: 11 Juli - 5 Agustus 2026 | Technical Briefing: Akhir Juli 2026 | Hackathon & Pitching: Agustus 2026",
     registrationLink: "/#detail-kegiatan",
     guidebookLink: "#"
   }
