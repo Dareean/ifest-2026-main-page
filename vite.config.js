@@ -6,12 +6,12 @@ export default defineConfig({
   assetsInclude: ['**/*.docx', '**/*.xlsx'],
   plugins: [
     vue(),
-    visualizer({
+    ...(process.env.VITE_VISUALIZER ? [visualizer({
       filename: 'stats.html',
       title: 'I-FEST 2026 Bundle Size Visualization',
       open: false,
       gzipSize: true,
       brotliSize: true
-    })
+    })] : []),
   ],
 })

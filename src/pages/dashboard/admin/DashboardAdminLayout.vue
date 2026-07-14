@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { useAdminStore } from '../../../stores/admin'
+import api from '../../../utils/api'
 import {
   LayoutDashboard, ClipboardList, Users, Bell, LogOut, Menu, X,
   ChevronRight, Shield, UserCog, Trophy
@@ -31,7 +32,23 @@ async function handleLogout() {
   router.push('/login')
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Server-side role verification — if localStorage was tampered, redirect
+  try {
+    const { data } = await api.get('/auth/user')
+    if (data.user?.role !== 'admin') {
+      auth.logout()
+      router.push('/login')
+      return
+    }
+    // Sync freshest user data into store
+    auth.user = data.user
+    localStorage.setItem('auth_user', JSON.stringify(data.user))
+  } catch {
+    auth.logout()
+    router.push('/login')
+    return
+  }
   admin.fetchStats()
 })
 </script>

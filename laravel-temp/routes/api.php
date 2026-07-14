@@ -22,8 +22,8 @@ Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->m
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])->middleware(...$authThrottle('10,1'));
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])->middleware(...$authThrottle('10,1'));
 
-Route::get('/lombas', [LombaController::class, 'index']);
-Route::get('/lombas/{lomba}', [LombaController::class, 'show']);
+Route::get('/lombas', [LombaController::class, 'index'])->middleware('throttle:60,1');
+Route::get('/lombas/{lomba}', [LombaController::class, 'show'])->middleware('throttle:60,1');
 
 // AI chat proxy (protected to prevent abuse)
 Route::middleware('auth:sanctum')->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
@@ -72,38 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // E2E testing helpers (local environment only — never in production)
 if (app()->environment('local')) {
-    Route::post('/e2e/verify-user', function (\Illuminate\Http\Request $request) {
-        $user = \App\Models\User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-        $user->update(['email_verified_at' => now()]);
-        return response()->json([
-            'message' => 'User verified',
-            'user'    => $user->fresh(),
-        ]);
-    });
-
-    Route::post('/e2e/reset-token', function (\Illuminate\Http\Request $request) {
-        $user = \App\Models\User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-        $token = \Illuminate\Support\Facades\Password::createToken($user);
-        return response()->json(['token' => $token, 'email' => $user->email]);
-    });
-
-    Route::post('/e2e/set-admin', function (\Illuminate\Http\Request $request) {
-        $user = \App\Models\User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-        $user->update(['role' => 'admin']);
-        return response()->json([
-            'message' => 'User promoted to admin',
-            'user'    => $user->fresh(),
-        ]);
-    });
+    require __DIR__.'/api-e2e.php';
 }
 
 // Admin routes

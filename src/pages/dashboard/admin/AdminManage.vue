@@ -123,6 +123,7 @@ onMounted(fetch)
                     :disabled="updatingUserId === user.id"
                     class="bg-slate-50 hover:bg-slate-100/80 border border-slate-200 focus:border-[#04000D]/40 rounded-lg py-1 pl-2 pr-6 text-[10px] font-mono font-bold uppercase text-on-surface focus:outline-none transition-all cursor-pointer appearance-none disabled:opacity-50"
                   >
+                    <option value="user">User</option>
                     <option value="admin">Admin</option>
                   </select>
                   <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/50 text-[8px]">▼</span>

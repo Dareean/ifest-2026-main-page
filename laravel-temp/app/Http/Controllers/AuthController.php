@@ -119,12 +119,21 @@ class AuthController extends Controller
     public function verifyOtp(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|exists:users,email',
+            'email' => 'required|string|email',
             'otp' => 'required|string|size:6',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email sudah diverifikasi'], 400);
         }
 
         $records = EmailVerification::where('email', $request->email)
@@ -136,8 +145,6 @@ class AuthController extends Controller
         if (!$record) {
             return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
         }
-
-        $user = User::where('email', $request->email)->first();
         $user->update(['email_verified_at' => now()]);
 
         $record->delete();

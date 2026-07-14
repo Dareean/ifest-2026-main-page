@@ -213,6 +213,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($lombas as $lomba) {
+            // S-DIH (REG-03) is hidden from public view — only displayed when explicitly activated via admin panel
+            if ($lomba['kode'] === 'REG-03') {
+                $lomba['is_active'] = false;
+            }
             Lomba::updateOrCreate(
                 ['kode' => $lomba['kode']],
                 $lomba

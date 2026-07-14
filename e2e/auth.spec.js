@@ -320,13 +320,13 @@ test.describe('Auth Flow — OTP Verification', () => {
     expect(body.errors.otp).toBeDefined()
   })
 
-  test('verify OTP with non-existent email returns 422', async ({ request }) => {
+  test('verify OTP with non-existent email returns 400', async ({ request }) => {
     const res = await request.post(`${API_BASE}/auth/verify-otp`, {
       data: { email: 'nonexistent@test.com', otp: '123456' }
     })
-    expect(res.status()).toBe(422)
+    expect(res.status()).toBe(400)
     const body = await res.json()
-    expect(body.errors.email).toBeDefined()
+    expect(body.message).toBeDefined()
   })
 })
 

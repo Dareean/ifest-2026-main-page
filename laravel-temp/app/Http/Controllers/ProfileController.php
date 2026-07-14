@@ -65,9 +65,28 @@ class ProfileController extends Controller
             return response()->json(['message' => 'File tidak valid. Hanya JPEG, PNG, dan WEBP yang diizinkan.'], 422);
         }
 
-        // Simpan file baru ke storage/app/public/avatars
-        $path = $file->store('public/avatars');
-        $publicUrl = '/storage/avatars/' . basename($path);
+        // Convert dan simpan sebagai WebP untuk konsistensi format dan keamanan
+        $filename = 'avatar_' . uniqid() . '.webp';
+        $destDir = storage_path('app/public/avatars');
+        if (!is_dir($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+        $destPath = $destDir . '/' . $filename;
+
+        $srcImage = match ($mime) {
+            'image/jpeg' => imagecreatefromjpeg($file->getRealPath()),
+            'image/png'  => imagecreatefrompng($file->getRealPath()),
+            'image/webp' => imagecreatefromwebp($file->getRealPath()),
+        };
+
+        if (!$srcImage) {
+            return response()->json(['message' => 'Gagal memproses gambar'], 500);
+        }
+
+        imagewebp($srcImage, $destPath, 80);
+        imagedestroy($srcImage);
+
+        $publicUrl = '/storage/avatars/' . $filename;
 
         $user->update(['avatar' => $publicUrl]);
 

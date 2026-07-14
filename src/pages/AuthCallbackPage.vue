@@ -17,6 +17,9 @@ onMounted(() => {
   const role = hashParams.get('role') || route.query.role || ''
   const action = hashParams.get('action') || route.query.action || ''
 
+  // Clear hash fragment from URL bar to prevent token persistence in browser history
+  window.history.replaceState(null, '', window.location.pathname + window.location.search)
+
   if (error) {
     statusMsg.value = 'Login Google gagal. Mengalihkan...'
     setTimeout(() => router.push('/login?error=google_failed'), 1500)
