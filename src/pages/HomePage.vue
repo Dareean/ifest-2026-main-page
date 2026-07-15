@@ -220,11 +220,6 @@ const doc2025AssetModules = import.meta.glob('../assets/dokumentasi_ifest2025/*'
   import: 'default',
 })
 
-const dokumenAssetModules = import.meta.glob('../assets/dokumen/*', {
-  eager: true,
-  import: 'default',
-})
-
 const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${folder}/${fileName}`] ?? ''
 
 const panitiaAssetModules = import.meta.glob('../assets/foto_kepanitiaan_ifest2026/**/*', {
