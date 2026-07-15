@@ -62,3 +62,5 @@ playwright/.cache/
 # ─── Misc ───────────────────────────────────────────────────
 *.local
 .vercel
+stats.html
+node_modules

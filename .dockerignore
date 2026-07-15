@@ -6,6 +6,6 @@ stats.html
 .DS_Store
 *.log
 .vite
-laravel-temp/vendor
-laravel-temp/node_modules
+backend/vendor
+backend/node_modules
 vue_frontend_backup

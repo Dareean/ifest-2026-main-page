@@ -31,7 +31,7 @@ e2e/
 
 ```bash
 # 1. Pastikan backend jalan
-cd laravel-temp && php artisan serve &
+cd backend && php artisan serve &
 # atau via Docker: docker-compose up -d backend
 
 # 2. Jalankan semua test E2E

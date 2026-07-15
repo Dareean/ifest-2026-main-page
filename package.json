@@ -11,7 +11,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "test:backend": "cd laravel-temp && composer test",
+    "test:backend": "cd backend && composer test",
     "check:all": "npm run test:e2e && npm run test:backend"
   },
   "dependencies": {
