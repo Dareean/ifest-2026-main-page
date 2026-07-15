@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/e2e/verify-user', function (Request $request) {
+Route::middleware('throttle:10,1')->post('/e2e/verify-user', function (Request $request) {
     $user = \App\Models\User::where('email', $request->email)->first();
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
@@ -16,7 +16,7 @@ Route::post('/e2e/verify-user', function (Request $request) {
     ]);
 });
 
-Route::post('/e2e/reset-token', function (Request $request) {
+Route::middleware('throttle:10,1')->post('/e2e/reset-token', function (Request $request) {
     $user = \App\Models\User::where('email', $request->email)->first();
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
@@ -25,7 +25,7 @@ Route::post('/e2e/reset-token', function (Request $request) {
     return response()->json(['token' => $token, 'email' => $user->email]);
 });
 
-Route::post('/e2e/set-admin', function (Request $request) {
+Route::middleware('throttle:5,10')->post('/e2e/set-admin', function (Request $request) {
     $user = \App\Models\User::where('email', $request->email)->first();
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);

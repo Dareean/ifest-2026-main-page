@@ -26,7 +26,7 @@ Route::get('/lombas', [LombaController::class, 'index'])->middleware('throttle:6
 Route::get('/lombas/{lomba}', [LombaController::class, 'show'])->middleware('throttle:60,1');
 
 // AI chat proxy (protected to prevent abuse)
-Route::middleware('auth:sanctum')->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
+Route::middleware(['auth:sanctum', 'throttle:30,1'])->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
 
 // Protected routes — global rate limit 60 req/min
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
