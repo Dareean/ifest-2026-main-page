@@ -24,7 +24,7 @@
     "dompurify": "^3.4.11",
     "gsap": "^3.15.0",
     "lucide-vue-next": "^0.577.0",
-    "marked": "^18.0.4",
+    "marked": "^18.0.6",
     "pinia": "^3.0.4",
     "vue": "^3.5.13",
     "vue-router": "^4.6.4"
