@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\EmailVerification;
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
@@ -127,6 +129,14 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $otpKey = 'otp_attempts_' . $request->email;
+        $attempts = (int) Cache::get($otpKey, 0);
+
+        if ($attempts >= 3) {
+            Log::warning('OTP brute force blocked', ['email' => $request->email]);
+            return response()->json(['message' => 'Terlalu banyak percobaan. Silakan minta kode OTP baru.'], 429);
+        }
+
         $user = User::where('email', $request->email)->first();
         if (!$user) {
             return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
@@ -143,8 +153,12 @@ class AuthController extends Controller
         $record = $records->first(fn($r) => $r->verify($request->otp));
 
         if (!$record) {
+            Cache::put($otpKey, $attempts + 1, now()->addHour());
+            Log::warning('OTP verification failed', ['email' => $request->email]);
             return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
         }
+
+        Cache::forget($otpKey);
         $user->update(['email_verified_at' => now()]);
 
         $record->delete();
@@ -175,9 +189,24 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $limiter = app(RateLimiter::class);
+        $loginKey = 'login:' . $request->input('email');
+
+        if ($limiter->tooManyAttempts($loginKey, 5)) {
+            $seconds = $limiter->availableIn($loginKey);
+            Log::warning('Login rate limited', ['email' => $request->input('email'), 'ip' => $request->ip()]);
+            return response()->json([
+                'message' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.'
+            ], 429);
+        }
+
         if (!Auth::attempt($request->only('email', 'password'))) {
+            $limiter->hit($loginKey, 900);
+            Log::warning('Login failed', ['email' => $request->input('email'), 'ip' => $request->ip()]);
             return response()->json(['message' => 'Email atau password salah'], 401);
         }
+
+        $limiter->clear($loginKey);
 
         $request->session()->regenerate();
 
