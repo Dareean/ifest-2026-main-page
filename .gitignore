@@ -25,6 +25,9 @@ out/
 # ─── Vite Cache ─────────────────────────────────────────────
 .vite/
 
+# ─── AI/Workspace Config ──────────────────────────────────────
+.claude/
+
 # ─── Editor & OS Files ──────────────────────────────────────
 .DS_Store
 .DS_Store?
@@ -63,4 +66,3 @@ playwright/.cache/
 *.local
 .vercel
 stats.html
-node_modules
