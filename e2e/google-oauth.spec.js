@@ -1,9 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { API_BASE, TEST_USER, uniqueEmail } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi } from './helpers/seed.js'
+import { loginViaUI } from './helpers/auth.js'
+
+const ROOT = API_BASE.replace('/api', '')
 
 test.describe('Google OAuth - API', () => {
-  let email, token, user
+  let email
 
   test.beforeAll(async () => {
     email = uniqueEmail('google')
@@ -14,9 +17,6 @@ test.describe('Google OAuth - API', () => {
       password_confirmation: TEST_USER.password,
     })
     await verifyUserViaApi(email)
-    const loginRes = await loginViaApi(email, TEST_USER.password)
-    token = loginRes.token
-    user = loginRes.user
   })
 
   test('GET /auth/google/redirect returns redirect URL', async ({ request }) => {
@@ -28,7 +28,6 @@ test.describe('Google OAuth - API', () => {
       expect(typeof body.url).toBe('string')
       expect(body.url.length).toBeGreaterThan(0)
     } else {
-      // Google OAuth not configured in local env — acceptable
       expect(status).toBe(500)
     }
   })
@@ -39,9 +38,9 @@ test.describe('Google OAuth - API', () => {
   })
 
   test('GET /auth/google/connect returns URL when authenticated', async ({ request }) => {
-    const res = await request.get(`${API_BASE}/auth/google/connect`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    await request.get(`${ROOT}/sanctum/csrf-cookie`)
+    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
+    const res = await request.get(`${API_BASE}/auth/google/connect`)
     const status = res.status()
     if (status === 200) {
       const body = await res.json()
@@ -49,7 +48,6 @@ test.describe('Google OAuth - API', () => {
       expect(typeof body.url).toBe('string')
       expect(body.url.length).toBeGreaterThan(0)
     } else {
-      // Google OAuth not configured in local env — acceptable
       expect(status).toBe(500)
     }
   })
@@ -60,9 +58,9 @@ test.describe('Google OAuth - API', () => {
   })
 
   test('POST /auth/google/disconnect returns 200 when authenticated', async ({ request }) => {
-    const res = await request.post(`${API_BASE}/auth/google/disconnect`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    await request.get(`${ROOT}/sanctum/csrf-cookie`)
+    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
+    const res = await request.post(`${API_BASE}/auth/google/disconnect`)
     expect(res.status()).toBe(200)
     const body = await res.json()
     expect(body).toHaveProperty('message')
@@ -94,28 +92,15 @@ test.describe('Google OAuth - UI', () => {
   })
 
   test('Profile page shows "Hubungkan Google" when disconnected', async ({ page }) => {
-    const { token, user } = await loginViaApi(email, TEST_USER.password)
-
-    await page.goto('/')
-    await page.evaluate(({ t, u }) => {
-      localStorage.setItem('auth_token', t)
-      localStorage.setItem('auth_user', JSON.stringify(u))
-    }, { t: token, u: user })
-
+    await loginViaUI(page, email, TEST_USER.password)
     await page.goto('/dashboard/profile')
     await expect(page.getByRole('button', { name: /hubungkan google/i })).toBeVisible()
   })
 
-  test('Profile page can disconnect Google from connected state', async ({ page }) => {
-    const { token, user } = await loginViaApi(email, TEST_USER.password)
+  test('Profile page can disconnect Google from connected state', async ({ page, request }) => {
+    await request.get(`${ROOT}/sanctum/csrf-cookie`)
+    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
 
-    await page.goto('/')
-    await page.evaluate(({ t, u }) => {
-      localStorage.setItem('auth_token', t)
-      localStorage.setItem('auth_user', JSON.stringify(u))
-    }, { t: token, u: user })
-
-    // Intercept /auth/user to simulate a user with google_id connected
     await page.route('**/api/auth/user', async route => {
       const response = await route.fetch()
       const body = await response.json()

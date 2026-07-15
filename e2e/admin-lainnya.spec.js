@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { TEST_USER, uniqueEmail, API_BASE } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginViaApi, setAdminViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, setAdminViaApi } from './helpers/seed.js'
 
 test.describe('Admin Dashboard', () => {
   let adminEmail
@@ -48,22 +48,17 @@ test.describe('Admin Dashboard', () => {
 })
 
 test.describe('Admin Users', () => {
-  let adminEmail, adminToken
-  let targetEmail, targetToken
+  let adminEmail, targetEmail
 
   test.beforeAll(async () => {
     adminEmail = uniqueEmail('e2e-users-admin')
     await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(adminEmail)
     await setAdminViaApi(adminEmail)
-    const adminLogin = await loginViaApi(adminEmail, TEST_USER.password)
-    adminToken = adminLogin.data?.token || adminLogin.token
 
     targetEmail = uniqueEmail('e2e-users-target')
     await registerUserViaApi({ ...TEST_USER, email: targetEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(targetEmail)
-    const loginRes = await loginViaApi(targetEmail, TEST_USER.password)
-    targetToken = loginRes.data?.token || loginRes.token
   })
 
   test.beforeEach(async ({ page }) => {
@@ -109,7 +104,6 @@ test.describe('Admin Manage', () => {
     await verifyUserViaApi(adminEmail)
     await setAdminViaApi(adminEmail)
 
-    // Create second admin
     const admin2Email = uniqueEmail('e2e-manage-admin2')
     await registerUserViaApi({ ...TEST_USER, email: admin2Email, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(admin2Email)

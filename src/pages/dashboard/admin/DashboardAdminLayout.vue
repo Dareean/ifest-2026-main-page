@@ -43,7 +43,6 @@ onMounted(async () => {
     }
     // Sync freshest user data into store
     auth.user = data.user
-    localStorage.setItem('auth_user', JSON.stringify(data.user))
   } catch {
     auth.logout()
     router.push('/login')

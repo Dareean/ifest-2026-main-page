@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { TEST_USER, uniqueEmail, API_BASE } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginViaApi, setAdminViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, loginAs } from './helpers/seed.js'
+
+const ROOT = API_BASE.replace('/api', '')
 
 test.describe('Admin Pendaftaran', () => {
   let adminEmail
@@ -10,32 +12,23 @@ test.describe('Admin Pendaftaran', () => {
     adminEmail = uniqueEmail('e2e-pendaftaran-admin')
     await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(adminEmail)
-    await setAdminViaApi(adminEmail)
+    await (await import('./helpers/seed.js')).setAdminViaApi(adminEmail)
 
-    // Get a competition ID first
-    const adminLogin = await loginViaApi(adminEmail, TEST_USER.password)
-    const adminToken = adminLogin.data?.token || adminLogin.token
-
-    const { request } = await import('@playwright/test')
-    const ctx = await request.newContext()
-    const lombasRes = await ctx.get(`${API_BASE}/lombas`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    })
+    const adminCtx = await loginAs(adminEmail, TEST_USER.password)
+    const lombasRes = await adminCtx.get(`${API_BASE}/lombas`)
     const lombas = await lombasRes.json()
     lombaId = lombas.data?.[0]?.id
 
-    // Register 3 users with different statuses
     const statuses = ['pending']
     for (const s of statuses) {
       const email = uniqueEmail('e2e-penda')
       await registerUserViaApi({ ...TEST_USER, email, password_confirmation: TEST_USER.password })
       await verifyUserViaApi(email)
-      const loginRes = await loginViaApi(email, TEST_USER.password)
-      const tok = loginRes.data?.token || loginRes.token
+      const userCtx = await loginAs(email, TEST_USER.password)
 
       if (lombaId) {
-        const res = await ctx.post(`${API_BASE}/lombas/${lombaId}/daftar`, {
-          headers: { Authorization: `Bearer ${tok}`, Accept: 'application/json' },
+        await userCtx.post(`${API_BASE}/lombas/${lombaId}/daftar`, {
+          headers: { Accept: 'application/json' },
         })
       }
     }

@@ -3,10 +3,12 @@ import { ref, computed, onBeforeUnmount, onMounted, defineAsyncComponent } from 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { competitionsData } from '../data/competitionsData'
+import { useAuthStore } from '../stores/auth'
 import api from '../utils/api'
 import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock, Plus, Download, ExternalLink } from 'lucide-vue-next'
 
-const isLoggedIn = computed(() => !!localStorage.getItem('auth_token'))
+const auth = useAuthStore()
+const isLoggedIn = computed(() => auth.isAuthenticated)
 
 const activeKodes = ref([])
 const showContent = ref(true)

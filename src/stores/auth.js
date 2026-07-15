@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import api from '../utils/api'
+import api, { getCsrf } from '../utils/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(JSON.parse(localStorage.getItem('auth_user') || 'null'))
-  const token = ref(localStorage.getItem('auth_token') || '')
+  const user = ref(null)
   const loading = ref(false)
 
-  const isAuthenticated = computed(() => !!token.value)
+  const isAuthenticated = computed(() => !!user.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
+
   async function register(data) {
     loading.value = true
     try {
+      await getCsrf()
       const res = await api.post('/auth/register', data)
       return res.data
     } finally {
@@ -22,11 +23,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(data) {
     loading.value = true
     try {
+      await getCsrf()
       const res = await api.post('/auth/login', data)
-      token.value = res.data.token
       user.value = res.data.user
-      localStorage.setItem('auth_token', res.data.token)
-      localStorage.setItem('auth_user', JSON.stringify(res.data.user))
       return res.data
     } finally {
       loading.value = false
@@ -37,9 +36,8 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await api.get('/auth/user')
       user.value = res.data.user
-      localStorage.setItem('auth_user', JSON.stringify(res.data.user))
     } catch {
-      logout()
+      user.value = null
     }
   }
 
@@ -49,14 +47,12 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       // ignore
     }
-    token.value = ''
     user.value = null
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('auth_user')
   }
 
   async function googleLogin() {
     try {
+      await getCsrf()
       const res = await api.get('/auth/google/redirect')
       window.location.href = res.data.url
     } catch (e) {
@@ -66,6 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function connectGoogle() {
     try {
+      await getCsrf()
       const res = await api.get('/auth/google/connect')
       window.location.href = res.data.url
     } catch (e) {
@@ -75,16 +72,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function disconnectGoogle() {
     await api.post('/auth/google/disconnect')
-    user.value.google_id = null
-    user.value.avatar = null
-    localStorage.setItem('auth_user', JSON.stringify(user.value))
+    await fetchUser()
   }
 
-  function handleGoogleCallback(authToken, userObj) {
-    token.value = authToken
-    user.value = userObj
-    localStorage.setItem('auth_token', authToken)
-    localStorage.setItem('auth_user', JSON.stringify(userObj))
+  async function handleGoogleCallback() {
+    await fetchUser()
   }
 
   async function sendOtp(email) {
@@ -92,16 +84,14 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function verifyOtp(email, otp) {
+    await getCsrf()
     const res = await api.post('/auth/verify-otp', { email, otp })
-    token.value = res.data.token
     user.value = res.data.user
-    localStorage.setItem('auth_token', res.data.token)
-    localStorage.setItem('auth_user', JSON.stringify(res.data.user))
     return res.data
   }
 
   return {
-    user, token, loading, isAuthenticated,
+    user, loading, isAuthenticated, isAdmin,
     register, login, fetchUser, logout, googleLogin, connectGoogle,
     disconnectGoogle, handleGoogleCallback, sendOtp, verifyOtp,
   }

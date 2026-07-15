@@ -2,9 +2,11 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { competitionsData } from '../data/competitionsData'
+import { useAuthStore } from '../stores/auth'
 import { Lock } from 'lucide-vue-next'
 import api from '../utils/api'
 
+const auth = useAuthStore()
 const dokumenAssetModules = import.meta.glob('../assets/dokumen/**/*', { eager: true })
 const getAsset = (assetModules, folder, fileName) => {
   const path = `../assets/${folder}/${fileName}`
@@ -13,7 +15,7 @@ const getAsset = (assetModules, folder, fileName) => {
 
 const route = useRoute()
 const router = useRouter()
-const isLoggedIn = !!localStorage.getItem('auth_token')
+const isLoggedIn = computed(() => auth.isAuthenticated)
 
 function handleDaftar() {
   if (!activeCompetition.value) return

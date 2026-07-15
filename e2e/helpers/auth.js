@@ -9,15 +9,3 @@ export async function loginViaUI(page, email, password) {
 
   await page.waitForURL(/\/dashboard/, { timeout: 20000 })
 }
-
-export async function getAuthToken(page) {
-  return page.evaluate(() => localStorage.getItem('auth_token'))
-}
-
-export async function logout(page) {
-  await page.evaluate(() => {
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('auth_user')
-  })
-  await page.goto('/')
-}

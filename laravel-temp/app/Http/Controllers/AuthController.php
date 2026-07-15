@@ -155,12 +155,12 @@ class AuthController extends Controller
             'pesan'   => "Halo, {$user->name}! Akun kamu berhasil diverifikasi. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan tim kamu sekarang!",
         ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        Auth::login($user);
+        $request->session()->regenerate();
 
         return response()->json([
             'message' => 'Email berhasil diverifikasi',
             'user'    => $user->only(['id', 'name', 'email', 'role']),
-            'token'   => $token,
         ]);
     }
 
@@ -179,10 +179,13 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email atau password salah'], 401);
         }
 
+        $request->session()->regenerate();
+
         $user = Auth::user();
 
         if (is_null($user->email_verified_at) && $user->role !== 'admin') {
             Auth::logout();
+            $request->session()->invalidate();
             return response()->json([
                 'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
                 'needs_verification' => true,
@@ -190,18 +193,26 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $token = $user->createToken('auth-token')->plainTextToken;
-
         return response()->json([
             'message' => 'Login berhasil',
             'user' => $user,
-            'token' => $token,
         ]);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        // Revoke token if using Bearer auth
+        $token = $request->user()?->currentAccessToken();
+        if ($token && method_exists($token, 'delete')) {
+            $token->delete();
+        }
+
+        // Logout session if using SPA auth
+        if (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->json(['message' => 'Logout berhasil']);
     }
@@ -330,9 +341,10 @@ class AuthController extends Controller
                 'pesan' => "Akun Google {$googleUser->getEmail()} berhasil dihubungkan ke akun I-FEST 2026 kamu. Kamu sekarang bisa login menggunakan Google kapan saja.",
             ]);
 
-            $token = $user->createToken('auth-token')->plainTextToken;
+            Auth::login($user);
+            $request->session()->regenerate();
 
-            return redirect($this->frontendUrl() . '/auth/callback#action=connect&token=' . $token . '&role=' . $user->role);
+            return redirect($this->frontendUrl() . '/dashboard/profile?google=connected');
         }
 
         // === LOGIN MODE: Normal Google login ===
@@ -368,9 +380,10 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        Auth::login($user);
+        $request->session()->regenerate();
 
-        return redirect($this->frontendUrl() . '/auth/callback#token=' . $token . '&role=' . $user->role);
+        return redirect($this->frontendUrl() . '/auth/callback?login=success');
     }
 
     public function googleConnect(Request $request): JsonResponse

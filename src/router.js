@@ -49,31 +49,37 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage,
+    meta: { skipAuthCheck: true },
   },
   {
     path: '/register',
     name: 'Register',
     component: RegisterPage,
+    meta: { skipAuthCheck: true },
   },
   {
     path: '/auth/callback',
     name: 'AuthCallback',
     component: () => import('./pages/AuthCallbackPage.vue'),
+    meta: { skipAuthCheck: true },
   },
   {
     path: '/verifikasi-email',
     name: 'OtpVerification',
     component: () => import('./pages/OtpVerificationPage.vue'),
+    meta: { skipAuthCheck: true },
   },
   {
     path: '/lupa-password',
     name: 'ForgotPassword',
     component: () => import('./pages/ForgotPasswordPage.vue'),
+    meta: { skipAuthCheck: true },
   },
   {
     path: '/reset-password/:token',
     name: 'ResetPassword',
     component: () => import('./pages/ResetPasswordPage.vue'),
+    meta: { skipAuthCheck: true },
   },
   {
     path: '/invoice/:id',
@@ -179,27 +185,30 @@ const router = createRouter({
   },
 })
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('auth_token')
-  let user = null
-  try {
-    user = JSON.parse(localStorage.getItem('auth_user') || 'null')
-  } catch { user = null }
-  const isAdmin = user && user.role === 'admin'
+router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore()
+
+  if (!auth.user && !to.meta?.skipAuthCheck) {
+    try {
+      await auth.fetchUser()
+    } catch {
+      // not authenticated
+    }
+  }
 
   if (to.meta.requiresAuth) {
-    if (!token) {
+    if (!auth.isAuthenticated) {
       next({ name: 'Login', query: { redirect: to.fullPath } })
       return
     }
     if (to.meta.requiresAdmin) {
-      if (!isAdmin) {
+      if (!auth.isAdmin) {
         next({ name: 'Dashboard' })
         return
       }
     } else {
       // Prevent admin from accessing participant-facing dashboard pages
-      if (isAdmin && to.path.startsWith('/dashboard') && !to.path.startsWith('/dashboard/admin')) {
+      if (auth.isAdmin && to.path.startsWith('/dashboard') && !to.path.startsWith('/dashboard/admin')) {
         next({ name: 'AdminDashboard' })
         return
       }
@@ -207,7 +216,7 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     // If admin is logged in, redirect login/register back to admin dashboard
-    if (token && isAdmin && (to.name === 'Login' || to.name === 'Register')) {
+    if (auth.isAdmin && (to.name === 'Login' || to.name === 'Register')) {
       next({ name: 'AdminDashboard' })
       return
     }

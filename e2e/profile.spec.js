@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { API_BASE, TEST_USER, PROFILE_UPDATE, uniqueEmail } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi } from './helpers/seed.js'
+import { loginViaUI } from './helpers/auth.js'
 
 test.describe('Profile — API', () => {
-  let email, token
+  let email
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ request }) => {
     email = uniqueEmail('e2e-profile-api')
     await registerUserViaApi({
       name: TEST_USER.name,
@@ -14,13 +15,13 @@ test.describe('Profile — API', () => {
       password_confirmation: TEST_USER.password,
     })
     await verifyUserViaApi(email)
-    const loginRes = await loginViaApi(email, TEST_USER.password)
-    token = loginRes.token
+    await request.get(`${API_BASE.replace('/api', '')}/sanctum/csrf-cookie`)
+    const loginRes = await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
+    expect(loginRes.status()).toBe(200)
   })
 
   test('PUT /profile updates name successfully', async ({ request }) => {
     const res = await request.put(`${API_BASE}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: { name: PROFILE_UPDATE.name },
     })
     expect(res.status()).toBe(200)
@@ -31,7 +32,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /profile updates all fields', async ({ request }) => {
     const res = await request.put(`${API_BASE}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         name: PROFILE_UPDATE.name,
         phone: PROFILE_UPDATE.phone,
@@ -46,7 +46,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /profile with empty name returns 422', async ({ request }) => {
     const res = await request.put(`${API_BASE}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: { name: '' },
     })
     expect(res.status()).toBe(422)
@@ -63,7 +62,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /password updates password successfully', async ({ request }) => {
     const res = await request.put(`${API_BASE}/password`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         current_password: TEST_USER.password,
         new_password: 'NewPass789!',
@@ -75,7 +73,6 @@ test.describe('Profile — API', () => {
     expect(body.message).toContain('berhasil diubah')
 
     await request.put(`${API_BASE}/password`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         current_password: 'NewPass789!',
         new_password: TEST_USER.password,
@@ -86,7 +83,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /password with wrong current password returns 400 or 429 (rate-limited)', async ({ request }) => {
     const res = await request.put(`${API_BASE}/password`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         current_password: 'WrongPassword1!',
         new_password: 'NewPass789!',
@@ -109,7 +105,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /password with mismatched passwords returns 422 or 429', async ({ request }) => {
     const res = await request.put(`${API_BASE}/password`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         current_password: TEST_USER.password,
         new_password: 'NewPass789!',
@@ -125,7 +120,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /password with short password returns 422 or 429', async ({ request }) => {
     const res = await request.put(`${API_BASE}/password`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         current_password: TEST_USER.password,
         new_password: '1234567',
@@ -141,7 +135,6 @@ test.describe('Profile — API', () => {
 
   test('PUT /password without current_password returns 422 (validation) or 429 (rate-limited)', async ({ request }) => {
     const res = await request.put(`${API_BASE}/password`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         new_password: 'NewPass789!',
         new_password_confirmation: 'NewPass789!',
@@ -157,7 +150,6 @@ test.describe('Profile — API', () => {
 
   test('POST /avatar with invalid file type returns 422 or 429', async ({ request }) => {
     const res = await request.post(`${API_BASE}/avatar`, {
-      headers: { Authorization: `Bearer ${token}` },
       multipart: {
         avatar: {
           name: 'test.txt',
@@ -175,7 +167,7 @@ test.describe('Profile — API', () => {
 })
 
 test.describe('Profile — UI', () => {
-  let email, token, user
+  let email
 
   test.beforeAll(async () => {
     email = uniqueEmail('e2e-profile-ui')
@@ -186,17 +178,10 @@ test.describe('Profile — UI', () => {
       password_confirmation: TEST_USER.password,
     })
     await verifyUserViaApi(email)
-    const loginRes = await loginViaApi(email, TEST_USER.password)
-    token = loginRes.token
-    user = loginRes.user
   })
 
   async function loginAndGoToProfile(page) {
-    await page.goto('/')
-    await page.evaluate(({ t, u }) => {
-      localStorage.setItem('auth_token', t)
-      localStorage.setItem('auth_user', JSON.stringify(u))
-    }, { t: token, u: user })
+    await loginViaUI(page, email, TEST_USER.password)
     await page.goto('/dashboard/profile')
     await page.waitForSelector('text=Data Diri')
   }
@@ -216,8 +201,9 @@ test.describe('Profile — UI', () => {
 
   test('Updated profile persists after API update and page reload', async ({ page, request }) => {
     // Update profile via API first
+    await request.get(`${API_BASE.replace('/api', '')}/sanctum/csrf-cookie`)
+    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
     const apiRes = await request.put(`${API_BASE}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
       data: {
         name: PROFILE_UPDATE.name,
         phone: PROFILE_UPDATE.phone,
@@ -254,12 +240,9 @@ test.describe('Profile — UI', () => {
     await expect(avatarZone).toBeVisible()
   })
 
-  test('Password field shows optional note for Google-connected users', async ({ page }) => {
-    await page.goto('/')
-    await page.evaluate(({ t, u }) => {
-      localStorage.setItem('auth_token', t)
-      localStorage.setItem('auth_user', JSON.stringify(u))
-    }, { t: token, u: user })
+  test('Password field shows optional note for Google-connected users', async ({ page, request }) => {
+    await request.get(`${API_BASE.replace('/api', '')}/sanctum/csrf-cookie`)
+    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
 
     await page.route('**/api/auth/user', async route => {
       try {

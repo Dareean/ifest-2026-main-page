@@ -71,7 +71,6 @@ async function uploadAvatar() {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     auth.user = res.data.user
-    localStorage.setItem('auth_user', JSON.stringify(res.data.user))
     avatarSuccess.value = 'Foto profil berhasil diperbarui!'
     avatarFile.value = null
     avatarPreview.value = null
@@ -144,7 +143,6 @@ async function saveProfile() {
   try {
     const res = await api.put('/profile', form.value)
     auth.user = res.data.user
-    localStorage.setItem('auth_user', JSON.stringify(res.data.user))
     profileSuccess.value = 'Profil berhasil diperbarui'
   } catch (e) {
     profileError.value = e.response?.data?.errors

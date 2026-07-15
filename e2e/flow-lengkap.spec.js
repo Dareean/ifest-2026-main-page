@@ -12,7 +12,7 @@ test.describe('Full End-to-End: Register → Verify → Login → Profile → Br
     institution: 'Universitas Tadulako',
   }
 
-  test('complete user journey', async ({ page, request }) => {
+  test('complete user journey', async ({ page }) => {
     // Track test progress
     const results = []
 
@@ -73,11 +73,8 @@ test.describe('Full End-to-End: Register → Verify → Login → Profile → Br
       await page.getByRole('button', { name: /simpan perubahan/i }).click()
       await expect(page.getByText('Profil berhasil diperbarui')).toBeVisible({ timeout: 15000 })
 
-      // Verify persistence via API
-      const token = await page.evaluate(() => localStorage.getItem('auth_token'))
-      const apiRes = await request.get(`${API_BASE}/auth/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      // Verify persistence via API (uses browser session cookie)
+      const apiRes = await page.request.get(`${API_BASE}/auth/user`)
       expect(apiRes.status()).toBe(200)
       const apiData = await apiRes.json()
       expect(apiData.user.name).toBe('E2E Full Flow Updated')

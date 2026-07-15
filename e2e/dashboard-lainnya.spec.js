@@ -1,28 +1,25 @@
 import { test, expect } from '@playwright/test'
 import { TEST_USER, uniqueEmail, API_BASE } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginViaApi, setAdminViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, loginAs } from './helpers/seed.js'
 import { loginViaUI } from './helpers/auth.js'
+
+const ROOT = API_BASE.replace('/api', '')
 
 test.describe('Dashboard Overview', () => {
   let userEmail
-  let token
 
   test.beforeAll(async () => {
     userEmail = uniqueEmail('e2e-overview')
     await registerUserViaApi({ ...TEST_USER, email: userEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(userEmail)
-    const loginRes = await loginViaApi(userEmail, TEST_USER.password)
-    token = loginRes.data?.token || loginRes.token
 
-    // Register for a competition so "Lomba Kamu" has data
-    const { request } = await import('@playwright/test')
-    const ctx = await request.newContext()
-    const lombasRes = await ctx.get(`${API_BASE}/lombas`)
+    const userCtx = await loginAs(userEmail, TEST_USER.password)
+    const lombasRes = await userCtx.get(`${API_BASE}/lombas`)
     const lombas = await lombasRes.json()
     const first = lombas.data?.[0]
     if (first) {
-      await ctx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
-        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      await userCtx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
+        headers: { Accept: 'application/json' },
       })
     }
   })
@@ -58,29 +55,20 @@ test.describe('Dashboard Overview', () => {
 
 test.describe('Dashboard Notifications', () => {
   let userEmail
-  let token
-  let adminToken
 
   test.beforeAll(async () => {
     userEmail = uniqueEmail('e2e-dashnotif')
     await registerUserViaApi({ ...TEST_USER, email: userEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(userEmail)
-    const loginRes = await loginViaApi(userEmail, TEST_USER.password)
-    token = loginRes.data?.token || loginRes.token
 
-    // Create admin to send notification
     const adminEmail = uniqueEmail('e2e-dashnotif-admin')
     await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(adminEmail)
-    await setAdminViaApi(adminEmail)
-    const adminLogin = await loginViaApi(adminEmail, TEST_USER.password)
-    adminToken = adminLogin.data?.token || adminLogin.token
+    await (await import('./helpers/seed.js')).setAdminViaApi(adminEmail)
+    const adminCtx = await loginAs(adminEmail, TEST_USER.password)
 
-    // Send notification to user
-    const { request } = await import('@playwright/test')
-    const ctx = await request.newContext()
-    await ctx.post(`${API_BASE}/admin/notifications`, {
-      headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+    await adminCtx.post(`${API_BASE}/admin/notifications`, {
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       data: {
         judul: 'E2E Test Notification',
         pesan: 'This is a test notification from E2E',
@@ -112,7 +100,6 @@ test.describe('Dashboard Notifications', () => {
 test.describe('Dashboard Invitations', () => {
   let userEmail
   let inviterEmail
-  let inviterToken
 
   test.beforeAll(async () => {
     userEmail = uniqueEmail('e2e-invitee')
@@ -122,25 +109,20 @@ test.describe('Dashboard Invitations', () => {
     inviterEmail = uniqueEmail('e2e-inviter')
     await registerUserViaApi({ ...TEST_USER, email: inviterEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(inviterEmail)
-    const inviterLogin = await loginViaApi(inviterEmail, TEST_USER.password)
-    inviterToken = inviterLogin.data?.token || inviterLogin.token
+    const inviterCtx = await loginAs(inviterEmail, TEST_USER.password)
 
-    // Inviter registers for competition
-    const { request } = await import('@playwright/test')
-    const ctx = await request.newContext()
-    const lombasRes = await ctx.get(`${API_BASE}/lombas`)
+    const lombasRes = await inviterCtx.get(`${API_BASE}/lombas`)
     const lombas = await lombasRes.json()
     const first = lombas.data?.[0]
     if (first) {
-      const daftarRes = await ctx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
-        headers: { Authorization: `Bearer ${inviterToken}`, Accept: 'application/json' },
+      const daftarRes = await inviterCtx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
+        headers: { Accept: 'application/json' },
       })
       if (daftarRes.ok()) {
         const d = await daftarRes.json()
         const pendaftaranId = d.data.id
-        // Invite the user
-        await ctx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/invite`, {
-          headers: { Authorization: `Bearer ${inviterToken}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+        await inviterCtx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/invite`, {
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           data: { email: userEmail },
         })
       }
