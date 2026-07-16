@@ -11,6 +11,9 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    ignore:
+      - dependency-name: "vite"
+        versions: [">=7.0.0"]
 
   - package-ecosystem: "composer"
     directory: "/backend"
