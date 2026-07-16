@@ -68,34 +68,44 @@ class AuthController extends Controller
 
     public function register(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
-            'institution' => 'nullable|string|max:255',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'phone' => 'nullable|string|max:20',
+                'institution' => 'nullable|string|max:255',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'institution' => $request->institution,
+                'email_verified_at' => null,
+            ]);
+
+            $this->generateAndSendOtp($user->email, $user->name);
+
+            return response()->json([
+                'message' => 'Registrasi berhasil. Silakan verifikasi email Anda dengan kode OTP yang telah dikirim.',
+                'user'    => $user->only(['id', 'name', 'email']),
+                'needs_verification' => true,
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Registration failed with exception: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'Registration failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'institution' => $request->institution,
-            'email_verified_at' => null,
-        ]);
-
-        $this->generateAndSendOtp($user->email, $user->name);
-
-        return response()->json([
-            'message' => 'Registrasi berhasil. Silakan verifikasi email Anda dengan kode OTP yang telah dikirim.',
-            'user'    => $user->only(['id', 'name', 'email']),
-            'needs_verification' => true,
-        ], 201);
     }
 
     public function sendOtp(Request $request): JsonResponse
@@ -120,118 +130,138 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'otp' => 'required|string|size:6',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string|email',
+                'otp' => 'required|string|size:6',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $otpKey = 'otp_attempts_' . $request->email;
+            $attempts = (int) Cache::get($otpKey, 0);
+
+            if ($attempts >= 3) {
+                Log::warning('OTP brute force blocked', ['email' => $request->email]);
+                return response()->json(['message' => 'Terlalu banyak percobaan. Silakan minta kode OTP baru.'], 429);
+            }
+
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
+            }
+
+            if ($user->email_verified_at) {
+                return response()->json(['message' => 'Email sudah diverifikasi'], 400);
+            }
+
+            $records = EmailVerification::where('email', $request->email)
+                ->valid()
+                ->get();
+
+            $record = $records->first(fn($r) => $r->verify($request->otp));
+
+            if (!$record) {
+                Cache::put($otpKey, $attempts + 1, now()->addHour());
+                Log::warning('OTP verification failed', ['email' => $request->email]);
+                return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
+            }
+
+            Cache::forget($otpKey);
+            $user->update(['email_verified_at' => now()]);
+
+            $record->delete();
+
+            Notification::create([
+                'user_id' => $user->id,
+                'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
+                'pesan'   => "Halo, {$user->name}! Akun kamu berhasil diverifikasi. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan tim kamu sekarang!",
+            ]);
+
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Email berhasil diverifikasi',
+                'user'    => $user->only(['id', 'name', 'email', 'role']),
+                'token'   => $token,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('OTP verification failed with exception: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'OTP verification failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        $otpKey = 'otp_attempts_' . $request->email;
-        $attempts = (int) Cache::get($otpKey, 0);
-
-        if ($attempts >= 3) {
-            Log::warning('OTP brute force blocked', ['email' => $request->email]);
-            return response()->json(['message' => 'Terlalu banyak percobaan. Silakan minta kode OTP baru.'], 429);
-        }
-
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
-        }
-
-        if ($user->email_verified_at) {
-            return response()->json(['message' => 'Email sudah diverifikasi'], 400);
-        }
-
-        $records = EmailVerification::where('email', $request->email)
-            ->valid()
-            ->get();
-
-        $record = $records->first(fn($r) => $r->verify($request->otp));
-
-        if (!$record) {
-            Cache::put($otpKey, $attempts + 1, now()->addHour());
-            Log::warning('OTP verification failed', ['email' => $request->email]);
-            return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
-        }
-
-        Cache::forget($otpKey);
-        $user->update(['email_verified_at' => now()]);
-
-        $record->delete();
-
-        Notification::create([
-            'user_id' => $user->id,
-            'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
-            'pesan'   => "Halo, {$user->name}! Akun kamu berhasil diverifikasi. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan tim kamu sekarang!",
-        ]);
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Email berhasil diverifikasi',
-            'user'    => $user->only(['id', 'name', 'email', 'role']),
-            'token'   => $token,
-        ]);
     }
 
     public function login(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string|email',
+                'password' => 'required|string',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
 
-        $limiter = app(RateLimiter::class);
-        $loginKey = 'login:' . $request->input('email');
+            $limiter = app(RateLimiter::class);
+            $loginKey = 'login:' . $request->input('email');
 
-        if ($limiter->tooManyAttempts($loginKey, 5)) {
-            $seconds = $limiter->availableIn($loginKey);
-            Log::warning('Login rate limited', ['email' => $request->input('email'), 'ip' => $request->ip()]);
+            if ($limiter->tooManyAttempts($loginKey, 5)) {
+                $seconds = $limiter->availableIn($loginKey);
+                Log::warning('Login rate limited', ['email' => $request->input('email'), 'ip' => $request->ip()]);
+                return response()->json([
+                    'message' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.'
+                ], 429);
+            }
+
+            if (!Auth::attempt($request->only('email', 'password'))) {
+                $limiter->hit($loginKey, 900);
+                Log::warning('Login failed', ['email' => $request->input('email'), 'ip' => $request->ip()]);
+                return response()->json(['message' => 'Email atau password salah'], 401);
+            }
+
+            $limiter->clear($loginKey);
+
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            if (is_null($user->email_verified_at) && $user->role !== 'admin') {
+                Auth::logout();
+                $request->session()->invalidate();
+                return response()->json([
+                    'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
+                    'needs_verification' => true,
+                    'email' => $user->email,
+                ], 403);
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
-                'message' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.'
-            ], 429);
-        }
-
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            $limiter->hit($loginKey, 900);
-            Log::warning('Login failed', ['email' => $request->input('email'), 'ip' => $request->ip()]);
-            return response()->json(['message' => 'Email atau password salah'], 401);
-        }
-
-        $limiter->clear($loginKey);
-
-        $request->session()->regenerate();
-
-        $user = Auth::user();
-
-        if (is_null($user->email_verified_at) && $user->role !== 'admin') {
-            Auth::logout();
-            $request->session()->invalidate();
+                'message' => 'Login berhasil',
+                'user' => $user->only(['id', 'name', 'email', 'avatar', 'role']),
+                'token' => $token,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Login failed with exception: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
-                'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
-                'needs_verification' => true,
-                'email' => $user->email,
-            ], 403);
+                'message' => 'Login failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login berhasil',
-            'user' => $user->only(['id', 'name', 'email', 'avatar', 'role']),
-            'token' => $token,
-        ]);
     }
 
     public function logout(Request $request): JsonResponse
