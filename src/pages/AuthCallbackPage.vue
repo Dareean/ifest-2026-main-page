@@ -12,6 +12,8 @@ onMounted(async () => {
   const token = urlParams.get('token')
   if (token) {
     localStorage.setItem('auth_token', token)
+    // Instantly remove token and all query parameters from the browser address bar
+    window.history.replaceState({}, document.title, window.location.pathname)
   }
 
   // Session already set by backend — fetch user data
