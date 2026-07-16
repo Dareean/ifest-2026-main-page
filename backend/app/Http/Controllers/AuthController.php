@@ -318,105 +318,105 @@ class AuthController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
+
+            // Detect connect mode via signed state parameter
+            $state = $request->input('state');
+            $connectUserId = null;
+
+            if ($state) {
+                $signed = json_decode(base64_decode($state), true);
+                if (is_array($signed) && isset($signed['state'], $signed['hmac'])) {
+                    $expectedHmac = hash_hmac('sha256', $signed['state'], config('app.key'));
+                    if (hash_equals($expectedHmac, $signed['hmac'])) {
+                        $data = json_decode(base64_decode($signed['state']), true);
+                        if (is_array($data) && isset($data['user_id'], $data['exp'])) {
+                            if (now()->timestamp <= $data['exp']) {
+                                $connectUserId = $data['user_id'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($connectUserId) {
+                // === CONNECT MODE: Link Google to existing account ===
+                $existing = User::where('google_id', $googleUser->getId())
+                    ->where('id', '!=', $connectUserId)
+                    ->first();
+                if ($existing) {
+                    return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=taken');
+                }
+
+                $user = User::find($connectUserId);
+                if (!$user) {
+                    return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=user_not_found');
+                }
+
+                $user->update([
+                    'name' => $googleUser->getName(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken,
+                    'email_verified_at' => $user->email_verified_at ?? now(),
+                ]);
+
+                Notification::create([
+                    'user_id' => $user->id,
+                    'judul' => 'Akun Google Terhubung',
+                    'pesan' => "Akun Google {$googleUser->getEmail()} berhasil dihubungkan ke akun I-FEST 2026 kamu. Kamu sekarang bisa login menggunakan Google kapan saja.",
+                ]);
+
+                Auth::login($user);
+                $request->session()->regenerate();
+
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=connected');
+            }
+
+            // === LOGIN MODE: Normal Google login ===
+            $user = User::where('google_id', $googleUser->getId())
+                ->orWhere('email', $googleUser->getEmail())
+                ->first();
+
+            $isNewUser = !$user;
+
+            if ($isNewUser) {
+                $user = User::create([
+                    'name'                 => $googleUser->getName(),
+                    'email'                => $googleUser->getEmail(),
+                    'google_id'            => $googleUser->getId(),
+                    'avatar'               => $googleUser->getAvatar(),
+                    'password'             => Hash::make(str()->random(32)),
+                    'google_token'         => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken,
+                ]);
+
+                Notification::create([
+                    'user_id' => $user->id,
+                    'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
+                    'pesan'   => "Halo, {$user->name}! Akun kamu berhasil dibuat via Google. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan diri kamu sekarang!",
+                ]);
+            } else {
+                $user->update([
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken ?? $user->google_refresh_token,
+                    'email_verified_at' => $user->email_verified_at ?? now(),
+                ]);
+            }
+
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect($this->frontendUrl() . '/auth/callback?login=success');
         } catch (\Exception $e) {
             Log::error('Google login callback failed: ' . $e->getMessage(), [
                 'exception' => $e,
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect($this->frontendUrl() . '/login?error=google_failed&message=' . urlencode($e->getMessage()));
+            return redirect($this->frontendUrl() . '/login?error=google_failed&message=' . urlencode($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()));
         }
-
-        // Detect connect mode via signed state parameter
-        $state = $request->input('state');
-        $connectUserId = null;
-
-        if ($state) {
-            $signed = json_decode(base64_decode($state), true);
-            if (is_array($signed) && isset($signed['state'], $signed['hmac'])) {
-                $expectedHmac = hash_hmac('sha256', $signed['state'], config('app.key'));
-                if (hash_equals($expectedHmac, $signed['hmac'])) {
-                    $data = json_decode(base64_decode($signed['state']), true);
-                    if (is_array($data) && isset($data['user_id'], $data['exp'])) {
-                        if (now()->timestamp <= $data['exp']) {
-                            $connectUserId = $data['user_id'];
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($connectUserId) {
-            // === CONNECT MODE: Link Google to existing account ===
-            $existing = User::where('google_id', $googleUser->getId())
-                ->where('id', '!=', $connectUserId)
-                ->first();
-            if ($existing) {
-                return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=taken');
-            }
-
-            $user = User::find($connectUserId);
-            if (!$user) {
-                return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=user_not_found');
-            }
-
-            $user->update([
-                'name' => $googleUser->getName(),
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-                'google_token' => $googleUser->token,
-                'google_refresh_token' => $googleUser->refreshToken,
-                'email_verified_at' => $user->email_verified_at ?? now(),
-            ]);
-
-            Notification::create([
-                'user_id' => $user->id,
-                'judul' => 'Akun Google Terhubung',
-                'pesan' => "Akun Google {$googleUser->getEmail()} berhasil dihubungkan ke akun I-FEST 2026 kamu. Kamu sekarang bisa login menggunakan Google kapan saja.",
-            ]);
-
-            Auth::login($user);
-            $request->session()->regenerate();
-
-            return redirect($this->frontendUrl() . '/dashboard/profile?google=connected');
-        }
-
-        // === LOGIN MODE: Normal Google login ===
-        $user = User::where('google_id', $googleUser->getId())
-            ->orWhere('email', $googleUser->getEmail())
-            ->first();
-
-        $isNewUser = !$user;
-
-        if ($isNewUser) {
-            $user = User::create([
-                'name'                 => $googleUser->getName(),
-                'email'                => $googleUser->getEmail(),
-                'google_id'            => $googleUser->getId(),
-                'avatar'               => $googleUser->getAvatar(),
-                'password'             => Hash::make(str()->random(32)),
-                'google_token'         => $googleUser->token,
-                'google_refresh_token' => $googleUser->refreshToken,
-            ]);
-
-            Notification::create([
-                'user_id' => $user->id,
-                'judul'   => 'Selamat Datang di I-FEST 2026! 🎉',
-                'pesan'   => "Halo, {$user->name}! Akun kamu berhasil dibuat via Google. Yuk, mulai jelajahi kompetisi-kompetisi seru di I-FEST 2026 dan daftarkan diri kamu sekarang!",
-            ]);
-        } else {
-            $user->update([
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-                'google_token' => $googleUser->token,
-                'google_refresh_token' => $googleUser->refreshToken ?? $user->google_refresh_token,
-                'email_verified_at' => $user->email_verified_at ?? now(),
-            ]);
-        }
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect($this->frontendUrl() . '/auth/callback?login=success');
     }
 
     public function googleConnect(Request $request): JsonResponse
