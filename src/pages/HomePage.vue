@@ -504,8 +504,12 @@ const parseCommitteePhotos = () => {
   return divisions
 }
 
-const panitiaData = parseCommitteePhotos()
+const panitiaData = ref({})
 const activeDivisionTab = ref('Koor Inti')
+
+onMounted(() => {
+  panitiaData.value = parseCommitteePhotos()
+})
 const fotoPanitiaKeseluruhan = computed(() => {
   return panitiaAssetModules['../assets/foto_kepanitiaan_ifest2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
 })
