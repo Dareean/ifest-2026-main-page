@@ -17,9 +17,9 @@ services:
       - key: APP_KEY
         generateValue: true
       - key: APP_URL
-        value: https://ifest-2026-api.onrender.com
+        value: https://ifest-2026-main-page.onrender.com
       - key: FRONTEND_URL
-        value: https://<vercel-domain>.vercel.app
+        value: https://ifest-hmti-untad.vercel.app
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
@@ -39,7 +39,7 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         fromEnv: GOOGLE_CLIENT_SECRET
       - key: GOOGLE_REDIRECT_URL
-        value: https://ifest-2026-api.onrender.com/api/auth/google/callback
+        value: https://ifest-2026-main-page.onrender.com/api/auth/google/callback
       - key: MAIL_MAILER
         value: log
       - key: MAIL_FROM_ADDRESS
@@ -48,3 +48,9 @@ services:
         value: file
       - key: SESSION_DRIVER
         value: database
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: localhost:5173,localhost:5174,localhost:5175,127.0.0.1:8000,localhost:8000,ifest-hmti-untad.vercel.app
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_SAME_SITE
+        value: none
