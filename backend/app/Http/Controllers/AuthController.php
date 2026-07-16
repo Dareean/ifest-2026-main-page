@@ -323,7 +323,7 @@ class AuthController extends Controller
                 'exception' => $e,
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect($this->frontendUrl() . '/login?error=google_failed');
+            return redirect($this->frontendUrl() . '/login?error=google_failed&message=' . urlencode($e->getMessage()));
         }
 
         // Detect connect mode via signed state parameter
