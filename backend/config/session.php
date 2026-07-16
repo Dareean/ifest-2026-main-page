@@ -169,7 +169,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', !app()->environment('local')),
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV', 'production') !== 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -199,7 +199,7 @@ return [
     |
     */
 
-    'same_site' => env('SESSION_SAME_SITE', app()->environment('local') ? 'lax' : 'none'),
+    'same_site' => env('SESSION_SAME_SITE', env('APP_ENV', 'production') === 'local' ? 'lax' : 'none'),
 
     /*
     |--------------------------------------------------------------------------
