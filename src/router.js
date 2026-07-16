@@ -1,40 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from './stores/auth'
-import HomePage from './pages/HomePage.vue'
-import CompetitionsPage from './pages/CompetitionsPage.vue'
-import RoadshowPage from './pages/RoadshowPage.vue'
-import LoginPage from './pages/LoginPage.vue'
-import RegisterPage from './pages/RegisterPage.vue'
-import AuthCallbackPage from './pages/AuthCallbackPage.vue'
-import InvoicePage from './pages/InvoicePage.vue'
-
-import DashboardLayout from './pages/dashboard/DashboardLayout.vue'
-import DashboardOverview from './pages/dashboard/DashboardOverview.vue'
-import DashboardCompetitions from './pages/dashboard/DashboardCompetitions.vue'
-import DashboardNotifications from './pages/dashboard/DashboardNotifications.vue'
-import DashboardProfile from './pages/dashboard/DashboardProfile.vue'
-import DashboardInvitations from './pages/dashboard/DashboardInvitations.vue'
-import DashboardHelp from './pages/dashboard/DashboardHelp.vue'
-
-import DashboardAdminLayout from './pages/dashboard/admin/DashboardAdminLayout.vue'
-import AdminDashboard from './pages/dashboard/admin/AdminDashboard.vue'
-import AdminPendaftaran from './pages/dashboard/admin/AdminPendaftaran.vue'
-import AdminPendaftaranDetail from './pages/dashboard/admin/AdminPendaftaranDetail.vue'
-import AdminUsers from './pages/dashboard/admin/AdminUsers.vue'
-import AdminNotifications from './pages/dashboard/admin/AdminNotifications.vue'
-import AdminManage from './pages/dashboard/admin/AdminManage.vue'
-import AdminLombas from './pages/dashboard/admin/AdminLombas.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: HomePage,
+    component: () => import('./pages/HomePage.vue'),
   },
   {
     path: '/kompetisi',
     name: 'Competitions',
-    component: CompetitionsPage,
+    component: () => import('./pages/CompetitionsPage.vue'),
   },
   {
     path: '/competitions',
@@ -43,18 +19,18 @@ const routes = [
   {
     path: '/roadshow',
     name: 'Roadshow',
-    component: RoadshowPage,
+    component: () => import('./pages/RoadshowPage.vue'),
   },
   {
     path: '/login',
     name: 'Login',
-    component: LoginPage,
+    component: () => import('./pages/LoginPage.vue'),
     meta: { skipAuthCheck: true },
   },
   {
     path: '/register',
     name: 'Register',
-    component: RegisterPage,
+    component: () => import('./pages/RegisterPage.vue'),
     meta: { skipAuthCheck: true },
   },
   {
@@ -84,86 +60,85 @@ const routes = [
   {
     path: '/invoice/:id',
     name: 'Invoice',
-    component: InvoicePage,
+    component: () => import('./pages/InvoicePage.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/dashboard',
-    component: DashboardLayout,
+    component: () => import('./pages/dashboard/DashboardLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'Dashboard',
-        component: DashboardOverview,
+        component: () => import('./pages/dashboard/DashboardOverview.vue'),
       },
       {
         path: 'competitions',
         name: 'DashboardCompetitions',
-        component: DashboardCompetitions,
+        component: () => import('./pages/dashboard/DashboardCompetitions.vue'),
       },
       {
         path: 'notifications',
         name: 'DashboardNotifications',
-        component: DashboardNotifications,
+        component: () => import('./pages/dashboard/DashboardNotifications.vue'),
       },
       {
         path: 'profile',
         name: 'DashboardProfile',
-        component: DashboardProfile,
+        component: () => import('./pages/dashboard/DashboardProfile.vue'),
       },
       {
         path: 'undangan',
         name: 'DashboardInvitations',
-        component: DashboardInvitations,
+        component: () => import('./pages/dashboard/DashboardInvitations.vue'),
       },
       {
         path: 'help',
         name: 'DashboardHelp',
-        component: DashboardHelp,
+        component: () => import('./pages/dashboard/DashboardHelp.vue'),
       },
     ],
   },
-  // Admin routes (moved to top level to prevent nesting under DashboardLayout)
   {
     path: '/dashboard/admin',
-    component: DashboardAdminLayout,
+    component: () => import('./pages/dashboard/admin/DashboardAdminLayout.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
         path: '',
         name: 'AdminDashboard',
-        component: AdminDashboard,
+        component: () => import('./pages/dashboard/admin/AdminDashboard.vue'),
       },
       {
         path: 'pendaftaran',
         name: 'AdminPendaftaran',
-        component: AdminPendaftaran,
+        component: () => import('./pages/dashboard/admin/AdminPendaftaran.vue'),
       },
       {
         path: 'pendaftaran/:id',
         name: 'AdminPendaftaranDetail',
-        component: AdminPendaftaranDetail,
+        component: () => import('./pages/dashboard/admin/AdminPendaftaranDetail.vue'),
       },
       {
         path: 'users',
         name: 'AdminUsers',
-        component: AdminUsers,
+        component: () => import('./pages/dashboard/admin/AdminUsers.vue'),
       },
       {
         path: 'notifications',
         name: 'AdminNotifications',
-        component: AdminNotifications,
+        component: () => import('./pages/dashboard/admin/AdminNotifications.vue'),
       },
       {
         path: 'manage',
         name: 'AdminManage',
-        component: AdminManage,
+        component: () => import('./pages/dashboard/admin/AdminManage.vue'),
       },
       {
         path: 'lombas',
         name: 'AdminLombas',
-        component: AdminLombas,
+        component: () => import('./pages/dashboard/admin/AdminLombas.vue'),
       },
     ],
   },

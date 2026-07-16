@@ -1209,6 +1209,7 @@ onBeforeUnmount(() => {
               <!-- Logo image, locked for stability -->
               <img 
                 :alt="logo.name" 
+                loading="lazy"
                 class="h-7 md:h-12 w-auto object-contain mix-blend-multiply filter grayscale contrast-200 transition-opacity duration-150 opacity-85 hover:opacity-100 flex-shrink-0 will-change-transform" 
                 :src="logo.src" 
               />
@@ -2578,10 +2579,11 @@ onBeforeUnmount(() => {
                 <!-- Photo frame -->
                 <div class="relative w-full aspect-[4/3] rounded-none overflow-hidden bg-[#FAF9F6] border-2 border-[#04000D]">
                   <img 
-                    :src="item.src" 
-                    :alt="item.alt" 
-                    class="w-full h-full object-cover grayscale mix-blend-multiply contrast-125 pointer-events-none select-none"
-                  />
+  :src="item.src" 
+  :alt="item.alt" 
+  loading="lazy"
+  class="w-full h-full object-cover grayscale mix-blend-multiply contrast-125 pointer-events-none select-none"
+/>
                   <div class="absolute inset-0 bg-[#04000D]/5 mix-blend-multiply pointer-events-none"></div>
                 </div>
                 
@@ -2703,18 +2705,19 @@ onBeforeUnmount(() => {
             <div class="bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PROJECT MANAGER ✦</span>
               <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[-2deg] transition-all duration-200 group-hover:scale-105 select-none relative">
-                <img 
-                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc"
-                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc" 
-                  alt="Nakita Semesta" 
-                  class="w-full h-full object-cover object-top"
-                />
-                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">NS</span>
+                  <img 
+                    v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc"
+                    :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Project Manager')?.imgSrc" 
+                    alt="Nakita Semesta" 
+                    loading="lazy"
+                    class="w-full h-full object-cover object-top"
+                  />
+                  <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">NS</span>
+                </div>
               </div>
-            </div>
-            <!-- Right Side Column (The Dossier Block) -->
-            <div class="bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
-              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
+              <!-- Right Side Column (The Dossier Block) -->
+              <div class="bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
+                <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
                 <a href="https://www.instagram.com/semestaaaa.__/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
@@ -2736,13 +2739,14 @@ onBeforeUnmount(() => {
             <div class="order-1 md:order-2 bg-[#FDE047] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ PIC I-FEST 2026 ✦</span>
               <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[3deg] transition-all duration-200 group-hover:scale-105 select-none relative">
-                <img 
-                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc"
-                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc" 
-                  alt="Dareean A. Raffi" 
-                  class="w-full h-full object-cover object-top"
-                />
-                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">DR</span>
+                  <img 
+                    v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc"
+                    :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'PIC')?.imgSrc" 
+                    alt="Dareean A. Raffi" 
+                    loading="lazy"
+                    class="w-full h-full object-cover object-top"
+                  />
+                  <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">DR</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
@@ -2769,13 +2773,14 @@ onBeforeUnmount(() => {
             <div class="bg-[#8839FF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#FDE047] pb-1 block w-full mb-6 font-bold text-[#FDE047]">✦ KETUA PANITIA ✦</span>
               <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[-1deg] transition-all duration-200 group-hover:scale-105 select-none relative">
-                <img 
-                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc"
-                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc" 
-                  alt="Gabriel Kristofan" 
-                  class="w-full h-full object-cover object-top"
-                />
-                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">GK</span>
+                  <img 
+                    v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc"
+                    :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Ketua Panitia')?.imgSrc" 
+                    alt="Gabriel Kristofan" 
+                    loading="lazy"
+                    class="w-full h-full object-cover object-top"
+                  />
+                  <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">GK</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) -->
@@ -2802,13 +2807,14 @@ onBeforeUnmount(() => {
             <div class="order-1 md:order-2 bg-[#D86BFF] p-5 md:p-6 flex flex-col justify-center items-center text-center border-b-3 md:border-b-0 border-[#04000D] transition-opacity duration-150 group-hover:opacity-95">
               <span class="font-mono text-xs tracking-widest border-b-2 border-[#04000D] pb-1 block w-full mb-6 font-bold text-[#04000D]">✦ WAKIL KETUA PANITIA ✦</span>
               <div class="w-20 h-20 md:w-24 md:h-24 bg-white border-[3px] border-[#04000D] shadow-[4px_4px_0px_0px_#04000D] overflow-hidden flex items-center justify-center rotate-[2deg] transition-all duration-200 group-hover:scale-105 select-none relative">
-                <img 
-                  v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc"
-                  :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc" 
-                  alt="Reyqal Syawalano" 
-                  class="w-full h-full object-cover object-top"
-                />
-                <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">RS</span>
+                  <img 
+                    v-if="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc"
+                    :src="panitiaData['Koor Inti']?.coordinators.find(p => p.role === 'Wakil Ketua Panitia')?.imgSrc" 
+                    alt="Reyqal Syawalano" 
+                    loading="lazy"
+                    class="w-full h-full object-cover object-top"
+                  />
+                  <span v-else class="font-mono font-black text-xl md:text-2xl text-[#04000D] uppercase">RS</span>
               </div>
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
@@ -2842,6 +2848,7 @@ onBeforeUnmount(() => {
                 <img 
                   :src="fotoPanitiaKeseluruhan" 
                   alt="Foto Bersama Seluruh Panitia I-FEST 2026" 
+                  loading="lazy"
                   class="w-full h-full object-cover"
                 />
               </div>
@@ -2910,6 +2917,7 @@ onBeforeUnmount(() => {
                         <img 
                           :src="panitiaData[activeDivisionTab]?.groupPhoto" 
                           alt="Foto Bersama Divisi" 
+                          loading="lazy"
                           class="w-full h-full object-cover"
                         />
                       </div>
@@ -2944,6 +2952,7 @@ onBeforeUnmount(() => {
                             v-if="coor.imgSrc" 
                             :src="coor.imgSrc" 
                             :alt="coor.name" 
+                            loading="lazy"
                             class="w-full h-full object-cover object-top"
                           />
                           <div v-else class="w-full h-full flex items-center justify-center font-mono font-black text-xs text-white" :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }">
@@ -2987,6 +2996,7 @@ onBeforeUnmount(() => {
                             v-if="member.imgSrc" 
                             :src="member.imgSrc" 
                             :alt="member.name" 
+                            loading="lazy"
                             class="w-full h-full object-cover object-top"
                           />
                           <div v-else class="w-full h-full flex items-center justify-center font-mono font-bold text-[9px] text-white" :style="{ backgroundColor: panitiaData[activeDivisionTab]?.color }">
@@ -3046,7 +3056,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="UNTAD Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
+                <img alt="UNTAD Logo" loading="lazy" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -3065,7 +3075,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="HMTI Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
+                <img alt="HMTI Logo" loading="lazy" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -3084,7 +3094,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="HMTI Cabinet Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.webp')" />
+                <img alt="HMTI Cabinet Logo" loading="lazy" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -3103,7 +3113,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="opacity-70 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <img alt="RINOYA Logo" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).webp')" />
+                <img alt="RINOYA Logo" loading="lazy" class="max-h-16 w-auto object-contain" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).webp')" />
               </a>
               <!-- Brutalist Tooltip -->
               <div class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 scale-90 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 origin-bottom z-30">
@@ -3213,7 +3223,7 @@ onBeforeUnmount(() => {
                     :key="index"
                     class="border border-[#04000D]/15 p-3 bg-off-white/40 flex items-center justify-center rounded w-full h-20 relative group"
                   >
-                    <img :src="sponsor.logo" :alt="sponsor.name" class="max-h-12 w-auto object-contain" />
+                    <img :src="sponsor.logo" :alt="sponsor.name" loading="lazy" class="max-h-12 w-auto object-contain" />
                     <div class="absolute inset-0 bg-[#04000D]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-1.5 text-center">
                       <span class="text-white font-mono text-[10px] font-bold uppercase tracking-wider">{{ sponsor.name }}</span>
                     </div>
@@ -3294,7 +3304,7 @@ onBeforeUnmount(() => {
                 rel="noopener noreferrer" 
                 class="cursor-pointer flex justify-center items-center"
               >
-                <img :alt="mainStrategicPartner.name" class="w-full max-w-[360px] h-auto object-contain mix-blend-multiply filter contrast-125" :src="mainStrategicPartner.src" />
+                <img :alt="mainStrategicPartner.name" loading="lazy" class="w-full max-w-[360px] h-auto object-contain mix-blend-multiply filter contrast-125" :src="mainStrategicPartner.src" />
               </a>
             </div>
           </div>
@@ -3322,6 +3332,7 @@ onBeforeUnmount(() => {
                   <img
                     :alt="partner.name"
                     :class="partner.logoMaxWidth"
+                    loading="lazy"
                     class="w-full h-14 md:h-16 object-contain mix-blend-multiply filter contrast-125 transition-all duration-300 hover:opacity-85"
                     :src="partner.src"
                   />
@@ -3330,6 +3341,7 @@ onBeforeUnmount(() => {
                   v-else
                   :alt="partner.name"
                   :class="partner.logoMaxWidth"
+                  loading="lazy"
                   class="w-full h-14 md:h-16 object-contain mix-blend-multiply filter contrast-125"
                   :src="partner.src"
                 />
@@ -3355,6 +3367,7 @@ onBeforeUnmount(() => {
                 <img 
                   v-if="partner.src"
                   :alt="partner.name" 
+                  loading="lazy"
                   class="max-h-10 md:max-h-16 w-auto object-contain mx-auto filter contrast-125 grayscale transition-all duration-300 group-hover:filter-none" 
                   :src="partner.src" 
                 />
@@ -3396,16 +3409,16 @@ onBeforeUnmount(() => {
               <span class="font-mono text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#F5F5F5]/60">ORGANIZED BY HMTI UNIVERSITAS TADULAKO</span>
               <div class="flex flex-row flex-wrap items-center gap-4 md:gap-6">
                 <a href="https://www.instagram.com/humasuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="UNTAD Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
+                  <img alt="UNTAD Logo" loading="lazy" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp')" />
                 </a>
                 <a href="https://www.instagram.com/hmtiuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="HMTI Logo" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
+                  <img alt="HMTI Logo" loading="lazy" class="h-8 md:h-10 w-auto object-contain opacity-80 filter invert grayscale contrast-125 transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp')" />
                 </a>
                 <a href="https://www.instagram.com/hmtiuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="HMTI Cabinet Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.webp')" />
+                  <img alt="HMTI Cabinet Logo" loading="lazy" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'all blue.webp')" />
                 </a>
                 <a href="https://www.instagram.com/rinoya.hmtiuntad/" target="_blank" rel="noopener noreferrer">
-                  <img alt="RINOYA Logo" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).webp')" />
+                  <img alt="RINOYA Logo" loading="lazy" class="h-8 md:h-10 w-auto object-contain opacity-90 filter brightness-0 invert transition-all duration-300 hover:filter-none hover:opacity-100 cursor-pointer" :src="getAsset(mainLogoAssetModules, 'logo_utama', 'Logo_Inovasi_dan_Karya__RINOYA(removebg).webp')" />
                 </a>
               </div>
             </div>
@@ -3533,6 +3546,7 @@ onBeforeUnmount(() => {
               v-if="selectedPerson.imgSrc" 
               :src="selectedPerson.imgSrc" 
               :alt="selectedPerson.name" 
+              loading="lazy"
               class="absolute inset-0 w-full h-full object-cover object-top filter contrast-105"
             />
             <div v-else class="absolute inset-0 flex items-center justify-center font-mono font-black text-4xl text-white" :style="{ backgroundColor: panitiaData[selectedPerson.division]?.color || '#8839FF' }">
