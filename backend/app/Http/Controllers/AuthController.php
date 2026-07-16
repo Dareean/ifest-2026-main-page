@@ -315,7 +315,11 @@ class AuthController extends Controller
 
     public function googleRedirect(): JsonResponse
     {
-        $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+        $url = Socialite::driver('google')
+            ->stateless()
+            ->with(['prompt' => 'select_account'])
+            ->redirect()
+            ->getTargetUrl();
 
         return response()->json(['url' => $url]);
     }
