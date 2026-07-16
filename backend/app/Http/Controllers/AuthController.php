@@ -181,7 +181,9 @@ class AuthController extends Controller
             ]);
 
             Auth::login($user);
-            $request->session()->regenerate();
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -232,13 +234,17 @@ class AuthController extends Controller
 
             $limiter->clear($loginKey);
 
-            $request->session()->regenerate();
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
 
             $user = Auth::user();
 
             if (is_null($user->email_verified_at) && $user->role !== 'admin') {
                 Auth::logout();
-                $request->session()->invalidate();
+                if ($request->hasSession()) {
+                    $request->session()->invalidate();
+                }
                 return response()->json([
                     'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
                     'needs_verification' => true,
@@ -275,8 +281,10 @@ class AuthController extends Controller
         // Logout session if using SPA auth
         if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
         }
 
         return response()->json(['message' => 'Logout berhasil']);
@@ -408,7 +416,9 @@ class AuthController extends Controller
                 ]);
 
                 Auth::login($user);
-                $request->session()->regenerate();
+                if ($request->hasSession()) {
+                    $request->session()->regenerate();
+                }
 
                 $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -449,7 +459,9 @@ class AuthController extends Controller
             }
 
             Auth::login($user);
-            $request->session()->regenerate();
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
