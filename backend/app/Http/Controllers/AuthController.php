@@ -319,6 +319,10 @@ class AuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
+            Log::error('Google login callback failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect($this->frontendUrl() . '/login?error=google_failed');
         }
 
