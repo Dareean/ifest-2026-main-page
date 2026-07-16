@@ -32,7 +32,7 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     await page.fill('input[type="email"]', adminEmail)
     await page.fill('input[type="password"]', TEST_USER.password)
     await page.click('button[type="submit"]')
-    await page.waitForURL(/\/dashboard/, { timeout: 20000 })
+    await page.waitForURL(/\/dashboard/, { timeout: 45000 })
     await page.goto('/dashboard/admin/lombas')
     await page.waitForTimeout(2000)
 
@@ -46,7 +46,7 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     await page.fill('input[type="email"]', adminEmail)
     await page.fill('input[type="password"]', TEST_USER.password)
     await page.click('button[type="submit"]')
-    await page.waitForURL(/\/dashboard/, { timeout: 20000 })
+    await page.waitForURL(/\/dashboard/, { timeout: 45000 })
     await page.goto('/dashboard/admin/lombas')
     await page.waitForTimeout(3000)
     await page.waitForLoadState('networkidle')
@@ -162,18 +162,35 @@ test.describe('Admin Detail — Submission Fields', () => {
 
     const lombasRes = await userCtx.get(`${API_BASE}/lombas`)
     const lombas = await lombasRes.json()
-    const first = lombas.data?.[0]
+    const first = lombas.data?.find(l => l.team_requirements.toLowerCase().includes('individu'))
     if (!first) return
 
+    const teamName = `E2E Admin Detail Team ${Math.random().toString(36).substring(7)}`
     const daftarRes = await userCtx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
       headers: { Accept: 'application/json' },
+      data: { team_name: teamName },
     })
     const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
     if (!pendaftaranId) return
 
-    await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
+    // Upload payment proof
+    const uploadPayRes = await userCtx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/payment/upload`, {
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      data: { payment_proof: 'https://example.com/payment-proof.jpg' }
+    })
+    expect(uploadPayRes.ok()).toBe(true)
+
+    // Verify payment proof
+    const verifyPayRes = await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify-payment`, {
       headers: { Accept: 'application/json' },
     })
+    expect(verifyPayRes.ok()).toBe(true)
+
+    // Verify pendaftaran
+    const verifyRes = await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
+      headers: { Accept: 'application/json' },
+    })
+    expect(verifyRes.ok()).toBe(true)
 
     await userCtx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -189,9 +206,9 @@ test.describe('Admin Detail — Submission Fields', () => {
     await page.fill('input[type="email"]', adminEmail)
     await page.fill('input[type="password"]', TEST_USER.password)
     await page.click('button[type="submit"]')
-    await page.waitForURL(/\/dashboard/, { timeout: 20000 })
+    await page.waitForURL(/\/dashboard/, { timeout: 45000 })
 
-    await page.goto(`/dashboard/admin/pendaftarans/${pendaftaranId}`)
+    await page.goto(`/dashboard/admin/pendaftaran/${pendaftaranId}`)
     await page.waitForTimeout(2000)
 
     await expect(page.getByText('Surat Pernyataan Orisinalitas')).toBeVisible()

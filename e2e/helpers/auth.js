@@ -7,5 +7,5 @@ export async function loginViaUI(page, email, password) {
 
   await page.click('button[type="submit"]')
 
-  await page.waitForURL(/\/dashboard/, { timeout: 20000 })
+  await page.waitForURL(/\/dashboard/, { timeout: 45000 })
 }

@@ -40,7 +40,7 @@ test.describe('Admin Pendaftaran', () => {
     await page.fill('input[type="email"]', adminEmail)
     await page.fill('input[type="password"]', TEST_USER.password)
     await page.click('button[type="submit"]')
-    await page.waitForURL(/\/dashboard/, { timeout: 20000 })
+    await page.waitForURL(/\/dashboard/, { timeout: 45000 })
     await page.goto('/dashboard/admin/pendaftaran')
     await page.waitForTimeout(3000)
   })

@@ -513,9 +513,8 @@ class AdminController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user->update([
-            'role' => $request->role,
-        ]);
+        $user->role = $request->role;
+        $user->save();
 
         return response()->json([
             'message' => "Role user {$user->name} berhasil diubah menjadi {$request->role}",

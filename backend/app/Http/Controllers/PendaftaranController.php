@@ -156,6 +156,13 @@ class PendaftaranController extends Controller
                 'email' => $inv->invitedUser->email,
             ]);
 
+        // Prepend the team leader to the members list
+        $leader = [
+            'name' => $pendaftaran->user->name,
+            'email' => $pendaftaran->user->email,
+        ];
+        $acceptedMembers->prepend($leader);
+
         return response()->json([
             'data' => $pendaftaran->load('lomba', 'submission', 'user')
                 ->setAttribute('accepted_members', $acceptedMembers),

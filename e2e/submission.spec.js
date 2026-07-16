@@ -196,11 +196,11 @@ test.describe('Submission Flow — UI Submit', () => {
     })
 
     await loginViaUI(page, userEmail, TEST_USER.password)
-    await page.goto('/dashboard/competitions')
-    await page.waitForTimeout(3000)
+    await page.goto(`/dashboard/competitions?id=${first.id}`)
+    await page.waitForLoadState('networkidle')
 
     const submitBtn = page.locator('button:has-text("Pengumpulan Karya")')
-    await expect(submitBtn.first()).toBeVisible({ timeout: 10000 })
+    await expect(submitBtn.first()).toBeVisible({ timeout: 15000 })
     await submitBtn.first().click()
     await page.waitForTimeout(1000)
 

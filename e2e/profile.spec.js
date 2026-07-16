@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { API_BASE, TEST_USER, PROFILE_UPDATE, uniqueEmail } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, loginAs } from './helpers/seed.js'
 import { loginViaUI } from './helpers/auth.js'
 
 test.describe('Profile — API', () => {
-  let email
+  let email, userCtx
 
-  test.beforeAll(async ({ request }) => {
+  test.beforeAll(async () => {
     email = uniqueEmail('e2e-profile-api')
     await registerUserViaApi({
       name: TEST_USER.name,
@@ -15,13 +15,11 @@ test.describe('Profile — API', () => {
       password_confirmation: TEST_USER.password,
     })
     await verifyUserViaApi(email)
-    await request.get(`${API_BASE.replace('/api', '')}/sanctum/csrf-cookie`)
-    const loginRes = await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-    expect(loginRes.status()).toBe(200)
+    userCtx = await loginAs(email, TEST_USER.password)
   })
 
-  test('PUT /profile updates name successfully', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/profile`, {
+  test('PUT /profile updates name successfully', async () => {
+    const res = await userCtx.put(`${API_BASE}/profile`, {
       data: { name: PROFILE_UPDATE.name },
     })
     expect(res.status()).toBe(200)
@@ -30,8 +28,8 @@ test.describe('Profile — API', () => {
     expect(body.user.name).toBe(PROFILE_UPDATE.name)
   })
 
-  test('PUT /profile updates all fields', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/profile`, {
+  test('PUT /profile updates all fields', async () => {
+    const res = await userCtx.put(`${API_BASE}/profile`, {
       data: {
         name: PROFILE_UPDATE.name,
         phone: PROFILE_UPDATE.phone,
@@ -44,8 +42,8 @@ test.describe('Profile — API', () => {
     expect(body.user.institution).toBe(PROFILE_UPDATE.institution)
   })
 
-  test('PUT /profile with empty name returns 422', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/profile`, {
+  test('PUT /profile with empty name returns 422', async () => {
+    const res = await userCtx.put(`${API_BASE}/profile`, {
       data: { name: '' },
     })
     expect(res.status()).toBe(422)
@@ -60,8 +58,8 @@ test.describe('Profile — API', () => {
     expect(res.status()).toBe(401)
   })
 
-  test('PUT /password updates password successfully', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/password`, {
+  test('PUT /password updates password successfully', async () => {
+    const res = await userCtx.put(`${API_BASE}/password`, {
       data: {
         current_password: TEST_USER.password,
         new_password: 'NewPass789!',
@@ -72,7 +70,7 @@ test.describe('Profile — API', () => {
     const body = await res.json()
     expect(body.message).toContain('berhasil diubah')
 
-    await request.put(`${API_BASE}/password`, {
+    await userCtx.put(`${API_BASE}/password`, {
       data: {
         current_password: 'NewPass789!',
         new_password: TEST_USER.password,
@@ -81,8 +79,8 @@ test.describe('Profile — API', () => {
     })
   })
 
-  test('PUT /password with wrong current password returns 400 or 429 (rate-limited)', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/password`, {
+  test('PUT /password with wrong current password returns 400 or 429 (rate-limited)', async () => {
+    const res = await userCtx.put(`${API_BASE}/password`, {
       data: {
         current_password: 'WrongPassword1!',
         new_password: 'NewPass789!',
@@ -103,8 +101,8 @@ test.describe('Profile — API', () => {
     expect(res.status()).toBe(401)
   })
 
-  test('PUT /password with mismatched passwords returns 422 or 429', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/password`, {
+  test('PUT /password with mismatched passwords returns 422 or 429', async () => {
+    const res = await userCtx.put(`${API_BASE}/password`, {
       data: {
         current_password: TEST_USER.password,
         new_password: 'NewPass789!',
@@ -118,8 +116,8 @@ test.describe('Profile — API', () => {
     }
   })
 
-  test('PUT /password with short password returns 422 or 429', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/password`, {
+  test('PUT /password with short password returns 422 or 429', async () => {
+    const res = await userCtx.put(`${API_BASE}/password`, {
       data: {
         current_password: TEST_USER.password,
         new_password: '1234567',
@@ -133,8 +131,8 @@ test.describe('Profile — API', () => {
     }
   })
 
-  test('PUT /password without current_password returns 422 (validation) or 429 (rate-limited)', async ({ request }) => {
-    const res = await request.put(`${API_BASE}/password`, {
+  test('PUT /password without current_password returns 422 (validation) or 429 (rate-limited)', async () => {
+    const res = await userCtx.put(`${API_BASE}/password`, {
       data: {
         new_password: 'NewPass789!',
         new_password_confirmation: 'NewPass789!',
@@ -148,8 +146,8 @@ test.describe('Profile — API', () => {
     expect(res.status()).toBe(401)
   })
 
-  test('POST /avatar with invalid file type returns 422 or 429', async ({ request }) => {
-    const res = await request.post(`${API_BASE}/avatar`, {
+  test('POST /avatar with invalid file type returns 422 or 429', async () => {
+    const res = await userCtx.post(`${API_BASE}/avatar`, {
       multipart: {
         avatar: {
           name: 'test.txt',
@@ -167,7 +165,7 @@ test.describe('Profile — API', () => {
 })
 
 test.describe('Profile — UI', () => {
-  let email
+  let email, userCtx
 
   test.beforeAll(async () => {
     email = uniqueEmail('e2e-profile-ui')
@@ -178,6 +176,7 @@ test.describe('Profile — UI', () => {
       password_confirmation: TEST_USER.password,
     })
     await verifyUserViaApi(email)
+    userCtx = await loginAs(email, TEST_USER.password)
   })
 
   async function loginAndGoToProfile(page) {
@@ -199,11 +198,9 @@ test.describe('Profile — UI', () => {
     await expect(page.getByText('Profil berhasil diperbarui')).toBeVisible({ timeout: 15000 })
   })
 
-  test('Updated profile persists after API update and page reload', async ({ page, request }) => {
+  test('Updated profile persists after API update and page reload', async ({ page }) => {
     // Update profile via API first
-    await request.get(`${API_BASE.replace('/api', '')}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-    const apiRes = await request.put(`${API_BASE}/profile`, {
+    const apiRes = await userCtx.put(`${API_BASE}/profile`, {
       data: {
         name: PROFILE_UPDATE.name,
         phone: PROFILE_UPDATE.phone,
@@ -240,10 +237,7 @@ test.describe('Profile — UI', () => {
     await expect(avatarZone).toBeVisible()
   })
 
-  test('Password field shows optional note for Google-connected users', async ({ page, request }) => {
-    await request.get(`${API_BASE.replace('/api', '')}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-
+  test('Password field shows optional note for Google-connected users', async ({ page }) => {
     await page.route('**/api/auth/user', async route => {
       try {
         const response = await route.fetch()
@@ -255,6 +249,7 @@ test.describe('Profile — UI', () => {
       }
     })
 
+    await loginViaUI(page, email, TEST_USER.password)
     await page.goto('/dashboard/profile')
     await page.waitForSelector('text=(Opsional untuk login Google)')
     await expect(page.getByText('Opsional untuk login Google')).toBeVisible()

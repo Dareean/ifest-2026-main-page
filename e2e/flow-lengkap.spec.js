@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { TEST_USER, uniqueEmail, API_BASE } from './fixtures/data.js'
 import { verifyUserViaApi } from './helpers/seed.js'
 
-test.describe('Full End-to-End: Register → Verify → Login → Profile → Browse → Logout', () => {
+test.describe('Full End-to-End: Landing → Register → Verify → Login → Dashboard → Profile → Browse → Logout', () => {
   const email = uniqueEmail('e2e-full')
   const testUser = {
     name: 'Full Flow User',
@@ -12,9 +12,32 @@ test.describe('Full End-to-End: Register → Verify → Login → Profile → Br
     institution: 'Universitas Tadulako',
   }
 
-  test('complete user journey', async ({ page }) => {
+  test('complete user journey from landing page', async ({ page }) => {
     // Track test progress
     const results = []
+
+    // ===== STEP 0: START FROM LANDING PAGE =====
+    await test.step('Visit landing page and explore hero section', async () => {
+      await page.goto('/')
+      await expect(page.getByText('DIGITAL SYMPHONY').first()).toBeVisible({ timeout: 15000 })
+      await expect(page.getByText('THE BIGGEST IT FESTIVAL IN EASTERN INDONESIA')).toBeVisible()
+      const cta = page.getByRole('button', { name: /EXPLORE THE SYMPHONY/i })
+      await expect(cta).toBeVisible()
+      results.push('Landing: Hero section loaded with CTA')
+    })
+
+    await test.step('Scroll to competitions section', async () => {
+      await page.locator('#competitions-section').scrollIntoViewIfNeeded()
+      await page.waitForTimeout(1000)
+      await expect(page.getByText('ARENA KOMPETISI DIGITAL.')).toBeVisible()
+      results.push('Landing: Competitions section visible')
+    })
+
+    await test.step('Click login link to navigate', async () => {
+      await page.locator('a[href="/login"]').first().click()
+      await page.waitForURL(/\/login/)
+      results.push('Landing: Login link navigated to /login')
+    })
 
     // ===== STEP 1: REGISTER =====
     await test.step('Register new user', async () => {
@@ -73,8 +96,13 @@ test.describe('Full End-to-End: Register → Verify → Login → Profile → Br
       await page.getByRole('button', { name: /simpan perubahan/i }).click()
       await expect(page.getByText('Profil berhasil diperbarui')).toBeVisible({ timeout: 15000 })
 
-      // Verify persistence via API (uses browser session cookie)
-      const apiRes = await page.request.get(`${API_BASE}/auth/user`)
+      // Verify persistence via API (uses browser session token from localStorage)
+      const token = await page.evaluate(() => localStorage.getItem('auth_token'))
+      const apiRes = await page.request.get(`${API_BASE}/auth/user`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
       expect(apiRes.status()).toBe(200)
       const apiData = await apiRes.json()
       expect(apiData.user.name).toBe('E2E Full Flow Updated')

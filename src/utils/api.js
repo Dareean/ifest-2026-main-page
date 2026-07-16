@@ -30,7 +30,9 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
       const { default: router } = await import('../router')
-      router.push('/login')
+      if (router.currentRoute.value?.meta?.requiresAuth) {
+        router.push('/login')
+      }
     }
     return Promise.reject(error)
   }

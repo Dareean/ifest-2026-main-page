@@ -1859,22 +1859,24 @@ onBeforeUnmount(() => {
                   >
                     <div class="bg-[#FAF5FF] border border-purple-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tr class="align-top">
-                          <td class="w-[80px] font-black text-[#8B5CF6] py-1">Januari:</td>
-                          <td class="py-1 text-[#04000D]/90">Pembentukan Tim Inti &amp; Penyusunan Konsep Kasar.</td>
-                        </tr>
-                        <tr class="align-top border-t border-purple-100/50">
-                          <td class="font-black text-[#8B5CF6] py-2">Februari:</td>
-                          <td class="py-2 text-[#04000D]/90">Penyusunan Proposal Kegiatan.</td>
-                        </tr>
-                        <tr class="align-top border-t border-purple-100/50">
-                          <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
-                          <td class="py-2 text-[#04000D]/90">Finalisasi struktur kepanitiaan (80+ personil).</td>
-                        </tr>
-                        <tr class="align-top border-t border-purple-100/50">
-                          <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
-                          <td class="py-2 text-[#04000D]/90">Audiensi Mitra Strategis &amp; Pencarian Dana.</td>
-                        </tr>
+                        <tbody>
+                          <tr class="align-top">
+                            <td class="w-[80px] font-black text-[#8B5CF6] py-1">Januari:</td>
+                            <td class="py-1 text-[#04000D]/90">Pembentukan Tim Inti &amp; Penyusunan Konsep Kasar.</td>
+                          </tr>
+                          <tr class="align-top border-t border-purple-100/50">
+                            <td class="font-black text-[#8B5CF6] py-2">Februari:</td>
+                            <td class="py-2 text-[#04000D]/90">Penyusunan Proposal Kegiatan.</td>
+                          </tr>
+                          <tr class="align-top border-t border-purple-100/50">
+                            <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
+                            <td class="py-2 text-[#04000D]/90">Finalisasi struktur kepanitiaan (80+ personil).</td>
+                          </tr>
+                          <tr class="align-top border-t border-purple-100/50">
+                            <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
+                            <td class="py-2 text-[#04000D]/90">Audiensi Mitra Strategis &amp; Pencarian Dana.</td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -1939,14 +1941,16 @@ onBeforeUnmount(() => {
                   >
                     <div class="bg-[#ECFDF5] border border-emerald-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tr class="align-top">
-                          <td class="w-[95px] font-black text-[#10B981] py-1">Mei - Jun:</td>
-                          <td class="py-1 text-[#04000D]/90">Awal pergerakan menyasar sekolah umum, sekolah alam/alternatif, dan komunitas disabilitas.</td>
-                        </tr>
-                        <tr class="align-top border-t border-emerald-100/50">
-                          <td class="font-black text-[#10B981] py-2">Jul - Agust:</td>
-                          <td class="py-2 text-[#04000D]/90">Ekspansi roadshow ke 800+ pelajar &amp; masyarakat marginal.</td>
-                        </tr>
+                        <tbody>
+                          <tr class="align-top">
+                            <td class="w-[95px] font-black text-[#10B981] py-1">Mei - Jun:</td>
+                            <td class="py-1 text-[#04000D]/90">Awal pergerakan menyasar sekolah umum, sekolah alam/alternatif, dan komunitas disabilitas.</td>
+                          </tr>
+                          <tr class="align-top border-t border-emerald-100/50">
+                            <td class="font-black text-[#10B981] py-2">Jul - Agust:</td>
+                            <td class="py-2 text-[#04000D]/90">Ekspansi roadshow ke 800+ pelajar &amp; masyarakat marginal.</td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -1991,14 +1995,16 @@ onBeforeUnmount(() => {
                   >
                     <div class="bg-[#EFF6FF] border border-blue-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tr class="align-top">
-                          <td class="w-[80px] font-black text-[#3B82F6] py-1">Juli:</td>
-                          <td class="py-1 text-[#04000D]/90">Pembukaan pendaftaran Arena Kompetisi di sela-sela roadshow lapangan.</td>
-                        </tr>
-                        <tr class="align-top border-t border-blue-100/50">
-                          <td class="font-black text-[#3B82F6] py-2">Agustus:</td>
-                          <td class="py-2 text-[#04000D]/90">Kampanye masif registrasi 6 Lomba menargetkan 500+ kompetitor elite.</td>
-                        </tr>
+                        <tbody>
+                          <tr class="align-top">
+                            <td class="w-[80px] font-black text-[#3B82F6] py-1">Juli:</td>
+                            <td class="py-1 text-[#04000D]/90">Pembukaan pendaftaran Arena Kompetisi di sela-sela roadshow lapangan.</td>
+                          </tr>
+                          <tr class="align-top border-t border-blue-100/50">
+                            <td class="font-black text-[#3B82F6] py-2">Agustus:</td>
+                            <td class="py-2 text-[#04000D]/90">Kampanye masif registrasi 6 Lomba menargetkan 500+ kompetitor elite.</td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -2063,14 +2069,16 @@ onBeforeUnmount(() => {
                   >
                     <div class="bg-[#FFFBEB] border border-amber-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tr class="align-top">
-                          <td class="w-[90px] font-black text-[#F59E0B] py-1">Agustus:</td>
-                          <td class="py-1 text-[#04000D]/90">Studi banding akademik ke laboratorium teknologi universitas target di Pulau Jawa.</td>
-                        </tr>
-                        <tr class="align-top border-t border-amber-100/50">
-                          <td class="font-black text-[#F59E0B] py-2">September:</td>
-                          <td class="py-2 text-[#04000D]/90">Industrial Visitation ke raksasa teknologi untuk sinkronisasi praktik industri.</td>
-                        </tr>
+                        <tbody>
+                          <tr class="align-top">
+                            <td class="w-[90px] font-black text-[#F59E0B] py-1">Agustus:</td>
+                            <td class="py-1 text-[#04000D]/90">Studi banding akademik ke laboratorium teknologi universitas target di Pulau Jawa.</td>
+                          </tr>
+                          <tr class="align-top border-t border-amber-100/50">
+                            <td class="font-black text-[#F59E0B] py-2">September:</td>
+                            <td class="py-2 text-[#04000D]/90">Industrial Visitation ke raksasa teknologi untuk sinkronisasi praktik industri.</td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -2115,14 +2123,16 @@ onBeforeUnmount(() => {
                   >
                     <div class="bg-[#FEF2F2] border border-red-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tr class="align-top">
-                          <td class="w-[90px] font-black text-[#EF4444] py-1">Pekan 3-4:</td>
-                          <td class="py-1 text-[#04000D]/90">TEDxUNTAD: Regional Resonance membedah tantangan disrupsi digital.</td>
-                        </tr>
-                        <tr class="align-top border-t border-red-100/50">
-                          <td class="font-black text-[#EF4444] py-2">Output:</td>
-                          <td class="py-2 text-[#04000D]/90">Dokumentasi pemikiran strategis untuk Expo Inovasi November.</td>
-                        </tr>
+                        <tbody>
+                          <tr class="align-top">
+                            <td class="w-[90px] font-black text-[#EF4444] py-1">Pekan 3-4:</td>
+                            <td class="py-1 text-[#04000D]/90">TEDxUNTAD: Regional Resonance membedah tantangan disrupsi digital.</td>
+                          </tr>
+                          <tr class="align-top border-t border-red-100/50">
+                            <td class="font-black text-[#EF4444] py-2">Output:</td>
+                            <td class="py-2 text-[#04000D]/90">Dokumentasi pemikiran strategis untuk Expo Inovasi November.</td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -2187,14 +2197,16 @@ onBeforeUnmount(() => {
                   >
                     <div class="bg-[#1E293B] border border-slate-700 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-white">
-                        <tr class="align-top">
-                          <td class="w-[95px] font-black text-[#F59E0B] py-1">November:</td>
-                          <td class="py-1 text-white/90"><span class="font-bold text-[#F59E0B]">3 HARI PUNCAK I-FEST 2026</span> (Expo Inovasi, Seminar Internasional, Awarding Night, Grand Closing Concert).</td>
-                        </tr>
-                        <tr class="align-top border-t border-slate-700/50">
-                          <td class="font-black text-[#F59E0B] py-2">Desember:</td>
-                          <td class="py-2 text-white/90">Perilisan Official Aftermovie &amp; Penyerahan Impact Report kepada mitra untuk transparansi ROI.</td>
-                        </tr>
+                        <tbody>
+                          <tr class="align-top">
+                            <td class="w-[95px] font-black text-[#F59E0B] py-1">November:</td>
+                            <td class="py-1 text-white/90"><span class="font-bold text-[#F59E0B]">3 HARI PUNCAK I-FEST 2026</span> (Expo Inovasi, Seminar Internasional, Awarding Night, Grand Closing Concert).</td>
+                          </tr>
+                          <tr class="align-top border-t border-slate-700/50">
+                            <td class="font-black text-[#F59E0B] py-2">Desember:</td>
+                            <td class="py-2 text-white/90">Perilisan Official Aftermovie &amp; Penyerahan Impact Report kepada mitra untuk transparansi ROI.</td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
                   </div>

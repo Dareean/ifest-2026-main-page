@@ -91,17 +91,27 @@ export async function setAdminViaApi(email) {
  */
 export async function loginAs(email, password) {
   const { request } = await import('@playwright/test')
-  const ctx = await request.newContext()
-  const csrfRes = await ctx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
+  const tempCtx = await request.newContext()
+  const csrfRes = await tempCtx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
     headers: { 'Origin': 'http://localhost:5173' },
   })
-  const token = extractXsrfToken(csrfRes.headers()['set-cookie'])
-  const res = await ctx.post(`${API_BASE}/auth/login`, {
-    headers: token ? { 'Origin': 'http://localhost:5173', 'X-XSRF-TOKEN': token } : {},
+  const csrfToken = extractXsrfToken(csrfRes.headers()['set-cookie'])
+  const res = await tempCtx.post(`${API_BASE}/auth/login`, {
+    headers: csrfToken ? { 'Origin': 'http://localhost:5173', 'X-XSRF-TOKEN': csrfToken } : {},
     data: { email, password },
   })
   if (!res.ok()) throw new Error(`Login as ${email} failed: ${await res.text()}`)
-  return ctx
+  
+  const body = await res.json()
+  const token = body.token
+
+  const authenticatedCtx = await request.newContext({
+    extraHTTPHeaders: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
+    }
+  })
+  return authenticatedCtx
 }
 
 /**

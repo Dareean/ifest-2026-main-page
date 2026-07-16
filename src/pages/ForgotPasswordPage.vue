@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../utils/api'
+import api, { getCsrf } from '../utils/api'
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-vue-next'
 import logoUntad from '../assets/logo_utama/logo_untad.webp'
 import logoHmti from '../assets/logo_utama/HMTI LOGO.webp'
@@ -18,6 +18,7 @@ async function handleSubmit() {
   success.value = false
   isSubmitting.value = true
   try {
+    await getCsrf()
     await api.post('/auth/forgot-password', { email: email.value })
     success.value = true
   } catch (e) {

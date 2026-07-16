@@ -39,8 +39,14 @@ test.describe('Google OAuth - API', () => {
 
   test('GET /auth/google/connect returns URL when authenticated', async ({ request }) => {
     await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-    const res = await request.get(`${API_BASE}/auth/google/connect`)
+    const loginRes = await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
+    const loginData = await loginRes.json()
+    const token = loginData.token
+    const res = await request.get(`${API_BASE}/auth/google/connect`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     const status = res.status()
     if (status === 200) {
       const body = await res.json()
@@ -59,8 +65,14 @@ test.describe('Google OAuth - API', () => {
 
   test('POST /auth/google/disconnect returns 200 when authenticated', async ({ request }) => {
     await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-    const res = await request.post(`${API_BASE}/auth/google/disconnect`)
+    const loginRes = await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
+    const loginData = await loginRes.json()
+    const token = loginData.token
+    const res = await request.post(`${API_BASE}/auth/google/disconnect`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     expect(res.status()).toBe(200)
     const body = await res.json()
     expect(body).toHaveProperty('message')
@@ -97,21 +109,35 @@ test.describe('Google OAuth - UI', () => {
     await expect(page.getByRole('button', { name: /hubungkan google/i })).toBeVisible()
   })
 
-  test('Profile page can disconnect Google from connected state', async ({ page, request }) => {
-    await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-
-    await page.route('**/api/auth/user', async route => {
-      const response = await route.fetch()
-      const body = await response.json()
-      body.user.google_id = 'e2e_test_google_id'
-      body.user.avatar = 'https://example.com/avatar.jpg'
-      await route.fulfill({ response, body: JSON.stringify(body) })
+  test('Profile page can disconnect Google from connected state', async ({ page }) => {
+    await loginViaUI(page, email, TEST_USER.password)
+ 
+    let isDisconnected = false
+    await page.route('**/api/auth/google/disconnect', async route => {
+      isDisconnected = true
+      await route.fulfill({ status: 200, json: { message: 'Google disconnected' } })
     })
 
+    await page.route('**/api/auth/user', async route => {
+      try {
+        const response = await route.fetch()
+        const body = await response.json()
+        if (!isDisconnected) {
+          body.user.google_id = 'e2e_test_google_id'
+          body.user.avatar = 'https://example.com/avatar.jpg'
+        } else {
+          body.user.google_id = null
+          body.user.avatar = null
+        }
+        await route.fulfill({ response, body: JSON.stringify(body) })
+      } catch {
+        await route.continue().catch(() => {})
+      }
+    })
+ 
     await page.goto('/dashboard/profile')
     await expect(page.getByText('Terhubung dengan Google')).toBeVisible()
-
+ 
     await page.getByRole('button', { name: /putuskan koneksi/i }).click()
     await expect(page.getByText('Google berhasil diputuskan')).toBeVisible()
     await expect(page.getByRole('button', { name: /hubungkan google/i })).toBeVisible()

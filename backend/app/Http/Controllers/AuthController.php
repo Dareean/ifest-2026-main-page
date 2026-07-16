@@ -170,7 +170,8 @@ class AuthController extends Controller
             }
 
             Cache::forget($otpKey);
-            $user->update(['email_verified_at' => now()]);
+            $user->email_verified_at = now();
+            $user->save();
 
             $record->delete();
 
