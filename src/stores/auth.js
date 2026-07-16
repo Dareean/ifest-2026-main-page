@@ -26,6 +26,9 @@ export const useAuthStore = defineStore('auth', () => {
       await getCsrf()
       const res = await api.post('/auth/login', data)
       user.value = res.data.user
+      if (res.data.token) {
+        localStorage.setItem('auth_token', res.data.token)
+      }
       return res.data
     } finally {
       loading.value = false
@@ -38,6 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = res.data.user
     } catch {
       user.value = null
+      localStorage.removeItem('auth_token')
     }
   }
 
@@ -47,6 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       // ignore
     }
+    localStorage.removeItem('auth_token')
     user.value = null
   }
 
@@ -87,6 +92,9 @@ export const useAuthStore = defineStore('auth', () => {
     await getCsrf()
     const res = await api.post('/auth/verify-otp', { email, otp })
     user.value = res.data.user
+    if (res.data.token) {
+      localStorage.setItem('auth_token', res.data.token)
+    }
     return res.data
   }
 

@@ -172,9 +172,12 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Email berhasil diverifikasi',
             'user'    => $user->only(['id', 'name', 'email', 'role']),
+            'token'   => $token,
         ]);
     }
 
@@ -222,9 +225,12 @@ class AuthController extends Controller
             ], 403);
         }
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Login berhasil',
             'user' => $user->only(['id', 'name', 'email', 'avatar', 'role']),
+            'token' => $token,
         ]);
     }
 
@@ -370,7 +376,9 @@ class AuthController extends Controller
                 Auth::login($user);
                 $request->session()->regenerate();
 
-                return redirect($this->frontendUrl() . '/dashboard/profile?google=connected');
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=connected&token=' . $token);
             }
 
             // === LOGIN MODE: Normal Google login ===
@@ -409,7 +417,9 @@ class AuthController extends Controller
             Auth::login($user);
             $request->session()->regenerate();
 
-            return redirect($this->frontendUrl() . '/auth/callback?login=success');
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return redirect($this->frontendUrl() . '/auth/callback?login=success&token=' . $token);
         } catch (\Exception $e) {
             Log::error('Google login callback failed: ' . $e->getMessage(), [
                 'exception' => $e,

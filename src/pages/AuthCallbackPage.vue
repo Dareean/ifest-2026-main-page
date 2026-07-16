@@ -8,6 +8,12 @@ const auth = useAuthStore()
 const statusMsg = ref('Memproses login Google...')
 
 onMounted(async () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const token = urlParams.get('token')
+  if (token) {
+    localStorage.setItem('auth_token', token)
+  }
+
   // Session already set by backend — fetch user data
   await auth.handleGoogleCallback()
 
