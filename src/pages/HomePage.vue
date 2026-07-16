@@ -6,6 +6,7 @@ import { competitionsData } from '../data/competitionsData'
 import { useAuthStore } from '../stores/auth'
 import api from '../utils/api'
 import { Check, Calendar, ChevronDown, Sun, Menu, X, Bot, Lock, Plus, Download, ExternalLink } from 'lucide-vue-next'
+import panitiaFiles from '../data/panitiaFiles.json'
 
 const auth = useAuthStore()
 const isLoggedIn = computed(() => auth.isAuthenticated)
@@ -222,11 +223,6 @@ const doc2025AssetModules = import.meta.glob('../assets/dokumentasi_ifest2025/*'
 
 const getAsset = (assetModules, folder, fileName) => assetModules[`../assets/${folder}/${fileName}`] ?? ''
 
-const panitiaAssetModules = import.meta.glob('../assets/foto_kepanitiaan_ifest2026/**/*', {
-  eager: true,
-  import: 'default',
-})
-
 const getNormalizedName = (filename) => {
   const dotIdx = filename.lastIndexOf('.')
   let name = dotIdx === -1 ? filename : filename.substring(0, dotIdx)
@@ -255,7 +251,7 @@ const getUniqueKey = (cleanName) => {
 
 // Parser for committee photos
 const parseCommitteePhotos = () => {
-  const allFiles = Object.keys(panitiaAssetModules)
+  const allFiles = panitiaFiles
   const divisions = {
     'Kreativitas': { name: 'Kreativitas', coordinators: [], members: [], groupPhoto: null, color: '#E11D48', textColor: '#ffffff', fruit: 'Apel', emoji: '🍎' },
     'Koor Inti': { name: 'Koor Inti', coordinators: [], members: [], groupPhoto: null, color: '#DC2626', textColor: '#ffffff', fruit: 'Cabe', emoji: '🌶️🌶️' },
@@ -342,7 +338,7 @@ const parseCommitteePhotos = () => {
       return
     }
 
-    const fileUrl = panitiaAssetModules[path]
+    const fileUrl = '/' + path
 
     if (isGroupPhoto(filename)) {
       if (!divisions[division].groupPhoto || ext === '.png') {
@@ -511,7 +507,7 @@ onMounted(() => {
   panitiaData.value = parseCommitteePhotos()
 })
 const fotoPanitiaKeseluruhan = computed(() => {
-  return panitiaAssetModules['../assets/foto_kepanitiaan_ifest2026/Panitia Keseluruhan/Fotooo.jpg'] || ''
+  return '/foto_kepanitiaan_ifest2026/Panitia Keseluruhan/Fotooo.jpg'
 })
 
 const selectedPerson = ref(null)

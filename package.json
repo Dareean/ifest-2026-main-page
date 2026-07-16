@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "node ./node_modules/vite/bin/vite.js build",
+    "dev": "node ./scripts/generate-panitia-json.js && vite",
+    "build": "node ./scripts/generate-panitia-json.js && node ./node_modules/vite/bin/vite.js build",
     "preview": "vite preview --host",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
