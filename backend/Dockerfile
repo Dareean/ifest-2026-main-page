@@ -19,4 +19,9 @@ RUN composer run post-autoload-dump \
     && mkdir -p database storage/framework storage/logs storage/app bootstrap/cache \
     && chmod -R 777 bootstrap/cache storage database
 
+RUN chmod +x startup.sh
+
 EXPOSE 8000
+
+CMD ["bash", "startup.sh"]
+
