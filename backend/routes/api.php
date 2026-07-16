@@ -19,8 +19,10 @@ Route::post('/auth/send-otp', [AuthController::class, 'sendOtp'])->middleware(..
 Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp'])->middleware(...$authThrottle('10,1'));
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware(...$authThrottle('3,10'));
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware(...$authThrottle('5,10'));
-Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])->middleware(...$authThrottle('10,1'));
-Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])->middleware(...$authThrottle('10,1'));
+Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])
+    ->middleware([\Illuminate\Session\Middleware\StartSession::class, ...$authThrottle('10,1')]);
+Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])
+    ->middleware([\Illuminate\Session\Middleware\StartSession::class, ...$authThrottle('10,1')]);
 
 Route::get('/lombas', [LombaController::class, 'index'])->middleware('throttle:60,1');
 Route::get('/lombas/{lomba}', [LombaController::class, 'show'])->middleware('throttle:60,1');
