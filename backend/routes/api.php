@@ -20,9 +20,9 @@ Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp'])->middlewar
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware(...$authThrottle('3,10'));
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware(...$authThrottle('5,10'));
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])
-    ->middleware([\Illuminate\Session\Middleware\StartSession::class, ...$authThrottle('10,1')]);
+    ->middleware($authThrottle('10,1'));
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])
-    ->middleware([\Illuminate\Session\Middleware\StartSession::class, ...$authThrottle('10,1')]);
+    ->middleware($authThrottle('10,1'));
 
 Route::post('/auth/2fa/verify', [AuthController::class, 'verifyTwoFactor'])->middleware(...$authThrottle('10,1'));
 Route::post('/auth/2fa/recover', [AuthController::class, 'recoverTwoFactor'])->middleware(...$authThrottle('5,10'));
