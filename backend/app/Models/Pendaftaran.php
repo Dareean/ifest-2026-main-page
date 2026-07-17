@@ -10,10 +10,10 @@ class Pendaftaran extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'user_id', 'lomba_id', 'team_name', 'gelombang', 'notes',
-        'payment_proof',
+        'user_id', 'lomba_id', 'team_name', 'status', 'gelombang', 'notes',
+        'payment_proof', 'payment_status', 'payment_verified_at', 'payment_notes',
         'last_reminder_sent_at', 'team_locked', 'unlock_requested',
-        'ig_follow_proof', 'ig_twibbon_proof',
+        'ig_follow_proof', 'ig_twibbon_proof', 'social_validated',
     ];
 
     protected $appends = ['max_members'];

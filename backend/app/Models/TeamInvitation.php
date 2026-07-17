@@ -11,6 +11,7 @@ class TeamInvitation extends Model
         'email',
         'invited_by_user_id',
         'invited_user_id',
+        'status',
         'expires_at',
         'ig_follow_proof',
         'ig_twibbon_proof',
