@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { API_BASE, TEST_USER, uniqueEmail } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, extractXsrfToken } from './helpers/seed.js'
 import { loginViaUI } from './helpers/auth.js'
 
 const ROOT = API_BASE.replace('/api', '')
@@ -38,14 +38,17 @@ test.describe('Google OAuth - API', () => {
   })
 
   test('GET /auth/google/connect returns URL when authenticated', async ({ request }) => {
-    await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    const loginRes = await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-    const loginData = await loginRes.json()
-    const token = loginData.token
+    const csrfRes = await request.get(`${ROOT}/sanctum/csrf-cookie`, {
+      headers: { Origin: 'http://localhost:5173' },
+    })
+    const xsrfToken = extractXsrfToken(csrfRes.headers()['set-cookie'])
+    const loginRes = await request.post(`${API_BASE}/auth/login`, {
+      headers: { Origin: 'http://localhost:5173', 'X-XSRF-TOKEN': xsrfToken || '' },
+      data: { email, password: TEST_USER.password },
+    })
+    expect(loginRes.ok()).toBe(true)
     const res = await request.get(`${API_BASE}/auth/google/connect`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { Origin: 'http://localhost:5173' },
     })
     const status = res.status()
     if (status === 200) {
@@ -64,14 +67,22 @@ test.describe('Google OAuth - API', () => {
   })
 
   test('POST /auth/google/disconnect returns 200 when authenticated', async ({ request }) => {
-    await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    const loginRes = await request.post(`${API_BASE}/auth/login`, { data: { email, password: TEST_USER.password } })
-    const loginData = await loginRes.json()
-    const token = loginData.token
+    const csrfRes = await request.get(`${ROOT}/sanctum/csrf-cookie`, {
+      headers: { Origin: 'http://localhost:5173' },
+    })
+    const xsrfToken = extractXsrfToken(csrfRes.headers()['set-cookie'])
+    const loginRes = await request.post(`${API_BASE}/auth/login`, {
+      headers: { Origin: 'http://localhost:5173', 'X-XSRF-TOKEN': xsrfToken || '' },
+      data: { email, password: TEST_USER.password },
+    })
+    expect(loginRes.ok()).toBe(true)
+
+    const csrfRes2 = await request.get(`${ROOT}/sanctum/csrf-cookie`, {
+      headers: { Origin: 'http://localhost:5173' },
+    })
+    const xsrfToken2 = extractXsrfToken(csrfRes2.headers()['set-cookie'])
     const res = await request.post(`${API_BASE}/auth/google/disconnect`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { Origin: 'http://localhost:5173', 'X-XSRF-TOKEN': xsrfToken2 || '' },
     })
     expect(res.status()).toBe(200)
     const body = await res.json()

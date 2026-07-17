@@ -25,14 +25,60 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await getCsrf()
       const res = await api.post('/auth/login', data)
-      user.value = res.data.user
-      if (res.data.token) {
-        localStorage.setItem('auth_token', res.data.token)
+      if (res.data.user) {
+        user.value = res.data.user
       }
       return res.data
     } finally {
       loading.value = false
     }
+  }
+
+  async function verifyTwoFactor(code) {
+    loading.value = true
+    try {
+      await getCsrf()
+      const res = await api.post('/auth/2fa/verify', { code })
+      user.value = res.data.user
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function recoverTwoFactor(recovery_code) {
+    loading.value = true
+    try {
+      await getCsrf()
+      const res = await api.post('/auth/2fa/recover', { recovery_code })
+      user.value = res.data.user
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function get2faStatus() {
+    const res = await api.get('/auth/2fa/status')
+    return res.data
+  }
+
+  async function enable2fa() {
+    await getCsrf()
+    const res = await api.post('/auth/2fa/enable')
+    return res.data
+  }
+
+  async function confirm2fa(code) {
+    await getCsrf()
+    const res = await api.post('/auth/2fa/verify-setup', { code })
+    return res.data
+  }
+
+  async function disable2fa(code) {
+    await getCsrf()
+    const res = await api.post('/auth/2fa/disable', { code })
+    return res.data
   }
 
   async function fetchUser() {
@@ -41,7 +87,6 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = res.data.user
     } catch {
       user.value = null
-      localStorage.removeItem('auth_token')
     }
   }
 
@@ -51,7 +96,6 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       // ignore
     }
-    localStorage.removeItem('auth_token')
     user.value = null
   }
 
@@ -92,9 +136,6 @@ export const useAuthStore = defineStore('auth', () => {
     await getCsrf()
     const res = await api.post('/auth/verify-otp', { email, otp })
     user.value = res.data.user
-    if (res.data.token) {
-      localStorage.setItem('auth_token', res.data.token)
-    }
     return res.data
   }
 
@@ -102,5 +143,7 @@ export const useAuthStore = defineStore('auth', () => {
     user, loading, isAuthenticated, isAdmin,
     register, login, fetchUser, logout, googleLogin, connectGoogle,
     disconnectGoogle, handleGoogleCallback, sendOtp, verifyOtp,
+    verifyTwoFactor, recoverTwoFactor, get2faStatus, enable2fa,
+    confirm2fa, disable2fa,
   }
 })

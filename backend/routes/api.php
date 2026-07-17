@@ -9,10 +9,10 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes — skip throttle in local for E2E testing
-$authThrottle = fn($limit) => env('APP_ENV') === 'local' ? [] : ["throttle:$limit"];
+$authThrottle = fn($limit) => [env('APP_ENV') === 'local' ? "throttle:1000,1" : "throttle:$limit"];
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware(...$authThrottle('5,10'));
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware(...$authThrottle('10,1'));
 Route::post('/auth/send-otp', [AuthController::class, 'sendOtp'])->middleware(...$authThrottle('3,10'));
@@ -24,14 +24,17 @@ Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])
     ->middleware([\Illuminate\Session\Middleware\StartSession::class, ...$authThrottle('10,1')]);
 
-Route::get('/lombas', [LombaController::class, 'index'])->middleware('throttle:60,1');
-Route::get('/lombas/{lomba}', [LombaController::class, 'show'])->middleware('throttle:60,1');
+Route::post('/auth/2fa/verify', [AuthController::class, 'verifyTwoFactor'])->middleware(...$authThrottle('10,1'));
+Route::post('/auth/2fa/recover', [AuthController::class, 'recoverTwoFactor'])->middleware(...$authThrottle('5,10'));
+
+Route::get('/lombas', [LombaController::class, 'index'])->middleware(...$authThrottle('60,1'));
+Route::get('/lombas/{lomba}', [LombaController::class, 'show'])->middleware(...$authThrottle('60,1'));
 
 // AI chat proxy (protected to prevent abuse)
-Route::middleware(['auth:sanctum', 'throttle:30,1'])->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
+Route::middleware(array_merge(['auth:sanctum'], $authThrottle('30,1')))->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
 
 // Protected routes — global rate limit 60 req/min
-Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+Route::middleware(array_merge(['auth:sanctum'], $authThrottle('60,1')))->group(function () use ($authThrottle) {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/user', [AuthController::class, 'user']);
 
@@ -62,14 +65,20 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
     Route::get('/auth/google/connect', [AuthController::class, 'googleConnect']);
     Route::post('/auth/google/disconnect', [AuthController::class, 'googleDisconnect']);
+
+    Route::get('/auth/2fa/status', [TwoFactorController::class, 'status']);
+    Route::post('/auth/2fa/enable', [TwoFactorController::class, 'enable']);
+    Route::post('/auth/2fa/verify-setup', [TwoFactorController::class, 'verify']);
+    Route::post('/auth/2fa/disable', [TwoFactorController::class, 'disable']);
+    Route::post('/auth/2fa/recovery-codes', [TwoFactorController::class, 'recover']);
 });
 
 // Sensitive endpoints with stricter rate limits
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/pendaftarans/{pendaftaran}/invite', [TeamController::class, 'invite'])->middleware('throttle:30,10');
-    Route::post('/pendaftarans/{pendaftaran}/submit', [SubmissionController::class, 'store'])->middleware('throttle:5,1');
-    Route::put('/password', [ProfileController::class, 'updatePassword'])->middleware('throttle:5,10');
-    Route::post('/avatar', [ProfileController::class, 'uploadAvatar'])->middleware('throttle:5,10');
+Route::middleware('auth:sanctum')->group(function () use ($authThrottle) {
+    Route::post('/pendaftarans/{pendaftaran}/invite', [TeamController::class, 'invite'])->middleware(...$authThrottle('30,10'));
+    Route::post('/pendaftarans/{pendaftaran}/submit', [SubmissionController::class, 'store'])->middleware(...$authThrottle('5,1'));
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->middleware(...$authThrottle('5,10'));
+    Route::post('/avatar', [ProfileController::class, 'uploadAvatar'])->middleware(...$authThrottle('5,10'));
 });
 
 // E2E testing helpers (local environment only — never in production)
@@ -78,7 +87,7 @@ if (app()->environment('local')) {
 }
 
 // Admin routes
-Route::middleware(['auth:sanctum', 'admin', 'throttle:120,1'])->prefix('admin')->group(function () {
+Route::middleware(array_merge(['auth:sanctum', 'admin'], $authThrottle('120,1')))->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
     Route::get('/pendaftarans', [AdminController::class, 'pendaftarans']);
     Route::get('/pendaftarans/export', [AdminController::class, 'exportPendaftarans']);

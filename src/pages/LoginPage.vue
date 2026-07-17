@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-vue-next'
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Shield, ShieldOff } from 'lucide-vue-next'
 import logoUntad from '../assets/logo_utama/logo_untad.webp'
 import logoHmti from '../assets/logo_utama/HMTI LOGO.webp'
 import logoIfest from '../assets/logo_utama/Logo-IFEST-2026.webp'
@@ -15,6 +15,8 @@ const form = ref({ email: '', password: '' })
 const showPassword = ref(false)
 const error = ref('')
 const isSubmitting = ref(false)
+const needs2fa = ref(false)
+const twoFactorCode = ref('')
 
 async function handleLogin() {
   error.value = ''
@@ -22,19 +24,55 @@ async function handleLogin() {
   try {
     const res = await auth.login(form.value)
     if (res?.needs_verification) {
-      router.push({ path: '/verifikasi-email', query: { email: res.email } })
+      router.push({ path: '/verifikasi-email', query: { email: form.value.email } })
       return
     }
-    let redirect = route.query.redirect
-    if (typeof redirect !== 'string' || !/^\/(?!\/)/.test(redirect)) {
-      redirect = res?.user?.role === 'admin' ? '/dashboard/admin' : '/dashboard'
+    if (res?.needs_2fa) {
+      needs2fa.value = true
+      return
     }
-    router.push(redirect)
+    redirectAfterLogin(res)
   } catch (e) {
     error.value = e.response?.data?.message || 'Email atau password salah'
   } finally {
     isSubmitting.value = false
   }
+}
+
+async function handleTwoFactor() {
+  error.value = ''
+  isSubmitting.value = true
+  try {
+    const res = await auth.verifyTwoFactor(twoFactorCode.value)
+    redirectAfterLogin(res)
+  } catch (e) {
+    error.value = e.response?.data?.message || 'Kode 2FA tidak valid'
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+async function handleTwoFactorRecover() {
+  error.value = ''
+  const recovery = prompt('Masukkan kode recovery 2FA:')
+  if (!recovery) return
+  isSubmitting.value = true
+  try {
+    const res = await auth.recoverTwoFactor(recovery)
+    redirectAfterLogin(res)
+  } catch (e) {
+    error.value = e.response?.data?.message || 'Kode recovery tidak valid'
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+function redirectAfterLogin(res) {
+  let redirect = route.query.redirect
+  if (typeof redirect !== 'string' || !/^\/(?!\/)/.test(redirect)) {
+    redirect = res?.user?.role === 'admin' ? '/dashboard/admin' : '/dashboard'
+  }
+  router.push(redirect)
 }
 
 async function handleGoogle() {
@@ -71,7 +109,32 @@ async function handleGoogle() {
 
         <div v-if="error" class="bg-[#FF3D8B]/5 border border-accent-magenta/30 rounded-xl px-4 py-3 mb-6 font-mono text-xs font-bold text-on-surface">{{ error }}</div>
 
-        <form @submit.prevent="handleLogin" class="space-y-5">
+        <!-- 2FA Challenge -->
+        <div v-if="needs2fa" class="mb-6">
+          <div class="flex items-center gap-2 mb-4">
+            <Shield class="w-5 h-5 text-accent-magenta" />
+            <span class="font-mono text-xs font-bold uppercase tracking-widest text-on-surface">Verifikasi 2FA</span>
+          </div>
+          <p class="font-mono text-xs text-on-surface-variant mb-4">Masukkan kode 6 digit dari Google Authenticator kamu.</p>
+          <form @submit.prevent="handleTwoFactor" class="space-y-4">
+            <div>
+              <label class="block font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Kode 2FA</label>
+              <input v-model="twoFactorCode" type="text" inputmode="numeric" maxlength="6" required placeholder="000000" class="w-full bg-[#F5F5F5] border border-[#04000D]/30 rounded-xl py-3 px-4 font-mono text-sm font-bold text-center text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-[#04000D] transition-colors tracking-[0.5em]" />
+            </div>
+            <button type="submit" :disabled="isSubmitting" class="riso-btn-plate w-full bg-[#04000D] text-white py-3.5 rounded-full font-mono text-xs font-black uppercase tracking-wider select-none disabled:opacity-40" style="--plate-color: #FDE047;">
+              {{ isSubmitting ? 'Memverifikasi...' : 'Verifikasi' }}
+            </button>
+          </form>
+          <button @click="handleTwoFactorRecover" class="mt-3 w-full font-mono text-xs font-bold text-accent-magenta hover:text-accent-magenta/80 transition-colors">
+            Pakai kode recovery
+          </button>
+          <button @click="needs2fa = false; error = ''" class="mt-1 w-full font-mono text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors">
+            Kembali
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <form v-show="!needs2fa" @submit.prevent="handleLogin" class="space-y-5">
           <div>
             <label class="block font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Email</label>
             <div class="relative">

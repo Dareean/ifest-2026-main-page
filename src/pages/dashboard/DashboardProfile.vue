@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import api from '../../utils/api'
-import { Save, Lock, Eye, EyeOff, CheckCircle, User, Building, Phone, Chrome, Camera, X } from 'lucide-vue-next'
+import { Save, Lock, Eye, EyeOff, CheckCircle, User, Building, Phone, Chrome, Camera, X, Shield, ShieldOff, Smartphone } from 'lucide-vue-next'
 
 const apiBase = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || 'http://localhost:8000'
 
@@ -90,6 +90,81 @@ function initForm() {
   form.value.institution = auth.user?.institution || ''
 }
 
+const twoFactorEnabled = ref(false)
+const twoFactorLoading = ref(false)
+const twoFactorSecret = ref('')
+const twoFactorQrUrl = ref('')
+const twoFactorRecoveryCodes = ref([])
+const twoFactorCode = ref('')
+const twoFactorError = ref('')
+const twoFactorSuccess = ref('')
+const twoFactorSetupMode = ref(false)
+
+async function load2faStatus() {
+  try {
+    const res = await auth.get2faStatus()
+    twoFactorEnabled.value = res.enabled
+  } catch { /* ignore */ }
+}
+
+async function enable2fa() {
+  twoFactorError.value = ''
+  twoFactorLoading.value = true
+  try {
+    const res = await auth.enable2fa()
+    twoFactorSecret.value = res.secret
+    twoFactorQrUrl.value = res.qr_code_url
+    twoFactorRecoveryCodes.value = res.recovery_codes
+    twoFactorSetupMode.value = true
+  } catch (e) {
+    twoFactorError.value = e.response?.data?.message || 'Gagal mengaktifkan 2FA'
+  } finally {
+    twoFactorLoading.value = false
+  }
+}
+
+async function confirm2faSetup() {
+  twoFactorError.value = ''
+  twoFactorLoading.value = true
+  try {
+    await auth.confirm2fa(twoFactorCode.value)
+    twoFactorEnabled.value = true
+    twoFactorSetupMode.value = false
+    twoFactorCode.value = ''
+    twoFactorSuccess.value = '2FA berhasil diaktifkan'
+    setTimeout(() => twoFactorSuccess.value = '', 5000)
+  } catch (e) {
+    twoFactorError.value = e.response?.data?.message || 'Kode 2FA tidak valid'
+  } finally {
+    twoFactorLoading.value = false
+  }
+}
+
+async function disable2fa() {
+  twoFactorError.value = ''
+  const confirmed = confirm('Nonaktifkan 2FA? Masukkan kode 2FA untuk konfirmasi.')
+  if (!confirmed) return
+  const code = prompt('Masukkan kode 2FA:')
+  if (!code) return
+  twoFactorLoading.value = true
+  try {
+    await auth.disable2fa(code)
+    twoFactorEnabled.value = false
+    twoFactorSuccess.value = '2FA berhasil dinonaktifkan'
+    setTimeout(() => twoFactorSuccess.value = '', 5000)
+  } catch (e) {
+    twoFactorError.value = e.response?.data?.message || 'Gagal menonaktifkan 2FA'
+  } finally {
+    twoFactorLoading.value = false
+  }
+}
+
+function cancel2faSetup() {
+  twoFactorSetupMode.value = false
+  twoFactorCode.value = ''
+  twoFactorError.value = ''
+}
+
 onMounted(async () => {
   try {
     await auth.fetchUser()
@@ -97,19 +172,13 @@ onMounted(async () => {
     console.error('Gagal mengambil data profil terbaru:', e)
   }
   initForm()
+  load2faStatus()
 
   if (route.query.google === 'connected') {
     googleMsg.value = 'Akun Google berhasil dihubungkan!'
     router.replace({ query: {} })
   } else if (route.query.google === 'error') {
-    const reasons = {
-      taken: 'Akun Google ini sudah terhubung ke akun lain',
-      missing_state: 'Sesi tidak valid, coba lagi',
-      invalid_state: 'Sesi tidak valid, coba lagi',
-      user_not_found: 'Pengguna tidak ditemukan',
-      access_denied: 'Koneksi Google dibatalkan',
-    }
-    googleMsg.value = reasons[route.query.reason] || 'Gagal menghubungkan Google'
+    googleMsg.value = 'Gagal menghubungkan Google'
     router.replace({ query: {} })
   }
 })
@@ -430,6 +499,80 @@ async function savePassword() {
               </button>
             </div>
           </form>
+        </div>
+
+        <!-- Two-Factor Authentication Card -->
+        <div class="bg-white border border-[#04000D]/5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-6 md:p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+              <Shield class="w-4 h-4 text-on-surface-variant" />
+            </div>
+            <div>
+              <h2 class="font-extrabold text-lg tracking-tight text-on-surface">Autentikasi 2 Faktor</h2>
+              <p class="text-[10px] text-on-surface-variant/70 uppercase tracking-wider font-semibold">Keamanan tambahan</p>
+            </div>
+          </div>
+
+          <div v-if="twoFactorSuccess" class="bg-[#DCEEB1]/30 border border-[#DCEEB1]/50 rounded-xl px-4 py-3 mb-6 text-xs font-semibold text-on-surface flex items-center gap-2">
+            <CheckCircle class="w-4 h-4 text-on-surface-variant" /> {{ twoFactorSuccess }}
+          </div>
+          <div v-if="twoFactorError" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-3 mb-6 text-xs font-semibold text-accent-magenta">{{ twoFactorError }}</div>
+
+          <template v-if="twoFactorSetupMode">
+            <div class="space-y-4">
+              <div class="bg-blue-50/50 border border-blue-200/40 rounded-xl px-4 py-3">
+                <p class="text-xs font-semibold text-on-surface">1. Scan QR code berikut dengan Google Authenticator:</p>
+              </div>
+              <div class="flex justify-center py-4">
+                <img :src="twoFactorQrUrl" alt="QR Code 2FA" class="w-48 h-48 border-2 border-dashed border-slate-200 rounded-xl p-2" />
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-on-surface-variant/80 mb-2">Atau masukkan kode manual:</p>
+                <code class="block bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-mono text-sm font-bold text-center text-on-surface select-all">{{ twoFactorSecret }}</code>
+              </div>
+              <div class="bg-amber-50/50 border border-amber-200/40 rounded-xl px-4 py-3">
+                <p class="text-xs font-semibold text-on-surface">2. Masukkan kode 6 digit dari aplikasi untuk verifikasi:</p>
+              </div>
+              <div class="flex gap-3 items-end">
+                <div class="flex-1">
+                  <input v-model="twoFactorCode" type="text" inputmode="numeric" maxlength="6" placeholder="000000" class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-3 px-4 font-mono text-sm font-bold text-center text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all tracking-[0.5em]" />
+                </div>
+                <button @click="confirm2faSetup" :disabled="twoFactorLoading || twoFactorCode.length !== 6" class="bg-[#04000D] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-sm text-xs uppercase tracking-wider disabled:opacity-40">
+                  {{ twoFactorLoading ? '...' : 'Verifikasi' }}
+                </button>
+              </div>
+              <div class="bg-green-50/50 border border-green-200/40 rounded-xl px-4 py-3">
+                <p class="text-xs font-semibold text-on-surface">3. Simpan kode recovery berikut di tempat aman:</p>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  <div v-for="(code, i) in twoFactorRecoveryCodes" :key="i" class="bg-white border border-slate-200 rounded-lg px-3 py-2 font-mono text-xs font-bold text-center text-on-surface select-all">
+                    {{ code }}
+                  </div>
+                </div>
+              </div>
+              <button @click="cancel2faSetup" class="text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-colors">
+                Batal
+              </button>
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-on-surface">
+                  {{ twoFactorEnabled ? '2FA aktif' : '2FA tidak aktif' }}
+                </p>
+                <p class="text-xs text-on-surface-variant/70 mt-0.5">
+                  {{ twoFactorEnabled ? 'Kode tambahan dari Google Authenticator diperlukan saat login.' : 'Tingkatkan keamanan akun dengan autentikasi dua faktor.' }}
+                </p>
+              </div>
+              <button v-if="twoFactorEnabled" @click="disable2fa" :disabled="twoFactorLoading" class="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-4 py-2.5 rounded-xl font-bold transition-all text-xs uppercase tracking-wider disabled:opacity-40">
+                <ShieldOff class="w-4 h-4" /> Nonaktifkan
+              </button>
+              <button v-else @click="enable2fa" :disabled="twoFactorLoading" class="flex items-center gap-2 bg-[#04000D] text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-sm text-xs uppercase tracking-wider disabled:opacity-40">
+                <Smartphone class="w-4 h-4" /> Aktifkan
+              </button>
+            </div>
+          </template>
         </div>
 
       </div>

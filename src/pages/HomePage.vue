@@ -976,6 +976,10 @@ onMounted(async () => {
   window.addEventListener('resize', updateViewport)
   window.addEventListener('scroll', handleScroll)
 
+  // Initialize countdown immediately (non-blocking)
+  calculateTimeLeft()
+  countdownInterval = setInterval(calculateTimeLeft, 1000)
+
   // Fetch active lomba codes from API
   try {
     const res = await api.get('/lombas')
@@ -983,10 +987,6 @@ onMounted(async () => {
   } catch {
     activeKodes.value = competitionsData.map(c => c.id)
   }
-
-  // Initialize countdown
-  calculateTimeLeft()
-  countdownInterval = setInterval(calculateTimeLeft, 1000)
 
   // Run once to set initial active section
   handleScroll()

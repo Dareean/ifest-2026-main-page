@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
+use PragmaRX\Google2FAQRCode\Google2FA;
 
 class AuthController extends Controller
 {
@@ -71,7 +72,7 @@ class AuthController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
+                'email' => 'required|string|email|max:255',
                 'password' => 'required|string|min:8|confirmed',
                 'phone' => 'nullable|string|max:20',
                 'institution' => 'nullable|string|max:255',
@@ -79,6 +80,13 @@ class AuthController extends Controller
 
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $existing = User::where('email', $request->email)->first();
+            if ($existing) {
+                return response()->json([
+                    'message' => 'Registrasi berhasil. Silakan verifikasi email Anda dengan kode OTP yang telah dikirim.',
+                ], 201);
             }
 
             $user = User::create([
@@ -102,9 +110,7 @@ class AuthController extends Controller
                 'exception' => $e,
                 'trace' => $e->getTraceAsString()
             ]);
-            return response()->json([
-                'message' => 'Registration failed: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['message' => 'Registrasi gagal. Silakan coba lagi.'], 500);
         }
     }
 
@@ -119,11 +125,10 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        if (!$user || $user->email_verified_at) {
-            return response()->json(['message' => 'Jika email terdaftar, kode OTP telah dikirim']);
-        }
 
-        $this->generateAndSendOtp($user->email, $user->name);
+        if ($user && !$user->email_verified_at) {
+            $this->generateAndSendOtp($user->email, $user->name);
+        }
 
         return response()->json(['message' => 'Jika email terdaftar, kode OTP telah dikirim']);
     }
@@ -154,7 +159,7 @@ class AuthController extends Controller
             }
 
             if ($user->email_verified_at) {
-                return response()->json(['message' => 'Email sudah diverifikasi'], 400);
+                return response()->json(['message' => 'Kode OTP tidak valid atau sudah kadaluarsa'], 400);
             }
 
             $records = EmailVerification::where('email', $request->email)
@@ -186,12 +191,9 @@ class AuthController extends Controller
                 $request->session()->regenerate();
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
             return response()->json([
                 'message' => 'Email berhasil diverifikasi',
                 'user'    => $user->only(['id', 'name', 'email', 'role']),
-                'token'   => $token,
             ]);
         } catch (\Exception $e) {
             Log::error('OTP verification failed with exception: ' . $e->getMessage(), [
@@ -227,38 +229,32 @@ class AuthController extends Controller
                 ], 429);
             }
 
-            if (!Auth::attempt($request->only('email', 'password'))) {
+            if (!Auth::validate($request->only('email', 'password'))) {
                 $limiter->hit($loginKey, 900);
                 Log::warning('Login failed', ['email' => $request->input('email'), 'ip' => $request->ip()]);
                 return response()->json(['message' => 'Email atau password salah'], 401);
             }
 
             $limiter->clear($loginKey);
+            $user = User::where('email', $request->email)->first();
 
+            if (is_null($user->email_verified_at) && $user->role !== 'admin') {
+                return response()->json(['message' => 'Email atau password salah'], 401);
+            }
+
+            if ($user->two_factor_secret) {
+                $request->session()->put('2fa:email', $user->email);
+                return response()->json(['needs_2fa' => true]);
+            }
+
+            Auth::login($user);
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
 
-            $user = Auth::user();
-
-            if (is_null($user->email_verified_at) && $user->role !== 'admin') {
-                Auth::logout();
-                if ($request->hasSession()) {
-                    $request->session()->invalidate();
-                }
-                return response()->json([
-                    'message' => 'Email belum diverifikasi. Silakan cek kode OTP di email Anda.',
-                    'needs_verification' => true,
-                    'email' => $user->email,
-                ], 403);
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
             return response()->json([
                 'message' => 'Login berhasil',
                 'user' => $user->only(['id', 'name', 'email', 'avatar', 'role']),
-                'token' => $token,
             ]);
         } catch (\Exception $e) {
             Log::error('Login failed with exception: ' . $e->getMessage(), [
@@ -266,20 +262,88 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json([
-                'message' => 'Login failed: ' . $e->getMessage()
+                'message' => 'Email atau password salah'
             ], 500);
         }
     }
 
-    public function logout(Request $request): JsonResponse
+    public function verifyTwoFactor(Request $request): JsonResponse
     {
-        // Revoke token if using Bearer auth
-        $token = $request->user()?->currentAccessToken();
-        if ($token && method_exists($token, 'delete')) {
-            $token->delete();
+        $email = $request->session()->get('2fa:email');
+        if (!$email) {
+            return response()->json(['message' => 'Sesi login tidak ditemukan. Silakan login ulang.'], 400);
         }
 
-        // Logout session if using SPA auth
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string|size:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::where('email', $email)->first();
+        if (!$user || !$user->two_factor_secret) {
+            return response()->json(['message' => 'Sesi tidak valid'], 400);
+        }
+
+        $google2fa = new Google2FA();
+        if (!$google2fa->verifyKey($user->two_factor_secret, $request->code)) {
+            return response()->json(['message' => 'Kode 2FA tidak valid'], 400);
+        }
+
+        $request->session()->forget('2fa:email');
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'message' => 'Login berhasil',
+            'user' => $user->only(['id', 'name', 'email', 'avatar', 'role']),
+        ]);
+    }
+
+    public function recoverTwoFactor(Request $request): JsonResponse
+    {
+        $email = $request->session()->get('2fa:email');
+        if (!$email) {
+            return response()->json(['message' => 'Sesi login tidak ditemukan. Silakan login ulang.'], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'recovery_code' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::where('email', $email)->first();
+        if (!$user || !$user->two_factor_secret) {
+            return response()->json(['message' => 'Sesi tidak valid'], 400);
+        }
+
+        $codes = json_decode($user->two_factor_recovery_codes ?? '[]', true);
+        $index = array_search($request->recovery_code, $codes);
+        if ($index === false) {
+            return response()->json(['message' => 'Kode recovery tidak valid'], 400);
+        }
+
+        unset($codes[$index]);
+        $user->two_factor_recovery_codes = json_encode(array_values($codes));
+        $user->save();
+
+        $request->session()->forget('2fa:email');
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'message' => 'Login berhasil menggunakan kode recovery',
+            'user' => $user->only(['id', 'name', 'email', 'avatar', 'role']),
+        ]);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
         if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
             if ($request->hasSession()) {
@@ -393,12 +457,12 @@ class AuthController extends Controller
                     ->where('id', '!=', $connectUserId)
                     ->first();
                 if ($existing) {
-                    return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=taken');
+                    return redirect($this->frontendUrl() . '/dashboard/profile?google=error');
                 }
 
                 $user = User::find($connectUserId);
                 if (!$user) {
-                    return redirect($this->frontendUrl() . '/dashboard/profile?google=error&reason=user_not_found');
+                    return redirect($this->frontendUrl() . '/dashboard/profile?google=error');
                 }
 
                 $user->update([
@@ -421,9 +485,7 @@ class AuthController extends Controller
                     $request->session()->regenerate();
                 }
 
-                $token = $user->createToken('auth_token')->plainTextToken;
-
-                return redirect($this->frontendUrl() . '/dashboard/profile?google=connected&token=' . $token);
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=connected');
             }
 
             // === LOGIN MODE: Normal Google login ===
@@ -464,15 +526,13 @@ class AuthController extends Controller
                 $request->session()->regenerate();
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return redirect($this->frontendUrl() . '/auth/callback?login=success&token=' . $token);
+            return redirect($this->frontendUrl() . '/auth/callback?login=success');
         } catch (\Exception $e) {
             Log::error('Google login callback failed: ' . $e->getMessage(), [
                 'exception' => $e,
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect($this->frontendUrl() . '/login?error=google_failed&message=' . urlencode($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()));
+            return redirect($this->frontendUrl() . '/login?error=google_failed');
         }
     }
 

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { TEST_USER, uniqueEmail, DRIVE_LINK, FIGMA_LINK, ORIGINALITY_LINK, API_BASE } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginAs } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, loginAs, authPut, authGet } from './helpers/seed.js'
 
 const ROOT = API_BASE.replace('/api', '')
 
@@ -62,12 +62,12 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     const firstLomba = lombasData.data?.[0]
     const initial = firstLomba.is_submission_open
 
-    const toggleRes1 = await ctx.put(`${API_BASE}/admin/lombas/${firstLomba.id}/toggle-submission`)
+    const toggleRes1 = await authPut(ctx, `${API_BASE}/admin/lombas/${firstLomba.id}/toggle-submission`)
     expect(toggleRes1.ok()).toBe(true)
     const toggleData1 = await toggleRes1.json()
     expect(toggleData1.data.is_submission_open).toBe(!initial)
 
-    const toggleRes2 = await ctx.put(`${API_BASE}/admin/lombas/${firstLomba.id}/toggle-submission`)
+    const toggleRes2 = await authPut(ctx, `${API_BASE}/admin/lombas/${firstLomba.id}/toggle-submission`)
     expect(toggleRes2.ok()).toBe(true)
     const toggleData2 = await toggleRes2.json()
     expect(toggleData2.data.is_submission_open).toBe(initial)
@@ -76,7 +76,7 @@ test.describe('Fase 6: Admin Lomba Management', () => {
   test('API: toggle-active changes is_active and public list reflects it', async ({ page }) => {
     const ctx = await adminContext()
 
-    const adminLombasRes = await ctx.get(`${API_BASE}/admin/lombas`)
+    const adminLombasRes = await authGet(ctx, `${API_BASE}/admin/lombas`)
     const adminLombas = await adminLombasRes.json()
     const sdih = adminLombas.data.find(l => l.kode === 'REG-03')
     expect(sdih).toBeDefined()
@@ -87,7 +87,7 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     const publicKodes = publicData.data.map(l => l.kode)
     expect(publicKodes).not.toContain('REG-03')
 
-    const toggleOn = await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
+    const toggleOn = await authPut(ctx, `${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
     expect(toggleOn.ok()).toBe(true)
     const toggleOnData = await toggleOn.json()
     expect(toggleOnData.data.is_active).toBe(true)
@@ -97,19 +97,19 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     const publicKodes2 = publicData2.data.map(l => l.kode)
     expect(publicKodes2).toContain('REG-03')
 
-    await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
+    await authPut(ctx, `${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
   })
 
   test('UI: toggle S-DIH active changes landing page competition count', async ({ page }) => {
     const ctx = await adminContext()
 
-    const adminLombasRes = await ctx.get(`${API_BASE}/admin/lombas`)
+    const adminLombasRes = await authGet(ctx, `${API_BASE}/admin/lombas`)
     const adminLombas = await adminLombasRes.json()
     const sdih = adminLombas.data.find(l => l.kode === 'REG-03')
     expect(sdih).toBeDefined()
 
     if (sdih.is_active) {
-      await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
+      await authPut(ctx, `${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
     }
 
     await page.goto('/kompetisi')
@@ -117,14 +117,14 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     let count = await page.locator('nav button').count()
     expect(count).toBe(5)
 
-    await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
+    await authPut(ctx, `${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
 
     await page.goto('/kompetisi')
     await page.waitForSelector('nav button', { timeout: 15000 })
     count = await page.locator('nav button').count()
     expect(count).toBe(6)
 
-    await ctx.put(`${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
+    await authPut(ctx, `${API_BASE}/admin/lombas/${sdih.id}/toggle-active`)
   })
 
   test('API: admin can update lomba deadlines', async ({ page }) => {
@@ -134,11 +134,8 @@ test.describe('Fase 6: Admin Lomba Management', () => {
     const lombasData = await lombasRes.json()
     const firstLomba = lombasData.data?.[0]
 
-    const updateRes = await ctx.put(`${API_BASE}/admin/lombas/${firstLomba.id}`, {
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      data: {
-        contact_person: 'E2E Test CP (+62 812-3456-7890)',
-      }
+    const updateRes = await authPut(ctx, `${API_BASE}/admin/lombas/${firstLomba.id}`, {
+      contact_person: 'E2E Test CP (+62 812-3456-7890)',
     })
     expect(updateRes.ok()).toBe(true)
     const updateData = await updateRes.json()

@@ -17,7 +17,7 @@ function withXsrf(headers = {}) {
   return csrfToken ? { ...headers, 'X-XSRF-TOKEN': csrfToken } : headers
 }
 
-function extractXsrfToken(setCookieHeader) {
+export function extractXsrfToken(setCookieHeader) {
   if (!setCookieHeader) return ''
   const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader]
   for (const c of cookies) {
@@ -85,33 +85,78 @@ export async function setAdminViaApi(email) {
   return body
 }
 
+const ORIGIN = 'http://localhost:5173'
+
+async function fetchXsrfToken(ctx) {
+  const res = await ctx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
+    headers: { Origin: ORIGIN },
+  })
+  return extractXsrfToken(res.headers()['set-cookie'])
+}
+
 /**
  * Create a fresh API context logged in as the given user.
- * Useful for tests that need multiple authenticated roles (e.g. admin + user).
+ * Returns a wrapper that auto-injects CSRF token + Origin header on every
+ * request, so spec files never need to worry about Sanctum session auth.
+ * The wrapper preserves the Playwright APIRequestContext method signatures,
+ * making this a drop-in replacement.
  */
 export async function loginAs(email, password) {
   const { request } = await import('@playwright/test')
-  const tempCtx = await request.newContext()
-  const csrfRes = await tempCtx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
-    headers: { 'Origin': 'http://localhost:5173' },
-  })
-  const csrfToken = extractXsrfToken(csrfRes.headers()['set-cookie'])
-  const res = await tempCtx.post(`${API_BASE}/auth/login`, {
-    headers: csrfToken ? { 'Origin': 'http://localhost:5173', 'X-XSRF-TOKEN': csrfToken } : {},
+  const ctx = await request.newContext()
+  const token = await fetchXsrfToken(ctx)
+  const res = await ctx.post(`${API_BASE}/auth/login`, {
+    headers: token ? { Origin: ORIGIN, 'X-XSRF-TOKEN': token } : {},
     data: { email, password },
   })
   if (!res.ok()) throw new Error(`Login as ${email} failed: ${await res.text()}`)
-  
-  const body = await res.json()
-  const token = body.token
 
-  const authenticatedCtx = await request.newContext({
-    extraHTTPHeaders: {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json',
-    }
+  async function withCsrf(method, url, options = {}) {
+    const xsrfToken = await fetchXsrfToken(ctx)
+    return ctx[method](url, {
+      ...options,
+      headers: { Origin: ORIGIN, 'X-XSRF-TOKEN': xsrfToken, ...options.headers },
+    })
+  }
+
+  return {
+    get:     (url, opts) => ctx.get(url, { ...opts, headers: { Origin: ORIGIN, Accept: 'application/json', ...opts?.headers } }),
+    post:    (url, opts) => withCsrf('post', url, opts),
+    put:     (url, opts) => withCsrf('put', url, opts),
+    patch:   (url, opts) => withCsrf('patch', url, opts),
+    delete:  (url, opts) => withCsrf('delete', url, opts),
+  }
+}
+
+export async function authPost(ctx, url, data) {
+  const csrfRes = await ctx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
+    headers: { 'Origin': 'http://localhost:5173' },
   })
-  return authenticatedCtx
+  const token = extractXsrfToken(csrfRes.headers()['set-cookie'])
+  return ctx.post(url, {
+    headers: { 'Origin': 'http://localhost:5173', 'X-XSRF-TOKEN': token, Accept: 'application/json' },
+    data,
+  })
+}
+
+export async function authPut(ctx, url, data) {
+  const csrfRes = await ctx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
+    headers: { 'Origin': 'http://localhost:5173' },
+  })
+  const token = extractXsrfToken(csrfRes.headers()['set-cookie'])
+  return ctx.put(url, {
+    headers: { 'Origin': 'http://localhost:5173', 'X-XSRF-TOKEN': token, 'Content-Type': 'application/json', Accept: 'application/json' },
+    data,
+  })
+}
+
+export async function authGet(ctx, url) {
+  await ctx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
+    headers: { 'Origin': 'http://localhost:5173' },
+  })
+  return ctx.get(url, {
+    headers: { 'Origin': 'http://localhost:5173', Accept: 'application/json' },
+  })
 }
 
 /**

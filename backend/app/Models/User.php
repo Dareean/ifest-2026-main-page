@@ -26,6 +26,26 @@ class User extends Authenticatable
         ];
     }
 
+    public function setNameAttribute($value): void
+    {
+        $this->attributes['name'] = strip_tags($value);
+    }
+
+    public function setPhoneAttribute($value): void
+    {
+        $this->attributes['phone'] = $value ? strip_tags($value) : null;
+    }
+
+    public function setInstitutionAttribute($value): void
+    {
+        $this->attributes['institution'] = $value ? strip_tags($value) : null;
+    }
+
+    public function setInstagramUsernameAttribute($value): void
+    {
+        $this->attributes['instagram_username'] = $value ? strip_tags($value) : null;
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

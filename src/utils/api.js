@@ -13,14 +13,6 @@ const api = axios.create({
   },
 })
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
 export async function getCsrf() {
   await api.get(`${APP_URL}/sanctum/csrf-cookie`)
 }

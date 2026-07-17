@@ -122,15 +122,17 @@ class AdminController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $notes = strip_tags($request->notes ?? '');
+
         $pendaftaran->update([
             'status' => 'rejected',
-            'notes' => $request->notes,
+            'notes' => $notes,
         ]);
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Pendaftaran Ditolak',
-            'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
+            'pesan' => "Pendaftaran untuk lomba {$pendaftaran->lomba->title} ditolak. " . ($notes ? "Catatan: {$notes}" : ''),
         ]);
 
         ActivityLog::create([
@@ -274,9 +276,11 @@ class AdminController extends Controller
                 }
 
                 // Atomic guard: only update if still pending — prevents TOCTOU race
+                $notes = strip_tags($request->notes ?? '');
+
                 $updated = Pendaftaran::where('id', $p->id)
                     ->where('status', 'pending')
-                    ->update(['status' => 'rejected', 'notes' => $request->notes]);
+                    ->update(['status' => 'rejected', 'notes' => $notes]);
 
                 if ($updated === 0) {
                     $results['skipped']++;
@@ -286,7 +290,7 @@ class AdminController extends Controller
                 $notif = Notification::create([
                     'user_id' => $p->user_id,
                     'judul' => 'Pendaftaran Ditolak',
-                    'pesan' => "Pendaftaran untuk lomba {$p->lomba->title} ditolak. " . ($request->notes ? "Catatan: {$request->notes}" : ''),
+                    'pesan' => "Pendaftaran untuk lomba {$p->lomba->title} ditolak. " . ($notes ? "Catatan: {$notes}" : ''),
                 ]);
 
                 ActivityLog::create([
@@ -385,15 +389,17 @@ class AdminController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $paymentNotes = strip_tags($request->payment_notes);
+
         $pendaftaran->update([
             'payment_status' => 'rejected',
-            'payment_notes' => $request->payment_notes,
+            'payment_notes' => $paymentNotes,
         ]);
 
         Notification::create([
             'user_id' => $pendaftaran->user_id,
             'judul' => 'Bukti Pembayaran Ditolak',
-            'pesan' => "Bukti pembayaran untuk lomba {$pendaftaran->lomba->title} ditolak. Alasan: {$request->payment_notes}. Silakan upload ulang bukti pembayaran yang valid.",
+            'pesan' => "Bukti pembayaran untuk lomba {$pendaftaran->lomba->title} ditolak. Alasan: {$paymentNotes}. Silakan upload ulang bukti pembayaran yang valid.",
         ]);
 
         ActivityLog::create([
@@ -447,8 +453,8 @@ class AdminController extends Controller
         foreach ($users as $user) {
             $notif = Notification::create([
                 'user_id' => $user->id,
-                'judul' => $request->judul,
-                'pesan' => $request->pesan,
+                'judul' => strip_tags($request->judul),
+                'pesan' => strip_tags($request->pesan),
             ]);
             if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
                 $emails[] = ['email' => $user->email, 'notif_id' => $notif->id];

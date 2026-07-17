@@ -183,9 +183,11 @@ async function fetchData() {
 }
 
 // Open detailed page for specific competition
-function openDetail(lomba) {
+function openDetail(lomba, preserveTab = false) {
   selectedLombaForDetail.value = lomba
-  activeTab.value = 'info'
+  if (!preserveTab) {
+    activeTab.value = 'info'
+  }
   error.value = ''
   submitError.value = ''
   
@@ -258,7 +260,7 @@ async function handleSubmitKarya() {
     // Refresh local detail state
     if (selectedLombaForDetail.value) {
       const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
-      if (updated) openDetail(updated)
+      if (updated) openDetail(updated, true)
     }
     await fetchData()
   } catch (e) {

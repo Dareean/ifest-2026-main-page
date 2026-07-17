@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { TEST_USER, uniqueEmail, API_BASE } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginAs } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, loginAs, authPost } from './helpers/seed.js'
 import { loginViaUI } from './helpers/auth.js'
 
 test.describe('Dashboard — Competitions Page', () => {
@@ -22,10 +22,7 @@ test.describe('Dashboard — Competitions Page', () => {
 
     if (lombaId) {
       const teamName = `E2E DashComp Team ${Math.random().toString(36).substring(7)}`
-      const res = await ctx.post(`${API_BASE}/lombas/${lombaId}/daftar`, {
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        data: { team_name: teamName },
-      })
+      const res = await authPost(ctx, `${API_BASE}/lombas/${lombaId}/daftar`, { team_name: teamName })
       expect(res.ok()).toBe(true)
     }
   })
@@ -85,10 +82,7 @@ test.describe('Dashboard — Competitions Page', () => {
     const inviterCtx = await loginAs(inviterEmail, TEST_USER.password)
 
     if (lombaId) {
-      const daftarRes = await inviterCtx.post(`${API_BASE}/lombas/${lombaId}/daftar`, {
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        data: { team_name: 'E2E Inviter Team' },
-      })
+      const daftarRes = await authPost(inviterCtx, `${API_BASE}/lombas/${lombaId}/daftar`, { team_name: 'E2E Inviter Team' })
       if (daftarRes.ok()) {
         const d = await daftarRes.json()
         await inviterCtx.post(`${API_BASE}/pendaftarans/${d.data.id}/invite`, {

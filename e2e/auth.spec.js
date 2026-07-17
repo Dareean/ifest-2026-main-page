@@ -15,13 +15,13 @@ test.describe('Auth Flow — Registration API Validation', () => {
     expect(body.needs_verification).toBe(true)
   })
 
-  test('register with duplicate email returns 422', async ({ request }) => {
+  test('register with duplicate email returns generic success (no enumeration)', async ({ request }) => {
     const email = uniqueEmail('e2e-reg-dup')
     await postWithCsrf(request, `${API_BASE}/auth/register`, { ...TEST_USER, email, password_confirmation: TEST_USER.password })
     const res = await postWithCsrf(request, `${API_BASE}/auth/register`, { ...TEST_USER, email, password_confirmation: TEST_USER.password })
-    expect(res.status()).toBe(422)
+    expect(res.status()).toBe(201)
     const body = await res.json()
-    expect(body.errors.email).toBeDefined()
+    expect(body.message).toContain('Registrasi berhasil')
   })
 
   test('register with password less than 8 characters returns 422', async ({ request }) => {
@@ -106,13 +106,13 @@ test.describe('Auth Flow — Login API Validation', () => {
     expect(body.message).toContain('Email atau password salah')
   })
 
-  test('login with unverified email returns 403 with needs_verification', async ({ request }) => {
+  test('login with unverified email returns 401 (no enumeration)', async ({ request }) => {
     const email = uniqueEmail('e2e-unver-login')
     await registerUserViaApi({ ...TEST_USER, email, password_confirmation: TEST_USER.password })
     const res = await postWithCsrf(request, `${API_BASE}/auth/login`, { email, password: TEST_USER.password })
-    expect(res.status()).toBe(403)
+    expect(res.status()).toBe(401)
     const body = await res.json()
-    expect(body.needs_verification).toBe(true)
+    expect(body.message).toContain('Email atau password salah')
   })
 
   test('login with empty email returns 422', async ({ request }) => {
@@ -185,14 +185,14 @@ test.describe('Auth Flow — UI Integration', () => {
     await expect(page.getByText(/verifikasi|OTP|kode/i).first()).toBeVisible()
   })
 
-  test('login with unverified user returns to OTP page', async ({ page }) => {
+  test('login with unverified email shows generic error (no enumeration)', async ({ page }) => {
     const email = uniqueEmail('e2e-unver-ui')
     await registerUserViaApi({ ...TEST_USER, email, password_confirmation: TEST_USER.password })
-    await page.goto('/login')
+    await page.goto('/login', { waitUntil: 'domcontentloaded' })
     await page.fill('input[type="email"]', email)
     await page.fill('input[type="password"]', TEST_USER.password)
     await page.click('button[type="submit"]')
-    await expect(page.getByText(/verifikasi|OTP|kode|verif/i).first()).toBeVisible()
+    await expect(page.getByText('Email atau password salah')).toBeVisible()
   })
 })
 
