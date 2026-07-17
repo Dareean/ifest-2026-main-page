@@ -2,7 +2,7 @@
 set -e
 
 echo "Caching config..."
-php artisan config:cache 2>&1
+php artisan config:cache 2>&1 || echo "Config cache skipped"
 
 echo "Caching routes..."
 php artisan route:cache 2>&1 || echo "Route cache skipped"
