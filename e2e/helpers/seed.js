@@ -173,3 +173,11 @@ export async function postWithCsrf(ctx, url, data) {
     data,
   })
 }
+
+export async function forceVerifyPendaftaranViaApi(pendaftaranId) {
+  const ctx = await getRequest()
+  const res = await ctx.post(`${API_BASE}/e2e/force-verify`, { data: { pendaftaran_id: pendaftaranId } })
+  const body = await res.json()
+  if (!res.ok()) throw new Error(`Force verify failed: ${JSON.stringify(body)}`)
+  return body
+}

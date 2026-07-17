@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Pendaftaran extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'user_id', 'lomba_id', 'team_name', 'status', 'gelombang', 'notes',
-        'payment_proof', 'payment_status', 'payment_verified_at', 'payment_notes',
+        'user_id', 'lomba_id', 'team_name', 'gelombang', 'notes',
+        'payment_proof',
         'last_reminder_sent_at', 'team_locked', 'unlock_requested',
-        'ig_follow_proof', 'ig_twibbon_proof', 'social_validated',
+        'ig_follow_proof', 'ig_twibbon_proof',
     ];
 
     protected $appends = ['max_members'];
@@ -20,6 +23,7 @@ class Pendaftaran extends Model
         return [
             'payment_verified_at' => 'datetime',
             'last_reminder_sent_at' => 'datetime',
+            'deleted_at' => 'datetime',
         ];
     }
 

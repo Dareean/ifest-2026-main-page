@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PragmaRX\Google2FAQRCode\Google2FA;
 
@@ -29,10 +30,11 @@ class TwoFactorController extends Controller
         $google2fa = new Google2FA();
         $secret = $google2fa->generateSecretKey();
 
+        $plainCodes = collect(range(1, 8))->map(fn() => strtoupper(str()->random(10)))->toArray();
+        $hashedCodes = array_map(fn($code) => Hash::make($code), $plainCodes);
+
         $user->two_factor_secret = $secret;
-        $user->two_factor_recovery_codes = json_encode(
-            collect(range(1, 8))->map(fn() => strtoupper(str()->random(10)))->toArray()
-        );
+        $user->two_factor_recovery_codes = json_encode($hashedCodes);
         $user->save();
 
         $qrCodeUrl = $google2fa->getQRCodeUrl(
@@ -45,7 +47,7 @@ class TwoFactorController extends Controller
             'message' => '2FA berhasil diaktifkan. Scan QR code dengan Google Authenticator.',
             'secret' => $secret,
             'qr_code_url' => $qrCodeUrl,
-            'recovery_codes' => json_decode($user->two_factor_recovery_codes),
+            'recovery_codes' => $plainCodes,
         ]);
     }
 
@@ -115,13 +117,19 @@ class TwoFactorController extends Controller
 
         $codes = json_decode($user->two_factor_recovery_codes ?? '[]', true);
 
-        $index = array_search($request->recovery_code, $codes);
+        $found = false;
+        foreach ($codes as $i => $hashed) {
+            if (Hash::check($request->recovery_code, $hashed)) {
+                unset($codes[$i]);
+                $found = true;
+                break;
+            }
+        }
 
-        if ($index === false) {
+        if (!$found) {
             return response()->json(['message' => 'Kode recovery tidak valid'], 400);
         }
 
-        unset($codes[$index]);
         $user->two_factor_recovery_codes = json_encode(array_values($codes));
         $user->save();
 

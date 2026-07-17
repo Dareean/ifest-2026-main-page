@@ -117,7 +117,6 @@ async function fetchInvitations() {
   try {
     const res = await api.get('/invitations/pending')
     invitations.value = res.data.data
-    localStorage.setItem('cached_invitations', JSON.stringify(res.data.data))
   } catch (e) {
     console.error(e)
   }
@@ -150,7 +149,6 @@ async function handleUploadPayment() {
       const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
       if (idx !== -1) {
         pendaftarans.value[idx] = res.data.data
-        localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
       }
     }
     await fetchData()
@@ -171,10 +169,6 @@ async function fetchData() {
     pendaftarans.value = pendaftaranRes.data.data
     lombaList.value = lombaRes.data.data
     invitations.value = invitationsRes.data.data
-    // Cache the data
-    localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftaranRes.data.data))
-    localStorage.setItem('cached_lombas', JSON.stringify(lombaRes.data.data))
-    localStorage.setItem('cached_invitations', JSON.stringify(invitationsRes.data.data))
   } catch (e) {
     console.error(e)
   } finally {
@@ -254,7 +248,6 @@ async function handleSubmitKarya() {
       const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
       if (idx !== -1) {
         pendaftarans.value[idx] = { ...pendaftarans.value[idx], submission: res.data.data }
-        localStorage.setItem('cached_pendaftarans', JSON.stringify(pendaftarans.value))
       }
     }
     // Refresh local detail state
@@ -374,21 +367,6 @@ async function handleRemoveMember(memberId) {
 
 
 onMounted(() => {
-  // Load from Cache first for instant render
-  const cachedPendaftarans = localStorage.getItem('cached_pendaftarans')
-  const cachedLombas = localStorage.getItem('cached_lombas')
-  const cachedInvitations = localStorage.getItem('cached_invitations')
-  if (cachedPendaftarans && cachedLombas) {
-    pendaftarans.value = JSON.parse(cachedPendaftarans)
-    lombaList.value = JSON.parse(cachedLombas)
-    if (cachedInvitations) {
-      invitations.value = JSON.parse(cachedInvitations)
-    }
-    loading.value = false
-  } else {
-    loading.value = true
-  }
-
   fetchData()
   // Timer placeholder for future countdown
 })
@@ -648,8 +626,13 @@ onUnmounted(() => {
 
             <div class="bg-sky-50 border border-sky-200/60 rounded-xl p-4 mb-4">
               <p class="text-[10px] font-bold uppercase tracking-wider text-sky-700 mb-1">Informasi Pembayaran</p>
-              <p class="text-xs font-semibold text-sky-800">Rp85.000 (Batch II / Gelombang 2)</p>
-              <p class="text-xs text-sky-700 mt-1">BRI a.n <strong>LARA FAUZIA</strong> — <strong class="text-sm tracking-wider">5199 0100 5106 502</strong></p>
+              <p v-if="selectedLombaForDetail?.payment_accounts?.length" class="text-xs space-y-1">
+                <template v-for="(acct, i) in selectedLombaForDetail.payment_accounts" :key="i">
+                  <p class="font-semibold text-sky-800">{{ acct.bank || acct.method }}</p>
+                  <p class="text-sky-700">{{ acct.account_number }} a.n {{ acct.account_name }}</p>
+                </template>
+              </p>
+              <p v-else class="text-xs text-sky-700">{{ selectedLombaForDetail?.fee || 'Lihat panduan pembayaran' }}</p>
             </div>
 
             <div v-if="getRegistration(selectedLombaForDetail?.id)?.payment_status === 'verified'" class="bg-[#DCEEB1]/20 border border-[#DCEEB1]/40 rounded-xl p-4 flex items-center gap-3">

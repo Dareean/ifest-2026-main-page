@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
-use PragmaRX\Google2FAQRCode\Google2FA;
 
 class AuthController extends Controller
 {
@@ -28,7 +27,8 @@ class AuthController extends Controller
     private function sendOtpEmail(string $email, string $name, string $otp, string $expiresAt): void
     {
         if (app()->environment('local')) {
-            Log::info('OTP for ' . $email . ': ' . $otp . ' (expires at ' . $expiresAt . ')');
+            $domain = substr(strrchr($email, '@') ?: '', 1);
+            Log::info('OTP for ***@' . $domain . ': ' . $otp . ' (expires at ' . $expiresAt . ')');
             return;
         }
 
@@ -201,7 +201,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json([
-                'message' => 'OTP verification failed: ' . $e->getMessage()
+                'message' => 'Verifikasi OTP gagal. Silakan coba lagi.'
             ], 500);
         }
     }
@@ -323,12 +323,18 @@ class AuthController extends Controller
         }
 
         $codes = json_decode($user->two_factor_recovery_codes ?? '[]', true);
-        $index = array_search($request->recovery_code, $codes);
-        if ($index === false) {
+        $found = false;
+        foreach ($codes as $i => $hashed) {
+            if (Hash::check($request->recovery_code, $hashed)) {
+                unset($codes[$i]);
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
             return response()->json(['message' => 'Kode recovery tidak valid'], 400);
         }
 
-        unset($codes[$index]);
         $user->two_factor_recovery_codes = json_encode(array_values($codes));
         $user->save();
 
@@ -418,9 +424,18 @@ class AuthController extends Controller
 
     public function googleRedirect(): JsonResponse
     {
+        $payload = json_encode([
+            'action' => 'login',
+            'exp' => now()->addMinutes(10)->timestamp,
+            'rand' => str()->random(32),
+        ]);
+        $state = base64_encode($payload);
+        $hmac = hash_hmac('sha256', $payload, config('app.key'));
+        $signed = base64_encode(json_encode(['state' => $state, 'hmac' => $hmac]));
+
         $url = Socialite::driver('google')
             ->stateless()
-            ->with(['prompt' => 'select_account'])
+            ->with(['state' => $signed, 'prompt' => 'select_account'])
             ->redirect()
             ->getTargetUrl();
 

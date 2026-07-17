@@ -519,8 +519,17 @@ class AdminController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $oldRole = $user->role;
         $user->role = $request->role;
         $user->save();
+
+        ActivityLog::create([
+            'admin_id' => $request->user()->id,
+            'action' => 'update_role',
+            'target_type' => 'user',
+            'target_id' => $user->id,
+            'metadata' => ['old_role' => $oldRole, 'new_role' => $request->role],
+        ]);
 
         return response()->json([
             'message' => "Role user {$user->name} berhasil diubah menjadi {$request->role}",

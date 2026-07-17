@@ -97,6 +97,8 @@ export const useAuthStore = defineStore('auth', () => {
       // ignore
     }
     user.value = null
+    // Clear any cached PII from localStorage
+    ;['cached_pendaftarans', 'cached_lombas', 'cached_invitations', 'cached_notifications', 'last_notif_id'].forEach(k => localStorage.removeItem(k))
   }
 
   async function googleLogin() {

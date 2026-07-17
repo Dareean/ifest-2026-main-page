@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { TEST_USER, DRIVE_LINK, FIGMA_LINK, ORIGINALITY_LINK, uniqueEmail, API_BASE } from './fixtures/data.js'
-import { registerUserViaApi, verifyUserViaApi, loginAs } from './helpers/seed.js'
+import { registerUserViaApi, verifyUserViaApi, loginAs, forceVerifyPendaftaranViaApi } from './helpers/seed.js'
 import { loginViaUI } from './helpers/auth.js'
 
 const ROOT = API_BASE.replace('/api', '')
@@ -51,30 +51,23 @@ test.describe('Submission Flow', () => {
     }
   })
 
-  test('API: submit with all required fields succeeds', async ({ page, request }) => {
-    await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email: userEmail, password: TEST_USER.password } })
+  test('API: submit with all required fields succeeds', async () => {
+    const userCtx = await loginAs(userEmail, TEST_USER.password)
 
-    const lombasRes = await request.get(`${API_BASE}/lombas`)
+    const lombasRes = await userCtx.get(`${API_BASE}/lombas`)
+    expect(lombasRes.ok()).toBe(true)
     const lombas = await lombasRes.json()
-    const firstLomba = lombas.data?.[0]
-    if (!firstLomba) return
+    const firstLomba = lombas.data?.find(l => l.team_requirements.toLowerCase().includes('individu'))
+    expect(firstLomba).toBeDefined()
 
-    const daftarRes = await request.post(`${API_BASE}/lombas/${firstLomba.id}/daftar`, {
+    const daftarRes = await userCtx.post(`${API_BASE}/lombas/${firstLomba.id}/daftar`, {
       headers: { Accept: 'application/json' },
     })
-    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
-    if (!pendaftaranId) return
+    expect(daftarRes.ok()).toBe(true)
+    const pendaftaranId = (await daftarRes.json()).data?.id
+    expect(pendaftaranId).toBeDefined()
 
-    const adminEmail = uniqueEmail('e2e-submit-admin')
-    await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
-    await verifyUserViaApi(adminEmail)
-    await (await import('./helpers/seed.js')).setAdminViaApi(adminEmail)
-    const adminCtx = await loginAs(adminEmail, TEST_USER.password)
-
-    await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
-      headers: { Accept: 'application/json' },
-    })
+    await forceVerifyPendaftaranViaApi(pendaftaranId)
 
     const submitPayload = {
       link_drive: DRIVE_LINK,
@@ -82,7 +75,7 @@ test.describe('Submission Flow', () => {
       link_figma: firstLomba.kode === 'NAT-02' ? FIGMA_LINK : null,
     }
 
-    const submitRes = await request.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
+    const submitRes = await userCtx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       data: submitPayload,
     })
@@ -97,64 +90,52 @@ test.describe('Submission Flow', () => {
 test.describe('Submission Flow — Validation Errors', () => {
   let userEmail
 
-  async function loginAndGetAdminCtx() {
-    const adminEmail = uniqueEmail('e2e-val-admin')
-    await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
-    await verifyUserViaApi(adminEmail)
-    await (await import('./helpers/seed.js')).setAdminViaApi(adminEmail)
-    const ctx = await loginAs(adminEmail, TEST_USER.password)
-    return ctx
-  }
-
   test.beforeAll(async () => {
     userEmail = uniqueEmail('e2e-val')
     await registerUserViaApi({ ...TEST_USER, email: userEmail, password_confirmation: TEST_USER.password })
     await verifyUserViaApi(userEmail)
   })
 
-  test('API: submit without originality_statement returns 422', async ({ request }) => {
-    await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email: userEmail, password: TEST_USER.password } })
+  test('API: submit without originality_statement returns 422', async () => {
+    const userCtx = await loginAs(userEmail, TEST_USER.password)
 
-    const lombasRes = await request.get(`${API_BASE}/lombas`)
+    const lombasRes = await userCtx.get(`${API_BASE}/lombas`)
+    expect(lombasRes.ok()).toBe(true)
     const lombas = await lombasRes.json()
-    const first = lombas.data?.[0]
-    if (!first) return
+    const first = lombas.data?.find(l => l.team_requirements.toLowerCase().includes('individu'))
+    expect(first).toBeDefined()
 
-    const daftarRes = await request.post(`${API_BASE}/lombas/${first.id}/daftar`, {
+    const daftarRes = await userCtx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
       headers: { Accept: 'application/json' },
     })
-    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
-    if (!pendaftaranId) return
+    expect(daftarRes.ok()).toBe(true)
+    const pendaftaranId = (await daftarRes.json()).data?.id
+    expect(pendaftaranId).toBeDefined()
 
-    const adminCtx = await loginAndGetAdminCtx()
-    await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
-      headers: { Accept: 'application/json' },
-    })
+    await forceVerifyPendaftaranViaApi(pendaftaranId)
 
-    const submitRes = await request.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
+    const submitRes = await userCtx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       data: { link_drive: DRIVE_LINK },
     })
     expect(submitRes.status()).toBe(422)
   })
 
-  test('API: submit UI/UX without link_figma returns 422', async ({ request }) => {
-    await request.get(`${ROOT}/sanctum/csrf-cookie`)
-    await request.post(`${API_BASE}/auth/login`, { data: { email: userEmail, password: TEST_USER.password } })
+  test('API: submit UI/UX without link_figma returns 422', async () => {
+    const userCtx = await loginAs(userEmail, TEST_USER.password)
 
-    const daftarRes = await request.post(`${API_BASE}/lombas/2/daftar`, {
-      headers: { Accept: 'application/json' },
+    const teamName = `E2E UIUX Team ${Math.random().toString(36).substring(7)}`
+    const daftarRes = await userCtx.post(`${API_BASE}/lombas/2/daftar`, {
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      data: { team_name: teamName },
     })
-    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
-    if (!pendaftaranId) return
+    expect(daftarRes.ok()).toBe(true)
+    const pendaftaranId = (await daftarRes.json()).data?.id
+    expect(pendaftaranId).toBeDefined()
 
-    const adminCtx = await loginAndGetAdminCtx()
-    await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
-      headers: { Accept: 'application/json' },
-    })
+    await forceVerifyPendaftaranViaApi(pendaftaranId)
 
-    const submitRes = await request.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
+    const submitRes = await userCtx.post(`${API_BASE}/pendaftarans/${pendaftaranId}/submit`, {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       data: { link_drive: DRIVE_LINK, originality_statement: ORIGINALITY_LINK },
     })
@@ -172,28 +153,22 @@ test.describe('Submission Flow — UI Submit', () => {
   })
 
   test('UI: submit karya via form shows success and displays new fields', async ({ page }) => {
-    const adminEmail = uniqueEmail('e2e-ui-admin')
-    await registerUserViaApi({ ...TEST_USER, email: adminEmail, password_confirmation: TEST_USER.password })
-    await verifyUserViaApi(adminEmail)
-    await (await import('./helpers/seed.js')).setAdminViaApi(adminEmail)
-
     const userCtx = await loginAs(userEmail, TEST_USER.password)
-    const adminCtx = await loginAs(adminEmail, TEST_USER.password)
 
     const lombasRes = await userCtx.get(`${API_BASE}/lombas`)
+    expect(lombasRes.ok()).toBe(true)
     const lombas = await lombasRes.json()
-    const first = lombas.data?.[0]
-    if (!first) return
+    const first = lombas.data?.find(l => l.team_requirements.toLowerCase().includes('individu'))
+    expect(first).toBeDefined()
 
     const daftarRes = await userCtx.post(`${API_BASE}/lombas/${first.id}/daftar`, {
       headers: { Accept: 'application/json' },
     })
-    const pendaftaranId = daftarRes.ok() ? (await daftarRes.json()).data?.id : null
-    if (!pendaftaranId) return
+    expect(daftarRes.ok()).toBe(true)
+    const pendaftaranId = (await daftarRes.json()).data?.id
+    expect(pendaftaranId).toBeDefined()
 
-    await adminCtx.put(`${API_BASE}/admin/pendaftarans/${pendaftaranId}/verify`, {
-      headers: { Accept: 'application/json' },
-    })
+    await forceVerifyPendaftaranViaApi(pendaftaranId)
 
     await loginViaUI(page, userEmail, TEST_USER.password)
     await page.goto(`/dashboard/competitions?id=${first.id}`)

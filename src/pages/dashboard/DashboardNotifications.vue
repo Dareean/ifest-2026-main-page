@@ -10,8 +10,7 @@ async function fetchNotifs() {
   try {
     const res = await api.get('/notifications')
     notifications.value = res.data.data
-    // Cache the data
-    localStorage.setItem('cached_notifications', JSON.stringify(res.data.data))
+
   } catch (e) {
     console.error(e)
   } finally {
@@ -41,14 +40,6 @@ async function markAllRead() {
 const unreadCount = () => notifications.value.filter(n => !n.is_read).length
 
 onMounted(() => {
-  // Load from Cache first for instant render
-  const cachedNotifs = localStorage.getItem('cached_notifications')
-  if (cachedNotifs) {
-    notifications.value = JSON.parse(cachedNotifs)
-    loading.value = false
-  } else {
-    loading.value = true
-  }
   fetchNotifs()
 })
 </script>

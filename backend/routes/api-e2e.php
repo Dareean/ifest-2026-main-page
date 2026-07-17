@@ -78,3 +78,29 @@ Route::post('/e2e/set-admin', function (Request $request) {
         'user'    => $user->fresh(),
     ]);
 })->middleware($throttle);
+
+Route::post('/e2e/force-verify', function (Request $request) {
+    Log::warning('E2E route called: force-verify', ['pendaftaran_id' => $request->pendaftaran_id, 'ip' => $request->ip()]);
+
+    $validator = Validator::make($request->all(), [
+        'pendaftaran_id' => 'required|integer|exists:pendaftarans,id',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $pendaftaran = \App\Models\Pendaftaran::findOrFail($request->pendaftaran_id);
+    $pendaftaran->update([
+        'status' => 'verified',
+        'payment_status' => 'verified',
+        'payment_verified_at' => now(),
+        'team_locked' => true,
+    ]);
+
+    return response()->json([
+        'message' => 'Pendaftaran force-verified',
+        'data' => $pendaftaran->fresh(),
+    ]);
+})->middleware($throttle);
+

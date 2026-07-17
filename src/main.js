@@ -1,3 +1,8 @@
+if (import.meta.env.PROD) {
+  const silenced = ['error', 'warn']
+  silenced.forEach(m => { const orig = console[m]; console[m] = (...args) => orig.call(console, '[PROD]', ...args) })
+}
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { MotionPlugin } from '@vueuse/motion'

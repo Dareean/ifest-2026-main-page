@@ -18,7 +18,7 @@ class SecurityHeadersMiddleware
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
 
-        $csp = "default-src 'self'; script-src 'self' https://accounts.google.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; frame-src https://accounts.google.com; connect-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'";
+        $csp = "default-src 'self'; script-src 'self' https://accounts.google.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; frame-src https://accounts.google.com; connect-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; report-uri /api/_csp-violation";
         $response->headers->set('Content-Security-Policy', $csp);
 
         if (app()->environment('production')) {
