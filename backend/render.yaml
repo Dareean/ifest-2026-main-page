@@ -50,8 +50,6 @@ services:
         value: database
       - key: SANCTUM_STATEFUL_DOMAINS
         value: ifest-hmti-untad.vercel.app,localhost:5173,localhost:5174,localhost:5175,127.0.0.1:8000,localhost:8000
-      - key: SESSION_DOMAIN
-        value: .onrender.com
       - key: SESSION_SECURE_COOKIE
         value: "true"
       - key: SESSION_SAME_SITE

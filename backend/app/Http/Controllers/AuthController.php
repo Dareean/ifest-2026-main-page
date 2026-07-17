@@ -401,6 +401,14 @@ class AuthController extends Controller
             'origin' => $request->header('Origin'),
             'auth_check' => Auth::check(),
             'auth_user' => Auth::user()?->only(['id', 'email']),
+            'session_config' => [
+                'cookie' => config('session.cookie'),
+                'domain' => config('session.domain'),
+                'secure' => config('session.secure'),
+                'same_site' => config('session.same_site'),
+                'http_only' => config('session.http_only'),
+                'driver' => config('session.driver'),
+            ],
         ]);
     }
 
