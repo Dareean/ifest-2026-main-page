@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
@@ -373,45 +372,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function debugSession(Request $request): JsonResponse
-    {
-        if ($request->query('token') !== config('app.debug_token', 'debug123')) {
-            return response()->json(['error' => 'unauthorized'], 403);
-        }
-
-        $sessionId = $request->session()?->getId();
-        $sessionData = $request->session()?->all();
-
-        $sessionRecord = null;
-        if ($sessionId) {
-            $sessionRecord = DB::table('sessions')->where('id', $sessionId)->first();
-        }
-
-        return response()->json([
-            'session_id' => $sessionId,
-            'session_data' => $sessionData,
-            'session_record' => $sessionRecord ? [
-                'id' => $sessionRecord->id,
-                'user_id' => $sessionRecord->user_id,
-                'payload_length' => strlen($sessionRecord->payload),
-                'last_activity' => $sessionRecord->last_activity,
-            ] : null,
-            'cookies_received' => $request->cookies->all(),
-            'cookie_header' => $request->header('Cookie'),
-            'origin' => $request->header('Origin'),
-            'auth_check' => Auth::check(),
-            'auth_user' => Auth::user()?->only(['id', 'email']),
-            'session_config' => [
-                'cookie' => config('session.cookie'),
-                'domain' => config('session.domain'),
-                'secure' => config('session.secure'),
-                'same_site' => config('session.same_site'),
-                'http_only' => config('session.http_only'),
-                'driver' => config('session.driver'),
-            ],
-        ]);
-    }
-
     public function forgotPassword(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -580,12 +540,6 @@ class AuthController extends Controller
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
-
-            Log::debug('Google callback result', [
-                'session_id' => $request->session()?->getId(),
-                'auth_check' => Auth::check(),
-                'user_id' => $user->id,
-            ]);
 
             return redirect($this->frontendUrl() . '/auth/callback?login=success');
         } catch (\Exception $e) {

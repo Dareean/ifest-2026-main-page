@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeadersMiddleware
@@ -23,6 +24,22 @@ class SecurityHeadersMiddleware
 
         if (app()->environment('production')) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
+
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === config('session.cookie', 'laravel_session')) {
+                $response->headers->setCookie(new Cookie(
+                    $cookie->getName(),
+                    $cookie->getValue(),
+                    $cookie->getExpiresTime(),
+                    $cookie->getPath(),
+                    $cookie->getDomain(),
+                    true,
+                    $cookie->isHttpOnly(),
+                    $cookie->isRaw(),
+                    Cookie::SAMESITE_NONE,
+                ));
+            }
         }
 
         return $response;

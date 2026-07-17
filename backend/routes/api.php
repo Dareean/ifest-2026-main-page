@@ -86,9 +86,6 @@ if (app()->environment('local')) {
     require __DIR__.'/api-e2e.php';
 }
 
-// Session debug helper (production only, guarded by token)
-Route::get('/_debug/session', [AuthController::class, 'debugSession']);
-
 // Admin routes
 Route::middleware(array_merge(['auth:sanctum', 'admin'], $authThrottle('120,1')))->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
