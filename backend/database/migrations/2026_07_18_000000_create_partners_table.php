@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('partners')) {
+            return;
+        }
+
         Schema::create('partners', function (Blueprint $table) {
             $table->id();
             $table->string('type'); // main_strategic, strategic_partner, media_partner, organizer, sponsorship_tier

@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('timeline_events')) {
+            return;
+        }
+
         Schema::create('timeline_events', function (Blueprint $table) {
             $table->id();
             $table->string('phase', 10);
