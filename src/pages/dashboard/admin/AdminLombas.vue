@@ -23,30 +23,14 @@ function toggleExpand(lomba) {
   } else {
     expandedId.value = lomba.id
     editForm.value = {
-      title: lomba.title || '',
-      scale: lomba.scale || '',
-      tagline: lomba.tagline || '',
-      fee: lomba.fee || '',
-      target: lomba.target || '',
-      team_requirements: lomba.team_requirements || '',
-      languages: lomba.languages || '',
-      babak: lomba.babak || '',
-      description: lomba.description || '',
-      long_description: lomba.long_description || '',
-      rules: lomba.rules || [],
-      schedule: lomba.schedule || '',
-      sub_themes: lomba.sub_themes || [],
-      registration_link: lomba.registration_link || '',
-      guidebook_link: lomba.guidebook_link || '',
-      contact_person: lomba.contact_person || '',
-      card_bg: lomba.card_bg || '#DCEEB1',
-      accent_color: lomba.accent_color || '#FF3D8B',
-      text_color: lomba.text_color || '#04000D',
       gelombang_1_start: lomba.gelombang_1_start || '',
       gelombang_1_end: lomba.gelombang_1_end || '',
       gelombang_2_end: lomba.gelombang_2_end || '',
       fee_gelombang_1: lomba.fee_gelombang_1 || '',
       fee_gelombang_2: lomba.fee_gelombang_2 || '',
+      registration_link: lomba.registration_link || '',
+      guidebook_link: lomba.guidebook_link || '',
+      contact_person: lomba.contact_person || '',
     }
   }
 }
@@ -246,108 +230,39 @@ onMounted(fetchLombas)
         <!-- Expanded edit panel -->
         <Transition name="slide">
           <div v-if="expandedId === lomba.id" class="border-t border-slate-100 bg-slate-50/50 p-4 md:p-6">
-            <h4 class="text-xs font-extrabold uppercase tracking-wider text-on-surface-variant/60 mb-4">Edit Data Lomba</h4>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-on-surface-variant/60 mb-4">Edit Jadwal & Data Lomba</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Judul</label>
-                <input v-model="editForm.title" placeholder="Nama lomba" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Gel. 1 Mulai</label>
+                <input v-model="editForm.gelombang_1_start" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Skala</label>
-                <input v-model="editForm.scale" placeholder="Nasional" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Gel. 1 Akhir</label>
+                <input v-model="editForm.gelombang_1_end" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Tagline</label>
-                <input v-model="editForm.tagline" placeholder="ALGORITMA & PROBLEM SOLVING" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Gel. 2 Akhir</label>
+                <input v-model="editForm.gelombang_2_end" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Fee</label>
-                <input v-model="editForm.fee" placeholder="Rp 85.000 / Tim" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Fee Gel. 1</label>
+                <input v-model="editForm.fee_gelombang_1" placeholder="Rp 40.000 / Tim" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Target Peserta</label>
-                <input v-model="editForm.target" placeholder="Terbuka untuk Umum" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Fee Gel. 2</label>
+                <input v-model="editForm.fee_gelombang_2" placeholder="Rp 50.000 / Tim" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
               <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Ket. Tim</label>
-                <input v-model="editForm.team_requirements" placeholder="Tim (2-3 Orang)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Bahasa / Platform</label>
-                <input v-model="editForm.languages" placeholder="Python, Java, C++" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Babak</label>
-                <input v-model="editForm.babak" placeholder="Penyisihan & Final" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Jadwal</label>
-                <input v-model="editForm.schedule" placeholder="11 Juli 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Contact Person</label>
+                <input v-model="editForm.contact_person" placeholder="Nama (+62 xxx)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
               <div class="md:col-span-2">
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Deskripsi</label>
-                <input v-model="editForm.description" placeholder="Deskripsi singkat lomba" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Registrasi</label>
+                <input v-model="editForm.registration_link" placeholder="https://forms.gle/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
-              <div class="md:col-span-3">
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Deskripsi Panjang</label>
-                <textarea v-model="editForm.long_description" placeholder="Deskripsi detail lomba" rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all resize-none"></textarea>
-              </div>
-              <div class="md:col-span-3">
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Aturan (1 per baris)</label>
-                <textarea :value="editForm.rules?.join('\n') || ''" @input="editForm.rules = $event.target.value.split('\n').filter(r => r.trim())" placeholder="Aturan 1&#10;Aturan 2&#10;Aturan 3" rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all resize-none"></textarea>
-              </div>
-              <div class="md:col-span-3">
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Sub-Tema (1 per baris)</label>
-                <textarea :value="editForm.sub_themes?.join('\n') || ''" @input="editForm.sub_themes = $event.target.value.split('\n').filter(t => t.trim())" placeholder="Smart Education&#10;Digital Business" rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all resize-none"></textarea>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Card BG (hex)</label>
-                <input v-model="editForm.card_bg" placeholder="#DCEEB1" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all font-mono" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Aksen Warna (hex)</label>
-                <input v-model="editForm.accent_color" placeholder="#FF3D8B" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all font-mono" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Warna Teks (hex)</label>
-                <input v-model="editForm.text_color" placeholder="#04000D" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all font-mono" />
-              </div>
-              <div class="border-t border-slate-200/60 pt-4 md:col-span-3">
-                <h5 class="text-xs font-extrabold uppercase tracking-wider text-on-surface-variant/60 mb-3">Jadwal Pendaftaran</h5>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Gel. 1 Mulai</label>
-                    <input v-model="editForm.gelombang_1_start" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Gel. 1 Akhir</label>
-                    <input v-model="editForm.gelombang_1_end" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Gel. 2 Akhir</label>
-                    <input v-model="editForm.gelombang_2_end" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Fee Gel. 1</label>
-                    <input v-model="editForm.fee_gelombang_1" placeholder="Rp 40.000 / Tim" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Fee Gel. 2</label>
-                    <input v-model="editForm.fee_gelombang_2" placeholder="Rp 50.000 / Tim" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Contact Person</label>
-                    <input v-model="editForm.contact_person" placeholder="Nama (+62 xxx)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Registrasi</label>
-                    <input v-model="editForm.registration_link" placeholder="https://forms.gle/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                  <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Guidebook</label>
-                    <input v-model="editForm.guidebook_link" placeholder="https://drive.google.com/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  </div>
-                </div>
+              <div class="md:col-span-2">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Guidebook</label>
+                <input v-model="editForm.guidebook_link" placeholder="https://drive.google.com/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
             </div>
             <div class="flex items-center gap-3 mt-5 pt-4 border-t border-slate-200/60">

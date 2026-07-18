@@ -15,7 +15,6 @@ class Lomba extends Model
         'gelombang_1_start', 'gelombang_1_end', 'gelombang_2_end',
         'fee_gelombang_1', 'fee_gelombang_2',
         'payment_accounts',
-        'sub_themes',
     ];
 
     protected function casts(): array
@@ -28,7 +27,6 @@ class Lomba extends Model
             'gelombang_1_end' => 'date',
             'gelombang_2_end' => 'date',
             'payment_accounts' => 'array',
-            'sub_themes' => 'array',
         ];
     }
 

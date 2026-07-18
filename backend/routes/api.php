@@ -3,15 +3,12 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminLombaController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LombaController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
-use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,10 +29,6 @@ Route::post('/auth/2fa/recover', [AuthController::class, 'recoverTwoFactor'])->m
 
 Route::get('/lombas', [LombaController::class, 'index'])->middleware(...$authThrottle('60,1'));
 Route::get('/lombas/{lomba}', [LombaController::class, 'show'])->middleware(...$authThrottle('60,1'));
-
-Route::get('/partners', [PartnerController::class, 'index']);
-Route::get('/timeline', [TimelineController::class, 'index']);
-Route::get('/faqs', [FaqController::class, 'index']);
 
 // AI chat proxy (protected to prevent abuse)
 Route::middleware(array_merge(['auth:sanctum'], $authThrottle('30,1')))->post('/ai/chat', [\App\Http\Controllers\GeminiController::class, 'chat']);
@@ -118,22 +111,4 @@ Route::middleware(array_merge(['auth:sanctum', 'admin'], $authThrottle('120,1'))
     Route::put('/lombas/{lomba}/toggle-submission', [AdminLombaController::class, 'toggleSubmission']);
     Route::put('/lombas/{lomba}/toggle-active', [AdminLombaController::class, 'toggleActive']);
     Route::put('/lombas/{lomba}', [AdminLombaController::class, 'update']);
-
-    Route::get('/partners', [PartnerController::class, 'adminIndex']);
-    Route::post('/partners', [PartnerController::class, 'store']);
-    Route::get('/partners/{partner}', [PartnerController::class, 'show']);
-    Route::put('/partners/{partner}', [PartnerController::class, 'update']);
-    Route::delete('/partners/{partner}', [PartnerController::class, 'destroy']);
-
-    Route::get('/timeline', [TimelineController::class, 'adminIndex']);
-    Route::post('/timeline', [TimelineController::class, 'store']);
-    Route::get('/timeline/{timelineEvent}', [TimelineController::class, 'show']);
-    Route::put('/timeline/{timelineEvent}', [TimelineController::class, 'update']);
-    Route::delete('/timeline/{timelineEvent}', [TimelineController::class, 'destroy']);
-
-    Route::get('/faqs', [FaqController::class, 'adminIndex']);
-    Route::post('/faqs', [FaqController::class, 'store']);
-    Route::get('/faqs/{faqItem}', [FaqController::class, 'show']);
-    Route::put('/faqs/{faqItem}', [FaqController::class, 'update']);
-    Route::delete('/faqs/{faqItem}', [FaqController::class, 'destroy']);
 });

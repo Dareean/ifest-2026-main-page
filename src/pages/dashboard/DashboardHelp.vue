@@ -1,7 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { HelpCircle, ChevronDown, ChevronUp, MessageSquare, PhoneCall } from 'lucide-vue-next'
-import api from '../../utils/api'
 
 const faqs = ref([
   {
@@ -34,22 +33,6 @@ const faqs = ref([
 function toggleFaq(index) {
   faqs.value[index].open = !faqs.value[index].open
 }
-
-onMounted(async () => {
-  try {
-    const res = await api.get('/faqs')
-    const data = res.data.data
-    if (data?.length) {
-      faqs.value = data.map(f => ({
-        question: f.question,
-        answer: f.answer,
-        open: false,
-      }))
-    }
-  } catch {
-    // fallback to hardcoded faqs
-  }
-})
 </script>
 
 <template>

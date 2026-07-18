@@ -11,40 +11,7 @@ import panitiaFiles from '../data/panitiaFiles.json'
 const auth = useAuthStore()
 const isLoggedIn = computed(() => auth.isAuthenticated)
 
-function mapLomba(l) {
-  return {
-    id: l.kode,
-    title: l.title,
-    scale: l.scale,
-    tagline: l.tagline,
-    fee: l.fee,
-    feeGelombang1: l.fee_gelombang_1,
-    feeGelombang2: l.fee_gelombang_2,
-    target: l.target,
-    teamRequirements: l.team_requirements,
-    languages: l.languages,
-    babak: l.babak,
-    description: l.description,
-    longDescription: l.long_description,
-    subThemes: l.sub_themes || [],
-    rules: l.rules || [],
-    schedule: l.schedule,
-    registrationLink: l.registration_link,
-    guidebookLink: l.guidebook_link,
-    contactPerson: l.contact_person,
-    cardBg: l.card_bg,
-    accentColor: l.accent_color,
-    textColor: l.text_color,
-  }
-}
-
 const activeKodes = ref([])
-const allLombas = ref([])
-const useLombaFallback = ref(false)
-const homeComps = computed(() => {
-  if (useLombaFallback.value) return competitionsData
-  return allLombas.value.map(mapLomba)
-})
 const showContent = ref(true)
 const isLoading = ref(false)
 const isMenuOpen = ref(false)
@@ -811,7 +778,7 @@ const heroDecorations = [
   },
 ]
 
-const mediaPartners = ref([
+const mediaPartners = [
   { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.webp'), instagram: 'https://www.instagram.com/infocamaba_/' },
   { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.webp'), instagram: 'https://www.instagram.com/hmpti_unisa/' },
   { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.webp'), instagram: 'https://www.instagram.com/lpm.hitamputih/' },
@@ -822,16 +789,16 @@ const mediaPartners = ref([
   { name: 'ANIMEDIA TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(8) Animedia Tadulako.webp'), instagram: 'https://www.instagram.com/animediatadulako/' },
   { name: 'PERMIKOMNAS WILAYAH X', src: getAsset(mediaPartnerAssetModules, 'medpart', '(9) Permikomnas Wilayah X.webp'), instagram: 'https://www.instagram.com/permikomnaswilayahx/' },
   { name: 'HIMATIF UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(10) HIMATIF UIN.webp'), instagram: 'https://www.instagram.com/himatif.uindkpalu/' },
-])
+]
 
-const mainStrategicPartner = ref({
+const mainStrategicPartner = {
   name: 'Hannah Asa Indonesia',
   shortName: 'HANNAH ASA INDONESIA',
   src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Hannah Asa.webp'),
   instagram: 'https://www.instagram.com/hannahasaindonesia/',
-})
+}
 
-const strategicPartners = ref([
+const strategicPartners = [
   {
     name: 'Sultan Music',
     shortName: 'SULTAN MUSIC',
@@ -848,21 +815,34 @@ const strategicPartners = ref([
     logoMaxWidth: 'max-w-[180px]',
     instagram: '',
   },
-])
+]
 
-const marqueeLogos = computed(() => [
-  { name: 'Hannah Asa Indonesia', src: mainStrategicPartner.value?.src, isMedia: false },
-  { name: 'INFOCAMABA', src: mediaPartners.value.find(p => p.name === 'INFOCAMABA')?.src || getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.webp'), isMedia: true },
-  { name: 'Sultan Music', src: strategicPartners.value[0]?.src, isMedia: false },
-  { name: 'HMPTI UNISA PALU', src: mediaPartners.value.find(p => p.name === 'HMPTI UNISA PALU')?.src || getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.webp'), isMedia: true },
+const tickerPartners = [
+  {
+    ...mainStrategicPartner,
+    roleLabel: 'MAIN STRATEGIC PARTNER',
+    logoClass: 'h-8 md:h-9',
+  },
+  ...strategicPartners.map((partner) => ({
+    ...partner,
+    roleLabel: 'STRATEGIC PARTNER',
+    logoClass: 'h-7 md:h-8',
+  })),
+]
+
+const marqueeLogos = [
+  { name: 'Hannah Asa Indonesia', src: mainStrategicPartner.src, isMedia: false },
+  { name: 'INFOCAMABA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(1) INFOCAMABA.webp'), isMedia: true },
+  { name: 'Sultan Music', src: strategicPartners[0].src, isMedia: false },
+  { name: 'HMPTI UNISA PALU', src: getAsset(mediaPartnerAssetModules, 'medpart', '(2) HMPTI UNISA PALU.webp'), isMedia: true },
   { name: 'UNTAD', src: getAsset(mainLogoAssetModules, 'logo_utama', 'logo_untad.webp'), isMedia: false },
-  { name: 'LPM HITAM PUTIH', src: mediaPartners.value.find(p => p.name === 'LPM HITAM PUTIH')?.src || getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.webp'), isMedia: true },
+  { name: 'LPM HITAM PUTIH', src: getAsset(mediaPartnerAssetModules, 'medpart', '(3) LPM HITAM PUTIH.webp'), isMedia: true },
   { name: 'HMTI', src: getAsset(mainLogoAssetModules, 'logo_utama', 'HMTI LOGO.webp'), isMedia: false },
-  { name: 'LPM NASEHA', src: mediaPartners.value.find(p => p.name === 'LPM NASEHA')?.src || getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.webp'), isMedia: true },
-  { name: 'Google Student Ambasador', src: strategicPartners.value[1]?.src, isMedia: false },
-  { name: 'HIMA - SI UIN', src: mediaPartners.value.find(p => p.name === 'HIMA - SI UIN')?.src || getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.webp'), isMedia: true },
-  { name: 'PROGRAMMING TADULAKO', src: mediaPartners.value.find(p => p.name === 'PROGRAMMING TADULAKO')?.src || getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.webp'), isMedia: true },
-])
+  { name: 'LPM NASEHA', src: getAsset(mediaPartnerAssetModules, 'medpart', '(4) LPM NASEHA.webp'), isMedia: true },
+  { name: 'Google Student Ambasador', src: strategicPartners[1].src, isMedia: false },
+  { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.webp'), isMedia: true },
+  { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.webp'), isMedia: true },
+]
 
 const activeSchemeTab = ref('tungsten')
 
@@ -1000,50 +980,12 @@ onMounted(async () => {
   calculateTimeLeft()
   countdownInterval = setInterval(calculateTimeLeft, 1000)
 
-  // Fetch active lomba codes + full data from API
+  // Fetch active lomba codes from API
   try {
     const res = await api.get('/lombas')
-    allLombas.value = res.data.data
     activeKodes.value = res.data.data.map(l => l.kode)
   } catch {
-    useLombaFallback.value = true
     activeKodes.value = competitionsData.map(c => c.id)
-  }
-
-  // Fetch partners from API (fallback to hardcoded data if fails)
-  try {
-    const res = await api.get('/partners')
-    const partners = res.data.data
-    if (partners?.length) {
-      const media = partners.filter(p => p.type === 'media_partner').map(p => ({
-        name: p.name,
-        src: p.logo_url,
-        instagram: p.instagram_url,
-      }))
-      if (media.length) mediaPartners.value = media
-
-      const main = partners.find(p => p.type === 'main_strategic')
-      if (main) {
-        mainStrategicPartner.value = {
-          name: main.name,
-          shortName: main.name.toUpperCase(),
-          src: main.logo_url,
-          instagram: main.instagram_url,
-        }
-      }
-
-      const sp = partners.filter(p => p.type === 'strategic_partner').map(p => ({
-        name: p.name,
-        shortName: p.name.toUpperCase(),
-        src: p.logo_url,
-        description: p.description || '',
-        logoMaxWidth: 'max-w-[200px]',
-        instagram: p.instagram_url,
-      }))
-      if (sp.length) strategicPartners.value = sp
-    }
-  } catch {
-    // fallback to hardcoded data
   }
 
   // Run once to set initial active section
@@ -1569,7 +1511,7 @@ onBeforeUnmount(() => {
 
           <div id="kompetisi-grid-tier1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div 
-              v-for="(comp, index) in homeComps.slice(0, 3)" 
+              v-for="(comp, index) in competitionsData.slice(0, 3)" 
               :key="comp.id"
               class="border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200"
               :class="!countdown.expired ? 'hover:scale-[1.01]' : 'hover:-rotate-1'"
@@ -1634,7 +1576,7 @@ onBeforeUnmount(() => {
 
           <div id="kompetisi-grid-tier2" class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div 
-              v-for="(comp, index) in homeComps.slice(3, 5)" 
+              v-for="(comp, index) in competitionsData.slice(3, 5)" 
               :key="comp.id"
               class="bg-white border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200"
               :class="!countdown.expired ? 'hover:scale-[1.01]' : 'hover:rotate-1'"
