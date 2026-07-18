@@ -17,6 +17,9 @@ const route = useRoute()
 const router = useRouter()
 const isLoggedIn = computed(() => auth.isAuthenticated)
 
+// Store API lomba data keyed by kode for easy lookup
+const apiLombaMap = ref({})
+
 function handleDaftar() {
   if (!activeCompetition.value) return
   if (isLoggedIn) {
@@ -27,9 +30,31 @@ function handleDaftar() {
 }
 
 const activeKodes = ref([])
+
+// Merge static local data with dynamic API data
 const visibleCompetitions = computed(() =>
-  competitionsData.filter(c => activeKodes.value.includes(c.id))
+  competitionsData
+    .filter(c => activeKodes.value.includes(c.id))
+    .map(c => {
+      const apiData = apiLombaMap.value[c.id]
+      if (!apiData) return c
+      return {
+        ...c,
+        // Override dynamic fields from API/DB
+        feeGelombang1: apiData.fee_gelombang_1 || c.feeGelombang1,
+        feeGelombang2: apiData.fee_gelombang_2 || c.feeGelombang2,
+        fee: apiData.fee || c.fee,
+        contactPerson: apiData.contact_person || c.contactPerson,
+        registrationLink: apiData.registration_link || c.registrationLink,
+        guidebookLink: apiData.guidebook_link || c.guidebookLink,
+        schedule: apiData.schedule || c.schedule,
+        gelombang_1_start: apiData.gelombang_1_start,
+        gelombang_1_end: apiData.gelombang_1_end,
+        gelombang_2_end: apiData.gelombang_2_end,
+      }
+    })
 )
+
 const activeCompetition = ref(null)
 const isScrolled = ref(false)
 
@@ -62,6 +87,13 @@ const getShortName = (id) => {
   }
 }
 
+// Format date from ISO string to human-readable Indonesian format
+function formatDate(dateStr) {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 onMounted(async () => {
   window.scrollTo(0, 0)
   window.addEventListener('scroll', handleScroll)
@@ -70,11 +102,17 @@ onMounted(async () => {
   calculateTimeLeft()
   countdownInterval = setInterval(calculateTimeLeft, 1000)
 
-  // Fetch active lomba codes from API
+  // Fetch full lomba data from API — includes dynamic fields (fee, contact, links, schedule)
   try {
     const res = await api.get('/lombas')
-    activeKodes.value = res.data.data.map(l => l.kode)
+    const lombaList = res.data.data
+    activeKodes.value = lombaList.map(l => l.kode)
+    // Build lookup map by kode
+    const map = {}
+    lombaList.forEach(l => { map[l.kode] = l })
+    apiLombaMap.value = map
   } catch {
+    // Fallback: show all local competitions if API fails
     activeKodes.value = competitionsData.map(c => c.id)
   }
   
@@ -136,6 +174,14 @@ watch(() => route.query.id, (newId) => {
     }
   }
 })
+
+// When API data arrives, refresh activeCompetition to pick up dynamic fields
+watch(apiLombaMap, () => {
+  if (activeCompetition.value) {
+    const refreshed = visibleCompetitions.value.find(c => c.id === activeCompetition.value.id)
+    if (refreshed) activeCompetition.value = refreshed
+  }
+}, { deep: true })
 
 </script>
 
@@ -504,11 +550,43 @@ watch(() => route.query.id, (newId) => {
                 </li>
               </ol>
             </div>
-
-            <!-- TIMELINE BLOCK -->
-            <div v-if="activeCompetition.schedule" class="mb-10 p-5 bg-[#DCEEB1]/20 border border-[#04000D] font-mono text-xs font-bold text-[#04000D] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <span class="text-accent-magenta">★ JADWAL PENTING:</span>
-              <span class="bg-white border border-[#04000D] px-3 py-1">{{ activeCompetition.schedule }}</span>
+          
+            <!-- TIMELINE BLOCK: Jadwal Gelombang dari DB -->
+            <div class="mb-10 border-2 border-[#04000D] overflow-hidden" v-if="activeCompetition.gelombang_1_start || activeCompetition.gelombang_1_end || activeCompetition.gelombang_2_end || activeCompetition.schedule">
+              <div class="bg-[#04000D] px-5 py-3 flex items-center gap-2">
+                <span class="text-[#FF3D8B] font-mono text-xs font-black">★</span>
+                <span class="font-mono text-xs font-black uppercase tracking-widest text-white">Jadwal Pendaftaran</span>
+              </div>
+              <div class="p-5 font-mono text-xs bg-[#DCEEB1]/10">
+                <!-- Gelombang 1 dari DB -->
+                <div v-if="activeCompetition.gelombang_1_start || activeCompetition.gelombang_1_end" class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-3 pb-3 border-b border-[#04000D]/10">
+                  <span class="font-black text-[#04000D] uppercase tracking-wider whitespace-nowrap">Gelombang 1</span>
+                  <span class="text-[#04000D]/50">—</span>
+                  <span class="font-bold text-[#FF3D8B]">
+                    {{ formatDate(activeCompetition.gelombang_1_start) }}
+                    <template v-if="activeCompetition.gelombang_1_end"> s/d {{ formatDate(activeCompetition.gelombang_1_end) }}</template>
+                  </span>
+                  <span v-if="activeCompetition.feeGelombang1" class="ml-auto font-black text-[#04000D] bg-[#DCEEB1] px-2 py-0.5 rounded">
+                    {{ activeCompetition.feeGelombang1 }}
+                  </span>
+                </div>
+                <!-- Gelombang 2 dari DB -->
+                <div v-if="activeCompetition.gelombang_2_end" class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-3 pb-3 border-b border-[#04000D]/10">
+                  <span class="font-black text-[#04000D] uppercase tracking-wider whitespace-nowrap">Gelombang 2</span>
+                  <span class="text-[#04000D]/50">—</span>
+                  <span class="font-bold text-[#FF3D8B]">
+                    s/d {{ formatDate(activeCompetition.gelombang_2_end) }}
+                  </span>
+                  <span v-if="activeCompetition.feeGelombang2" class="ml-auto font-black text-[#04000D] bg-[#EFD4D4] px-2 py-0.5 rounded">
+                    {{ activeCompetition.feeGelombang2 }}
+                  </span>
+                </div>
+                <!-- Jadwal tambahan (schedule text) -->
+                <div v-if="activeCompetition.schedule" class="text-[#04000D]/70 leading-relaxed pt-1">
+                  <span class="font-black text-[#04000D] block mb-1 uppercase tracking-wider text-[10px]">Detail Jadwal:</span>
+                  <span>{{ activeCompetition.schedule }}</span>
+                </div>
+              </div>
             </div>
 
             <!-- CONTACT PERSON -->

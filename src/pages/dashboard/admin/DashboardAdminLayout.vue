@@ -6,7 +6,7 @@ import { useAdminStore } from '../../../stores/admin'
 import api from '../../../utils/api'
 import {
   LayoutDashboard, ClipboardList, Users, Bell, LogOut, Menu, X,
-  ChevronRight, Shield, UserCog, Trophy
+  ChevronRight, Shield, UserCog, Trophy, Handshake, CalendarDays, HelpCircle
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -20,6 +20,9 @@ const navItems = computed(() => {
     { path: '/dashboard/admin', name: 'Dashboard', icon: LayoutDashboard },
     { path: '/dashboard/admin/pendaftaran', name: 'Pendaftaran', icon: ClipboardList },
     { path: '/dashboard/admin/lombas', name: 'Lomba', icon: Trophy },
+    { path: '/dashboard/admin/partners', name: 'Partner', icon: Handshake },
+    { path: '/dashboard/admin/timeline', name: 'Timeline', icon: CalendarDays },
+    { path: '/dashboard/admin/faqs', name: 'FAQ', icon: HelpCircle },
     { path: '/dashboard/admin/users', name: 'Pengguna', icon: Users },
     { path: '/dashboard/admin/notifications', name: 'Notifikasi', icon: Bell },
   ]

@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Lomba;
 use App\Models\User;
+use App\Models\Partner;
+use App\Models\TimelineEvent;
+use App\Models\FaqItem;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -220,6 +223,170 @@ class DatabaseSeeder extends Seeder
             Lomba::updateOrCreate(
                 ['kode' => $lomba['kode']],
                 $lomba
+            );
+        }
+
+        // Seed Partners
+        $partners = [
+            [
+                'name' => 'Universitas Tadulako',
+                'type' => 'main_strategic',
+                'logo_url' => 'logo_untad.webp',
+                'instagram_url' => 'https://instagram.com/untad',
+                'description' => 'Official partner mengawal eskalasi lobi pendanaan Tier-1 dan kurikulum 25 Titik Roadshow Inklusif.',
+                'order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Permikomnas Wilayah X',
+                'type' => 'strategic_partner',
+                'logo_url' => '(9) Permikomnas Wilayah X.webp',
+                'instagram_url' => 'https://instagram.com/permikomnas_wilx',
+                'description' => 'Aliansi strategis regional untuk perluasan jaringan partisipasi lomba.',
+                'order' => 2,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'LPM Hitam Putih',
+                'type' => 'media_partner',
+                'logo_url' => '(3) LPM HITAM PUTIH.webp',
+                'instagram_url' => 'https://instagram.com/lpmhitampuith',
+                'description' => 'Media partner publikasi rangkaian kegiatan I-FEST 2026.',
+                'order' => 3,
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($partners as $partner) {
+            Partner::updateOrCreate(
+                ['name' => $partner['name']],
+                $partner
+            );
+        }
+
+        // Seed Timeline Events
+        $timelineEvents = [
+            [
+                'phase' => '01',
+                'title' => 'Identity & Foundation',
+                'date_range' => 'Januari - Maret',
+                'accent_color' => '#8B5CF6',
+                'status' => 'completed',
+                'description_items' => [
+                    'Januari: Pembentukan Tim Inti & Penyusunan Konsep Kasar.',
+                    'Februari: Penyusunan Proposal Kegiatan.',
+                    'Maret: Finalisasi struktur kepanitiaan (80+ personil).',
+                    'Maret: Audiensi Mitra Strategis & Pencarian Dana.'
+                ],
+                'order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'phase' => '02',
+                'title' => 'Inklusif Roadshow',
+                'date_range' => 'Mei - Agustus',
+                'accent_color' => '#10B981',
+                'status' => 'ongoing',
+                'description_items' => [
+                    'Mei - Jun: Awal pergerakan menyasar sekolah umum, sekolah alam/alternatif, dan komunitas disabilitas.',
+                    'Jul - Agust: Roadshow di 25 titik wilayah Sulawesi Tengah.'
+                ],
+                'order' => 2,
+                'is_active' => true,
+            ],
+            [
+                'phase' => '03',
+                'title' => 'Awareness & Reg',
+                'date_range' => 'Agustus - September',
+                'accent_color' => '#3B82F6',
+                'status' => 'upcoming',
+                'description_items' => [
+                    'Agustus: Pembukaan Registrasi Kompetisi Nasional (3 Bidang Lomba).',
+                    'September: Kampanye digital masif & pendampingan teknis peserta.'
+                ],
+                'order' => 3,
+                'is_active' => true,
+            ],
+            [
+                'phase' => '04',
+                'title' => 'Benchmark & Exploration',
+                'date_range' => 'September - Oktober',
+                'accent_color' => '#F59E0B',
+                'status' => 'upcoming',
+                'description_items' => [
+                    'September: Batas akhir pengumpulan karya gelombang 1.',
+                    'Oktober: Penjurian Tahap Penyisihan kompetisi.'
+                ],
+                'order' => 4,
+                'is_active' => true,
+            ],
+            [
+                'phase' => '05',
+                'title' => 'Local Intellectual Series',
+                'date_range' => 'Oktober - November',
+                'accent_color' => '#EF4444',
+                'status' => 'upcoming',
+                'description_items' => [
+                    'Oktober: Pengumuman finalis utama & pembukaan ticketing Grand Closing.',
+                    'November: Technical Meeting & persiapan akomodasi finalis nasional.'
+                ],
+                'order' => 5,
+                'is_active' => true,
+            ],
+            [
+                'phase' => '06',
+                'title' => 'Grand Symphony & Legacy',
+                'date_range' => 'November - Desember',
+                'accent_color' => '#F59E0B',
+                'status' => 'upcoming',
+                'description_items' => [
+                    'November: 3 HARI PUNCAK I-FEST 2026 (Expo Inovasi, Seminar Internasional, Awarding Night, Grand Closing Concert).',
+                    'Desember: Perilisan Official Aftermovie & Penyerahan Impact Report.'
+                ],
+                'order' => 6,
+                'is_active' => true,
+            ]
+        ];
+
+        foreach ($timelineEvents as $event) {
+            TimelineEvent::updateOrCreate(
+                ['phase' => $event['phase']],
+                $event
+            );
+        }
+
+        // Seed FAQs
+        $faqs = [
+            [
+                'question' => 'Apa itu I-FEST 2026?',
+                'answer' => 'I-FEST (Informatics Festival) 2026 adalah festival IT nasional tahunan yang diselenggarakan oleh Himpunan Mahasiswa Teknik Informatika (HMTI) Universitas Tadulako.',
+                'order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'question' => 'Siapa saja yang bisa mendaftar kompetisi?',
+                'answer' => 'Kompetisi di I-FEST 2026 terbuka untuk siswa SMA/SMK sederajat dan mahasiswa aktif di seluruh Indonesia sesuai dengan kategori lomba masing-masing.',
+                'order' => 2,
+                'is_active' => true,
+            ],
+            [
+                'question' => 'Bagaimana cara melakukan pendaftaran?',
+                'answer' => 'Pendaftaran dapat dilakukan secara online melalui website resmi ini dengan membuat akun peserta, melengkapi data profil, dan melakukan pembayaran biaya registrasi.',
+                'order' => 3,
+                'is_active' => true,
+            ],
+            [
+                'question' => 'Apakah pendaftaran bisa dibatalkan atau direfund?',
+                'answer' => 'Biaya pendaftaran yang sudah dibayarkan tidak dapat dikembalikan (refund) jika peserta membatalkan keikutsertaannya secara sepihak.',
+                'order' => 4,
+                'is_active' => true,
+            ]
+        ];
+
+        foreach ($faqs as $faq) {
+            FaqItem::updateOrCreate(
+                ['question' => $faq['question']],
+                $faq
             );
         }
     }

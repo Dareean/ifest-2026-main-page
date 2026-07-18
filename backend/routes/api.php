@@ -10,6 +10,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\TimelineController;
+use App\Http\Controllers\FaqController;
 use Illuminate\Support\Facades\Route;
 
 $authThrottle = fn($limit) => [env('APP_ENV') === 'local' ? "throttle:1000,1" : "throttle:$limit"];
@@ -86,6 +89,10 @@ if (app()->environment('local')) {
     require __DIR__.'/api-e2e.php';
 }
 
+Route::get('/partners', [PartnerController::class, 'index']);
+Route::get('/timeline', [TimelineController::class, 'index']);
+Route::get('/faqs', [FaqController::class, 'index']);
+
 // Admin routes
 Route::middleware(array_merge(['auth:sanctum', 'admin'], $authThrottle('120,1')))->prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'stats']);
@@ -111,4 +118,22 @@ Route::middleware(array_merge(['auth:sanctum', 'admin'], $authThrottle('120,1'))
     Route::put('/lombas/{lomba}/toggle-submission', [AdminLombaController::class, 'toggleSubmission']);
     Route::put('/lombas/{lomba}/toggle-active', [AdminLombaController::class, 'toggleActive']);
     Route::put('/lombas/{lomba}', [AdminLombaController::class, 'update']);
+
+    Route::get('/partners', [PartnerController::class, 'adminIndex']);
+    Route::post('/partners', [PartnerController::class, 'store']);
+    Route::get('/partners/{partner}', [PartnerController::class, 'show']);
+    Route::put('/partners/{partner}', [PartnerController::class, 'update']);
+    Route::delete('/partners/{partner}', [PartnerController::class, 'destroy']);
+
+    Route::get('/timeline', [TimelineController::class, 'adminIndex']);
+    Route::post('/timeline', [TimelineController::class, 'store']);
+    Route::get('/timeline/{timelineEvent}', [TimelineController::class, 'show']);
+    Route::put('/timeline/{timelineEvent}', [TimelineController::class, 'update']);
+    Route::delete('/timeline/{timelineEvent}', [TimelineController::class, 'destroy']);
+
+    Route::get('/faqs', [FaqController::class, 'adminIndex']);
+    Route::post('/faqs', [FaqController::class, 'store']);
+    Route::get('/faqs/{faqItem}', [FaqController::class, 'show']);
+    Route::put('/faqs/{faqItem}', [FaqController::class, 'update']);
+    Route::delete('/faqs/{faqItem}', [FaqController::class, 'destroy']);
 });

@@ -980,6 +980,9 @@ onMounted(async () => {
   calculateTimeLeft()
   countdownInterval = setInterval(calculateTimeLeft, 1000)
 
+  // Fetch dynamic CMS data
+  fetchCmsData()
+
   // Fetch active lomba codes from API
   try {
     const res = await api.get('/lombas')
@@ -1148,6 +1151,208 @@ const formatTimeNumber = (num) => {
 
 let countdownInterval = null
 
+// --- DYNAMIC CMS CONFIGURATION ---
+const dynamicPartners = ref([])
+const dynamicTimeline = ref([])
+const dynamicFaqs = ref([])
+const activeFaqIndex = ref(-1)
+
+async function fetchCmsData() {
+  try {
+    const resPartners = await api.get('/partners')
+    dynamicPartners.value = resPartners.data.data
+  } catch (e) {
+    console.error('Failed to fetch partners', e)
+  }
+
+  try {
+    const resTimeline = await api.get('/timeline')
+    dynamicTimeline.value = resTimeline.data.data
+  } catch (e) {
+    console.error('Failed to fetch timeline', e)
+  }
+
+  try {
+    const resFaqs = await api.get('/faqs')
+    dynamicFaqs.value = resFaqs.data.data
+  } catch (e) {
+    console.error('Failed to fetch FAQs', e)
+  }
+}
+
+const mediaPartnersComputed = computed(() => {
+  const dynamic = dynamicPartners.value.filter(p => p.type === 'media_partner')
+  if (dynamic.length > 0) {
+    return dynamic.map(p => ({
+      name: p.name,
+      src: p.logo_url,
+      instagram: p.instagram_url
+    }))
+  }
+  return mediaPartners
+})
+
+const mainStrategicPartnerComputed = computed(() => {
+  const dynamic = dynamicPartners.value.find(p => p.type === 'main_strategic')
+  if (dynamic) {
+    return {
+      name: dynamic.name,
+      shortName: dynamic.name.toUpperCase(),
+      src: dynamic.logo_url,
+      instagram: dynamic.instagram_url
+    }
+  }
+  return mainStrategicPartner
+})
+
+const strategicPartnersComputed = computed(() => {
+  const dynamic = dynamicPartners.value.filter(p => p.type === 'strategic_partner')
+  if (dynamic.length > 0) {
+    return dynamic.map(p => ({
+      name: p.name,
+      shortName: p.name.toUpperCase(),
+      src: p.logo_url,
+      description: p.description,
+      logoMaxWidth: 'max-w-[200px]',
+      instagram: p.instagram_url
+    }))
+  }
+  return strategicPartners
+})
+
+const tickerPartnersComputed = computed(() => {
+  const list = []
+  const main = mainStrategicPartnerComputed.value
+  if (main) {
+    list.push({
+      ...main,
+      roleLabel: 'MAIN STRATEGIC PARTNER',
+      logoClass: 'h-8 md:h-9'
+    })
+  }
+  strategicPartnersComputed.value.forEach(p => {
+    list.push({
+      ...p,
+      roleLabel: 'STRATEGIC PARTNER',
+      logoClass: 'h-7 md:h-8'
+    })
+  })
+  return list.length > 0 ? list : tickerPartners
+})
+
+const marqueeLogosComputed = computed(() => {
+  if (dynamicPartners.value.length > 0) {
+    return dynamicPartners.value.map(p => ({
+      name: p.name,
+      src: p.logo_url,
+      isMedia: p.type === 'media_partner'
+    }))
+  }
+  return marqueeLogos
+})
+
+const partnershipSchemesComputed = computed(() => {
+  return partnershipSchemes.map(scheme => {
+    const sponsors = dynamicPartners.value
+      .filter(p => p.type === 'sponsorship_tier' && p.tier_data?.tier === scheme.id)
+      .map(p => ({
+        name: p.name,
+        logo: p.logo_url,
+        instagram: p.instagram_url
+      }))
+    return {
+      ...scheme,
+      sponsors: sponsors.length > 0 ? sponsors : scheme.sponsors
+    }
+  })
+})
+
+const defaultFaqs = [
+  { question: 'Apa itu I-FEST 2026?', answer: 'I-FEST (Informatics Festival) 2026 adalah festival IT nasional tahunan yang diselenggarakan oleh Himpunan Mahasiswa Teknik Informatika (HMTI) Universitas Tadulako.' },
+  { question: 'Siapa saja yang bisa mendaftar kompetisi?', answer: 'Kompetisi di I-FEST 2026 terbuka untuk siswa SMA/SMK sederajat dan mahasiswa aktif di seluruh Indonesia sesuai dengan kategori lomba masing-masing.' },
+  { question: 'Bagaimana cara melakukan pendaftaran?', answer: 'Pendaftaran dapat dilakukan secara online melalui website resmi ini dengan membuat akun peserta, melengkapi data profil, dan melakukan pembayaran biaya registrasi.' },
+  { question: 'Apakah pendaftaran bisa dibatalkan atau direfund?', answer: 'Biaya pendaftaran yang sudah dibayarkan tidak dapat dikembalikan (refund) jika peserta membatalkan keikutsertaannya secara sepihak.' }
+]
+
+const faqsComputed = computed(() => {
+  return dynamicFaqs.value.length > 0 ? dynamicFaqs.value : defaultFaqs
+})
+
+const timelineEventsComputed = computed(() => {
+  const defaultTimeline = [
+    {
+      phase: '01',
+      title: 'Identity & Foundation',
+      date_range: 'Januari - Maret',
+      accent_color: '#8B5CF6',
+      status: 'completed',
+      description_items: [
+        'Januari: Pembentukan Tim Inti & Penyusunan Konsep Kasar.',
+        'Februari: Penyusunan Proposal Kegiatan.',
+        'Maret: Finalisasi struktur kepanitiaan (80+ personil).',
+        'Maret: Audiensi Mitra Strategis & Pencarian Dana.'
+      ]
+    },
+    {
+      phase: '02',
+      title: 'Inklusif Roadshow',
+      date_range: 'Mei - Agustus',
+      accent_color: '#10B981',
+      status: 'ongoing',
+      description_items: [
+        'Mei - Jun: Awal pergerakan menyasar sekolah umum, sekolah alam/alternatif, dan komunitas disabilitas.',
+        'Jul - Agust: Roadshow di 25 titik wilayah Sulawesi Tengah.'
+      ]
+    },
+    {
+      phase: '03',
+      title: 'Awareness & Reg',
+      date_range: 'Agustus - September',
+      accent_color: '#3B82F6',
+      status: 'upcoming',
+      description_items: [
+        'Agustus: Pembukaan Registrasi Kompetisi Nasional (3 Bidang Lomba).',
+        'September: Kampanye digital masif & pendampingan teknis peserta.'
+      ]
+    },
+    {
+      phase: '04',
+      title: 'Benchmark & Exploration',
+      date_range: 'September - Oktober',
+      accent_color: '#F59E0B',
+      status: 'upcoming',
+      description_items: [
+        'September: Batas akhir pengumpulan karya gelombang 1.',
+        'Oktober: Penjurian Tahap Penyisihan kompetisi.'
+      ]
+    },
+    {
+      phase: '05',
+      title: 'Local Intellectual Series',
+      date_range: 'Oktober - November',
+      accent_color: '#EF4444',
+      status: 'upcoming',
+      description_items: [
+        'Oktober: Pengumuman finalis utama & pembukaan ticketing Grand Closing.',
+        'November: Technical Meeting & persiapan akomodasi finalis nasional.'
+      ]
+    },
+    {
+      phase: '06',
+      title: 'Grand Symphony & Legacy',
+      date_range: 'November - Desember',
+      accent_color: '#F59E0B',
+      status: 'upcoming',
+      description_items: [
+        'November: 3 HARI PUNCAK I-FEST 2026 (Expo Inovasi, Seminar Internasional, Awarding Night, Grand Closing Concert).',
+        'Desember: Perilisan Official Aftermovie & Penyerahan Impact Report.'
+      ]
+    }
+  ]
+  return dynamicTimeline.value.length > 0 ? dynamicTimeline.value : defaultTimeline
+})
+// ------------------------------------
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateViewport)
   window.removeEventListener('scroll', handleScroll)
@@ -1200,7 +1405,7 @@ onBeforeUnmount(() => {
           <!-- We repeat the set of logos twice (using group in 2) to ensure perfect 100% seamless infinite looping -->
           <div v-for="group in 2" :key="group" class="flex items-center flex-shrink-0">
             <div 
-              v-for="logo in marqueeLogos.filter(logo => logo.src)" 
+              v-for="logo in marqueeLogosComputed.filter(logo => logo.src)" 
               :key="`${group}-${logo.name}`" 
               class="flex items-center flex-shrink-0"
             >
@@ -1820,61 +2025,62 @@ onBeforeUnmount(() => {
           <div class="lg:hidden absolute left-8 top-4 bottom-4 w-1 border-l-4 border-dashed border-slate-300/80 z-0"></div>
 
           <div class="flex flex-col gap-10 md:gap-12">
-            
-            <!-- PHASE 01 -->
-            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
-              <!-- Left Card -->
+            <div 
+              v-for="(event, index) in timelineEventsComputed" 
+              :key="index"
+              class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full"
+            >
+              <!-- Card on Left (for odd indices) -->
               <div 
+                v-if="index % 2 === 0"
                 v-motion
                 :initial="{ opacity: 0, x: -40 }"
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#8B5CF6] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #8B5CF6;">
-                  <!-- Status: Terlaksana -->
+                <div class="w-full max-w-xl text-left bg-white border-3 rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" :style="{ borderColor: event.accent_color, boxShadow: `6px 6px 0px 0px ${event.accent_color}` }">
+                  <!-- Status Badge -->
                   <div class="flex items-center gap-1.5 mb-3">
-                    <span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                      <Check class="w-3 h-3" />
-                      Terlaksana
+                    <span v-if="event.status === 'completed'" class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Check class="w-3 h-3" /> Terlaksana
+                    </span>
+                    <span v-else-if="event.status === 'ongoing'" class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                      ◉ Sedang Berjalan
+                    </span>
+                    <span v-else class="bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
+                      ◉ Terjadwal
                     </span>
                   </div>
+
                   <div 
-                    @click="activeTimelinePhase = activeTimelinePhase === 0 ? -1 : 0"
+                    @click="activeTimelinePhase = activeTimelinePhase === index ? -1 : index"
                     class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
                   >
-                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 01: Identity &amp; Foundation</h4>
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE {{ event.phase }}: {{ event.title }}</h4>
                     <div class="flex items-center gap-3">
-                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#8B5CF6] uppercase">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold uppercase" :style="{ color: event.accent_color }">
                         <Calendar class="w-4 h-4" stroke-width="2.5" />
-                        Januari - Maret
+                        {{ event.date_range }}
                       </span>
-                      <!-- Chevron icon -->
-                      <ChevronDown class="w-4 h-4 text-[#8B5CF6] transition-transform duration-300" :class="activeTimelinePhase === 0 ? 'rotate-180' : ''" stroke-width="3.5" />
+                      <ChevronDown class="w-4 h-4 transition-transform duration-300" :class="activeTimelinePhase === index ? 'rotate-180' : ''" :style="{ color: event.accent_color }" stroke-width="3.5" />
                     </div>
                   </div>
                   
                   <div 
                     class="overflow-hidden transition-all duration-300 ease-in-out"
-                    :class="activeTimelinePhase === 0 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                    :class="activeTimelinePhase === index ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
                   >
-                    <div class="bg-[#FAF5FF] border border-purple-100 rounded-xl p-4 md:p-5">
+                    <div class="bg-[#FAF9F5] border border-slate-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
                         <tbody>
-                          <tr class="align-top">
-                            <td class="w-[80px] font-black text-[#8B5CF6] py-1">Januari:</td>
-                            <td class="py-1 text-[#04000D]/90">Pembentukan Tim Inti &amp; Penyusunan Konsep Kasar.</td>
-                          </tr>
-                          <tr class="align-top border-t border-purple-100/50">
-                            <td class="font-black text-[#8B5CF6] py-2">Februari:</td>
-                            <td class="py-2 text-[#04000D]/90">Penyusunan Proposal Kegiatan.</td>
-                          </tr>
-                          <tr class="align-top border-t border-purple-100/50">
-                            <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
-                            <td class="py-2 text-[#04000D]/90">Finalisasi struktur kepanitiaan (80+ personil).</td>
-                          </tr>
-                          <tr class="align-top border-t border-purple-100/50">
-                            <td class="font-black text-[#8B5CF6] py-2">Maret:</td>
-                            <td class="py-2 text-[#04000D]/90">Audiensi Mitra Strategis &amp; Pencarian Dana.</td>
+                          <tr v-for="(item, idx) in event.description_items" :key="idx" class="align-top" :class="idx > 0 ? 'border-t border-purple-100/50' : ''">
+                            <template v-if="item.includes(':')">
+                              <td class="w-[95px] font-black py-2" :style="{ color: event.accent_color }">{{ item.split(':')[0] }}:</td>
+                              <td class="py-2 text-[#04000D]/90">{{ item.split(':').slice(1).join(':').trim() }}</td>
+                            </template>
+                            <template v-else>
+                              <td colspan="2" class="py-2 text-[#04000D]/90">{{ item }}</td>
+                            </template>
                           </tr>
                         </tbody>
                       </table>
@@ -1882,127 +2088,76 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
               </div>
-              
-              <!-- Spine Node -->
-              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#8B5CF6] border-4 border-[#8B5CF6] flex items-center justify-center shadow-[2px_2px_0px_0px_#04000D]">
-                  <Check class="w-5 h-5 text-white" stroke-width="2.5" />
-                </div>
-              </div>
-              
-              <!-- Spacer for desktop -->
-              <div class="hidden lg:block lg:order-3"></div>
-            </div>
+              <!-- Spacer for left card on desktop -->
+              <div v-else class="hidden lg:block lg:order-1"></div>
 
-            <!-- PHASE 02 -->
-            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
-              <!-- Spacer for desktop -->
-              <div class="hidden lg:block lg:order-1"></div>
-              
               <!-- Spine Node -->
               <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#10B981] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#10B981] shadow-[2px_2px_0px_0px_#04000D] ring-4 ring-[#10B981]/30 animate-pulse">
-                  02
+                <div 
+                  class="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 flex items-center justify-center font-mono text-sm md:text-base font-extrabold shadow-[2px_2px_0px_0px_#04000D]"
+                  :class="event.status === 'completed' ? 'text-white' : ''"
+                  :style="{ 
+                    borderColor: event.accent_color, 
+                    backgroundColor: event.status === 'completed' ? event.accent_color : '#ffffff',
+                    color: event.status === 'completed' ? '#ffffff' : event.accent_color
+                  }"
+                >
+                  <Check class="w-5 h-5 text-white" stroke-width="2.5" v-if="event.status === 'completed'" />
+                  <span v-else>{{ event.phase }}</span>
                 </div>
               </div>
 
-              <!-- Right Card -->
+              <!-- Card on Right (for even indices) -->
               <div 
+                v-if="index % 2 !== 0"
                 v-motion
                 :initial="{ opacity: 0, x: 40 }"
                 :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
                 class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
               >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#10B981] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #10B981;">
-                  <!-- Status: Segera -->
+                <div class="w-full max-w-xl text-left bg-white border-3 rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" :style="{ borderColor: event.accent_color, boxShadow: `6px 6px 0px 0px ${event.accent_color}` }">
+                  <!-- Status Badge -->
                   <div class="flex items-center gap-1.5 mb-3">
-                    <span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
-                      ◉ Segera — Juli
+                    <span v-if="event.status === 'completed'" class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Check class="w-3 h-3" /> Terlaksana
+                    </span>
+                    <span v-else-if="event.status === 'ongoing'" class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                      ◉ Sedang Berjalan
+                    </span>
+                    <span v-else class="bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
+                      ◉ Terjadwal
                     </span>
                   </div>
-                  <div 
-                    @click="activeTimelinePhase = activeTimelinePhase === 1 ? -1 : 1"
-                    class="flex items-center justify-between border-b border-emerald-100 pb-3 cursor-pointer select-none"
-                  >
-                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 02: Inklusif Roadshow</h4>
-                    <div class="flex items-center gap-3">
-                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#10B981] uppercase">
-                        <Calendar class="w-4 h-4" stroke-width="2.5" />
-                        Mei - Agustus
-                      </span>
-                      <!-- Chevron icon -->
-                      <ChevronDown class="w-4 h-4 text-[#10B981] transition-transform duration-300" :class="activeTimelinePhase === 1 ? 'rotate-180' : ''" stroke-width="3.5" />
-                    </div>
-                  </div>
-                  
-                  <div 
-                    class="overflow-hidden transition-all duration-300 ease-in-out"
-                    :class="activeTimelinePhase === 1 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
-                  >
-                    <div class="bg-[#ECFDF5] border border-emerald-100 rounded-xl p-4 md:p-5">
-                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tbody>
-                          <tr class="align-top">
-                            <td class="w-[95px] font-black text-[#10B981] py-1">Mei - Jun:</td>
-                            <td class="py-1 text-[#04000D]/90">Awal pergerakan menyasar sekolah umum, sekolah alam/alternatif, dan komunitas disabilitas.</td>
-                          </tr>
-                          <tr class="align-top border-t border-emerald-100/50">
-                            <td class="font-black text-[#10B981] py-2">Jul - Agust:</td>
-                            <td class="py-2 text-[#04000D]/90">Ekspansi roadshow ke 800+ pelajar &amp; masyarakat marginal.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <!-- PHASE 03 -->
-            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
-              <!-- Left Card -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0, x: -40 }"
-                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
-                class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
-              >
-                <div class="w-full max-w-xl text-left bg-white border-3 border-[#3B82F6] rounded-2xl p-5 transition-all duration-300 hover:scale-[1.01]" style="box-shadow: 6px 6px 0px 0px #3B82F6;">
-                  <!-- Status: Segera -->
-                  <div class="flex items-center gap-1.5 mb-3">
-                    <span class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
-                      ◉ Segera — Juli
-                    </span>
-                  </div>
                   <div 
-                    @click="activeTimelinePhase = activeTimelinePhase === 2 ? -1 : 2"
-                    class="flex items-center justify-between border-b border-blue-100 pb-3 cursor-pointer select-none"
+                    @click="activeTimelinePhase = activeTimelinePhase === index ? -1 : index"
+                    class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
                   >
-                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 03: Awareness &amp; Reg</h4>
+                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE {{ event.phase }}: {{ event.title }}</h4>
                     <div class="flex items-center gap-3">
-                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#3B82F6] uppercase">
+                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold uppercase" :style="{ color: event.accent_color }">
                         <Calendar class="w-4 h-4" stroke-width="2.5" />
-                        Juli - Agustus
+                        {{ event.date_range }}
                       </span>
-                      <!-- Chevron icon -->
-                      <ChevronDown class="w-4 h-4 text-[#3B82F6] transition-transform duration-300" :class="activeTimelinePhase === 2 ? 'rotate-180' : ''" stroke-width="3.5" />
+                      <ChevronDown class="w-4 h-4 transition-transform duration-300" :class="activeTimelinePhase === index ? 'rotate-180' : ''" :style="{ color: event.accent_color }" stroke-width="3.5" />
                     </div>
                   </div>
                   
                   <div 
                     class="overflow-hidden transition-all duration-300 ease-in-out"
-                    :class="activeTimelinePhase === 2 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
+                    :class="activeTimelinePhase === index ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
                   >
-                    <div class="bg-[#EFF6FF] border border-blue-100 rounded-xl p-4 md:p-5">
+                    <div class="bg-[#FAF9F5] border border-slate-100 rounded-xl p-4 md:p-5">
                       <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
                         <tbody>
-                          <tr class="align-top">
-                            <td class="w-[80px] font-black text-[#3B82F6] py-1">Juli:</td>
-                            <td class="py-1 text-[#04000D]/90">Pembukaan pendaftaran Arena Kompetisi di sela-sela roadshow lapangan.</td>
-                          </tr>
-                          <tr class="align-top border-t border-blue-100/50">
-                            <td class="font-black text-[#3B82F6] py-2">Agustus:</td>
-                            <td class="py-2 text-[#04000D]/90">Kampanye masif registrasi 6 Lomba menargetkan 500+ kompetitor elite.</td>
+                          <tr v-for="(item, idx) in event.description_items" :key="idx" class="align-top" :class="idx > 0 ? 'border-t border-purple-100/50' : ''">
+                            <template v-if="item.includes(':')">
+                              <td class="w-[95px] font-black py-2" :style="{ color: event.accent_color }">{{ item.split(':')[0] }}:</td>
+                              <td class="py-2 text-[#04000D]/90">{{ item.split(':').slice(1).join(':').trim() }}</td>
+                            </template>
+                            <template v-else>
+                              <td colspan="2" class="py-2 text-[#04000D]/90">{{ item }}</td>
+                            </template>
                           </tr>
                         </tbody>
                       </table>
@@ -2010,208 +2165,8 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
               </div>
-              
-              <!-- Spine Node -->
-              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-[#3B82F6] flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#3B82F6] shadow-[2px_2px_0px_0px_#04000D] ring-4 ring-[#3B82F6]/30 animate-pulse">
-                  03
-                </div>
-              </div>
-              
-              <!-- Spacer for desktop -->
+              <!-- Spacer for right card on desktop -->
               <div class="hidden lg:block lg:order-3"></div>
-            </div>
-
-            <!-- PHASE 04 -->
-            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
-              <!-- Spacer for desktop -->
-              <div class="hidden lg:block lg:order-1"></div>
-              
-              <!-- Spine Node -->
-              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-dashed border-[#F59E0B]/50 flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#F59E0B]/40 shadow-none">
-                  04
-                </div>
-              </div>
-
-              <!-- Right Card -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0, x: 40 }"
-                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
-                class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
-              >
-                <div class="w-full max-w-xl text-left bg-white/80 border-2 border-dashed border-[#F59E0B]/40 rounded-2xl p-5 transition-all duration-300 opacity-60">
-                  <!-- Status: Mendatang -->
-                  <div class="flex items-center gap-1.5 mb-3">
-                    <span class="bg-slate-100 text-slate-400 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
-                      Mendatang
-                    </span>
-                  </div>
-                  <div 
-                    @click="activeTimelinePhase = activeTimelinePhase === 3 ? -1 : 3"
-                    class="flex items-center justify-between border-b border-amber-100 pb-3 cursor-pointer select-none"
-                  >
-                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 04: Benchmark &amp; Exploration</h4>
-                    <div class="flex items-center gap-3">
-                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#F59E0B] uppercase">
-                        <Calendar class="w-4 h-4" stroke-width="2.5" />
-                        Agustus - Sept
-                      </span>
-                      <!-- Chevron icon -->
-                      <ChevronDown class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 3 ? 'rotate-180' : ''" stroke-width="3.5" />
-                    </div>
-                  </div>
-                  
-                  <div 
-                    class="overflow-hidden transition-all duration-300 ease-in-out"
-                    :class="activeTimelinePhase === 3 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
-                  >
-                    <div class="bg-[#FFFBEB] border border-amber-100 rounded-xl p-4 md:p-5">
-                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tbody>
-                          <tr class="align-top">
-                            <td class="w-[90px] font-black text-[#F59E0B] py-1">Agustus:</td>
-                            <td class="py-1 text-[#04000D]/90">Studi banding akademik ke laboratorium teknologi universitas target di Pulau Jawa.</td>
-                          </tr>
-                          <tr class="align-top border-t border-amber-100/50">
-                            <td class="font-black text-[#F59E0B] py-2">September:</td>
-                            <td class="py-2 text-[#04000D]/90">Industrial Visitation ke raksasa teknologi untuk sinkronisasi praktik industri.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- PHASE 05 -->
-            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
-              <!-- Left Card -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0, x: -40 }"
-                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
-                class="lg:text-right flex flex-col items-start lg:items-end w-full lg:order-1 order-3 pl-16 lg:pl-0"
-              >
-                <div class="w-full max-w-xl text-left bg-white/80 border-2 border-dashed border-[#EF4444]/40 rounded-2xl p-6 transition-all duration-300 opacity-60">
-                  <!-- Status: Mendatang -->
-                  <div class="flex items-center gap-1.5 mb-3">
-                    <span class="bg-slate-100 text-slate-400 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
-                      Mendatang
-                    </span>
-                  </div>
-                  <div 
-                    @click="activeTimelinePhase = activeTimelinePhase === 4 ? -1 : 4"
-                    class="flex items-center justify-between border-b border-red-100 pb-3 cursor-pointer select-none"
-                  >
-                    <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE 05: Local Intellectual Series</h4>
-                    <div class="flex items-center gap-3">
-                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#EF4444] uppercase">
-                        <Calendar class="w-4 h-4" stroke-width="2.5" />
-                        September
-                      </span>
-                      <!-- Chevron icon -->
-                      <ChevronDown class="w-4 h-4 text-[#EF4444] transition-transform duration-300" :class="activeTimelinePhase === 4 ? 'rotate-180' : ''" stroke-width="3.5" />
-                    </div>
-                  </div>
-                  
-                  <div 
-                    class="overflow-hidden transition-all duration-300 ease-in-out"
-                    :class="activeTimelinePhase === 4 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
-                  >
-                    <div class="bg-[#FEF2F2] border border-red-100 rounded-xl p-4 md:p-5">
-                      <table class="w-full font-mono text-xs md:text-sm text-[#04000D]">
-                        <tbody>
-                          <tr class="align-top">
-                            <td class="w-[90px] font-black text-[#EF4444] py-1">Pekan 3-4:</td>
-                            <td class="py-1 text-[#04000D]/90">TEDxUNTAD: Regional Resonance membedah tantangan disrupsi digital.</td>
-                          </tr>
-                          <tr class="align-top border-t border-red-100/50">
-                            <td class="font-black text-[#EF4444] py-2">Output:</td>
-                            <td class="py-2 text-[#04000D]/90">Dokumentasi pemikiran strategis untuk Expo Inovasi November.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Spine Node -->
-              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-4 border-dashed border-[#EF4444]/50 flex items-center justify-center font-mono text-sm md:text-base font-extrabold text-[#EF4444]/40 shadow-none">
-                  05
-                </div>
-              </div>
-              
-              <!-- Spacer for desktop -->
-              <div class="hidden lg:block lg:order-3"></div>
-            </div>
-
-            <!-- PHASE 06 -->
-            <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-start gap-8 lg:gap-12 w-full">
-              <!-- Spacer for desktop -->
-              <div class="hidden lg:block lg:order-1"></div>
-              
-              <!-- Spine Node -->
-              <div class="absolute left-4 lg:left-auto lg:relative lg:order-2 order-1 z-10">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0F172A] border-4 border-dashed border-[#F59E0B]/50 flex items-center justify-center shadow-none opacity-60">
-                  <Sun class="w-5 h-5 text-[#F59E0B]" />
-                </div>
-              </div>
-
-              <!-- Right Card (Dark Navy Theme) -->
-              <div 
-                v-motion
-                :initial="{ opacity: 0, x: 40 }"
-                :visible-once="{ opacity: 1, x: 0, transition: { duration: 500 } }"
-                class="flex flex-col items-start w-full lg:order-3 order-3 pl-16 lg:pl-0"
-              >
-                <div class="w-full max-w-xl text-left bg-[#0F172A]/80 border-2 border-dashed border-[#F59E0B]/40 rounded-2xl p-6 transition-all duration-300 opacity-60">
-                  <!-- Status: Mendatang -->
-                  <div class="flex items-center gap-1.5 mb-3">
-                    <span class="bg-slate-700 text-slate-400 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider">
-                      Mendatang
-                    </span>
-                  </div>
-                  <div 
-                    @click="activeTimelinePhase = activeTimelinePhase === 5 ? -1 : 5"
-                    class="flex items-center justify-between border-b border-slate-700 pb-3 cursor-pointer select-none"
-                  >
-                    <h4 class="font-black text-lg md:text-xl text-white tracking-tight uppercase">PHASE 06: Grand Symphony &amp; Legacy</h4>
-                    <div class="flex items-center gap-3">
-                      <span class="flex items-center gap-1.5 font-mono text-xs font-bold text-[#F59E0B] uppercase">
-                        <Calendar class="w-4 h-4" stroke-width="2.5" />
-                        Nov - Des
-                      </span>
-                      <!-- Chevron icon -->
-                      <ChevronDown class="w-4 h-4 text-[#F59E0B] transition-transform duration-300" :class="activeTimelinePhase === 5 ? 'rotate-180' : ''" stroke-width="3.5" />
-                    </div>
-                  </div>
-                  
-                  <div 
-                    class="overflow-hidden transition-all duration-300 ease-in-out"
-                    :class="activeTimelinePhase === 5 ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'"
-                  >
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-xl p-4 md:p-5">
-                      <table class="w-full font-mono text-xs md:text-sm text-white">
-                        <tbody>
-                          <tr class="align-top">
-                            <td class="w-[95px] font-black text-[#F59E0B] py-1">November:</td>
-                            <td class="py-1 text-white/90"><span class="font-bold text-[#F59E0B]">3 HARI PUNCAK I-FEST 2026</span> (Expo Inovasi, Seminar Internasional, Awarding Night, Grand Closing Concert).</td>
-                          </tr>
-                          <tr class="align-top border-t border-slate-700/50">
-                            <td class="font-black text-[#F59E0B] py-2">Desember:</td>
-                            <td class="py-2 text-white/90">Perilisan Official Aftermovie &amp; Penyerahan Impact Report kepada mitra untuk transparansi ROI.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -3036,6 +2991,60 @@ onBeforeUnmount(() => {
 
 
 
+    <!-- SECTION I: FAQ ACCORDION -->
+    <section id="faq" class="bg-off-white riso-canvas py-12 md:py-16 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden animate-fade-in" data-reveal>
+      <div class="absolute inset-0 bg-[radial-gradient(#04000D_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.02] pointer-events-none z-0"></div>
+      <div class="absolute inset-0 bg-noise-grain opacity-[0.015] pointer-events-none z-0"></div>
+
+      <div class="max-w-container-max mx-auto relative z-10">
+        
+        <!-- Section Header -->
+        <div class="mb-10 text-center md:text-left border-b-2 border-[#04000D] pb-6">
+          <div class="flex items-center justify-center md:justify-start gap-3 mb-3">
+            <span class="w-12 h-1 bg-[#EF4444] inline-block"></span>
+            <span class="font-mono text-sm uppercase tracking-widest font-black text-[#EF4444]">BANTUAN &amp; FAQ</span>
+          </div>
+          <h2 class="font-black text-3xl sm:text-4xl md:text-5xl leading-none text-[#04000D] tracking-tight uppercase">
+            Pertanyaan <span class="text-[#EF4444] italic font-serif lowercase capitalize">Sering</span> Diajukan
+          </h2>
+        </div>
+
+        <!-- FAQ List (Accordion) -->
+        <div class="max-w-3xl mx-auto space-y-4">
+          <div 
+            v-for="(faq, index) in faqsComputed" 
+            :key="index"
+            class="bg-white border-3 border-[#04000D] transition-all duration-200"
+            :style="{ boxShadow: activeFaqIndex === index ? '4px 4px 0px 0px #EF4444' : '4px 4px 0px 0px #04000D' }"
+          >
+            <!-- Question Clickable Header -->
+            <button 
+              @click="activeFaqIndex = activeFaqIndex === index ? -1 : index"
+              class="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-[#04000D] hover:bg-slate-50 transition-colors"
+            >
+              <span>{{ faq.question }}</span>
+              <ChevronDown 
+                class="w-5 h-5 text-[#04000D] flex-shrink-0 transition-transform duration-300"
+                :class="activeFaqIndex === index ? 'rotate-180 text-[#EF4444]' : ''" 
+                stroke-width="3"
+              />
+            </button>
+            
+            <!-- Answer Panel -->
+            <div 
+              class="overflow-hidden transition-all duration-300 ease-in-out border-t border-[#04000D]/10"
+              :class="activeFaqIndex === index ? 'max-h-96 opacity-100 p-5 bg-[#FAF9F5]' : 'max-h-0 opacity-0 pointer-events-none'"
+            >
+              <p class="text-xs sm:text-sm text-[#04000D]/85 leading-relaxed whitespace-pre-line font-medium font-mono">
+                {{ faq.answer }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- SECTION J: "OUR NETWORK" / SPONSOR HIERARCHY (Placed right above the Footer) -->
     <section id="partners" class="bg-white riso-canvas py-12 sm:py-16 px-4 sm:px-6 md:px-lg border-t border-dashed border-[#04000D]/20 relative overflow-hidden" data-reveal>
       <!-- Background Decorative Stamp Shards -->
@@ -3155,7 +3164,7 @@ onBeforeUnmount(() => {
         <div class="mb-8 overflow-x-auto pb-4 scrollbar-thin select-none">
           <div class="flex gap-2 min-w-max border-b border-[#04000D]/20 pb-3">
             <button
-              v-for="scheme in partnershipSchemes"
+              v-for="scheme in partnershipSchemesComputed"
               :key="scheme.id"
               @click="activeSchemeTab = scheme.id"
               class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 border-2 border-[#04000D] transition-all duration-150 rounded-none relative"
@@ -3167,7 +3176,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Active Tab Content Panel -->
-        <div v-for="scheme in partnershipSchemes" :key="scheme.id" class="mb-16">
+        <div v-for="scheme in partnershipSchemesComputed" :key="scheme.id" class="mb-16">
           <div v-if="activeSchemeTab === scheme.id" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-fade-in">
             
             <!-- Left Column: Scheme Details Card (Brutalist style) -->
@@ -3304,19 +3313,19 @@ onBeforeUnmount(() => {
           <div class="p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 md:gap-16">
             <div class="flex-1">
               <p class="font-mono text-xs uppercase tracking-widest font-bold text-[#D86BFF]">✦ MAIN STRATEGIC PARTNER ✦</p>
-              <h3 class="font-bold text-xl sm:text-2xl md:text-3xl text-[#04000D] mt-2 mb-4">{{ mainStrategicPartner.name }}</h3>
+              <h3 class="font-bold text-xl sm:text-2xl md:text-3xl text-[#04000D] mt-2 mb-4">{{ mainStrategicPartnerComputed.name }}</h3>
               <p class="font-body-md text-base md:text-lg text-[#04000D]/80 leading-relaxed max-w-xl">
                 Official partner mengawal eskalasi lobi pendanaan Tier-1 dan kurikulum 25 Titik Roadshow Inklusif.
               </p>
             </div>
             <div class="w-full md:w-1/2 flex justify-center items-center opacity-70 hover:opacity-100 transition-opacity duration-200">
               <a 
-                :href="mainStrategicPartner.instagram" 
+                :href="mainStrategicPartnerComputed.instagram" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 class="cursor-pointer flex justify-center items-center"
               >
-                <img :alt="mainStrategicPartner.name" loading="lazy" class="w-full max-w-[360px] h-auto object-contain mix-blend-multiply filter contrast-125" :src="mainStrategicPartner.src" />
+                <img :alt="mainStrategicPartnerComputed.name" loading="lazy" class="w-full max-w-[360px] h-auto object-contain mix-blend-multiply filter contrast-125" :src="mainStrategicPartnerComputed.src" />
               </a>
             </div>
           </div>
@@ -3329,7 +3338,7 @@ onBeforeUnmount(() => {
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               <div
-                v-for="partner in strategicPartners"
+                v-for="partner in strategicPartnersComputed"
                 :key="partner.name"
                 class="border border-[#04000D]/10 bg-off-white/40 p-5 md:p-6 rounded-lg flex flex-col items-center text-center gap-4 opacity-75 hover:opacity-100 transition-opacity duration-200"
               >
@@ -3368,7 +3377,7 @@ onBeforeUnmount(() => {
             <p class="font-mono text-[#04000D] text-xs uppercase tracking-widest font-bold mb-8">✦ OFFICIAL MEDIA PARTNERS ✦</p>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-8 items-stretch">
               <a
-                v-for="partner in mediaPartners"
+                v-for="partner in mediaPartnersComputed"
                 :key="partner.name"
                 :href="partner.instagram || '#'"
                 :target="partner.instagram ? '_blank' : '_self'"
