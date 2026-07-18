@@ -26,10 +26,39 @@ function handleDaftar() {
   }
 }
 
-const activeKodes = ref([])
-const visibleCompetitions = computed(() =>
-  competitionsData.filter(c => activeKodes.value.includes(c.id))
-)
+function mapLomba(l) {
+  return {
+    id: l.kode,
+    title: l.title,
+    scale: l.scale,
+    tagline: l.tagline,
+    fee: l.fee,
+    feeGelombang1: l.fee_gelombang_1,
+    feeGelombang2: l.fee_gelombang_2,
+    target: l.target,
+    teamRequirements: l.team_requirements,
+    languages: l.languages,
+    babak: l.babak,
+    description: l.description,
+    longDescription: l.long_description,
+    subThemes: l.sub_themes || [],
+    rules: l.rules || [],
+    schedule: l.schedule,
+    registrationLink: l.registration_link,
+    guidebookLink: l.guidebook_link,
+    contactPerson: l.contact_person,
+    cardBg: l.card_bg,
+    accentColor: l.accent_color,
+    textColor: l.text_color,
+  }
+}
+
+const allLombas = ref([])
+const useFallback = ref(false)
+const visibleCompetitions = computed(() => {
+  if (useFallback.value) return competitionsData
+  return allLombas.value.map(mapLomba)
+})
 const activeCompetition = ref(null)
 const isScrolled = ref(false)
 
@@ -66,18 +95,16 @@ onMounted(async () => {
   window.scrollTo(0, 0)
   window.addEventListener('scroll', handleScroll)
 
-  // Initialize countdown immediately (non-blocking)
   calculateTimeLeft()
   countdownInterval = setInterval(calculateTimeLeft, 1000)
 
-  // Fetch active lomba codes from API
   try {
     const res = await api.get('/lombas')
-    activeKodes.value = res.data.data.map(l => l.kode)
+    allLombas.value = res.data.data
   } catch {
-    activeKodes.value = competitionsData.map(c => c.id)
+    useFallback.value = true
   }
-  
+
   const compId = route.query.id
   if (compId) {
     const found = visibleCompetitions.value.find(c => c.id === compId)

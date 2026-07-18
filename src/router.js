@@ -140,6 +140,21 @@ const routes = [
         name: 'AdminLombas',
         component: () => import('./pages/dashboard/admin/AdminLombas.vue'),
       },
+      {
+        path: 'partners',
+        name: 'AdminPartners',
+        component: () => import('./pages/dashboard/admin/AdminPartners.vue'),
+      },
+      {
+        path: 'timeline',
+        name: 'AdminTimeline',
+        component: () => import('./pages/dashboard/admin/AdminTimeline.vue'),
+      },
+      {
+        path: 'faqs',
+        name: 'AdminFaqs',
+        component: () => import('./pages/dashboard/admin/AdminFaqs.vue'),
+      },
     ],
   },
   {

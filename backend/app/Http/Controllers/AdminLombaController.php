@@ -46,14 +46,32 @@ class AdminLombaController extends Controller
     public function update(Request $request, Lomba $lomba): JsonResponse
     {
         $validator = Validator::make($request->all(), [
+            'title' => 'sometimes|string|max:255',
+            'scale' => 'sometimes|string|max:100',
+            'tagline' => 'sometimes|string|max:255',
+            'fee' => 'sometimes|string|max:100',
+            'target' => 'sometimes|string|max:255',
+            'team_requirements' => 'sometimes|string|max:100',
+            'languages' => 'sometimes|string|max:255',
+            'babak' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string|max:500',
+            'long_description' => 'sometimes|string',
+            'rules' => 'nullable|array',
+            'rules.*' => 'string|max:1000',
+            'schedule' => 'sometimes|string|max:255',
+            'sub_themes' => 'nullable|array',
+            'sub_themes.*' => 'string|max:500',
+            'registration_link' => 'nullable|string|max:500',
+            'guidebook_link' => 'nullable|string|max:500',
+            'contact_person' => 'nullable|string|max:200',
+            'card_bg' => 'sometimes|string|max:20',
+            'accent_color' => 'sometimes|string|max:20',
+            'text_color' => 'sometimes|string|max:20',
             'gelombang_1_start' => 'nullable|date',
             'gelombang_1_end' => 'nullable|date',
             'gelombang_2_end' => 'nullable|date',
             'fee_gelombang_1' => 'nullable|string|max:100',
             'fee_gelombang_2' => 'nullable|string|max:100',
-            'registration_link' => 'nullable|string|max:500',
-            'guidebook_link' => 'nullable|string|max:500',
-            'contact_person' => 'nullable|string|max:200',
         ]);
 
         if ($validator->fails()) {
@@ -61,9 +79,14 @@ class AdminLombaController extends Controller
         }
 
         $lomba->update($request->only([
+            'title', 'scale', 'tagline', 'fee', 'target',
+            'team_requirements', 'languages', 'babak',
+            'description', 'long_description', 'rules',
+            'schedule', 'sub_themes',
+            'registration_link', 'guidebook_link', 'contact_person',
+            'card_bg', 'accent_color', 'text_color',
             'gelombang_1_start', 'gelombang_1_end', 'gelombang_2_end',
             'fee_gelombang_1', 'fee_gelombang_2',
-            'registration_link', 'guidebook_link', 'contact_person',
         ]));
 
         return response()->json([

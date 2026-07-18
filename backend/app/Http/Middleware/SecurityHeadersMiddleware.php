@@ -28,16 +28,22 @@ class SecurityHeadersMiddleware
 
         foreach ($response->headers->getCookies() as $cookie) {
             if ($cookie->getName() === config('session.cookie', 'laravel_session')) {
+                $sameSite = config('session.same_site') === 'none'
+                    ? Cookie::SAMESITE_NONE
+                    : Cookie::SAMESITE_LAX;
+                $isSecure = $sameSite === Cookie::SAMESITE_NONE
+                    && ($request->isSecure() || app()->environment('production'));
+
                 $response->headers->setCookie(new Cookie(
                     $cookie->getName(),
                     $cookie->getValue(),
                     $cookie->getExpiresTime(),
                     $cookie->getPath(),
                     $cookie->getDomain(),
-                    true,
+                    $isSecure,
                     $cookie->isHttpOnly(),
                     $cookie->isRaw(),
-                    Cookie::SAMESITE_NONE,
+                    $sameSite,
                 ));
             }
         }
