@@ -42,6 +42,8 @@ const inviteSuccess = ref('')
 
 const actionLoading = ref(null)
 const unlockRequesting = ref(false)
+const submittingFigma = ref(false)
+const submitFigmaError = ref('')
 
 const paymentLink = ref('')
 const uploadingPayment = ref(false)
@@ -260,6 +262,39 @@ async function handleSubmitKarya() {
     submitError.value = e.response?.data?.message || 'Gagal mengumpulkan karya'
   } finally {
     submittingSubmit.value = false
+  }
+}
+
+// Khusus NAT-02: kirim/update link Figma saja, terpisah dari proposal
+async function handleSubmitFigma() {
+  const reg = getRegistration(selectedLombaForDetail.value?.id)
+  if (!reg || !submitForm.value.link_figma) return
+  submitFigmaError.value = ''
+  submittingFigma.value = true
+  try {
+    const existing = reg.submission
+    const res = await api.post(`/pendaftarans/${reg.id}/submit`, {
+      // Kirim ulang seluruh data + tambahkan link_figma yang baru
+      link_drive: submitForm.value.link_drive || existing?.link_drive || '',
+      link_figma: submitForm.value.link_figma,
+      originality_statement: submitForm.value.originality_statement || existing?.originality_statement || '',
+      catatan: submitForm.value.catatan || existing?.catatan || null,
+    })
+    if (res.data.data) {
+      const idx = pendaftarans.value.findIndex(p => p.id === reg.id)
+      if (idx !== -1) {
+        pendaftarans.value[idx] = { ...pendaftarans.value[idx], submission: res.data.data }
+      }
+    }
+    if (selectedLombaForDetail.value) {
+      const updated = lombaList.value.find(l => l.id === selectedLombaForDetail.value.id)
+      if (updated) openDetail(updated, true)
+    }
+    await fetchData()
+  } catch (e) {
+    submitFigmaError.value = e.response?.data?.message || 'Gagal memperbarui link Figma'
+  } finally {
+    submittingFigma.value = false
   }
 }
 
@@ -760,7 +795,15 @@ onUnmounted(() => {
             <!-- Submit/Re-submit Form -->
             <template v-if="selectedLombaForDetail?.is_submission_open !== false">
               <div class="space-y-5">
-                <h4 class="font-extrabold text-sm text-on-surface">
+
+                <!-- NAT-02: Label Tahap -->
+                <div v-if="selectedLombaForDetail?.kode === 'NAT-02'" class="flex items-center gap-2">
+                  <span class="inline-flex items-center gap-1.5 bg-[#04000D] text-[#DCEEB1] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    Tahap 1
+                  </span>
+                  <h4 class="font-extrabold text-sm text-on-surface">Kumpulkan Proposal</h4>
+                </div>
+                <h4 v-else class="font-extrabold text-sm text-on-surface">
                   {{ getRegistration(selectedLombaForDetail?.id)?.submission ? 'Perbarui Karya Kamu' : 'Kumpulkan Karya Baru' }}
                 </h4>
                 
@@ -772,17 +815,7 @@ onUnmounted(() => {
                     <FileText class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
                     <input v-model="submitForm.link_drive" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
                   </div>
-                  <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan status akses link Google Drive Anda telah disetel menjadi **Public (Siapa saja yang memiliki link dapat melihat)** agar juri dapat menilai karya Anda.</p>
-                </div>
-
-                <!-- Link Figma (UI/UX only) -->
-                <div v-if="selectedLombaForDetail?.kode === 'NAT-02'">
-                  <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Figma <span class="text-accent-magenta">*</span></label>
-                  <div class="relative">
-                    <PenTool class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
-                    <input v-model="submitForm.link_figma" placeholder="https://www.figma.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
-                  </div>
-                  <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan akses Figma diatur ke <strong>"Anyone with the link"</strong> agar juri dapat melihat prototipe Anda.</p>
+                  <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan status akses link Google Drive Anda telah disetel menjadi <strong>Public (Siapa saja yang memiliki link dapat melihat)</strong> agar juri dapat menilai karya Anda.</p>
                 </div>
 
                 <!-- Surat Pernyataan Orisinalitas -->
@@ -800,12 +833,41 @@ onUnmounted(() => {
 
                 <div>
                   <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Catatan untuk Juri <span class="text-on-surface-variant/50">(opsional)</span></label>
-                  <textarea v-model="submitForm.catatan" rows="4" placeholder="Tuliskan catatan tambahan mengenai berkas/karya Anda di sini jika ada..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all resize-none"></textarea>
+                  <textarea v-model="submitForm.catatan" rows="3" placeholder="Tuliskan catatan tambahan mengenai berkas/karya Anda di sini jika ada..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 px-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all resize-none"></textarea>
                 </div>
 
                 <button @click="handleSubmitKarya" :disabled="submittingSubmit || !submitForm.link_drive || !submitForm.originality_statement" class="w-full bg-[#04000D] text-white hover:bg-black py-3 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm mt-2 flex items-center justify-center gap-1.5">
-                  <Send class="w-3.5 h-3.5" /> {{ submittingSubmit ? 'Mengirim...' : 'Kirim Karya' }}
+                  <Send class="w-3.5 h-3.5" /> {{ submittingSubmit ? 'Mengirim...' : (selectedLombaForDetail?.kode === 'NAT-02' ? 'Kirim Proposal' : 'Kirim Karya') }}
                 </button>
+
+                <!-- NAT-02 ONLY: Tahap 2 — Link Figma Prototype -->
+                <template v-if="selectedLombaForDetail?.kode === 'NAT-02'">
+                  <div class="border-t border-slate-200/60 pt-5 space-y-4">
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center gap-1.5 bg-sky-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                        Tahap 2
+                      </span>
+                      <h4 class="font-extrabold text-sm text-on-surface">Kumpulkan Link Figma Prototype</h4>
+                    </div>
+                    <p class="text-xs text-on-surface-variant/70 leading-relaxed">Link Figma dapat dikumpulkan secara terpisah setelah proposal dikirim. Deadline pengumpulan Figma bisa berbeda — cek jadwal di tab <strong>Timeline</strong>.</p>
+
+                    <div v-if="submitFigmaError" class="bg-[#FF3D8B]/5 border border-accent-magenta/20 rounded-xl px-4 py-3 text-xs font-semibold text-accent-magenta">{{ submitFigmaError }}</div>
+
+                    <div>
+                      <label class="block text-xs font-semibold text-on-surface-variant/80 mb-1.5">Link Figma Prototype <span class="text-on-surface-variant/50">(bisa diperbarui kapanpun)</span></label>
+                      <div class="relative">
+                        <PenTool class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40" />
+                        <input v-model="submitForm.link_figma" placeholder="https://www.figma.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-[#04000D]/40 rounded-xl py-2.5 pl-11 pr-4 text-xs font-semibold text-on-surface placeholder:text-on-surface-variant/30 focus:bg-white focus:outline-none transition-all" />
+                      </div>
+                      <p class="text-[10px] text-on-surface-variant/50 mt-1.5 leading-normal">Pastikan akses Figma diatur ke <strong>"Anyone with the link"</strong> agar juri dapat melihat prototipe Anda.</p>
+                    </div>
+
+                    <button @click="handleSubmitFigma" :disabled="submittingFigma || !submitForm.link_figma" class="w-full bg-sky-600 text-white hover:bg-sky-700 py-3 rounded-xl font-bold transition-all disabled:opacity-40 shadow-sm flex items-center justify-center gap-1.5">
+                      <PenTool class="w-3.5 h-3.5" /> {{ submittingFigma ? 'Mengirim...' : 'Kirim Link Figma' }}
+                    </button>
+                  </div>
+                </template>
+
               </div>
             </template>
           </div>
@@ -820,19 +882,30 @@ onUnmounted(() => {
               <p>
                 <strong>2. Surat Pernyataan Orisinalitas:</strong> Download template surat pernyataan, isi dan tanda tangani, lalu unggah kembali ke Google Drive dengan akses <strong>Public</strong>. Tempelkan tautannya di kolom yang tersedia.
               </p>
-              <p v-if="selectedLombaForDetail?.kode === 'NAT-02'">
-                <strong>3. Link Figma (UI/UX):</strong> Publikasikan prototipe Figma Anda dan atur akses menjadi <strong>"Anyone with the link"</strong>. Salin tautan dan tempelkan pada kolom yang tersedia.
-              </p>
-              <p>
-                <strong>{{ selectedLombaForDetail?.kode === 'NAT-02' ? '4' : '3' }}. Tempel Tautan Karya:</strong> Salin tautan Google Drive Anda dan tempelkan pada kolom input yang tersedia di samping kiri.
-              </p>
-              <p>
-                <strong>{{ selectedLombaForDetail?.kode === 'NAT-02' ? '5' : '4' }}. Batas Waktu:</strong> Anda dapat memperbarui kiriman tautan berkas karya Anda berulang kali hingga batas waktu pengumpulan resmi ditutup.
-              </p>
+              <template v-if="selectedLombaForDetail?.kode === 'NAT-02'">
+                <p>
+                  <strong>3. Kirim Proposal (Tahap 1):</strong> Isi link Google Drive dan Surat Pernyataan, lalu klik <strong>"Kirim Proposal"</strong>. Tahap ini wajib diselesaikan terlebih dahulu.
+                </p>
+                <p>
+                  <strong>4. Link Figma Prototype (Tahap 2):</strong> Publikasikan prototipe Figma Anda, atur akses menjadi <strong>"Anyone with the link"</strong>, lalu klik <strong>"Kirim Link Figma"</strong>. Tahap ini memiliki deadline berbeda — cek jadwal di tab Timeline.
+                </p>
+                <p>
+                  <strong>5. Batas Waktu:</strong> Kedua tahap dapat diperbarui berulang kali hingga batas waktu masing-masing ditutup.
+                </p>
+              </template>
+              <template v-else>
+                <p>
+                  <strong>3. Tempel Tautan Karya:</strong> Salin tautan Google Drive Anda dan tempelkan pada kolom input yang tersedia di samping kiri.
+                </p>
+                <p>
+                  <strong>4. Batas Waktu:</strong> Anda dapat memperbarui kiriman tautan berkas karya Anda berulang kali hingga batas waktu pengumpulan resmi ditutup.
+                </p>
+              </template>
             </div>
           </div>
         </div>
       </div>
+
 
       <!-- Tab Content: Anggota Tim -->
       <div v-else-if="activeTab === 'anggota'" class="space-y-6">
