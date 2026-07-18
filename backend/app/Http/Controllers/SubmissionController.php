@@ -41,9 +41,8 @@ class SubmissionController extends Controller
             'catatan' => 'nullable|string|max:1000',
         ];
 
-        if ($pendaftaran->lomba->kode === 'NAT-02') {
-            $rules['link_figma'] = 'required|url|max:500';
-        }
+        // link_figma selalu opsional — bisa dikumpulkan terpisah di tahap berikutnya
+
 
         $validator = Validator::make($request->all(), $rules);
 
