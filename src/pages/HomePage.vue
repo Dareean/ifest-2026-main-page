@@ -1847,7 +1847,11 @@ onBeforeUnmount(() => {
                   <div class="border-t border-dashed border-[#04000D]/20 pt-4 flex flex-col gap-2 font-mono text-[11px] text-[#04000D]/80 font-medium tracking-wide">
                     <div class="flex justify-between"><span>Skala:</span><span class="font-bold">{{ comp.scale }}</span></div>
                     <div class="flex justify-between"><span>Biaya Registrasi:</span><span class="font-bold font-mono text-right">
-                      <span>Gratis</span>
+                      <span v-if="comp.fee === 'Gratis'">Gratis</span>
+                      <template v-else>
+                        <span class="block">Gel 1: {{ comp.feeGelombang1 || comp.fee }}</span>
+                        <span class="block text-[9px] text-[#04000D]/60">Gel 2: {{ comp.feeGelombang2 || comp.fee }}</span>
+                      </template>
                     </span></div>
                   </div>
                 </div>
