@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useToast } from '../../../composables/useToast'
 import { useConfirm } from '../../../composables/useConfirm'
 import api from '../../../utils/api'
@@ -20,6 +20,93 @@ function formatDateForInput(date) {
   if (!date) return ''
   return date.split('T')[0]
 }
+
+function formatIndonesianDateRange(startStr, endStr) {
+  if (!startStr || !endStr) return ''
+  const start = new Date(startStr)
+  const end = new Date(endStr)
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return ''
+
+  const monthsIndo = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ]
+
+  const startDay = start.getDate()
+  const startMonth = monthsIndo[start.getMonth()]
+  const endDay = end.getDate()
+  const endMonth = monthsIndo[end.getMonth()]
+  const endYear = end.getFullYear()
+
+  return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${endYear}`
+}
+
+function isRegistrationStage(title) {
+  if (!title) return false
+  const t = title.toLowerCase()
+  return t.includes('pendaftaran') || t.includes('daftar') || t.includes('gelombang') || t.includes('gel 1') || t.includes('gel 2') || t.includes('gel. 1') || t.includes('gel. 2')
+}
+
+function syncRegistrationDates() {
+  if (!editForm.value.stages || !editForm.value.stages.length) return
+  
+  const start1 = editForm.value.gelombang_1_start
+  const end1 = editForm.value.gelombang_1_end
+  const end2 = editForm.value.gelombang_2_end
+
+  if (!start1 || !end2) return
+
+  // Calculate start of Gelombang 2 (day after Gelombang 1 ends)
+  let start2 = ''
+  if (end1) {
+    const d = new Date(end1)
+    d.setDate(d.getDate() + 1)
+    if (!isNaN(d.getTime())) {
+      start2 = d.toISOString().split('T')[0]
+    }
+  }
+
+  let foundSpecific = false
+
+  editForm.value.stages.forEach(stage => {
+    const title = stage.title.toLowerCase()
+    if (title.includes('gelombang 1') || title.includes('gel 1') || title.includes('gel. 1')) {
+      if (start1 && end1) {
+        stage.date = formatIndonesianDateRange(start1, end1)
+        foundSpecific = true
+      }
+    } else if (title.includes('gelombang 2') || title.includes('gel 2') || title.includes('gel. 2')) {
+      if (start2 && end2) {
+        stage.date = formatIndonesianDateRange(start2, end2)
+        foundSpecific = true
+      }
+    }
+  })
+
+  if (!foundSpecific) {
+    const pendaftaranStage = editForm.value.stages.find(s => 
+      s.title.toLowerCase().includes('pendaftaran') || 
+      s.title.toLowerCase().includes('daftar')
+    ) || editForm.value.stages[0]
+
+    if (pendaftaranStage) {
+      pendaftaranStage.date = formatIndonesianDateRange(start1, end2)
+    }
+  }
+}
+
+watch(
+  () => [
+    editForm.value.gelombang_1_start,
+    editForm.value.gelombang_1_end,
+    editForm.value.gelombang_2_end,
+    editForm.value.stages
+  ],
+  () => {
+    syncRegistrationDates()
+  },
+  { deep: true }
+)
 
 function toggleExpand(lomba) {
   if (expandedId.value === lomba.id) {
@@ -50,6 +137,9 @@ function toggleExpand(lomba) {
       current_stage: lomba.current_stage !== undefined && lomba.current_stage !== null ? lomba.current_stage : 0,
       stages: stages.length > 0 ? stages : [{ title: '', date: '' }]
     }
+
+    // Sync on initial load
+    syncRegistrationDates()
   }
 }
 
@@ -325,7 +415,13 @@ onMounted(fetchLombas)
                 <div v-for="(stage, idx) in editForm.stages" :key="idx" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pb-2 border-b border-slate-100 last:border-0 last:pb-0">
                   <span class="text-[10px] font-bold text-on-surface-variant/55 min-w-[50px] select-none">Tahap {{ idx + 1 }}</span>
                   <input v-model="stage.title" placeholder="Nama Tahap (contoh: Technical Meeting)" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
-                  <input v-model="stage.date" placeholder="Tanggal/Deskripsi (contoh: 11 Agustus 2026)" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                  <input
+                    v-model="stage.date"
+                    :placeholder="isRegistrationStage(stage.title) ? 'Otomatis tersinkronisasi' : 'Tanggal/Deskripsi (contoh: 11 Agustus 2026)'"
+                    :readonly="isRegistrationStage(stage.title)"
+                    :class="isRegistrationStage(stage.title) ? 'bg-slate-100/70 text-on-surface-variant/75 cursor-not-allowed select-none' : 'bg-white'"
+                    class="flex-1 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all"
+                  />
                   <button type="button" @click="removeStage(idx)" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-all self-end sm:self-auto" :disabled="editForm.stages.length <= 1">
                     <X class="w-3.5 h-3.5" />
                   </button>
