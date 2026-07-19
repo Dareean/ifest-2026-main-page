@@ -36,6 +36,7 @@ function toggleExpand(lomba) {
       registration_link: lomba.registration_link || '',
       guidebook_link: lomba.guidebook_link || '',
       contact_person: lomba.contact_person || '',
+      schedule: lomba.schedule || '',
     }
   }
 }
@@ -270,6 +271,10 @@ onMounted(fetchLombas)
               <div class="md:col-span-2">
                 <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Guidebook</label>
                 <input v-model="editForm.guidebook_link" placeholder="https://drive.google.com/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+              </div>
+              <div class="md:col-span-3">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Jadwal & Tahapan Lomba (Gunakan pemisah '|' untuk tiap tahap)</label>
+                <textarea v-model="editForm.schedule" rows="2" placeholder="Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 11 Agustus 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all"></textarea>
               </div>
             </div>
             <div class="flex items-center gap-3 mt-5 pt-4 border-t border-slate-200/60">
