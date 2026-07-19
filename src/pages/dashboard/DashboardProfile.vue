@@ -183,14 +183,10 @@ onMounted(async () => {
   }
 })
 
-async function handleConnectGoogle() {
+function handleConnectGoogle() {
   connectLoading.value = true
-  try {
-    await auth.connectGoogle()
-  } catch (e) {
-    googleMsg.value = e.response?.data?.message || 'Gagal membuka Google'
-    connectLoading.value = false
-  }
+  const apiBase = import.meta.env.VITE_API_URL || `${window.location.origin}/api`
+  window.location.href = `${apiBase}/auth/google/connect?redirect=true`
 }
 
 async function handleDisconnectGoogle() {

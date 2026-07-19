@@ -584,10 +584,13 @@ class AuthController extends Controller
         }
     }
 
-    public function googleConnect(Request $request): JsonResponse
+    public function googleConnect(Request $request)
     {
         try {
             $user = $request->user();
+            if (!$user) {
+                return redirect($this->frontendUrl() . '/login');
+            }
 
             $payload = json_encode([
                 'user_id' => $user->id,
@@ -603,9 +606,16 @@ class AuthController extends Controller
                 ->redirect()
                 ->getTargetUrl();
 
+            if ($request->has('redirect') || !$request->wantsJson()) {
+                return redirect($url);
+            }
+
             return response()->json(['url' => $url]);
         } catch (\Exception $e) {
             Log::error('googleConnect error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            if ($request->has('redirect') || !$request->wantsJson()) {
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=error');
+            }
             return response()->json(['message' => 'Gagal menghubungkan Google. Silakan coba lagi.'], 500);
         }
     }
