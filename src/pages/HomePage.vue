@@ -987,6 +987,11 @@ onMounted(async () => {
   try {
     const res = await api.get('/lombas')
     activeKodes.value = res.data.data.map(l => l.kode)
+    const map = {}
+    res.data.data.forEach(l => {
+      map[l.kode] = l
+    })
+    apiLombaMap.value = map
   } catch {
     activeKodes.value = competitionsData.map(c => c.id)
   }
@@ -1156,8 +1161,26 @@ const dynamicPartners = ref([])
 const dynamicTimeline = ref([])
 const dynamicFaqs = ref([])
 const activeFaqIndex = ref(-1)
+const apiLombaMap = ref({})
+
+const dynamicCompetitions = computed(() => {
+  return competitionsData.map(c => {
+    const apiData = apiLombaMap.value[c.id]
+    if (!apiData) return c
+    return {
+      ...c,
+      feeGelombang1: apiData.fee_gelombang_1 || c.feeGelombang1,
+      feeGelombang2: apiData.fee_gelombang_2 || c.feeGelombang2,
+      fee: apiData.fee || c.fee,
+      gelombang_1_start: apiData.gelombang_1_start,
+      gelombang_1_end: apiData.gelombang_1_end,
+      gelombang_2_end: apiData.gelombang_2_end,
+    }
+  })
+})
 
 async function fetchCmsData() {
+
   try {
     const resPartners = await api.get('/partners')
     dynamicPartners.value = resPartners.data.data
@@ -1716,7 +1739,7 @@ onBeforeUnmount(() => {
 
           <div id="kompetisi-grid-tier1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div 
-              v-for="(comp, index) in competitionsData.slice(0, 3)" 
+              v-for="(comp, index) in dynamicCompetitions.slice(0, 3)" 
               :key="comp.id"
               class="border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200"
               :class="!countdown.expired ? 'hover:scale-[1.01]' : 'hover:-rotate-1'"
@@ -1781,7 +1804,7 @@ onBeforeUnmount(() => {
 
           <div id="kompetisi-grid-tier2" class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div 
-              v-for="(comp, index) in competitionsData.slice(3, 5)" 
+              v-for="(comp, index) in dynamicCompetitions.slice(3, 5)" 
               :key="comp.id"
               class="bg-white border-2 md:border-3 border-[#04000D] p-5 sm:p-6 flex flex-col justify-between min-h-[240px] relative transition-transform duration-200"
               :class="!countdown.expired ? 'hover:scale-[1.01]' : 'hover:rotate-1'"
