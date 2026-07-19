@@ -468,7 +468,8 @@ class AuthController extends Controller
 
             if ($connectUserId) {
                 // === CONNECT MODE: Link Google to existing account ===
-                $existing = User::where('google_id', $googleUser->getId())
+                $existing = User::withTrashed()
+                    ->where('google_id', $googleUser->getId())
                     ->where('id', '!=', $connectUserId)
                     ->first();
                 if ($existing) {
@@ -504,9 +505,14 @@ class AuthController extends Controller
             }
 
             // === LOGIN MODE: Normal Google login ===
-            $user = User::where('google_id', $googleUser->getId())
+            $user = User::withTrashed()
+                ->where('google_id', $googleUser->getId())
                 ->orWhere('email', $googleUser->getEmail())
                 ->first();
+
+            if ($user && $user->trashed()) {
+                return redirect($this->frontendUrl() . '/login?error=account_deleted');
+            }
 
             $isNewUser = !$user;
 
@@ -534,6 +540,11 @@ class AuthController extends Controller
                     'google_refresh_token' => $googleUser->refreshToken ?? $user->google_refresh_token,
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
+            }
+
+            if ($user->two_factor_secret) {
+                $request->session()->put('2fa:email', $user->email);
+                return redirect($this->frontendUrl() . '/login?needs_2fa=true');
             }
 
             Auth::login($user);

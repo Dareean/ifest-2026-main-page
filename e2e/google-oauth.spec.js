@@ -159,4 +159,20 @@ test.describe('Google OAuth - UI', () => {
     await expect(page.locator('.animate-spin')).toBeVisible()
     await page.waitForURL(/\/login/, { timeout: 5000 })
   })
+
+  test('Login page shows error message when redirected with error=google_failed', async ({ page }) => {
+    await page.goto('/login?error=google_failed')
+    await expect(page.getByText('Gagal login menggunakan Google. Silakan coba lagi.')).toBeVisible()
+  })
+
+  test('Login page shows error message when redirected with error=account_deleted', async ({ page }) => {
+    await page.goto('/login?error=account_deleted')
+    await expect(page.getByText('Akun Anda telah dinonaktifkan atau dihapus. Silakan hubungi admin.')).toBeVisible()
+  })
+
+  test('Login page shows 2FA code input when needs_2fa=true is present', async ({ page }) => {
+    await page.goto('/login?needs_2fa=true')
+    await expect(page.getByText('Verifikasi 2FA')).toBeVisible()
+    await expect(page.getByLabel('Kode 2FA')).toBeVisible()
+  })
 })

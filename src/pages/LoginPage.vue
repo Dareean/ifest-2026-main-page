@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Shield, ShieldOff } from 'lucide-vue-next'
@@ -17,6 +17,16 @@ const error = ref('')
 const isSubmitting = ref(false)
 const needs2fa = ref(false)
 const twoFactorCode = ref('')
+
+onMounted(() => {
+  if (route.query.error === 'google_failed') {
+    error.value = 'Gagal login menggunakan Google. Silakan coba lagi.'
+  } else if (route.query.error === 'account_deleted') {
+    error.value = 'Akun Anda telah dinonaktifkan atau dihapus. Silakan hubungi admin.'
+  } else if (route.query.needs_2fa === 'true') {
+    needs2fa.value = true
+  }
+})
 
 async function handleLogin() {
   error.value = ''
