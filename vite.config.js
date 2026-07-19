@@ -14,6 +14,23 @@ export default defineConfig({
       brotliSize: true
     })] : []),
   ],
+  server: {
+    proxy: {
+      // Proxy /sanctum and /api to the Laravel backend.
+      // This makes XSRF-TOKEN cookies same-origin (localhost:5173),
+      // so Axios withXSRFToken:true can read them via document.cookie.
+      '/sanctum': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   build: {
     rollupOptions: {
       output: {

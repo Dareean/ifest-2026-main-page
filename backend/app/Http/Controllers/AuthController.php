@@ -466,10 +466,17 @@ class AuthController extends Controller
                 }
             }
 
+            $googleId = $googleUser->getId();
+            $googleEmail = $googleUser->getEmail();
+
+            if (empty($googleId)) {
+                return redirect($this->frontendUrl() . '/dashboard/profile?google=error');
+            }
+
             if ($connectUserId) {
                 // === CONNECT MODE: Link Google to existing account ===
                 $existing = User::withTrashed()
-                    ->where('google_id', $googleUser->getId())
+                    ->where('google_id', $googleId)
                     ->where('id', '!=', $connectUserId)
                     ->first();
                 if ($existing) {
@@ -483,7 +490,7 @@ class AuthController extends Controller
 
                 $user->update([
                     'name' => $googleUser->getName(),
-                    'google_id' => $googleUser->getId(),
+                    'google_id' => $googleId,
                     'avatar' => $googleUser->getAvatar(),
                     'google_token' => $googleUser->token,
                     'google_refresh_token' => $googleUser->refreshToken,
@@ -493,7 +500,7 @@ class AuthController extends Controller
                 Notification::create([
                     'user_id' => $user->id,
                     'judul' => 'Akun Google Terhubung',
-                    'pesan' => "Akun Google {$googleUser->getEmail()} berhasil dihubungkan ke akun I-FEST 2026 kamu. Kamu sekarang bisa login menggunakan Google kapan saja.",
+                    'pesan' => "Akun Google {$googleEmail} berhasil dihubungkan ke akun I-FEST 2026 kamu. Kamu sekarang bisa login menggunakan Google kapan saja.",
                 ]);
 
                 Auth::login($user);
@@ -505,9 +512,23 @@ class AuthController extends Controller
             }
 
             // === LOGIN MODE: Normal Google login ===
+            if (empty($googleId) && empty($googleEmail)) {
+                return redirect($this->frontendUrl() . '/login?error=google_failed');
+            }
+
             $user = User::withTrashed()
-                ->where('google_id', $googleUser->getId())
-                ->orWhere('email', $googleUser->getEmail())
+                ->where(function ($query) use ($googleId, $googleEmail) {
+                    if (!empty($googleId)) {
+                        $query->where('google_id', $googleId);
+                    }
+                    if (!empty($googleEmail)) {
+                        if (!empty($googleId)) {
+                            $query->orWhere('email', $googleEmail);
+                        } else {
+                            $query->where('email', $googleEmail);
+                        }
+                    }
+                })
                 ->first();
 
             if ($user && $user->trashed()) {
@@ -519,8 +540,8 @@ class AuthController extends Controller
             if ($isNewUser) {
                 $user = User::create([
                     'name'                 => $googleUser->getName(),
-                    'email'                => $googleUser->getEmail(),
-                    'google_id'            => $googleUser->getId(),
+                    'email'                => $googleEmail,
+                    'google_id'            => $googleId,
                     'avatar'               => $googleUser->getAvatar(),
                     'password'             => Hash::make(str()->random(32)),
                     'google_token'         => $googleUser->token,
@@ -534,7 +555,7 @@ class AuthController extends Controller
                 ]);
             } else {
                 $user->update([
-                    'google_id' => $googleUser->getId(),
+                    'google_id' => $googleId,
                     'avatar' => $googleUser->getAvatar(),
                     'google_token' => $googleUser->token,
                     'google_refresh_token' => $googleUser->refreshToken ?? $user->google_refresh_token,

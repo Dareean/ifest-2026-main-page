@@ -2054,7 +2054,7 @@ onBeforeUnmount(() => {
 
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === index ? -1 : index"
-                    class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
+                    class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none gap-2"
                   >
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE {{ event.phase }}: {{ event.title }}</h4>
                     <div class="flex items-center gap-3">
@@ -2131,7 +2131,7 @@ onBeforeUnmount(() => {
 
                   <div 
                     @click="activeTimelinePhase = activeTimelinePhase === index ? -1 : index"
-                    class="flex items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none"
+                    class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-purple-100 pb-3 cursor-pointer select-none gap-2"
                   >
                     <h4 class="font-black text-lg md:text-xl text-[#04000D] tracking-tight uppercase">PHASE {{ event.phase }}: {{ event.title }}</h4>
                     <div class="flex items-center gap-3">
@@ -2828,7 +2828,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- Division Selection Cards (Polished Neo-Brutalist Grid) -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8 select-none">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-8 select-none">
             <button
               v-for="(div, key) in panitiaData"
               :key="key"

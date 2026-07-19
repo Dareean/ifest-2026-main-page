@@ -32,9 +32,9 @@ export async function getCsrfCookie() {
   const res = await ctx.get(`${APP_BASE}/sanctum/csrf-cookie`, {
     headers: { 'Origin': 'http://localhost:5173' },
   })
-  if (!csrfToken) {
-    csrfToken = extractXsrfToken(res.headers()['set-cookie'])
-  }
+  // Always refresh — after a login the session regenerates and the old XSRF token becomes stale
+  const fresh = extractXsrfToken(res.headers()['set-cookie'])
+  if (fresh) csrfToken = fresh
 }
 
 export async function registerUserViaApi(userData) {
@@ -55,6 +55,14 @@ export async function verifyUserViaApi(email) {
   const body = await res.json()
   if (!res.ok()) throw new Error(`Verify failed: ${JSON.stringify(body)}`)
   return body
+}
+
+export async function getTokenForUser(email) {
+  const ctx = await getRequest()
+  const res = await ctx.post(`${API_BASE}/e2e/token`, { data: { email } })
+  const body = await res.json()
+  if (!res.ok()) throw new Error(`Get token failed: ${JSON.stringify(body)}`)
+  return body.token
 }
 
 export async function loginViaApi(email, password) {

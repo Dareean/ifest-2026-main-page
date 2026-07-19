@@ -34,6 +34,31 @@ Route::post('/e2e/verify-user', function (Request $request) {
     ]);
 })->middleware($throttle);
 
+Route::post('/e2e/token', function (Request $request) {
+    Log::warning('E2E route called: token', ['email' => $request->email, 'ip' => $request->ip()]);
+
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $user = \App\Models\User::where('email', $request->email)->first();
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    // Revoke existing E2E tokens to avoid buildup
+    $user->tokens()->where('name', 'e2e-test')->delete();
+
+    $token = $user->createToken('e2e-test')->plainTextToken;
+
+    return response()->json(['token' => $token]);
+})->middleware($throttle);
+
+
 Route::post('/e2e/reset-token', function (Request $request) {
     Log::warning('E2E route called: reset-token', ['email' => $request->email, 'ip' => $request->ip()]);
 

@@ -1,9 +1,15 @@
 import axios from 'axios'
 
-const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:8000'
+// In dev (no explicit VITE_API_URL / VITE_APP_URL), use relative paths so
+// ALL requests (CSRF + API calls) go through the Vite dev proxy.
+// This keeps the XSRF-TOKEN and laravel_session cookies on the SAME origin
+// (localhost:5173) so Axios can read and send them correctly.
+// In production VITE_API_URL points to the real backend API base URL.
+const API_BASE = import.meta.env.VITE_API_URL
+  || (import.meta.env.VITE_APP_URL ? `${import.meta.env.VITE_APP_URL}/api` : '/api')
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || `${APP_URL}/api`,
+  baseURL: API_BASE,
   timeout: 15000,
   withCredentials: true,
   withXSRFToken: true,
@@ -14,7 +20,11 @@ const api = axios.create({
 })
 
 export async function getCsrf() {
-  await api.get(`${APP_URL}/sanctum/csrf-cookie`)
+  // Use axios directly (not `api`) to avoid the /api baseURL prefix.
+  // Goes through Vite proxy in dev → same-origin cookie on localhost:5173.
+  // In production VITE_APP_URL is the backend (same origin anyway).
+  const csrfBase = import.meta.env.VITE_APP_URL || window.location.origin
+  await axios.get(`${csrfBase}/sanctum/csrf-cookie`, { withCredentials: true })
 }
 
 api.interceptors.response.use(

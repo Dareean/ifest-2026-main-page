@@ -128,8 +128,8 @@ async function handleGoogle() {
           <p class="font-mono text-xs text-on-surface-variant mb-4">Masukkan kode 6 digit dari Google Authenticator kamu.</p>
           <form @submit.prevent="handleTwoFactor" class="space-y-4">
             <div>
-              <label class="block font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Kode 2FA</label>
-              <input v-model="twoFactorCode" type="text" inputmode="numeric" maxlength="6" required placeholder="000000" class="w-full bg-[#F5F5F5] border border-[#04000D]/30 rounded-xl py-3 px-4 font-mono text-sm font-bold text-center text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-[#04000D] transition-colors tracking-[0.5em]" />
+              <label for="twofa-code" class="block font-mono text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5">Kode 2FA</label>
+              <input id="twofa-code" v-model="twoFactorCode" type="text" inputmode="numeric" maxlength="6" required placeholder="000000" class="w-full bg-[#F5F5F5] border border-[#04000D]/30 rounded-xl py-3 px-4 font-mono text-sm font-bold text-center text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-[#04000D] transition-colors tracking-[0.5em]" />
             </div>
             <button type="submit" :disabled="isSubmitting" class="riso-btn-plate w-full bg-[#04000D] text-white py-3.5 rounded-full font-mono text-xs font-black uppercase tracking-wider select-none disabled:opacity-40" style="--plate-color: #FDE047;">
               {{ isSubmitting ? 'Memverifikasi...' : 'Verifikasi' }}

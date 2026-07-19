@@ -9,3 +9,4 @@ export async function loginViaUI(page, email, password) {
 
   await page.waitForURL(/\/dashboard/, { timeout: 45000 })
 }
+
