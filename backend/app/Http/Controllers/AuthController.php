@@ -454,9 +454,10 @@ class AuthController extends Controller
             if ($state) {
                 $signed = json_decode(base64_decode($state), true);
                 if (is_array($signed) && isset($signed['state'], $signed['hmac'])) {
-                    $expectedHmac = hash_hmac('sha256', $signed['state'], config('app.key'));
+                    $payload = base64_decode($signed['state']);
+                    $expectedHmac = hash_hmac('sha256', $payload, config('app.key'));
                     if (hash_equals($expectedHmac, $signed['hmac'])) {
-                        $data = json_decode(base64_decode($signed['state']), true);
+                        $data = json_decode($payload, true);
                         if (is_array($data) && isset($data['user_id'], $data['exp'])) {
                             if (now()->timestamp <= $data['exp']) {
                                 $connectUserId = $data['user_id'];
