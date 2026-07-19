@@ -636,4 +636,43 @@ class AdminController extends Controller
 
         return response()->json($data);
     }
+
+    public function createUser(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'required|string|in:user,admin',
+            'phone' => 'nullable|string|max:30',
+            'institution' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::create([
+            'name' => strip_tags($request->name),
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => $request->role,
+            'phone' => strip_tags($request->phone ?? ''),
+            'institution' => strip_tags($request->institution ?? ''),
+            'email_verified_at' => now(),
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => $request->user()->id,
+            'action' => 'create_user',
+            'target_type' => 'user',
+            'target_id' => $user->id,
+            'metadata' => ['name' => $user->name, 'email' => $user->email, 'role' => $user->role],
+        ]);
+
+        return response()->json([
+            'message' => "Pengguna {$user->name} berhasil ditambahkan",
+            'data' => $user,
+        ], 201);
+    }
 }

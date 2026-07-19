@@ -107,6 +107,7 @@ Route::middleware(array_merge(['auth:sanctum', 'admin'], $authThrottle('120,1'))
     Route::put('/pendaftarans/{pendaftaran}/reject-payment', [AdminController::class, 'rejectPayment']);
     Route::put('/pendaftarans/{pendaftaran}/approve-unlock', [AdminController::class, 'approveUnlock']);
     Route::get('/users', [AdminController::class, 'users']);
+    Route::post('/users', [AdminController::class, 'createUser']);
     Route::get('/activity-logs', [AdminController::class, 'activityLogs']);
     Route::post('/notifications', [AdminController::class, 'broadcastNotification']);
     Route::get('/notifications', [AdminController::class, 'notifications']);
