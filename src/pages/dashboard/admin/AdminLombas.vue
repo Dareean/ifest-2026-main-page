@@ -16,6 +16,11 @@ const lombas = ref([])
 const expandedId = ref(null)
 const editForm = ref({})
 
+function formatDateForInput(date) {
+  if (!date) return ''
+  return date.split('T')[0]
+}
+
 function toggleExpand(lomba) {
   if (expandedId.value === lomba.id) {
     expandedId.value = null
@@ -23,9 +28,9 @@ function toggleExpand(lomba) {
   } else {
     expandedId.value = lomba.id
     editForm.value = {
-      gelombang_1_start: lomba.gelombang_1_start || '',
-      gelombang_1_end: lomba.gelombang_1_end || '',
-      gelombang_2_end: lomba.gelombang_2_end || '',
+      gelombang_1_start: formatDateForInput(lomba.gelombang_1_start),
+      gelombang_1_end: formatDateForInput(lomba.gelombang_1_end),
+      gelombang_2_end: formatDateForInput(lomba.gelombang_2_end),
       fee_gelombang_1: lomba.fee_gelombang_1 || '',
       fee_gelombang_2: lomba.fee_gelombang_2 || '',
       registration_link: lomba.registration_link || '',
@@ -102,10 +107,12 @@ async function handleSave(lomba) {
 
 function formatDate(date) {
   if (!date) return '-'
-  return new Date(date + 'T00:00:00').toLocaleDateString('id-ID', {
+  const cleanDate = date.split('T')[0]
+  return new Date(cleanDate + 'T00:00:00').toLocaleDateString('id-ID', {
     day: 'numeric', month: 'short', year: 'numeric'
   })
 }
+
 
 onMounted(fetchLombas)
 </script>
