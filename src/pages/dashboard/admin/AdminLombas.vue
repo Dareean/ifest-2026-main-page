@@ -5,7 +5,7 @@ import { useConfirm } from '../../../composables/useConfirm'
 import api from '../../../utils/api'
 import {
   Trophy, ToggleLeft, ToggleRight, Calendar, ExternalLink, Lock, Unlock, ChevronDown, ChevronUp, Save, X,
-  Eye, EyeOff
+  Eye, EyeOff, Plus
 } from 'lucide-vue-next'
 
 const { showToast } = useToast()
@@ -27,6 +27,16 @@ function toggleExpand(lomba) {
     editForm.value = {}
   } else {
     expandedId.value = lomba.id
+    
+    // Parse schedule string into array of stages
+    const scheduleStr = lomba.schedule || ''
+    const stages = scheduleStr.split('|').filter(item => item.trim()).map(item => {
+      const parts = item.split(':')
+      const title = parts[0]?.trim() || ''
+      const date = parts.slice(1).join(':')?.trim() || ''
+      return { title, date }
+    })
+
     editForm.value = {
       gelombang_1_start: formatDateForInput(lomba.gelombang_1_start),
       gelombang_1_end: formatDateForInput(lomba.gelombang_1_end),
@@ -38,16 +48,25 @@ function toggleExpand(lomba) {
       contact_person: lomba.contact_person || '',
       schedule: lomba.schedule || '',
       current_stage: lomba.current_stage !== undefined && lomba.current_stage !== null ? lomba.current_stage : 0,
+      stages: stages.length > 0 ? stages : [{ title: '', date: '' }]
     }
   }
 }
 
-function getStagesFromSchedule(scheduleStr) {
-  if (!scheduleStr) return []
-  return scheduleStr.split('|').map((item, index) => {
-    const title = item.trim().split(':')[0] || `Tahap ${index + 1}`
-    return { index, title }
-  })
+function addStage() {
+  if (!editForm.value.stages) {
+    editForm.value.stages = []
+  }
+  editForm.value.stages.push({ title: '', date: '' })
+}
+
+function removeStage(index) {
+  if (editForm.value.stages && editForm.value.stages.length > 1) {
+    editForm.value.stages.splice(index, 1)
+    if (editForm.value.current_stage >= editForm.value.stages.length) {
+      editForm.value.current_stage = editForm.value.stages.length - 1
+    }
+  }
 }
 
 async function fetchLombas() {
@@ -103,7 +122,18 @@ async function handleToggle(lomba) {
 async function handleSave(lomba) {
   saving.value = lomba.id
   try {
-    const res = await api.put(`/admin/lombas/${lomba.id}`, editForm.value)
+    const compiledSchedule = (editForm.value.stages || [])
+      .filter(s => s.title.trim())
+      .map(s => `${s.title.trim()}: ${s.date.trim()}`)
+      .join(' | ')
+
+    const payload = {
+      ...editForm.value,
+      schedule: compiledSchedule
+    }
+    delete payload.stages
+
+    const res = await api.put(`/admin/lombas/${lomba.id}`, payload)
     showToast(res.data.message, 'success')
     expandedId.value = null
     editForm.value = {}
@@ -276,8 +306,8 @@ onMounted(fetchLombas)
               <div>
                 <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Tahap Aktif Saat Ini</label>
                 <select v-model="editForm.current_stage" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all">
-                  <option v-for="stage in getStagesFromSchedule(editForm.schedule || lomba.schedule)" :key="stage.index" :value="stage.index">
-                    Tahap {{ stage.index + 1 }}: {{ stage.title }}
+                  <option v-for="(stage, index) in editForm.stages" :key="index" :value="index">
+                    Tahap {{ index + 1 }}: {{ stage.title || `Tahap ${index + 1}` }}
                   </option>
                 </select>
               </div>
@@ -289,9 +319,21 @@ onMounted(fetchLombas)
                 <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Guidebook</label>
                 <input v-model="editForm.guidebook_link" placeholder="https://drive.google.com/..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
               </div>
-              <div class="md:col-span-3">
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Jadwal & Tahapan Lomba (Gunakan pemisah '|' untuk tiap tahap)</label>
-                <textarea v-model="editForm.schedule" rows="2" placeholder="Pendaftaran: 9 Juli - 9 Agustus 2026 | Technical Meeting: 11 Agustus 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all"></textarea>
+              <div class="md:col-span-3 border border-slate-200/80 rounded-xl p-4 bg-slate-50/20 space-y-3 mt-2">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50">Jadwal & Tahapan Lomba</label>
+                
+                <div v-for="(stage, idx) in editForm.stages" :key="idx" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pb-2 border-b border-slate-100 last:border-0 last:pb-0">
+                  <span class="text-[10px] font-bold text-on-surface-variant/55 min-w-[50px] select-none">Tahap {{ idx + 1 }}</span>
+                  <input v-model="stage.title" placeholder="Nama Tahap (contoh: Technical Meeting)" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                  <input v-model="stage.date" placeholder="Tanggal/Deskripsi (contoh: 11 Agustus 2026)" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+                  <button type="button" @click="removeStage(idx)" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-all self-end sm:self-auto" :disabled="editForm.stages.length <= 1">
+                    <X class="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                
+                <button type="button" @click="addStage" class="flex items-center gap-1 text-[10px] font-bold text-on-surface/70 hover:text-black mt-2 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm transition-all">
+                  <Plus class="w-3 h-3" /> Tambah Tahap
+                </button>
               </div>
             </div>
             <div class="flex items-center gap-3 mt-5 pt-4 border-t border-slate-200/60">
