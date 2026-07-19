@@ -179,10 +179,17 @@ router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
 
   if (!auth.user && !to.meta?.skipAuthCheck) {
-    try {
-      await auth.fetchUser()
-    } catch {
-      // not authenticated
+    if (to.meta.requiresAuth) {
+      try {
+        await auth.fetchUser()
+      } catch {
+        // not authenticated
+      }
+    } else {
+      // For public pages (e.g. Home, Competitions, Roadshow), fetch the user profile
+      // in the background without blocking the route transition. This prevents
+      // backend API cold starts (e.g. on Render/Supabase free tiers) from hanging the initial page render.
+      auth.fetchUser().catch(() => {})
     }
   }
 
