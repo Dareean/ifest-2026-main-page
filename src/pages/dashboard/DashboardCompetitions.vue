@@ -585,8 +585,12 @@ onUnmounted(() => {
             :key="i"
             class="relative"
           >
-            <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2 border-accent-magenta flex items-center justify-center">
-              <div class="w-1.5 h-1.5 rounded-full bg-accent-magenta animate-ping" v-if="i === 0"></div>
+            <div 
+              class="absolute -left-[31px] top-1 w-4 h-4 rounded-full flex items-center justify-center border-2 transition-colors"
+              :class="i === (selectedLombaForDetail?.current_stage ?? 0) ? 'border-accent-magenta bg-white' : 'border-slate-200 bg-slate-100'"
+            >
+              <div class="w-1.5 h-1.5 rounded-full bg-accent-magenta animate-ping" v-if="i === (selectedLombaForDetail?.current_stage ?? 0)"></div>
+              <div class="w-1.5 h-1.5 rounded-full bg-slate-300" v-else></div>
             </div>
             <div>
               <span class="font-mono text-[9px] font-bold uppercase text-accent-magenta tracking-wider">Tahap {{ i + 1 }}</span>

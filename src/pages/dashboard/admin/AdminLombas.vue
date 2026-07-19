@@ -37,8 +37,17 @@ function toggleExpand(lomba) {
       guidebook_link: lomba.guidebook_link || '',
       contact_person: lomba.contact_person || '',
       schedule: lomba.schedule || '',
+      current_stage: lomba.current_stage !== undefined && lomba.current_stage !== null ? lomba.current_stage : 0,
     }
   }
+}
+
+function getStagesFromSchedule(scheduleStr) {
+  if (!scheduleStr) return []
+  return scheduleStr.split('|').map((item, index) => {
+    const title = item.trim().split(':')[0] || `Tahap ${index + 1}`
+    return { index, title }
+  })
 }
 
 async function fetchLombas() {
@@ -263,6 +272,14 @@ onMounted(fetchLombas)
               <div>
                 <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Contact Person</label>
                 <input v-model="editForm.contact_person" placeholder="Nama (+62 xxx)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Tahap Aktif Saat Ini</label>
+                <select v-model="editForm.current_stage" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#04000D]/40 transition-all">
+                  <option v-for="stage in getStagesFromSchedule(editForm.schedule || lomba.schedule)" :key="stage.index" :value="stage.index">
+                    Tahap {{ stage.index + 1 }}: {{ stage.title }}
+                  </option>
+                </select>
               </div>
               <div class="md:col-span-2">
                 <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-1">Link Registrasi</label>

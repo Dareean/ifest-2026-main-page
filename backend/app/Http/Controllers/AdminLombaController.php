@@ -55,6 +55,7 @@ class AdminLombaController extends Controller
             'guidebook_link' => 'nullable|string|max:500',
             'contact_person' => 'nullable|string|max:200',
             'schedule' => 'nullable|string|max:2000',
+            'current_stage' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -66,6 +67,7 @@ class AdminLombaController extends Controller
             'fee_gelombang_1', 'fee_gelombang_2',
             'registration_link', 'guidebook_link', 'contact_person',
             'schedule',
+            'current_stage',
         ]));
 
         return response()->json([
