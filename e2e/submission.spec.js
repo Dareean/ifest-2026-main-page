@@ -121,7 +121,7 @@ test.describe('Submission Flow — Validation Errors', () => {
     expect(submitRes.status()).toBe(422)
   })
 
-  test('API: submit UI/UX without link_figma returns 422', async () => {
+  test('API: submit UI/UX without link_figma succeeds (optional field)', async () => {
     const userCtx = await loginAs(userEmail, TEST_USER.password)
 
     const teamName = `E2E UIUX Team ${Math.random().toString(36).substring(7)}`
@@ -139,7 +139,7 @@ test.describe('Submission Flow — Validation Errors', () => {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       data: { link_drive: DRIVE_LINK, originality_statement: ORIGINALITY_LINK },
     })
-    expect(submitRes.status()).toBe(422)
+    expect(submitRes.status()).toBe(201)
   })
 })
 

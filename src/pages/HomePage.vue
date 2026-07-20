@@ -815,6 +815,14 @@ const strategicPartners = [
     logoMaxWidth: 'max-w-[180px]',
     instagram: '',
   },
+  {
+    name: 'Green Generation',
+    shortName: 'GREEN GENERATION',
+    src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Green Generation.webp'),
+    description: 'Strategic partner dalam kolaborasi aksi lingkungan hidup dan pemberdayaan pemuda menuju pembangunan berkelanjutan.',
+    logoMaxWidth: 'max-w-[180px]',
+    instagram: 'https://www.instagram.com/greengnrid/',
+  },
 ]
 
 const tickerPartners = [
@@ -842,6 +850,7 @@ const marqueeLogos = [
   { name: 'Google Student Ambasador', src: strategicPartners[1].src, isMedia: false },
   { name: 'HIMA - SI UIN', src: getAsset(mediaPartnerAssetModules, 'medpart', '(5) HIMA - SI UIN.webp'), isMedia: true },
   { name: 'PROGRAMMING TADULAKO', src: getAsset(mediaPartnerAssetModules, 'medpart', '(6) programmig_tad.webp'), isMedia: true },
+  { name: 'Green Generation', src: getAsset(strategicPartnerAssetModules, 'sponsor-strategic_partner', 'Green Generation.webp'), isMedia: false },
 ]
 
 const activeSchemeTab = ref('tungsten')
