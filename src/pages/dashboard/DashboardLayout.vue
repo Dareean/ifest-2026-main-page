@@ -79,12 +79,17 @@ onMounted(() => {
       sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
     ]">
       <!-- Logo -->
-      <div class="px-6 py-6 flex items-center justify-center border-b border-[#04000D]/5 relative">
-        <router-link to="/" class="flex items-center gap-3.5 justify-center">
-          <img src="../../assets/logo_utama/logo_untad.webp" alt="UNTAD Logo" class="h-8 object-contain" />
-          <img src="../../assets/logo_utama/HMTI LOGO.webp" alt="HMTI Logo" class="h-8 object-contain" />
-          <img src="../../assets/logo_utama/Logo-IFEST-2026.webp" alt="I-FEST Logo" class="h-8 object-contain" />
+      <div class="px-6 py-6 flex flex-col items-center justify-center gap-2.5 border-b border-[#04000D]/5 relative select-none w-full">
+        <router-link to="/" class="flex items-center gap-2.5 justify-center">
+          <img src="../../assets/logo_utama/logo_untad.webp" alt="UNTAD Logo" class="h-7 w-auto object-contain shrink-0" />
+          <div class="w-px h-5 bg-slate-200 shrink-0"></div>
+          <img src="../../assets/logo_utama/HMTI LOGO.webp" alt="HMTI Logo" class="h-7 w-auto object-contain shrink-0" />
+          <div class="w-px h-5 bg-slate-200 shrink-0"></div>
+          <img src="../../assets/logo_utama/Logo-IFEST-2026.webp" alt="I-FEST Logo" class="h-9 w-auto object-contain shrink-0" />
         </router-link>
+        <span class="font-mono text-sm font-black tracking-[0.35em] text-on-surface uppercase mt-0.5">
+          Sintuwu
+        </span>
         <button @click="sidebarOpen = false" class="md:hidden absolute right-6 text-on-surface-variant hover:text-on-surface transition-colors">
           <X class="w-5 h-5" />
         </button>

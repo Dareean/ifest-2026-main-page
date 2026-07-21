@@ -67,12 +67,17 @@ onMounted(async () => {
       'fixed md:sticky top-0 left-0 z-50 h-screen bg-white flex flex-col transition-transform duration-300 w-72 md:w-64 lg:w-72 flex-shrink-0 border-r border-[#04000D]/5 overflow-y-auto',
       sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
     ]">
-      <div class="px-6 py-6 flex items-center justify-center border-b border-[#04000D]/5 relative">
-        <router-link to="/" class="flex items-center gap-3.5 justify-center">
-          <img src="../../../assets/logo_utama/logo_untad.webp" alt="UNTAD" class="h-8 object-contain" />
-          <img src="../../../assets/logo_utama/HMTI LOGO.webp" alt="HMTI" class="h-8 object-contain" />
-          <img src="../../../assets/logo_utama/Logo-IFEST-2026.webp" alt="I-FEST" class="h-8 object-contain" />
+      <div class="px-6 py-6 flex flex-col items-center justify-center gap-2.5 border-b border-[#04000D]/5 relative select-none w-full">
+        <router-link to="/" class="flex items-center gap-2.5 justify-center">
+          <img src="../../../assets/logo_utama/logo_untad.webp" alt="UNTAD" class="h-7 w-auto object-contain shrink-0" />
+          <div class="w-px h-5 bg-slate-200 shrink-0"></div>
+          <img src="../../../assets/logo_utama/HMTI LOGO.webp" alt="HMTI" class="h-7 w-auto object-contain shrink-0" />
+          <div class="w-px h-5 bg-slate-200 shrink-0"></div>
+          <img src="../../../assets/logo_utama/Logo-IFEST-2026.webp" alt="I-FEST" class="h-9 w-auto object-contain shrink-0" />
         </router-link>
+        <span class="font-mono text-sm font-black tracking-[0.35em] text-on-surface uppercase mt-0.5">
+          Sintuwu
+        </span>
         <button @click="sidebarOpen = false" class="md:hidden absolute right-6 text-on-surface-variant">
           <X class="w-5 h-5" />
         </button>

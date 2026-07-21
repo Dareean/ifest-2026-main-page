@@ -23,9 +23,11 @@ h1, h2, h3, h4, h5, h6, button, input, select, textarea {
 
 /* Shadow reset only for Tailwind default utility preflight — not for intentional shadows */
 
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(40px);
+@media (min-width: 768px) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(40px);
+  }
 }
 
 .paper-texture {
@@ -55,23 +57,25 @@ h1, h2, h3, h4, h5, h6, button, input, select, textarea {
   overflow-x: clip;
 }
 
-.bg-off-white::before,
-.bg-background::before,
-.bg-surface-container::before,
-.riso-canvas::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.04;
-  background-image: 
-    radial-gradient(#04000D 1px, transparent 1px),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  background-size: 16px 16px, auto;
+@media (min-width: 768px) {
+  .bg-off-white::before,
+  .bg-background::before,
+  .bg-surface-container::before,
+  .riso-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.04;
+    background-image: 
+      radial-gradient(#04000D 1px, transparent 1px),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 16px 16px, auto;
+  }
 }
 
 .bg-solid-white {
@@ -85,25 +89,29 @@ h1, h2, h3, h4, h5, h6, button, input, select, textarea {
 }
 
 /* Midnight Background also gets a subtle white/magenta grain screen */
-.bg-midnight::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.025;
-  background-image: 
-    radial-gradient(#ffffff 1px, transparent 1px),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  background-size: 20px 20px, auto;
+@media (min-width: 768px) {
+  .bg-midnight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.025;
+    background-image: 
+      radial-gradient(#ffffff 1px, transparent 1px),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 20px 20px, auto;
+  }
 }
 
-/* Ink Bleed Filter Utility */
-.riso-bleed {
-  filter: url(#riso-ink-bleed);
+/* Ink Bleed Filter Utility - Disabled on mobile/tablet for performance, enabled on desktop */
+@media (min-width: 1024px) {
+  .riso-bleed {
+    filter: url(#riso-ink-bleed);
+  }
 }
 
 /* 1. TEXT MISREGISTRATION (Chromatically Shifted Plates) */

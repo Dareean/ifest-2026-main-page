@@ -17,26 +17,29 @@ onMounted(async () => {
   await nextTick()
 
   try {
-    gsap.registerPlugin(ScrollTrigger)
+    const isMobile = window.innerWidth < 768
+    if (!isMobile) {
+      gsap.registerPlugin(ScrollTrigger)
 
-    const roadshowGrid = document.querySelector('#roadshow-grid')
-    if (!roadshowGrid) return
+      const roadshowGrid = document.querySelector('#roadshow-grid')
+      if (!roadshowGrid) return
 
-    gsap.fromTo('#roadshow-grid > div',
-      { opacity: 0, y: 40 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: roadshowGrid,
-          start: 'top 85%',
-          toggleActions: 'play none none none'
+      gsap.fromTo('#roadshow-grid > div',
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: roadshowGrid,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
         }
-      }
-    )
+      )
+    }
   } catch (error) {
     console.error('Roadshow animation init failed:', error)
   }
@@ -44,6 +47,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
 })
 
 // Asset loading for decorative risk stamp shards

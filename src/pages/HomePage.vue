@@ -755,25 +755,25 @@ const heroDecorations = [
   {
     src: getAsset(visualAssetModules, 'visual_assets', 'Component 1.webp'),
     alt: 'Abstract visual asset',
-    className: 'absolute top-24 -left-12 md:-left-4 lg:left-6 w-48 md:w-80 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    className: 'hidden md:block absolute top-24 -left-12 md:-left-4 lg:left-6 w-48 md:w-80 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter transform-gpu will-change-transform',
     delay: '0s',
   },
   {
     src: getAsset(visualAssetModules, 'visual_assets', 'rb1 1.webp'),
     alt: 'Abstract visual asset',
-    className: 'absolute bottom-40 -right-12 md:right-6 w-56 md:w-96 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    className: 'hidden md:block absolute bottom-40 -right-12 md:right-6 w-56 md:w-96 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter transform-gpu will-change-transform',
     delay: '-2s',
   },
   {
     src: getAsset(visualAssetModules, 'visual_assets', 'ry1 1.webp'),
     alt: 'Abstract visual asset',
-    className: 'absolute bottom-32 -left-12 md:left-[5%] lg:left-[10%] w-40 md:w-64 opacity-70 md:opacity-80 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    className: 'hidden md:block absolute bottom-32 -left-12 md:left-[5%] lg:left-[10%] w-40 md:w-64 opacity-70 md:opacity-80 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter transform-gpu will-change-transform',
     delay: '-4s',
   },
   {
     src: getAsset(visualAssetModules, 'visual_assets', 'cat1 1.webp'),
     alt: 'Abstract visual asset',
-    className: 'absolute top-24 -right-12 md:right-[10%] lg:right-[16%] w-32 md:w-56 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter',
+    className: 'hidden md:block absolute top-24 -right-12 md:right-[10%] lg:right-[16%] w-32 md:w-56 opacity-75 md:opacity-85 mix-blend-multiply contrast-125 animate-float pointer-events-none z-0 filter transform-gpu will-change-transform',
     delay: '-1s',
   },
 ]
@@ -1012,96 +1012,103 @@ onMounted(async () => {
     document.body.style.overflow = 'hidden'
   }
 
-  // GSAP ScrollTrigger integration
-  gsap.registerPlugin(ScrollTrigger)
+  const isMobile = window.innerWidth < 768
 
-  // 1. Core Section Reveal Animations
-  const revealElements = document.querySelectorAll('[data-reveal]')
-  revealElements.forEach((el) => {
-    if (el.id === 'hero-content') {
-      // Hero content fades in smoothly on load
-      gsap.fromTo(el, 
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.15 }
-      )
-    } else {
-      // General section reveal triggers
-      gsap.fromTo(el,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none'
+  if (isMobile) {
+    // Run counters immediately on mobile viewports to prevent static 0 values
+    animateCounters()
+  } else {
+    // GSAP ScrollTrigger integration for desktop viewports
+    gsap.registerPlugin(ScrollTrigger)
+
+    // 1. Core Section Reveal Animations
+    const revealElements = document.querySelectorAll('[data-reveal]')
+    revealElements.forEach((el) => {
+      if (el.id === 'hero-content') {
+        // Hero content fades in smoothly on load
+        gsap.fromTo(el, 
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.15 }
+        )
+      } else {
+        // General section reveal triggers
+        gsap.fromTo(el,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none'
+            }
           }
-        }
-      )
-    }
-  })
-
-  // 2. Trilogy Grid Staggered Card Entry
-  gsap.fromTo('#trilogy-grid > div',
-    { opacity: 0, y: 40 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      stagger: 0.12,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '#trilogy-grid',
-        start: 'top 85%',
-        toggleActions: 'play none none none'
+        )
       }
-    }
-  )
-
-  // 3. Competition Cards (Tier 1 & Tier 2) Staggered Entry
-  gsap.fromTo('#kompetisi-grid-tier1 > div',
-    { opacity: 0, y: 40 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      stagger: 0.12,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '#kompetisi-grid-tier1',
-        start: 'top 85%',
-        toggleActions: 'play none none none'
-      }
-    }
-  )
-
-  gsap.fromTo('#kompetisi-grid-tier2 > div',
-    { opacity: 0, y: 40 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      stagger: 0.12,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '#kompetisi-grid-tier2',
-        start: 'top 85%',
-        toggleActions: 'play none none none'
-      }
-    }
-  )
-
-  // 5. Impact Dashboard Counters Trigger
-  const keyNumbersSection = document.querySelector('#impact-dashboard')
-  if (keyNumbersSection) {
-    ScrollTrigger.create({
-      trigger: keyNumbersSection,
-      start: 'top 85%',
-      onEnter: () => animateCounters(),
-      once: true
     })
+
+    // 2. Trilogy Grid Staggered Card Entry
+    gsap.fromTo('#trilogy-grid > div',
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#trilogy-grid',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    )
+
+    // 3. Competition Cards (Tier 1 & Tier 2) Staggered Entry
+    gsap.fromTo('#kompetisi-grid-tier1 > div',
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#kompetisi-grid-tier1',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    )
+
+    gsap.fromTo('#kompetisi-grid-tier2 > div',
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#kompetisi-grid-tier2',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    )
+
+    // 5. Impact Dashboard Counters Trigger
+    const keyNumbersSection = document.querySelector('#impact-dashboard')
+    if (keyNumbersSection) {
+      ScrollTrigger.create({
+        trigger: keyNumbersSection,
+        start: 'top 85%',
+        onEnter: () => animateCounters(),
+        once: true
+      })
+    }
   }
 
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -1952,7 +1959,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
               <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TARGET PARTISIPAN</span>
               <div>
-                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedPartisipan }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg tabular-nums">{{ formattedPartisipan }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#FDE047] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[2px] translate-y-[1px] shadow-[2px_2px_0px_0px_#04000D]">8.000+ PARTICIPANTS</span>
                 </p>
@@ -1966,7 +1973,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
               <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">TITIK ROADSHOW INKLUSIF</span>
               <div>
-                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedRoadshow }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg tabular-nums">{{ formattedRoadshow }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#D86BFF] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[-2px] translate-y-[1px] shadow-[2px_2px_0px_0px_#04000D]">25 REGIONAL ROADSHOWS</span>
                 </p>
@@ -1980,7 +1987,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
               <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI TALENTA DIGITAL</span>
               <div>
-                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedTalent }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg tabular-nums">{{ formattedTalent }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#FDE047] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[1px] translate-y-[-1px] shadow-[2px_2px_0px_0px_#04000D]">500+ DIGITAL TALENTS</span>
                 </p>
@@ -1994,7 +2001,7 @@ onBeforeUnmount(() => {
             <div class="relative bg-[#F5F5F5] border border-dashed border-[#04000D] p-3 sm:p-4 z-10 flex flex-col justify-between min-h-[110px]">
               <span class="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-[#04000D]/60 font-bold">ESTIMASI MEDIA EXPOSURE</span>
               <div>
-                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg riso-bleed tabular-nums">{{ formattedExposure }}</h3>
+                <h3 class="text-2xl sm:text-4xl font-bold tracking-tighter text-[#04000D] leading-none mb-1 font-headline-lg tabular-nums">{{ formattedExposure }}</h3>
                 <p class="font-mono text-[9px] sm:text-[10px] tracking-widest text-[#04000D] font-bold uppercase leading-none mt-2 select-none">
                   <span class="bg-[#D86BFF] text-[#04000D] px-2 py-0.5 rounded-none inline-block transform translate-x-[-1px] translate-y-[2px] shadow-[2px_2px_0px_0px_#04000D]">800K+ MEDIA EXPOSURE</span>
                 </p>
@@ -2720,7 +2727,7 @@ onBeforeUnmount(() => {
               </div>
               <!-- Right Side Column (The Dossier Block) -->
               <div class="bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
-                <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">NAKITA SEMESTA</h3>
+                <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D]">NAKITA SEMESTA</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
                 <a href="https://www.instagram.com/semestaaaa.__/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
@@ -2754,7 +2761,7 @@ onBeforeUnmount(() => {
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
             <div class="order-2 md:order-1 bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
-              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">DAREEAN A. RAFFI</h3>
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D]">DAREEAN A. RAFFI</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
                 <a href="https://www.instagram.com/darenrafi/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
@@ -2788,7 +2795,7 @@ onBeforeUnmount(() => {
             </div>
             <!-- Right Side Column (The Dossier Block) -->
             <div class="bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-l-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
-              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">GABRIEL KRISTOFAN</h3>
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D]">GABRIEL KRISTOFAN</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
                 <a href="https://www.instagram.com/gabrielkristofansupari/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#D86BFF] transition-colors underline decoration-dashed pointer-events-auto">
@@ -2822,7 +2829,7 @@ onBeforeUnmount(() => {
             </div>
             <!-- Right Side Column (The Dossier Block) - Positioned on the Left on Desktop -->
             <div class="order-2 md:order-1 bg-[#F5F5F5] p-5 md:p-6 flex flex-col justify-center md:border-r-3 border-[#04000D] transition-colors duration-150 group-hover:bg-white">
-              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D] riso-bleed">REYQAL SYAWALANO</h3>
+              <h3 class="font-black text-3xl md:text-5xl lg:text-6xl tracking-[-0.04em] uppercase leading-none text-[#04000D]">REYQAL SYAWALANO</h3>
               <div class="mt-2 font-mono text-xs text-[#04000D]/60 flex flex-wrap items-center gap-1 select-none">
                 <span>Instagram:</span>
                 <a href="https://www.instagram.com/reyqalsew/" target="_blank" rel="noopener noreferrer" @click.stop class="font-bold text-[#04000D] hover:text-[#8839FF] transition-colors underline decoration-dashed pointer-events-auto">
@@ -2840,7 +2847,7 @@ onBeforeUnmount(() => {
         <!-- Division Command Board (Grid selection cards + panel below) -->
         <div class="mt-16 select-none animate-fade-in" data-reveal>
           <div class="mb-6 flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 border-b-3 border-[#04000D] pb-3">
-            <h3 class="font-black text-2xl md:text-4xl tracking-[-0.04em] uppercase text-[#04000D] riso-bleed">✦ DIVISI OPERASIONAL</h3>
+            <h3 class="font-black text-2xl md:text-4xl tracking-[-0.04em] uppercase text-[#04000D]">✦ DIVISI OPERASIONAL</h3>
             <span class="font-mono text-xs text-[#04000D]/60 uppercase tracking-wider font-bold">SELECT A DIVISION TO VIEW INDIVIDUAL ROSTER</span>
           </div>
 
